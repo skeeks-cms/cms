@@ -11,12 +11,13 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\components\Cms;
-use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\models\forms\PasswordChangeFormV2;
 use skeeks\sx\helpers\ResponseHelper;
 use skeeks\yii2\form\Field;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class UpaPersonalController
@@ -137,9 +138,10 @@ class UpaPersonalController extends BackendController
 
         return $actions;
     }
-    
-    
-    public function actionView() {
+
+
+    public function actionView()
+    {
         $user = \Yii::$app->user->identity;
         return $this->render($this->action->id, [
             'model' => $user,
@@ -156,8 +158,7 @@ class UpaPersonalController extends BackendController
         }*/
 
         if ($rr->isRequestAjaxPost) {
-            if ($user->load(\Yii::$app->request->post()) && $user->save())
-            {
+            if ($user->load(\Yii::$app->request->post()) && $user->save()) {
                 $rr->message = '✓ Сохранено';
                 $rr->success = true;
             } else {
@@ -165,7 +166,7 @@ class UpaPersonalController extends BackendController
                 $rr->data = [
                     'validation' => ArrayHelper::merge(
                         ActiveForm::validate($user),
-                    )
+                    ),
                 ];
             }
 
@@ -177,31 +178,21 @@ class UpaPersonalController extends BackendController
         ]);
     }
 
-    
+
     public function actionPassword()
     {
         $rr = new ResponseHelper();
         $model = \Yii::$app->user->identity;
-        $formModel = new PasswordChangeForm();
+        $formModel = new PasswordChangeFormV2();
         $formModel->user = $model;
         /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
             return $rr->ajaxValidateForm($formModel);
         }*/
 
-        if ($rr->isRequestPjaxPost)
-        {
-            if ($formModel->load(\Yii::$app->request->post()) && $formModel->changePassword())
-            {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {}
-            }
-        } elseif ($rr->isRequestAjaxPost) {
+        if ($rr->isRequestAjaxPost) {
             try {
-                if ($formModel->load(\Yii::$app->request->post()) && $formModel->changePassword())
-                {
+                if ($formModel->load(\Yii::$app->request->post()) && $formModel->changePassword()) {
                     $rr->message = '✓ Пароль изменен';
                     $rr->success = true;
                 } else {
@@ -209,11 +200,11 @@ class UpaPersonalController extends BackendController
                     $rr->data = [
                         'validation' => ArrayHelper::merge(
                             ActiveForm::validate($formModel), []
-                        )
+                        ),
                     ];
                 }
             } catch (\Exception $exception) {
-                $rr->message = 'Пароль не изменен!';
+                $rr->message = 'Пароль не изменен!' . $exception->getMessage();
                 $rr->success = false;
             }
 
@@ -223,7 +214,6 @@ class UpaPersonalController extends BackendController
 
         return $this->render($this->action->id, ['model' => $formModel]);
     }
-
 
 
     public function updateFields()

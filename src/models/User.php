@@ -19,6 +19,7 @@ use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasTableCache;
+use skeeks\cms\models\behaviors\HasUserLog;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\queries\CmsUserQuery;
 use skeeks\cms\models\user\UserEmail;
@@ -264,6 +265,13 @@ class User
 
             TimestampBehavior::class,
 
+            /*HasUserLog::class => [
+                'class'  => HasUserLog::class,
+                'no_log_attributes' => [
+                    'created_at', 'updated_at', 'updated_by', 'last_admin_activity_at', 'last_activity_at', 'created_by'
+                ]
+            ],*/
+
             HasStorageFile::class => [
                 'class'  => HasStorageFile::class,
                 'fields' => ['image_id'],
@@ -445,7 +453,8 @@ class User
                 ['password_hash'],
                 'default',
                 'value' => function (self $model) {
-                    return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
+                    return '';
+                    //return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
                 },
             ],
 

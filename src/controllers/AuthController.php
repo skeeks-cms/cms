@@ -128,6 +128,8 @@ class AuthController extends Controller
         if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
+        
+        \Yii::$app->view->title = "Авторизация";
 
         $rr = new RequestResponse();
 
@@ -435,6 +437,25 @@ class AuthController extends Controller
                         'type'  => "password",
                     ];
 
+                    if ($user->password_hash) {
+                        $rr->data = [
+                            'user'  => true,
+                            'phone' => $model->phone,
+                            'type'  => "password",
+                        ];
+                    } else {
+                        //Генерация, отправка и сохранение sms кода
+                        $this->_generateAndSaveSmsCode($model->phone);
+
+                        //Авторазиция по временному коду
+                        $rr->data = [
+                            'user'        => true,
+                            'phone'       => $model->phone,
+                            'type'        => "tmp-phone-code",
+                            'left-repeat' => $this->getSessionAuthPhoneLeftRepeat(),
+                        ];
+                    }
+                    
 
                 } else {
                     //Если пользователь не существует нужно создать
@@ -919,15 +940,33 @@ class AuthController extends Controller
                 $rr->success = true;
                 $rr->message = '';
 
+                /**
+                 * @var $user CmsUser
+                 */
                 if ($user = CmsUser::find()->cmsSite()->email($model->email)->one()) {
                     //Если пользователь существует
                     //Нужно предложить ему авторизоваться с его паролем
 
-                    $rr->data = [
-                        'user'  => true,
-                        'email' => $model->email,
-                        'type'  => "password",
-                    ];
+                    if ($user->password_hash) {
+                        $rr->data = [
+                            'user'  => true,
+                            'email' => $model->email,
+                            'type'  => "password",
+                        ];
+                    } else {
+                        //Генерация, отправка и сохранение sms кода
+                        $this->_generateAndSaveEmailCode($model->email);
+                        
+                        //Авторазиция по временному коду
+                        $rr->data = [
+                            'user'        => true,
+                            'email'       => $model->email,
+                            'type'        => "tmp-email-code",
+                            'left-repeat' => $this->getSessionAuthEmailLeftRepeat(),
+                        ];
+                    }
+                    
+                    
 
 
                 } else {

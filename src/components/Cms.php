@@ -44,6 +44,7 @@ use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeDate;
 use skeeks\cms\relatedProperties\userPropertyTypes\UserPropertyTypeSelectFile;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
@@ -51,6 +52,7 @@ use yii\base\Event;
 use yii\base\InvalidParamException;
 use yii\console\Application;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\UserEvent;
 use yii\web\View;
 
@@ -71,11 +73,14 @@ use yii\web\View;
  *
  * @property CmsSmsProvider                   $smsProvider
  * @property CmsCallcheckProvider             $callcheckProvider
+ * @property string                           $afterAuthUrl
  *
  * @package skeeks\cms\components
  */
 class Cms extends \skeeks\cms\base\Component
 {
+
+    public $after_auth_url = ['/cms/upa-personal/view'];
 
     /**
      * Разршение на доступ к персональной части
@@ -133,6 +138,16 @@ class Cms extends \skeeks\cms\base\Component
      * @var int Reset password token one hour later
      */
     public $passwordResetTokenExpire = 3600;
+
+    /**
+     * @var int
+     */
+    public $pass_required_length = 8;
+    public $pass_required_need_number = 1;
+    public $pass_required_need_uppercase = 0;
+    public $pass_required_need_lowercase = 1;
+    public $pass_required_need_specialChars = 0;
+
     /**
      * @var int
      */
@@ -148,6 +163,9 @@ class Cms extends \skeeks\cms\base\Component
      */
     public $userOnlineTime = 60; //1 минута
 
+    public $modelsMap = [
+
+    ];
 
     static public function descriptorConfig()
     {
@@ -157,6 +175,13 @@ class Cms extends \skeeks\cms\base\Component
         ]);
     }
 
+    /**
+     * @return string
+     */
+    public function getAfterAuthUrl()
+    {
+        return Url::to($this->after_auth_url);
+    }
     /**
      * Схема временных папок
      * Чистятся в момент нажатия на кнопку чистки временных файлов
@@ -330,6 +355,13 @@ class Cms extends \skeeks\cms\base\Component
             [['auth_only_email_is_approved'], 'integer'],
             [['email_approved_key_length'], 'integer'],
             [['approved_key_is_letter'], 'integer'],
+
+
+            [['pass_required_length'], 'integer'],
+            [['pass_required_need_number'], 'integer'],
+            [['pass_required_need_uppercase'], 'integer'],
+            [['pass_required_need_lowercase'], 'integer'],
+            [['pass_required_need_specialChars'], 'integer'],
         ]);
     }
     public function attributeLabels()
@@ -342,6 +374,12 @@ class Cms extends \skeeks\cms\base\Component
             'auth_only_email_is_approved' => 'Разрешить авторизацию на сайте только с подтвержденными email?',
             'email_approved_key_length'   => 'Длина проверочного кода',
             'approved_key_is_letter'      => 'Проверочный код содержит буквы?',
+
+            'pass_required_length'      => 'Минимальная длина пароля',
+            'pass_required_need_number'      => 'Пароль должен содержать хотя бы одну цифру',
+            'pass_required_need_uppercase'      => 'Пароль должен содержать хотя бы одну заглавную букву',
+            'pass_required_need_lowercase'      => 'Пароль должен содержать хотя бы одну строчную букву',
+            'pass_required_need_specialChars'      => 'Пароль должен содержать хотя бы один спецсимвол',
         ]);
     }
     public function attributeHints()
@@ -395,7 +433,7 @@ class Cms extends \skeeks\cms\base\Component
                         'multiple' => true,
                         'items'    => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'description'),
                     ],
-                    'auth_only_email_is_approved' => [
+                    /*'auth_only_email_is_approved' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
@@ -403,7 +441,30 @@ class Cms extends \skeeks\cms\base\Component
                     'approved_key_is_letter'      => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
+                    ],*/
+
+
+                    'pass_required_length'      => [
+                        'class'     => NumberField::class,
                     ],
+                    
+                    'pass_required_need_number'      => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'pass_required_need_uppercase'      => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'pass_required_need_lowercase'      => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'pass_required_need_specialChars'      => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    
                 ],
             ],
 
