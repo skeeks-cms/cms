@@ -10,7 +10,7 @@
 ?>
 <h1>Смена пароля</h1>
 <div class="row">
-<div class="col-12 col-lg-6">
+<div class="col-12" style="max-width: 50rem;">
 <?php $form = \skeeks\cms\backend\widgets\ActiveFormAjaxBackend::begin(); ?>
     <?= $form->field($model, 'new_password')->passwordInput() ?>
     <?= $form->field($model, 'new_password_confirm')->passwordInput() ?>

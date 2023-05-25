@@ -26,7 +26,7 @@ CSS
 ?>
 <h1><?php echo $model->displayName; ?></h1>
 
-<div class="sx-project-content">
+<div class="sx-content">
     <div class="row">
         <div class="col-md-3">
             <div class="sx-photo">

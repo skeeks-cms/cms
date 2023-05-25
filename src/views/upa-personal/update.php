@@ -11,32 +11,32 @@
 <h1>Личные данные</h1>
 
 <div class="row">
-<div class="col-12 col-lg-6">
+    <div class="col-12" style="max-width: 50rem;">
 
-<?php $form = \skeeks\cms\backend\widgets\ActiveFormAjaxBackend::begin(); ?>
+        <?php $form = \skeeks\cms\backend\widgets\ActiveFormAjaxBackend::begin(); ?>
 
-<?
-\skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
-$id = \yii\helpers\Html::getInputId($model, 'phone');
-$this->registerJs(<<<JS
+        <?
+        \skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
+        $id = \yii\helpers\Html::getInputId($model, 'phone');
+        $this->registerJs(<<<JS
 $("#{$id}").mask("+7 999 999-99-99");
 JS
-);
-?>
+        );
+        ?>
 
-    <?php echo $form->field($model, "image_id")->widget(\skeeks\cms\widgets\AjaxFileUploadWidget::class, [
-        //'view_file'   => '@skeeks/yii2/ajaxfileupload/widgets/views/default',
-        'accept'    => 'image/*',
-        'multiple'  => false,
-    ]); ?>
+        <?php echo $form->field($model, "image_id")->widget(\skeeks\cms\widgets\AjaxFileUploadWidget::class, [
+            //'view_file'   => '@skeeks/yii2/ajaxfileupload/widgets/views/default',
+            'accept'   => 'image/*',
+            'multiple' => false,
+        ]); ?>
 
-    <?= $form->field($model, 'first_name') ?>
-    <?= $form->field($model, 'last_name') ?>
-    <?= $form->field($model, 'patronymic') ?>
-    <?= $form->field($model, 'email') ?>
-    <?= $form->field($model, 'phone') ?>
-    <?= $form->buttonsStandart($model) ?>
-    <?= $form->errorSummary([$model]) ?>
-<?php $form::end(); ?>
-</div>
+        <?= $form->field($model, 'first_name') ?>
+        <?= $form->field($model, 'last_name') ?>
+        <?= $form->field($model, 'patronymic') ?>
+        <?= $form->field($model, 'email') ?>
+        <?= $form->field($model, 'phone') ?>
+        <?= $form->buttonsStandart($model) ?>
+        <?= $form->errorSummary([$model]) ?>
+        <?php $form::end(); ?>
+    </div>
 </div>
