@@ -147,6 +147,7 @@ class Cms extends \skeeks\cms\base\Component
     public $pass_required_need_uppercase = 0;
     public $pass_required_need_lowercase = 1;
     public $pass_required_need_specialChars = 0;
+    public $pass_is_need_change = 1;
 
     /**
      * @var int
@@ -357,6 +358,7 @@ class Cms extends \skeeks\cms\base\Component
             [['approved_key_is_letter'], 'integer'],
 
 
+            [['pass_is_need_change'], 'integer'],
             [['pass_required_length'], 'integer'],
             [['pass_required_need_number'], 'integer'],
             [['pass_required_need_uppercase'], 'integer'],
@@ -375,6 +377,7 @@ class Cms extends \skeeks\cms\base\Component
             'email_approved_key_length'   => 'Длина проверочного кода',
             'approved_key_is_letter'      => 'Проверочный код содержит буквы?',
 
+            'pass_is_need_change'      => 'Необходимо устанавливать постоянный пароль?',
             'pass_required_length'      => 'Минимальная длина пароля',
             'pass_required_need_number'      => 'Пароль должен содержать хотя бы одну цифру',
             'pass_required_need_uppercase'      => 'Пароль должен содержать хотя бы одну заглавную букву',
@@ -389,6 +392,7 @@ class Cms extends \skeeks\cms\base\Component
             'noImageUrl'                  => 'Это изображение показывается в тех случаях, когда не найдено основное.',
             'registerRoles'               => 'Так же после созданию пользователя, ему будут назначены, выбранные группы.',
             'auth_only_email_is_approved' => 'Если эта опция включена то пользователь, который не подтвердил свой email не сможет авторизоваться на сайте.',
+            'pass_is_need_change' => 'Если авторизация произошла через код подтверждения (телефон,email), то после авторизации будет предолжено установить постоянный пароль.',
         ]);
     }
     /**
@@ -444,10 +448,16 @@ class Cms extends \skeeks\cms\base\Component
                     ],*/
 
 
+                    'pass_is_need_change'      => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
                     'pass_required_length'      => [
                         'class'     => NumberField::class,
                     ],
                     
+
                     'pass_required_need_number'      => [
                         'class'     => BoolField::class,
                         'allowNull' => false,

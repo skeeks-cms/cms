@@ -51,6 +51,7 @@ use yii\web\IdentityInterface;
  * @property string                      $patronymic
  * @property integer                     $is_company
  * @property string                      $company_name
+ * @property integer                      $birthday_at
  *
  * @property string                      $gender
  * @property string                      $alias
@@ -296,10 +297,11 @@ class User
     public function rules()
     {
         return [
+            ['birthday_at', 'default', 'value' => null],
             ['alias', 'default', 'value' => null],
             ['is_active', 'default', 'value' => 1],
-            ['gender', 'default', 'value' => 'men'],
-            ['gender', 'in', 'range' => ['men', 'women']],
+            /*['gender', 'default', 'value' => 'men'],
+            ['gender', 'in', 'range' => ['men', 'women']],*/
 
             [['company_name'], 'string'],
             [
@@ -310,6 +312,7 @@ class User
                 },
             ],
 
+            [['birthday_at'], 'integer'],
             [['is_company'], 'integer'],
             ['is_company', 'default', 'value' => 0],
 
@@ -452,10 +455,7 @@ class User
             [
                 ['password_hash'],
                 'default',
-                'value' => function (self $model) {
-                    return '';
-                    //return \Yii::$app->security->generatePasswordHash(\Yii::$app->security->generateRandomString());
-                },
+                'value' => null,
             ],
 
             [['roleNames'], 'safe'],
@@ -502,6 +502,7 @@ class User
             'last_name'              => \Yii::t('skeeks/cms', 'Last name'),
             'patronymic'             => \Yii::t('skeeks/cms', 'Patronymic'),
             'gender'                 => Yii::t('skeeks/cms', 'Gender'),
+            'birthday_at'                 => Yii::t('skeeks/cms', 'Дата рождения'),
             'logged_at'              => Yii::t('skeeks/cms', 'Logged At'),
             'last_activity_at'       => Yii::t('skeeks/cms', 'Last Activity At'),
             'last_admin_activity_at' => Yii::t('skeeks/cms', 'Last Activity In The Admin At'),

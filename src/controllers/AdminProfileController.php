@@ -12,25 +12,31 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\models\forms\PasswordChangeFormV2;
 use skeeks\cms\models\User;
 use skeeks\cms\models\UserGroup;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\sx\helpers\ResponseHelper;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Class AdminProfileController
  * @package skeeks\cms\controllers
  */
-class AdminProfileController extends BackendModelController
+class AdminProfileController extends BackendController
 {
+    public $defaultAction = "update";
     /**
      * @return string
      */
@@ -42,179 +48,101 @@ class AdminProfileController extends BackendModelController
     public function init()
     {
         $this->name = "Личный кабинет";
-        $this->modelShowAttribute = "username";
-        $this->modelClassName = User::className();
         parent::init();
     }
 
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-            'update' => [
-                'class'          => BackendModelUpdateAction::class,
-                "callback"       => [$this, 'update'],
-                "isVisible"      => false,
-                "accessCallback" => false,
+            "update" => [
+                'class'     => BackendAction::class,
+                'name'      => ['skeeks/cms', 'Personal data'],
+                "callback"  => [$this, 'actionUpdate'],
+                "isVisible" => false,
+            ],
+
+            'password' =>
+            [
+                'class'           => BackendAction::class,
+                'name'            => 'Смена пароля',
+                "icon"            => "glyphicon glyphicon-warning-sign",
+                "permissionNames" => [],
+                "callback"        => [$this, 'actionPassword'],
+                "priority"        => 10,
+                "isVisible"       => false,
             ],
         ]);
 
 
-        ArrayHelper::remove($actions, 'delete');
-        ArrayHelper::remove($actions, 'create');
-        ArrayHelper::remove($actions, 'index');
-
         return $actions;
     }
 
-
-    public function update($adminAction)
+    public function actionPassword()
     {
-        /**
-         * @var $model CmsUser
-         */
-        $model = $this->model;
-        $relatedModel = $model->relatedPropertiesModel;
-        $passwordChange = new PasswordChangeForm([
-            'user' => $model,
-        ]);
-        $passwordChange->scenario = PasswordChangeForm::SCENARION_NOT_REQUIRED;
+        $rr = new ResponseHelper();
+        $model = \Yii::$app->user->identity;
+        $formModel = new PasswordChangeFormV2();
+        $formModel->user = $model;
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            return $rr->ajaxValidateForm($formModel);
+        }*/
 
-        $rr = new RequestResponse();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $passwordChange->load(\Yii::$app->request->post());
-
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-                $passwordChange,
-            ]);
-        }
-
-        if ($rr->isRequestPjaxPost()) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $passwordChange->load(\Yii::$app->request->post());
-
+        if ($rr->isRequestAjaxPost) {
             try {
-
-
-                if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-
-
-                    if ($relatedModel->load(\Yii::$app->request->post())) {
-                        if (!$relatedModel->save()) {
-                            throw new Exception("Не удалось сохранить дополнительные свойства: ".print_r($relatedModel->errors, true));
-                        }
-                    }
-
-                    if ($passwordChange->load(\Yii::$app->request->post()) && $passwordChange->new_password) {
-                        if (!$passwordChange->changePassword()) {
-                            throw new Exception("Пароль не изменен");
-                        }
-
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Пароль успешно обновлен'));
-                    }
-
-
-                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
-
-                    } else {
-                        return $this->redirect(
-                            $this->url
-                        );
-                    }
-
-                    $model->refresh();
-
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Данные обновлены'));
-
+                if ($formModel->load(\Yii::$app->request->post()) && $formModel->changePassword()) {
+                    $rr->message = '✓ Пароль изменен';
+                    $rr->success = true;
                 } else {
-                    throw new Exception("Не удалось сохранить дополнительные свойства: ".print_r($model->errors, true));
+                    $rr->success = false;
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($formModel), []
+                        ),
+                    ];
                 }
-
-            } catch (\Exception $e) {
-                \Yii::$app->getSession()->setFlash('error', $e->getMessage());
-            }
-        }
-
-        return $this->render('_form', [
-            'model'          => $model,
-            'relatedModel'   => $relatedModel,
-            'passwordChange' => $passwordChange,
-        ]);
-    }
-
-
-    public function beforeAction($action)
-    {
-        $this->model = \Yii::$app->user->identity;
-        return parent::beforeAction($action);
-    }
-
-    /**
-     * @return mixed|\yii\web\Response
-     */
-    public function actionIndex()
-    {
-        return $this->redirect(UrlHelper::construct("cms/admin-profile/update")->enableAdmin()->toString());
-    }
-
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    /*public function actionFileManager()
-    {
-        $model = $this->model;
-
-
-        return $this->render('@skeeks/cms/views/admin-user/file-manager', [
-            'model' => $model
-        ]);
-
-    }*/
-
-
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionChangePassword()
-    {
-        $model = $this->model;
-
-        $modelForm = new PasswordChangeForm([
-            'user' => $model,
-        ]);
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $modelForm->load(\Yii::$app->request->post());
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-            return \skeeks\cms\modules\admin\widgets\ActiveForm::validate($modelForm);
-        }
-
-
-        if ($modelForm->load(\Yii::$app->request->post()) && $modelForm->changePassword()) {
-            \Yii::$app->getSession()->setFlash('success', 'Успешно сохранено');
-            return $this->redirect(['change-password', 'id' => $model->id]);
-        } else {
-            if (\Yii::$app->request->isPost) {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось изменить пароль');
+            } catch (\Exception $exception) {
+                $rr->message = 'Пароль не изменен!' . $exception->getMessage();
+                $rr->success = false;
             }
 
-            return $this->render('@skeeks/cms/views/admin-user/change-password.php', [
-                'model' => $modelForm,
-            ]);
 
-            /*return $this->render('_form-change-password', [
-                'model' => $modelForm,
-            ]);*/
+            return $rr;
         }
+
+        return $this->render($this->action->id, ['model' => $formModel]);
+    }
+
+
+    public function actionUpdate()
+    {
+        $rr = new ResponseHelper();
+        $user = \Yii::$app->user->identity;
+
+        /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            return $rr->ajaxValidateForm($user);
+        }*/
+
+        if ($rr->isRequestAjaxPost) {
+            if ($user->load(\Yii::$app->request->post()) && $user->save()) {
+                $rr->message = '✓ Сохранено';
+                $rr->success = true;
+            } else {
+                $rr->success = false;
+                $rr->data = [
+                    'validation' => ArrayHelper::merge(
+                        ActiveForm::validate($user),
+                    ),
+                ];
+            }
+
+            return $rr;
+        }
+
+        return $this->render($this->action->id, [
+            'model' => $user,
+        ]);
     }
 
 

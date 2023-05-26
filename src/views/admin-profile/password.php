@@ -91,22 +91,22 @@ JS
 );
 
 ?>
-<h1><?php echo \Yii::$app->user->identity->password_hash ? "Смена пароля" : "Установка пароля"; ?></h1>
+<h1>Смена пароля</h1>
 <div class="row">
     <div class="col-12" style="max-width: 50rem;">
 
-        <?php if (!\Yii::$app->user->identity->password_hash && \Yii::$app->cms->pass_is_need_change) : ?>
-            <?php $alert = \yii\bootstrap\Alert::begin([
-                'closeButton' => false,
-                'id' => "no-pass",
-                'options'     => [
-                    'class' => 'alert-danger',
-                ],
-            ]); ?>
-            <b>Внимание!</b> <br/> Для продолжения работы, придумайте свой постоянный пароль, с которым вы будете входить в систему в дальнейшем.
+    <?php if (!\Yii::$app->user->identity->password_hash && \Yii::$app->cms->pass_is_need_change) : ?>
+    <?php $alert = \yii\bootstrap\Alert::begin([
+        'closeButton' => false,
+        'id' => "no-pass",
+        'options' => [
+            'class' => 'alert-danger',
+        ],
+    ]); ?>
+    <b>Внимание!</b> <br/> Для продолжения работы, придумайте свой постоянный пароль, с которым вы будете входить в систему в дальнейшем.
 
-            <?php $alert::end(); ?>
-        <?php endif; ?>
+    <?php $alert::end(); ?>
+    <?php endif; ?>
 
         <?php $form = \skeeks\cms\backend\widgets\ActiveFormAjaxBackend::begin([
                 'clientSuccess' => new \yii\web\JsExpression(<<<JS
@@ -119,11 +119,6 @@ JS
 )
         ]); ?>
 
-        <?php /*if (!\Yii::$app->user->identity->password_hash && \Yii::$app->cms->pass_is_need_change) : */ ?><!--
-            <div class="form-group">
-                <b>Внимание!</b> <br/>Придумайте свой постоянный пароль, с которым вы будете входить в систему в дальнейшем.
-            </div>
-        --><?php /*endif; */ ?>
 
         <div style="position:relative;">
             <i class="far fa-eye sx-view-pass"></i>

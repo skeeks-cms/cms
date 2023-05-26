@@ -12,8 +12,41 @@
 
 <div class="row">
     <div class="col-12" style="max-width: 50rem;">
+<?php if (!$model->email || !$model->first_name || !$model->last_name
+    //|| !$model->image
+) : ?>
+    <?php $alert = \yii\bootstrap\Alert::begin([
+        'closeButton' => false,
+        'id' => "no-info",
+        'options' => [
+            'class' => 'alert-danger',
+        ],
+    ]); ?>
+    <p><b>Внимание!</b></p>
+    <p>Для продолжения работы с системой управления сайта требуется указать ваши данные:</p>
+    <ul>
+        <li>Реальный email</li>
+        <li>Фамилия</li>
+        <li>Имя</li>
+        <!--<li>Фото</li>-->
+    </ul>
 
-        <?php $form = \skeeks\cms\backend\widgets\ActiveFormAjaxBackend::begin(); ?>
+    <?php $alert::end(); ?>
+<?php endif; ?>
+
+        <?php $form = \skeeks\cms\backend\widgets\ActiveFormAjaxBackend::begin([
+                'clientSuccess' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+        if ($("#no-info").length) {
+            $("#no-info").fadeOut();
+        }
+    }
+JS
+)
+        ]); ?>
+
+
+
 
         <?
         \skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
@@ -42,6 +75,7 @@ JS
                 ]
             ]
         ); ?>
+
         <?= $form->field($model, 'first_name') ?>
         <?= $form->field($model, 'last_name') ?>
         <?= $form->field($model, 'patronymic') ?>
@@ -53,7 +87,6 @@ JS
                 'type' => \skeeks\cms\backend\widgets\forms\DateControlInputWidget::FORMAT_DATE
             ]
         ); ?>
-
         <?= $form->buttonsStandart($model) ?>
         <?= $form->errorSummary([$model]) ?>
         <?php $form::end(); ?>

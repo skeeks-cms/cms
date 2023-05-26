@@ -58,7 +58,12 @@ CSS
                         <div class="sx-label">Телефон</div>
                         <div class="sx-value"><?php echo $model->phone; ?></div>
                     </div>
-
+                    <?php if($model->birthday_at) : ?>
+                        <div class="sx-info">
+                            <div class="sx-label">Дата рождения</div>
+                            <div class="sx-value"><?php echo \Yii::$app->formatter->asDate($model->birthday_at); ?></div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
