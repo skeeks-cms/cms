@@ -525,15 +525,32 @@ class AuthController extends Controller
                 $rr->success = true;
                 $rr->message = '';
 
+                /**
+                 * @var $user CmsUser
+                 */
                 if ($user = CmsUser::find()->cmsSite()->phone($model->phone)->one()) {
                     //Если пользователь существует
                     //Нужно предложить ему авторизоваться с его паролем
 
-                    $rr->data = [
-                        'user'  => true,
-                        'phone' => $model->phone,
-                        'type'  => "password",
-                    ];
+                    if ($user->password_hash) {
+                        $rr->data = [
+                            'user'  => true,
+                            'phone' => $model->phone,
+                            'type'  => "password",
+                        ];
+                    } else {
+                        //Генерация, отправка и сохранение sms кода
+                        $this->_generateAndSaveCallcheckCode($model->phone);
+
+                        //Авторазиция по временному коду
+                        $rr->data = [
+                            'user'        => true,
+                            'phone'       => $model->phone,
+                            'type'        => "tmp-phone-code",
+                            'left-repeat' => $this->getSessionCallcheckAuthPhoneLeftRepeat(),
+                        ];
+                    }
+
 
 
                 } else {
