@@ -9,6 +9,14 @@
  * @var $this yii\web\View
  * @var $cmsTheme \skeeks\cms\models\CmsTheme
  */
+
+if ($copyId = \Yii::$app->request->get("copy")) {
+    $cmsThemeCopy = \skeeks\cms\models\CmsTheme::findOne($copyId);
+    if ($cmsThemeCopy) {
+        $configModelCopy = $cmsThemeCopy->objectTheme->configFormModel;
+        $configModel->setAttributes($configModelCopy->toArray());
+    }
+}
 $this->registerCss(<<<CSS
 .sx-row .sx-label {
     color: gray;
@@ -28,6 +36,7 @@ $this->registerCss(<<<CSS
     color: #656464;
 }
 
+
 CSS
 );
 ?>
@@ -46,6 +55,32 @@ CSS
     <?php else : ?>
         <div class="alert-default alert">
             В данный момент эта тема не используется на вашем сайте
+        </div>
+    <?php endif; ?>
+    
+    <?php $cmsThemes = \skeeks\cms\models\CmsTheme::find()->cmsSite()->andWhere(['!=', 'id', $cmsTheme->id])->sort()->all(); ?>
+    <?php if($cmsThemes) : ?>
+    <?
+    $this->registerJs(<<<JS
+$("select", $("#sx-copy-form")).on("change", function() {
+    $("#sx-copy-form").submit();
+    return false;
+});
+JS
+    );    
+    ?>
+        <div class="alert-default alert sx-green">
+            <?php $form = \yii\widgets\ActiveForm::begin([
+                'id' => 'sx-copy-form',
+                'method' => 'get'
+            ]); ?>
+            <p>Загрузить настройки из другой темы</p>
+            <?php echo \skeeks\cms\widgets\Select::widget([
+                'name' => 'copy',
+                'value' => \Yii::$app->request->get("copy"),
+                'data' => \yii\helpers\ArrayHelper::map($cmsThemes, "id", "themeName")
+            ]); ?>
+            <?php $form::end(); ?>
         </div>
     <?php endif; ?>
 
