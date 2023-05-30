@@ -33,7 +33,6 @@ class ActiveFormAjaxSubmit extends ActiveForm
 {
     use ActiveFormAjaxSubmitTrait;
 
-    public $enableAjaxValidation = true;
-    public $validateOnChange = false;
-    public $validateOnBlur = false;
+    public $validateOnChange = true;
+    public $validateOnBlur = true;
 }
