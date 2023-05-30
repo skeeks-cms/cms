@@ -45,6 +45,9 @@
 
             this.AjaxQuery = sx.ajax.preparePostQuery(this.jForm.attr('action'));
 
+            this.jForm.yiiActiveForm().data().yiiActiveForm.validated = true;
+            /*console.log(this.jForm.yiiActiveForm().data().yiiActiveForm.validated = true);*/
+
             this.AjaxQuery.set('beforeSend', function (e) {
                 self.InProgress = true;
 
@@ -82,6 +85,7 @@
 
                 if (data.data && data.data.validation) {
                     self.jForm.yiiActiveForm('updateMessages', data.data.validation, true);
+                    self.jForm.yiiActiveForm().data().yiiActiveForm.validated = true;
                 }
 
                 self.trigger('error', {
@@ -128,8 +132,12 @@
                 });
             });*/
 
+            this.jForm.on('beforeValidate', function (event, messages, errorAttributes) {
+               /*alert('beforeValidate');*/
+            });
             this.jForm.on('afterValidate', function (event, messages, errorAttributes) {
 
+                /*alert('afterValidate');*/
                 if (self.beforeSubmitProcess === false) {
                     console.log('Это просто валидация, форму еще не отправляли');
                     return false;
@@ -141,7 +149,6 @@
                 }
 
                 //console.log('afterValidate');
-
                 self.trigger('afterValidate', {
                     'activeFormAjaxSubmit': self,
                     'messages': messages,
@@ -167,6 +174,8 @@
 
 
             this.jForm.on('submit', function (event, data) {
+                self.AjaxQuery.setData($(this).serialize()).execute();
+                /*alert('submit');*/
                 //console.log('submit');
                 
                 /*if (data['pjax'] == 'reload') {
@@ -189,6 +198,7 @@
 
 
             this.jForm.on('beforeSubmit', function (event, attribute, message) {
+                /*alert('beforeSubmit');*/
                 return false;
             });
 

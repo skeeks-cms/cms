@@ -45,12 +45,23 @@ trait ActiveFormAjaxSubmitTrait
      */
     public $afterValidateCallback = "";
 
+    /**
+     * @var bool
+     */
+    public $enableClientValidation = true;
+
+    /**
+     * @var bool
+     */
+    public $enableAjaxValidation = false;
+
     public function registerJs()
     {
         ActiveFormAjaxSubmitAsset::register($this->view);
 
         $this->view->registerJs(<<<JS
 sx.ActiveForm = new sx.classes.activeForm.AjaxSubmit('{$this->id}');
+/*sx.ActiveForm.jForm.off('mouseup.yiiActiveForm keyup.yiiActiveForm');*/
 JS
     );
         $afterValidateCallback = $this->afterValidateCallback;
@@ -81,4 +92,7 @@ JS
         $this->registerJs();
         return parent::run();
     }
+
+
+
 }
