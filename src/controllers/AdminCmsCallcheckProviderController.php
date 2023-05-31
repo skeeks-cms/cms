@@ -194,7 +194,7 @@ CSS
         $result = [
             'main' => [
                 'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
+                'name'   => \Yii::t('skeeks/cms', 'Main'),
                 'fields' => [
 
                     'is_main' => [
