@@ -79,14 +79,16 @@
                 sx.EventManager.trigger("ajaxFormSuccessSubmited", {
                     'form': self
                 });
+
+                self.jForm.yiiActiveForm().data().yiiActiveForm.validated = true;
             });
 
             this.AjaxQueryHandler.on('error', function (e, data) {
 
                 if (data.data && data.data.validation) {
                     self.jForm.yiiActiveForm('updateMessages', data.data.validation, true);
-                    self.jForm.yiiActiveForm().data().yiiActiveForm.validated = true;
                 }
+                self.jForm.yiiActiveForm().data().yiiActiveForm.validated = true;
 
                 self.trigger('error', {
                     'message': data.message,
@@ -135,9 +137,9 @@
             this.jForm.on('beforeValidate', function (event, messages, errorAttributes) {
                /*alert('beforeValidate');*/
             });
-            this.jForm.on('afterValidate', function (event, messages, errorAttributes) {
+            this.jForm.on('afterValidateBackup', function (event, messages, errorAttributes) {
 
-                /*alert('afterValidate');*/
+                console.log("afterValidate");
                 if (self.beforeSubmitProcess === false) {
                     console.log('Это просто валидация, форму еще не отправляли');
                     return false;
@@ -174,6 +176,7 @@
 
 
             this.jForm.on('submit', function (event, data) {
+                console.log("submit");
                 self.AjaxQuery.setData($(this).serialize()).execute();
                 /*alert('submit');*/
                 //console.log('submit');

@@ -462,8 +462,11 @@ class AuthController extends Controller
                     $t = \Yii::$app->db->beginTransaction();
                     try {
 
-                        $class = \Yii::$app->user->identityClass;
-                        $user = new $class();
+                        /*$class = \Yii::$app->user->identityClass;
+                        $user = new $class();*/
+
+                        $user = new CmsUser();
+
                         $user->phone = $model->phone;
                         if (!$user->save()) {
                             throw new Exception("Ошибка регистрации: ".print_r($user->errors, true));
@@ -994,8 +997,9 @@ class AuthController extends Controller
                         /**
                          * @var $user CmsUser
                          */
-                        $class = \Yii::$app->user->identityClass;
-                        $user = new $class();
+                        /*$class = \Yii::$app->user->identityClass;
+                        $user = new $class();*/
+                        $user = new CmsUser();
                         $user->email = $model->email;
                         /*$user->email = "info@sitika.ru";
                         var_dump($user->validate());

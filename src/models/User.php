@@ -33,6 +33,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\AfterSaveEvent;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\web\Application;
 use yii\web\IdentityInterface;
 
 /**
@@ -140,18 +141,21 @@ class User
 
     public function _cmsCheckBeforeSave($e)
     {
+        if (\Yii::$app instanceof Application) {
+            if (!isset(\Yii::$app->user)) {
+                return true;
+            }
 
-        if (!isset(\Yii::$app->user)) {
-            return true;
+            if (!\Yii::$app->user && !\Yii::$app->user->identity) {
+                return true;
+            }
+
+            if (!$this->is_active && $this->id == \Yii::$app->user->identity->id) {
+                throw new Exception(\Yii::t('skeeks/cms', 'Нельзя деактивировать себя'));
+            }
+
         }
 
-        if (!\Yii::$app->user && !\Yii::$app->user->identity) {
-            return true;
-        }
-
-        if (!$this->is_active && $this->id == \Yii::$app->user->identity->id) {
-            throw new Exception(\Yii::t('skeeks/cms', 'Нельзя деактивировать себя'));
-        }
 
         if ($this->isAttributeChanged('image_id')) {
             if ($this->image) {
