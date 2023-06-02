@@ -80,7 +80,7 @@ use yii\web\View;
 class Cms extends \skeeks\cms\base\Component
 {
 
-    public $after_auth_url = ['/cms/upa-personal/view'];
+    public $after_auth_url = ['/cms/upa-personal/view', 'is_default' => 1];
 
     /**
      * Разршение на доступ к персональной части
