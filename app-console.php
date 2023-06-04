@@ -15,19 +15,28 @@ require_once(__DIR__ . '/bootstrap.php');
 \Yii::beginProfile('Load config app');
 
 if (YII_ENV == 'dev') {
-    \Yii::beginProfile('Rebuild config');
-    \Yiisoft\Composer\Config\Builder::rebuild();
-    \Yii::endProfile('Rebuild config');
+    error_reporting(E_ALL);
+    ini_set('display_errors', 'On');
 }
 
-$configFile = \Yiisoft\Composer\Config\Builder::path('console-' . ENV);
-if (!file_exists($configFile)) {
-    $configFile = \Yiisoft\Composer\Config\Builder::path('console');
+
+$config = new \Yiisoft\Config\Config(
+    new \Yiisoft\Config\ConfigPaths(ROOT_DIR, "config"),
+    null,
+    [
+        \Yiisoft\Config\Modifier\RecursiveMerge::groups('console', 'console-' . ENV, 'params', "params-console-" . ENV),
+    ],
+    "params-console-" . ENV
+);
+
+if ($config->has('console-' . ENV)) {
+    $configData = $config->get('console-' . ENV);
+} else {
+    $configData = $config->get('console');
 }
 
-$config = (array)require $configFile;
 \Yii::endProfile('Load config app');
 
-$application = new yii\console\Application($config);
+$application = new yii\console\Application($configData);
 $exitCode = $application->run();
 exit($exitCode);

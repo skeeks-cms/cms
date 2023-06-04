@@ -106,7 +106,7 @@
             "console": [
                 "src/config/common.php",
                 "src/config/console.php"
-            ],
+            ]
         }
     }
 }
