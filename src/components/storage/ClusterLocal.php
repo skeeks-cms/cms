@@ -34,7 +34,7 @@ class ClusterLocal extends Cluster
         }
 
         if (!$this->rootBasePath) {
-            $this->rootBasePath = \Yii::getAlias("@frontend/web/uploads/all");
+            $this->rootBasePath = \Yii::getAlias("@webroot/uploads/all");
         } else {
             $this->rootBasePath = \Yii::getAlias($this->rootBasePath);
         }

@@ -199,7 +199,7 @@ class Cms extends \skeeks\cms\base\Component
 
             'assets' =>
                 [
-                    '@frontend/web/assets',
+                    '@webroot/assets',
                 ],
         ];
     protected $_languages = null;

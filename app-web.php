@@ -16,42 +16,31 @@ require_once(__DIR__ . '/bootstrap.php');
 \Yii::beginProfile('Load config app');
 
 if (YII_ENV == 'dev') {
-    
     error_reporting(E_ALL);
     ini_set('display_errors', 'On');
-    //\skeeks\cms\composer\config\Builder::rebuild();
-    if (isset($_GET['rebuild'])) {
-        \Yii::beginProfile('Rebuild config');
-        \Yiisoft\Composer\Config\Builder::rebuild();
-        \Yii::endProfile('Rebuild config');
-    }
-}
-
-$configFile = \Yiisoft\Composer\Config\Builder::path('web-' . ENV);
-if (!file_exists($configFile)) {
-    $configFile = \Yiisoft\Composer\Config\Builder::path('web');
 }
 
 
-//Если по каким то причинам файла конфиг нет, надо попробовать пересобрать!
-if (!file_exists($configFile)) {
-    \Yii::warning("file not found - {$configFile}", "skeeks/cms");
+$config = new \Yiisoft\Config\Config(
+    new \Yiisoft\Config\ConfigPaths(ROOT_DIR, "config"),
+    null,
+    [
+        \Yiisoft\Config\Modifier\RecursiveMerge::groups('web', 'web-' . ENV, 'params', "params-web-" . ENV),
+    ],
+    "params-web-" . ENV
+);
 
-    \Yii::beginProfile('Rebuild config 2');
-    \Yiisoft\Composer\Config\Builder::rebuild();
-    \Yii::endProfile('Rebuild config 2');
 
-    $configFile = \Yiisoft\Composer\Config\Builder::path('web-' . ENV);
-    if (!file_exists($configFile)) {
-        $configFile = \Yiisoft\Composer\Config\Builder::path('web');
-    }
+if ($config->has('web-' . ENV)) {
+    $configData = $config->get('web-' . ENV);
+} else {
+    $configData = $config->get('web');
 }
 
-$config = (array)require $configFile;
 //print_r($config);die;
 \Yii::endProfile('Load config app');
 
 \Yii::beginProfile('new app');
-$application = new yii\web\Application($config);
+$application = new yii\web\Application($configData);
 \Yii::endProfile('new app');
 $application->run();
