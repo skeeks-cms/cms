@@ -7,8 +7,6 @@
  */
 $config =
     [
-        'id' => 'app-skeeks-console',
-
         'modules' => [
 
             'cms' => [

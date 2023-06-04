@@ -6,33 +6,15 @@
  * @date 06.11.2017
  */
 return [
-    "name" => "SkeekS CMS",
-    'id' => 'skeeks-cms-app',
 
     'vendorPath' => '@vendor',
-
-    'language' => 'ru',
 
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
     ],
 
-    'timeZone' => 'UTC',
-
     'components' => [
-        'formatter' => [
-            'defaultTimeZone' => 'UTC',
-            'timeZone'        => 'Europe/Moscow',
-        ],
-
-        'db' => [
-            //'class' => 'yii\db\Connection',
-            //'dsn' => 'mysql:host=mysql.skeeks.com;dbname=s2_vz1005_demo-cms',
-            //'username' => 's2_vz1016',
-            //'password' => 'dryagtepEjsiocakVenAvyeyb',
-            
-        ],
 
         'cache' => [
             'class' => 'yii\caching\FileCache',
