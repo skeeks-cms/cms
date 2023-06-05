@@ -411,6 +411,7 @@ class Tree extends ActiveRecord
             [['seo_h1'], 'string', 'max' => 255],
             [['external_id'], 'string', 'max' => 255],
             [['external_id'], 'default', 'value' => null],
+            [['seo_h1'], 'default', 'value' => ''],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
             [['meta_title'], 'string', 'max' => 500],
             [['cms_site_id'], 'integer'],

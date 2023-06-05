@@ -66,10 +66,11 @@
             //При первом запуске будет запущен этот код.
             if (this.ckeditorInited === false)
             {
-                skeeks.ckEditorWidget.registerOnChangeHandler(this.get('inputId'));
+                sx.ckEditorWidget.registerOnChangeHandler(this.widget.get('inputId'));
+
                 if (this.widget.get('ckeditor').filebrowserUploadUrl)
                 {
-                    skeeks.ckEditorWidget.registerCsrfImageUploadHandler();
+                    sx.ckEditorWidget.registerCsrfImageUploadHandler();
                 }
 
                 //TODO: Это не работает, нужно дорабатывать.

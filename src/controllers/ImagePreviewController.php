@@ -42,7 +42,7 @@ class ImagePreviewController extends Controller
 
         $newFileSrc = \Yii::$app->request->getPathInfo();
         //Если расширение файла не совпадает с оригинальным
-        $ext = trim(\Yii::$app->request->get("ext"));
+        $ext = trim((string) \Yii::$app->request->get("ext"));
 
         if (!$ext) {
             $extension = Imaging::getExtension($newFileSrc);
