@@ -134,14 +134,20 @@ class View extends \yii\web\View
         //Тут создание объекта тему
         parent::init();
 
-        //Установка настроек в тему из базы данных
-        
-        if ($cmsTheme) {
-            $cmsTheme->loadConfigToTheme($this->theme);
-        }
-        
-        
-        
+        //Из настроек сайта выбралась тема
+        $defaultSelectTheme = $this->theme;
+
+        //Перед рендером темы, нужно проверить та ли тема сейчас установлена?
+        //Она могла переопределиться в процессе
+        $this->on(static::EVENT_BEFORE_RENDER, function ($event) use ($cmsTheme, $defaultSelectTheme) {
+            if ($this->theme instanceof $defaultSelectTheme) {
+                //Если тема та, то нужно установить настройки в тему из базы данных
+                if ($cmsTheme) {
+                    $cmsTheme->loadConfigToTheme($this->theme);
+                    $this->theme->trigger(static::EVENT_BEFORE_RENDER, $event);
+                }
+            }
+        });
     }
 
     /**
