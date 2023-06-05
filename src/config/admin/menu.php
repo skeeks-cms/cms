@@ -240,11 +240,11 @@ return array_merge(dashboardsMenu(), [
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
                 ],*/
 
-                [
+                /*[
                     "label" => \Yii::t('skeeks/cms', "File manager"),
                     "url"   => ["cms/admin-file-manager"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/folder.png'],
-                ],
+                ],*/
 
                 [
                     "label" => \Yii::t('skeeks/cms', "Files"),

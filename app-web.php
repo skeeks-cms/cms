@@ -41,6 +41,7 @@ if ($config->has('web-' . ENV)) {
 \Yii::endProfile('Load config app');
 
 \Yii::beginProfile('new app');
+/*print_r($configData);die;*/
 $application = new yii\web\Application($configData);
 \Yii::endProfile('new app');
 $application->run();
