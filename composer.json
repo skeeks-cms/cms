@@ -43,7 +43,7 @@
         "skeeks/cms-backend-admin": "^2.0 || dev-master@dev",
         "skeeks/cms-admin": "^3.0 || dev-master@dev",
 
-        "skeeks/cms-query-filters": "^1.0 || dev-master@dev",
+        "skeeks/cms-query-filters": "^2.0 || dev-master@dev",
 
         "skeeks/yii2-jquery-contextmenu": "^1.0 || dev-master@dev",
 
