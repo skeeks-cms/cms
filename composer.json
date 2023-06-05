@@ -44,15 +44,14 @@
         "skeeks/cms-admin": "^3.0 || dev-master@dev",
 
         "skeeks/cms-query-filters": "^2.0 || dev-master@dev",
-
         "skeeks/yii2-jquery-contextmenu": "^1.0 || dev-master@dev",
 
-        "skeeks/cms-rbac": "^2.3 || dev-master@dev",
+        "skeeks/cms-rbac": "^3.0 || dev-master@dev",
         "skeeks/cms-marketplace": "^3.0 || dev-master@dev",
-        "skeeks/cms-toolbar": "^1.0 || dev-master@dev",
-        "skeeks/cms-agent": "^2.0 || dev-master@dev",
+        "skeeks/cms-toolbar": "^2.0 || dev-master@dev",
+        "skeeks/cms-agent": "^3.0 || dev-master@dev",
         "skeeks/cms-ya-map": "^2.0 || dev-master@dev",
-        "skeeks/cms-measure": "^2.0 || dev-master",
+        "skeeks/cms-measure": "^3.0 || dev-master",
 
         "skeeks/yii2-ajax-file-upload": "^1.0.0",
         "skeeks/yii2-imagine": "^2.0 || dev-master@dev",
