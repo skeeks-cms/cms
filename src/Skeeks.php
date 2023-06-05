@@ -60,6 +60,7 @@ class Skeeks extends Component
                     }
                 }
 
+                
 
             } else {
                 $this->_serverName = \Yii::$app->getRequest()->getServerName();
@@ -106,17 +107,22 @@ class Skeeks extends Component
                     );
                 }
             }
+            
+            
         }
 
         if (\Yii::$app instanceof Application) {
-            if ($this->_site && $this->_site->cmsSiteMainDomain) {
-                \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
+            if ($this->_site) {
+                if ($this->_site->cmsSiteMainDomain) {
+                    \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
+                }
             }
         }
 
         //Если только поставили проект, и база еще пустая.
         if (!$this->_site) {
-            $this->_site = new CmsSite();
+            //$this->_site = new CmsSite();
+            //$this->_site->setIsNewRecord(true);
         }
 
         return $this->_site;

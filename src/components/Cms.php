@@ -240,7 +240,10 @@ class Cms extends \skeeks\cms\base\Component
         parent::init();
 
         //Название проекта.
-        \Yii::$app->name = \Yii::$app->skeeks->site->name;
+        if (\Yii::$app->skeeks->site) {
+            \Yii::$app->name = \Yii::$app->skeeks->site->name;
+        }
+        
 
         //Язык
         if ($this->languageCode) {
