@@ -109,9 +109,14 @@ class Skeeks extends Component
         }
 
         if (\Yii::$app instanceof Application) {
-            if ($this->_site->cmsSiteMainDomain) {
+            if ($this->_site && $this->_site->cmsSiteMainDomain) {
                 \Yii::$app->urlManager->hostInfo = $this->_site->cmsSiteMainDomain->url;
             }
+        }
+
+        //Если только поставили проект, и база еще пустая.
+        if (!$this->_site) {
+            $this->_site = new CmsSite();
         }
 
         return $this->_site;
