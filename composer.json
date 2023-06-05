@@ -58,7 +58,7 @@
         "skeeks/yii2-sx": "^1.4 || dev-master@dev",
         "skeeks/yii2-ckeditor": "^1.1 || dev-master@dev",
         "skeeks/yii2-widget-simpleajaxuploader": "^1.1.0 || dev-master@dev",
-        "skeeks/yii2-widget-chose   n": "^1.2 || dev-master@dev",
+        "skeeks/yii2-widget-chosen": "^1.2 || dev-master@dev",
         "skeeks/yii2-widget-highcharts": "^1.0 || dev-master@dev",
         "skeeks/yii2-widget-codemirror": "^1.0 || dev-master@dev",
         "skeeks/yii2-slug-behavior": "^1.0 || dev-master@dev",
