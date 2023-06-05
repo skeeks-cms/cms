@@ -92,7 +92,7 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
     curl -sS https://getcomposer.org/installer | COMPOSER_HOME=.composer php
 
     # Installing the base project SkeekS CMS
-    COMPOSER_HOME=.composer php composer.phar create-project --prefer-dist --stability=dev skeeks/app-basic demo.ru
+    COMPOSER_HOME=.composer php composer.phar create-project --prefer-dist --repository-url=https://skeeks.com/composer/ --stability=dev skeeks/app-shop demo.ru
     # Going into the project folder
     cd demo.ru
 
@@ -101,13 +101,11 @@ Navigate to the folder where are your projects (such as **/var/www/sites/**).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Edit the file to access the database, it is located at **common/config/db.php**
-
-Update configs:
+Edit the file to access the database, it is located at **config/common/params.php**
 
 .. code-block:: bash
 
-    COMPOSER_HOME=.composer php composer.phar self-update && COMPOSER_HOME=.composer php composer.phar du
+    nano config/common/params.php
 
 
 4. Installation of migrations
@@ -135,9 +133,9 @@ Default management system is available at the following address (if desired, it 
 
 **//example.com/~sx/admin/auth/**
 
-**root** (login)
+**info@skeeks.com** (login)
 
-**skeeks** (password)
+**skeeks123** (password)
 
 7. Check the working environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
