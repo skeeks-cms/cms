@@ -33,7 +33,7 @@
 
         "yiisoft/config": "^1.3 || dev-master@dev",
 
-        "skeeks/cms-composer": "^2.0 || dev-master@dev",
+        "skeeks/cms-composer": "^3.0 || dev-master@dev",
         "skeeks/cms-composer-update-plugin": "^2.0 || dev-master",
 
         "skeeks/yii2-config": "^1.0 || dev-master@dev",
