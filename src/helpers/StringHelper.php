@@ -53,7 +53,7 @@ class StringHelper
      */
     public static function strtolower($string)
     {
-        return mb_strtolower($string, \Yii::$app->charset);
+        return mb_strtolower((string) $string, \Yii::$app->charset);
     }
 
 
