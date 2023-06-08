@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsSiteTheme;
 use skeeks\cms\models\CmsTheme;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
+use yii\web\Application;
 
 /**
  * @property array $availableThemes
@@ -139,7 +140,10 @@ class View extends \yii\web\View
 
         //Перед рендером темы, нужно проверить та ли тема сейчас установлена?
         //Она могла переопределиться в процессе
-        $this->on(static::EVENT_BEFORE_RENDER, function ($event) use ($cmsTheme, $defaultSelectTheme) {
+        \Yii::$app->on(Application::EVENT_BEFORE_ACTION, function ($event) use ($cmsTheme, $defaultSelectTheme) {
+            if (\Yii::$app->controller && \Yii::$app->controller->module && in_array(\Yii::$app->controller->module->id, ['debug', 'gii'])) {
+                return false;
+            }
             if ($this->theme instanceof $defaultSelectTheme) {
                 //Если тема та, то нужно установить настройки в тему из базы данных
                 if ($cmsTheme) {

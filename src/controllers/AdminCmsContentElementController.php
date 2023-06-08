@@ -1052,6 +1052,9 @@ HTML
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 
+                $model->validate();
+                $relatedModel->validate();
+
                 if (!$model->errors && !$relatedModel->errors)
                 {
                     if (!$model->save()) {
