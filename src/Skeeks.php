@@ -144,6 +144,6 @@ class Skeeks extends Component
     static public function unlimited()
     {
         set_time_limit(0);
-        ini_set("memory_limit", "2G");
+        ini_set("memory_limit", "50G");
     }
 }

@@ -25,4 +25,15 @@ class CmsStorageFileActiveQuery extends CmsActiveQuery
             ->andWhere([$this->getPrimaryTableName().'.cluster_file' => $clusterFile])
         ;
     }
+    
+    /**
+     * @param string $clusterId
+     * @return CmsStorageFileActiveQuery
+     */
+    public function cluster(string $clusterId)
+    {
+        return $this
+            ->andWhere([$this->getPrimaryTableName().'.cluster_id' => $clusterId])
+        ;
+    }
 }
