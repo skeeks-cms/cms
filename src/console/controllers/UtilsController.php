@@ -19,6 +19,7 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\Skeeks;
 use yii\base\Exception;
 use yii\console\Controller;
 use yii\console\controllers\HelpController;
@@ -371,19 +372,24 @@ class UtilsController extends Controller
      */
     public function actionRemoveFilesNotStorage($onlyCheck = 1)
     {
+        //Skeeks::unlimited();
+        ini_set("memory_limit", "50G");
+        
         $clusters = \Yii::$app->storage->getClusters();
         foreach ($clusters as $cluster) {
             $this->stdout("cluster: {$cluster->id}\n");
             $this->stdout("cluster: {$cluster->rootBasePath}\n");
             //sleep(3);
             $totalStorageSize = StorageFile::find()
-                ->cluster($cluster->id)
+                /*->cluster($cluster->id)*/
+                ->andWhere(['cluster_id' => $cluster->id])
                 ->select(["id", 'total_size' => new Expression("SUM(size)")])
                 ->asArray()
                 ->one();
 
             $totalStorageFies = StorageFile::find()
-                ->cluster($cluster->id)
+                /*->cluster($cluster->id)*/
+                ->andWhere(['cluster_id' => $cluster->id])
                 ->count();
             
 
@@ -465,7 +471,11 @@ class UtilsController extends Controller
                     //$this->stdout("\t{$clusterFilePath} " . $fileDirLevel . "\n");
                     //$this->stdout("\t\tПроверить в базе!\n");
                     
-                    $cmsStorageFile = StorageFile::find()->clusterFile($cluster->id, $clusterFilePath)->one();
+                    $cmsStorageFile = StorageFile::find()
+                        ->andWhere(['cluster_id' => $cluster->id])
+                        ->andWhere(['cluster_file' => $clusterFilePath])
+                        //->clusterFile($cluster->id, $clusterFilePath)
+                        ->one();
                     
                     if (!$cmsStorageFile) {
                         $this->stdout("\t{$clusterFilePath}\n");
