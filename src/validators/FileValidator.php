@@ -41,19 +41,6 @@ class FileValidator extends \yii\validators\FileValidator
         }
     }
 
-    /**
-     * Загрузка файлов реализована частями, поэтому не сильно важны параметры из настроек php
-     * @return float|int|void
-     */
-    public function getSizeLimit()
-    {
-        if ($this->maxSize) {
-            return $this->maxSize;
-        }
-        
-        return 1024;
-    }
-
     public function validateAttribute($model, $attribute)
     {
         if ($this->maxFiles != 1 || $this->minFiles > 1) {

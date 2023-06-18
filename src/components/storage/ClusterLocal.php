@@ -66,7 +66,7 @@ class ClusterLocal extends Cluster
             $resultFile = $dir->newFile($clusterFileName);
             $tmpFile->move($resultFile);
 
-        } catch (\yii\base\Exception $e) {
+        } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
 
