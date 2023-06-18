@@ -53,7 +53,7 @@
         "skeeks/cms-ya-map": "^2.0 || dev-master@dev",
         "skeeks/cms-measure": "^3.0 || dev-master",
 
-        "skeeks/yii2-ajax-file-upload": "^1.0.0",
+        "skeeks/yii2-ajax-file-upload": "^2.0",
         "skeeks/yii2-imagine": "^2.0 || dev-master@dev",
         "skeeks/yii2-sx": "^1.4 || dev-master@dev",
         "skeeks/yii2-ckeditor": "^1.1 || dev-master@dev",
