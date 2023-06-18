@@ -894,7 +894,10 @@ class User
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
+        if (!$this->password_hash) {
+            return false;
+        }
+        return Yii::$app->security->validatePassword((string) $password, (string) $this->password_hash);
     }
 
     /**

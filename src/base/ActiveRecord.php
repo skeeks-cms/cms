@@ -10,6 +10,7 @@ namespace skeeks\cms\base;
 
 use common\models\User;
 use skeeks\cms\models\behaviors\HasTableCache;
+use skeeks\cms\models\behaviors\HasUserLog;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\traits\TActiveRecord;
@@ -82,12 +83,32 @@ class ActiveRecord extends \yii\db\ActiveRecord
                 'class' => HasTableCache::class,
                 'cache' => \Yii::$app->cache,
             ],
+
+            HasUserLog::class => [
+                'class'  => HasUserLog::class,
+            ],
         ]);
 
         try {
             if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_by') && self::safeGetTableSchema()->getColumn('updated_by')) {
                 $result[BlameableBehavior::class] = [
                     'class' => BlameableBehavior::class,
+                    'value' => function ($event) {
+                        if (\Yii::$app instanceof \yii\console\Application) {
+                            return null;
+                        } else {
+                            $user = Yii::$app->get('user', false);
+                            return $user && !$user->isGuest ? $user->id : null;
+                        }
+                    },
+                ];
+            } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_by')) {
+                $result[BlameableBehavior::class] = [
+                    'class' => BlameableBehavior::class,
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => ['created_by'],
+                        ActiveRecord::EVENT_BEFORE_UPDATE => [],
+                    ],
                     'value' => function ($event) {
                         if (\Yii::$app instanceof \yii\console\Application) {
                             return null;

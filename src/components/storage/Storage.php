@@ -76,7 +76,7 @@ class Storage extends Component
         } else {
 
             if ($file instanceof File || (is_string($file) && BaseUrl::isRelative($file))) {
-                /*print_r($file);die;*/
+
                 $file = File::object($file);
                 $original_file_name = $file->getBaseName();
 
