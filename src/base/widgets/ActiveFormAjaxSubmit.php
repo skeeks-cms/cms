@@ -35,4 +35,15 @@ class ActiveFormAjaxSubmit extends ActiveForm
 
     public $validateOnChange = true;
     public $validateOnBlur = true;
+
+    public function init()
+    {
+        //TODO: подумать над этим, но для мультиязычных сайтов это нужно
+        if (!$this->action) {
+            $this->action = \yii\helpers\Url::current();
+        }
+        parent::init();
+    }
+
+
 }
