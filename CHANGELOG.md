@@ -1,6 +1,18 @@
 CHANGELOG
 ==============
 
+6.0.1
+-----------------
+ * New ajax file uploader
+
+6.0.0
+-----------------
+ * Update project structure
+ * Yii 3 yii/config
+
+
+
+
 5.5.11
 -----------------
  * Yii 2.0.24
