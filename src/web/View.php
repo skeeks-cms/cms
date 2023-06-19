@@ -29,6 +29,14 @@ class View extends \yii\web\View
     public $defaultThemeId = '';
 
     /**
+     * Принудительно включить эту тему
+     * Нужно например для разработки, можно включить окружение и в нем прописать использование нужного шаблона
+     * Тогда для всех пользователей будет использован 1 шаблон, а для разработчика свой шаблон
+     * @var string
+     */
+    public $forceThemeId = '';
+
+    /**
      * @var array Доступные темы
      */
     public $themes = [
@@ -98,18 +106,33 @@ class View extends \yii\web\View
             return parent::init();
         }
 
-        //Поиск настроек сохраненных в базу данных
-        $cmsTheme = CmsTheme::getDb()->cache(function ($db) {
-            return CmsTheme::find()->cmsSite()->active()->one();
-        },
-            null,
-            new TagDependency([
-                'tags' => [
-                    (new CmsTheme())->getTableCacheTagCmsSite(),
-                    \Yii::$app->skeeks->site->cacheTag
-                ],
-            ])
-        );
+        if ($this->forceThemeId) {
+            $cmsTheme = CmsTheme::getDb()->cache(function ($db) {
+                return CmsTheme::find()->cmsSite()->andWhere(['code' => $this->forceThemeId])->one();
+            },
+                null,
+                new TagDependency([
+                    'tags' => [
+                        (new CmsTheme())->getTableCacheTagCmsSite(),
+                        \Yii::$app->skeeks->site->cacheTag
+                    ],
+                ])
+            );
+        } else {
+            //Поиск настроек сохраненных в базу данных
+            $cmsTheme = CmsTheme::getDb()->cache(function ($db) {
+                return CmsTheme::find()->cmsSite()->active()->one();
+            },
+                null,
+                new TagDependency([
+                    'tags' => [
+                        (new CmsTheme())->getTableCacheTagCmsSite(),
+                        \Yii::$app->skeeks->site->cacheTag
+                    ],
+                ])
+            );
+        }
+
 
 
         $themeData = [];
@@ -123,7 +146,10 @@ class View extends \yii\web\View
 
             //print_r($themeData);die;
         } else {
-            if ($this->defaultThemeId) {
+
+            if ($this->forceThemeId) {
+                $themeData = (array)ArrayHelper::getValue($this->availableThemes, $this->forceThemeId);
+            } else if ($this->defaultThemeId) {
                 $themeData = (array)ArrayHelper::getValue($this->availableThemes, $this->defaultThemeId);
             }
         }
