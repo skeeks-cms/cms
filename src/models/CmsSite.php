@@ -52,7 +52,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsStorageFile         $favicon
  * @property CmsComponentSettings[] $cmsComponentSettings
  * @property CmsSiteEmail|null      $cmsSiteEmail
- * @property CmsSiteEmail|null      $cmsSitePhone
+ * @property CmsSitePhone|null      $cmsSitePhone
  * @property CmsSiteAddress|null    $cmsSiteAddress
  * @property CmsSiteEmail[]         $cmsSiteEmails
  * @property CmsSiteAddress[]       $cmsSiteAddresses

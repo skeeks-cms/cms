@@ -51,6 +51,7 @@ class CmsSiteEmail extends ActiveRecord
         ]);
     }
 
+
     /**
      * @inheritdoc
      */

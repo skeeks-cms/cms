@@ -5,31 +5,31 @@
  * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
  */
+
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
-use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\validators\PhoneValidator;
 use skeeks\modules\cms\user\models\User;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "cms_site_phone".
  *
- * @property int $id
- * @property int|null $created_by
- * @property int|null $updated_by
- * @property int|null $created_at
- * @property int|null $updated_at
- * @property int $cms_site_id
- * @property string $value
+ * @property int         $id
+ * @property int|null    $created_by
+ * @property int|null    $updated_by
+ * @property int|null    $created_at
+ * @property int|null    $updated_at
+ * @property int         $cms_site_id
+ * @property string      $value
+ * @property string      $onlyNumber
  * @property string|null $name
- * @property int $priority
+ * @property int         $priority
  *
- * @property CmsSite $cmsSite
- * @property CmsUser $createdBy
- * @property CmsUser $updatedBy
+ * @property CmsSite     $cmsSite
+ * @property CmsUser     $createdBy
+ * @property CmsUser     $updatedBy
  */
 class CmsSitePhone extends ActiveRecord
 {
@@ -47,8 +47,8 @@ class CmsSitePhone extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'value' => 'Телефон',
-            'name' => 'Название',
+            'value'    => 'Телефон',
+            'name'     => 'Название',
             'priority' => 'Сортировка',
         ]);
     }
@@ -59,7 +59,7 @@ class CmsSitePhone extends ActiveRecord
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'name' => 'Необязтельное поле, можно дать название этому номеру телефона',
+            'name'     => 'Необязтельное поле, можно дать название этому номеру телефона',
             'priority' => 'Чем ниже цифра тем выше телефон',
         ]);
     }
@@ -102,5 +102,30 @@ class CmsSitePhone extends ActiveRecord
     public function getCmsSite()
     {
         return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getOnlyNumber()
+    {
+        if ($this->value) {
+            return self::onlyNumber($this->value);
+        }
+
+        return '';
+    }
+
+    /**
+     * @param string $formatedPhone
+     * @return string
+     */
+    static public function onlyNumber(string $formatedPhone): string
+    {
+        $formatedPhone = str_replace("-", "", $formatedPhone);
+        //$formatedPhone = str_replace("+", "", $formatedPhone);
+        $formatedPhone = str_replace(" ", "", $formatedPhone);
+        $formatedPhone = str_replace("&nbsp;", "", $formatedPhone);
+        return $formatedPhone;
     }
 }

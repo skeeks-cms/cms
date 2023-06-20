@@ -338,6 +338,7 @@ class CmsContentElement extends RelatedElementModel
             ['priority', 'default', 'value' => 500],
             ['active', 'default', 'value' => Cms::BOOL_Y],
             [['meta_title', 'meta_description', 'meta_keywords'], 'string'],
+            [['meta_title', 'meta_description', 'meta_keywords', 'seo_h1'], 'default', 'value' => ''],
             [['meta_title'], 'string', 'max' => 500],
 
             ['description_short_type', 'string'],
