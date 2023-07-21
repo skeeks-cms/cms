@@ -18,6 +18,15 @@ use skeeks\cms\models\Tree;
 CSS
 ); ?>
 
+<div class="alert alert-info">
+    <p>Ссылка на этот файл:</p>
+    <p>
+    <a href="<?php echo $model->src; ?>" target="_blank">
+    <?php echo $model->src; ?>
+    </a>
+    </p>
+</div>
+
 <div class="sx-image-controll">
     <?php $form = ActiveForm::begin(); ?>
 

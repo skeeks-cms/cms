@@ -24,6 +24,10 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 {
     public $w = 50;
     public $h = 50;
+    /**
+     * @var int Качество сохраняемого фото
+     */
+    public $q;
     public $m = ManipulatorInterface::THUMBNAIL_INSET;
 
     public function init()
@@ -32,6 +36,21 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 
         if (!$this->w && !$this->h) {
             throw new Exception("Необходимо указать ширину или высоту");
+        }
+
+        $q = (int) $this->q;
+        if (!$q) {
+            $this->q = (int) \Yii::$app->seo->img_preview_quality;
+        }
+
+        $q = (int) $this->q;
+
+        if ($q < 10) {
+            $this->q = 10;
+        }
+
+        if ($q > 100) {
+            $this->q = 100;
         }
 
     }
@@ -44,18 +63,28 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
         if (!$this->w) {
             $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
             $width = ($size->getWidth() * $this->h) / $size->getHeight();
+
             Image::thumbnailV2($this->_originalRootFilePath, (int)round($width), $this->h,
-                $this->m)->save($this->_newRootFilePath);
+                $this->m)->save($this->_newRootFilePath, [
+                        'jpeg_quality' => $this->q,
+                        'webp_quality' => $this->q,
+                    ]);
 
         } else {
             if (!$this->h) {
                 $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
                 $height = ($size->getHeight() * $this->w) / $size->getWidth();
                 Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height),
-                    $this->m)->save($this->_newRootFilePath);
+                    $this->m)->save($this->_newRootFilePath, [
+                        'jpeg_quality' => $this->q,
+                        'webp_quality' => $this->q,
+                    ]);
             } else {
-                Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h,
-                    $this->m)->save($this->_newRootFilePath);
+                $image = Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h,
+                    $this->m)->save($this->_newRootFilePath, [
+                        'jpeg_quality' => $this->q,
+                        'webp_quality' => $this->q,
+                    ]);
             }
         }
     }
