@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\Exception;
+use skeeks\imagine\Image;
 use skeeks\sx\File;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -157,12 +158,15 @@ class ImagePreviewController extends Controller
             $url = \Yii::$app->request->getUrl().($params ?
                     ""//"?" . http_build_query($params) . '&sx-refresh'
                     : '?sx-refresh');
+            /*echo $url;die;*/
 
-            /*Header("HTTP/1.0 200 OK");
+            Header("HTTP/1.0 200 OK");
             Image::getImagine()->open($newFileRootDefault)->show('png');
-            return '';*/
+            die;
+            return '';
 
-            return \Yii::$app->response->redirect($url, 302);
+            /*\Yii::$app->response->redirect($url, 302);
+            \Yii::$app->end();*/
 
         } catch (\Exception $e) {
             throw $e;

@@ -77,7 +77,7 @@ return [
                 'normalizeTrailingSlash' => true,
                 'action' => \yii\web\UrlNormalizer::ACTION_REDIRECT_PERMANENT,
             ],
-            'rules' => [
+            /*'rules' => [
                 'u' => 'cms/user/index',
                 'u/<username>' => 'cms/user/view',
                 'u/<username>/<action>' => 'cms/user/<action>',
@@ -92,13 +92,10 @@ return [
                 "image-preview" => ["class" => 'skeeks\cms\components\urlRules\UrlRuleImagePreview'],
                 "storage-file" => ["class" => 'skeeks\cms\components\urlRules\UrlRuleStorageFile'],
 
-                //'search' => 'cmsSearch/result',
-
                 [
                     'class' => \skeeks\cms\components\urlRules\UrlRuleSavedFilter::class
                 ],
-                //Resize image on request
-            ],
+            ],*/
         ],
 
         'cmsAgent' => [
