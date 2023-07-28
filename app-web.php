@@ -37,7 +37,7 @@ if ($config->has('web-' . ENV)) {
     $configData = $config->get('web');
 }
 
-//print_r($config);die;
+/*print_r($configData);die;*/
 \Yii::endProfile('Load config app');
 
 \Yii::beginProfile('new app');
