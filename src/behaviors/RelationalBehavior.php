@@ -65,10 +65,25 @@ class RelationalBehavior extends Behavior
             $this->owner->populateRelation($name, []);
             return;
         }
+        
+        $first = false;
+        if (is_array($value) && count($value) > 0) {
+            foreach ($value as $key => $val)
+            {
+                if (!($val instanceof BaseObject)) {
+                    $first = true;
+                    
+                }
+                
+                break;
+            }
+        }
 
-        if (is_array($value) && count($value) > 0 && !($value[0] instanceof BaseObject) ||
+        if ($first || !is_array($value) && !($value instanceof BaseObject)) {
+
+        /*if (is_array($value) && count($value) > 0 && !($value[0] instanceof BaseObject) ||
             !is_array($value) && !($value instanceof BaseObject)
-        ) {
+        ) {*/
             $getter = 'get' . $name;
             /** @var ActiveQuery $query */
             $query = $this->owner->$getter();
