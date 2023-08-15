@@ -1050,6 +1050,155 @@ class Tree extends ActiveRecord
 
         return false;
     }
+
+
+    /**
+     * @param bool $is_copy_childrents
+     * @param bool $is_copy_elements
+     * @return $this|CmsContentElement|CmsTree
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function copy(bool $is_copy_childrents = true, bool $is_copy_elements = false)
+    {
+        if ($is_copy_childrents) {
+            return $this->_copyWithChildrens(null, $is_copy_elements);
+        } else {
+            $newTree = $this->_copyCurrentTree(null, $is_copy_elements);
+
+            $newTree->name = $newTree->name . " (копия)";
+            $newTree->update(false, ['name']);
+
+            return $newTree;
+
+        }
+    }
+
+    protected function _copyWithChildrens(self $parent = null, bool $is_copy_elements = false)
+    {
+        $newTree = $this->_copyCurrentTree($parent, $is_copy_elements);
+
+        if ($parent == null) {
+            $newTree->name = $newTree->name . " (копия)";
+            $newTree->update(false, ['name']);
+        }
+
+        if ($this->children) {
+            foreach ($this->children as $child)
+            {
+                $child->_copyWithChildrens($newTree, $is_copy_elements);
+            }
+        }
+
+        return $newTree;
+    }
+
+    /**
+     * @return CmsTree|static
+     */
+    protected function _copyCurrentTree(self $parent = null, $is_copy_elements = false)
+    {
+        $newImage = null;
+        $newImage2 = null;
+
+        if ($parent === null) {
+            $parent = $this->parent;
+        }
+
+
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+
+            $data = $this->toArray();
+
+            ArrayHelper::remove($data, 'id');
+            ArrayHelper::remove($data, 'created_at');
+            ArrayHelper::remove($data, 'created_by');
+            ArrayHelper::remove($data, 'updated_at');
+            ArrayHelper::remove($data, 'updated_by');
+            ArrayHelper::remove($data, 'image_id');
+            ArrayHelper::remove($data, 'image_full_id');
+            ArrayHelper::remove($data, 'pid');
+            ArrayHelper::remove($data, 'pids');
+            ArrayHelper::remove($data, 'level');
+            ArrayHelper::remove($data, 'dir');
+            ArrayHelper::remove($data, 'external_id');
+            ArrayHelper::remove($data, 'main_cms_tree_id');
+            ArrayHelper::remove($data, 'code');
+
+            $newModel = new static($data);
+            /*$newModel->name = $newModel->name . " (копия)";*/
+
+            $newModel->external_id = null;
+
+            //$newModel->active = "N";
+            if ($newModel->appendTo($parent)->save()) {
+
+                /**
+                 * @var $newModel CmsContentElement
+                 */
+                if ($this->image) {
+                    $newImage = $this->image->copy();
+                    $newModel->link('image', $newImage);
+                }
+
+                if ($this->fullImage) {
+                    $newImage2 = $this->fullImage->copy();
+                    $newModel->link('fullImage', $newImage2);
+                }
+
+
+                if ($this->images) {
+                    foreach ($this->images as $img) {
+                        $newImg = $img->copy();
+                        $newModel->link('images', $newImg);
+                    }
+
+                }
+            }
+
+            if ($rp = $this->relatedPropertiesModel) {
+                $this->relatedPropertiesModel->initAllProperties();
+                $newRp = $newModel->relatedPropertiesModel;
+                $newRp->initAllProperties();
+                $newRp->setAttributes($rp->toArray());
+                //$rp->relatedElementModel = $newModel;
+                $newRp->save();
+            }
+
+            $transaction->commit();
+
+
+            //Скопировать элементы
+            /**
+             * @var $element CmsContentElement
+             */
+            if ($is_copy_elements) {
+                $elements = CmsContentElement::find()->cmsTree($this, false, false);
+                if ($elements->count()) {
+                    foreach ($elements->each(10) as $element)
+                    {
+                        $newElement = $element->copy(false);
+                        $newElement->tree_id = $newModel->id;
+                        $newElement->update(false, ['tree_id']);
+                    }
+                }
+            }
+
+            return $newModel;
+
+        } catch (\Exception $e) {
+
+            if ($newImage) {
+                $newImage->delete();
+            }
+            if ($newImage2) {
+                $newImage2->delete();
+            }
+            $transaction->rollBack();
+            throw $e;
+        }
+    }
 }
 
 

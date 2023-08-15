@@ -864,7 +864,7 @@ class CmsContentElement extends RelatedElementModel
     /**
      * @return CmsContentElement|static
      */
-    public function copy()
+    public function copy($add_copy_name = true)
     {
         $newImage = null;
         $newImage2 = null;
@@ -884,14 +884,18 @@ class CmsContentElement extends RelatedElementModel
             ArrayHelper::remove($data, 'code');
 
             $newModel = new static($data);
-            $newModel->name = $newModel->name . " (копия)";
+
+            if ($add_copy_name) {
+                $newModel->name = $newModel->name . " (копия)";
+            }
+
 
             $newModel->external_id = null;
             $newModel->main_cce_at = null;
             $newModel->main_cce_by = null;
             $newModel->main_cce_id = null;
 
-            $newModel->active = "N";
+            //$newModel->active = "N";
             if ($newModel->save()) {
 
                 /**

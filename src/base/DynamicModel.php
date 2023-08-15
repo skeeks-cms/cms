@@ -55,7 +55,7 @@ class DynamicModel extends \yii\base\DynamicModel {
      * @param string $value
      * @return $this
      */
-    public function setAttrubuteLebel(string $attribute, string $value)
+    public function setAttributeLebel(string $attribute, string $value)
     {
         $this->_attributeLabels[$attribute] = $value;
         return $this;

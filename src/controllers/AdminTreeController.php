@@ -23,6 +23,7 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\Skeeks;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
@@ -247,6 +248,14 @@ class AdminTreeController extends BackendModelStandartController
                 }
             ],
 
+            "copy-tree" => [
+                "priority"       => 300,
+                'class'          => BackendModelUpdateAction::class,
+                "name"           => \Yii::t('skeeks/cms', 'Copy'),
+                "icon"           => "fas fa-copy",
+                "callback"           => [$this, 'copyTree'],
+            ],
+
             "move" => [
                 "priority"       => 200,
                 'class'          => BackendModelUpdateAction::class,
@@ -366,6 +375,68 @@ class AdminTreeController extends BackendModelStandartController
         return $actions;
     }
 
+    public function copyTree()
+    {
+        $dm = new \skeeks\cms\base\DynamicModel(['is_copy_childs', 'is_copy_elements']);
+        
+        $dm->addRule(['is_copy_childs'], 'integer');
+        $dm->addRule(['is_copy_elements'], 'integer');
+
+        $dm->setAttributeLebel("is_copy_childs", 'Копировать дочерние разделы?');
+        $dm->setAttributeLebel("is_copy_elements", 'Копировать привязанные элементы?');
+        
+        Skeeks::unlimited();
+        
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            try {
+                $dm->load(\Yii::$app->request->post());
+                /**
+                 * @var $currentTree CmsTree
+                 */
+                $currentTree = $this->model;
+
+                $currentTree->copy((bool) $dm->is_copy_childs, (bool) $dm->is_copy_elements);
+    
+                /*$newTree = $currentTree->copyCurrentTree();
+                $newTree->name = $newTree->name . " (копия)";
+                $newTree->update(false, ['name']);
+    
+                if ($dm->is_copy_childs) {
+                    
+                    if ($currentTree->activeChildren) {
+                        foreach ($currentTree->activeChildren as $childTree)
+                        {
+    
+                        }
+                    }
+                    
+                }
+                */
+                $rr->success = true;
+                $rr->message = "Скопировано";
+            } catch (\Exception $exception) {
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+            
+
+            
+
+            return $rr;
+        }
+        
+        return $this->render($this->action->id, [
+            'dm' => $dm
+        ]);
+    }
+
+    
+    protected function _copyTree(CmsTree $cmsTree) {
+        
+    }
 
     public function update(BackendModelUpdateAction $adminAction)
     {

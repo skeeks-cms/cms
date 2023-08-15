@@ -968,7 +968,7 @@ JS
                 return false;
             }*/
         });
-        $dm->setAttrubuteLebel('password', 'Новый пароль');
+        $dm->setAttributeLebel('password', 'Новый пароль');
 
         $is_saved = false;
         try {

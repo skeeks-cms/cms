@@ -662,6 +662,10 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
+                    'is_img_offer_property' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
 
                 ],
             ],

@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property integer|null                 $cms_site_id
  *
  * @property integer                      $is_offer_property
+ * @property integer                      $is_img_offer_property
  * @property integer                      $is_vendor
  * @property integer                      $is_vendor_code
  * @property integer                      $is_country
@@ -80,6 +81,7 @@ class CmsContentProperty extends RelatedPropertyModel
             'cms_site_id' => Yii::t('skeeks/cms', 'Сайт'),
 
             'is_offer_property' => \Yii::t('skeeks/cms', 'Свойство предложения?'),
+            'is_img_offer_property' => \Yii::t('skeeks/cms', 'Отображать свойство картинкой?'),
             'is_vendor'         => \Yii::t('skeeks/cms', 'Производитель?'),
             'is_vendor_code'    => \Yii::t('skeeks/cms', 'Код производителя?'),
             'is_country'        => \Yii::t('skeeks/cms', 'Страна'),
@@ -91,6 +93,7 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'is_img_offer_property'          => \Yii::t('skeeks/cms', 'В карточке будет отображатсья картинка при выборе этого варианта.'),
             'is_offer_property'          => \Yii::t('skeeks/cms', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
             'cms_site_id' => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
             'cmsContents' => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
@@ -107,7 +110,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         $rules = ArrayHelper::merge(parent::rules(), [
             [
-                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
+                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property', 'is_img_offer_property'],
                 'integer',
             ],
 
@@ -117,7 +120,7 @@ class CmsContentProperty extends RelatedPropertyModel
                 'value' => null,
             ],*/
             [
-                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
+                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property', 'is_img_offer_property'],
                 function($attr) {
                     if ($this->{$attr} != 1) {
                         $this->{$attr} = null;

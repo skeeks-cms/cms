@@ -10,6 +10,7 @@ namespace skeeks\cms\query;
 
 use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\models\Tree;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -49,7 +50,7 @@ class CmsContentElementActiveQuery extends CmsActiveQuery
             $cmsTree = \Yii::$app->cms->currentTree;
         }
 
-        if (!$cmsTree || !$cmsTree instanceof CmsTree) {
+        if (!$cmsTree || !$cmsTree instanceof Tree) {
             return $this;
         }
 
