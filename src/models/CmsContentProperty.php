@@ -120,13 +120,18 @@ class CmsContentProperty extends RelatedPropertyModel
                 'value' => null,
             ],*/
             [
-                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property', 'is_img_offer_property'],
+                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
                 function($attr) {
                     if ($this->{$attr} != 1) {
                         $this->{$attr} = null;
                     }
                 },
                 
+            ],
+            [
+                ['is_img_offer_property'],
+                'default',
+                'value' => 0
             ],
 
             [['cmsContents'], 'safe'],

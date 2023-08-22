@@ -440,7 +440,7 @@ class User
             ],
 
             ['username', 'string', 'min' => 3, 'max' => 25],
-            [['username'], 'unique', 'targetAttribute' => ['cms_site_id', 'username']],
+            [['username'], 'unique', 'targetAttribute' => ['cms_site_id', 'username'], 'message' => 'Этот логин уже занят'],
             [['username'], \skeeks\cms\validators\LoginValidator::class],
 
             [['logged_at'], 'integer'],
