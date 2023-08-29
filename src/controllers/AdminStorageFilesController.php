@@ -150,6 +150,7 @@ JS
                                                 'or',
                                                 ['like', CmsStorageFile::tableName().'.id', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.name', $e->field->value],
+                                                ['like', CmsStorageFile::tableName().'.cluster_file', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.original_name', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.name_to_save', $e->field->value],
                                                 ['like', CmsStorageFile::tableName().'.description_short', $e->field->value],
