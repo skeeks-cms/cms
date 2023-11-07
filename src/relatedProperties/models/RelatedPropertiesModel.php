@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\relatedProperties\models;
 
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -379,7 +380,7 @@ class RelatedPropertiesModel extends DynamicModel
                         'value_bool'   => (bool)$value,
                         'value_num2'   => $value,
                         'value_int2'   => $value,
-                        'value_string' => (string)$value,
+                        'value_string' => StringHelper::substr((string)$value, 0, 255)
                     ]);
                     if ($property->property_type == PropertyType::CODE_LIST) {
                         $productPropertyValue->value_enum_id = (int)$value;
@@ -406,7 +407,7 @@ class RelatedPropertiesModel extends DynamicModel
                 $productPropertyValue->value_bool = (bool)$value;
                 $productPropertyValue->value_num2 = $value;
                 $productPropertyValue->value_int2 = $value;
-                $productPropertyValue->value_string = (string)$value;
+                $productPropertyValue->value_string = StringHelper::substr((string)$value, 0, 255);
 
                 if ($property->property_type == PropertyType::CODE_LIST) {
                     $productPropertyValue->value_enum_id = (int)$value;
@@ -428,7 +429,7 @@ class RelatedPropertiesModel extends DynamicModel
                     'value_bool'   => (bool)$value,
                     'value_num2'   => $value,
                     'value_int2'   => $value,
-                    'value_string' => (string)$value,
+                    'value_string' => StringHelper::substr((string)$value, 0, 255),
                 ]);
                 
                 if ($property->property_type == PropertyType::CODE_LIST) {
