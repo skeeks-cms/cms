@@ -959,7 +959,7 @@ HTML
                 if (!$model->errors && !$relatedModel->errors)
                 {
                     if (!$model->save()) {
-                        throw new Exception("Ошибка сохранения данных");
+                        throw new Exception("Ошибка сохранения данных: " . print_r($model->errors, true));
                     }
 
                     if (!$relatedModel->save()) {
@@ -1058,7 +1058,7 @@ HTML
                 if (!$model->errors && !$relatedModel->errors)
                 {
                     if (!$model->save()) {
-                        throw new Exception("Ошибка сохранения данных");
+                        throw new Exception("Ошибка сохранения данных: " . print_r($model->errors, true));
                     }
 
                     if (!$relatedModel->save()) {

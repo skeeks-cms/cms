@@ -21,10 +21,16 @@ class ClusterLocal extends Cluster
      * @var bool
      */
     public $publicBaseUrlIsAbsolute = false;
+    public $hostInfo = "";
+
     public function init()
     {
         if (!$this->name) {
             $this->name = \Yii::t('skeeks/cms', "Local storage");
+        }
+
+        if (!$this->hostInfo) {
+            $this->hostInfo = \Yii::$app->urlManager->hostInfo;
         }
 
         if (!$this->publicBaseUrl) {
@@ -120,7 +126,7 @@ class ClusterLocal extends Cluster
         if ($this->publicBaseUrlIsAbsolute) {
             return $this->getPublicUrl($clusterFile);
         } else {
-            return \Yii::$app->urlManager->hostInfo.$this->getPublicUrl($clusterFile);
+            return $this->hostInfo . $this->getPublicUrl($clusterFile);
         }
     }
     
@@ -133,7 +139,7 @@ class ClusterLocal extends Cluster
         if ($this->publicBaseUrlIsAbsolute) {
             return $this->getPublicBaseNameUrl($clusterFile);
         } else {
-            return \Yii::$app->urlManager->hostInfo.$this->getPublicBaseNameUrl($clusterFile);
+            return $this->hostInfo . $this->getPublicBaseNameUrl($clusterFile);
         }
     }
     

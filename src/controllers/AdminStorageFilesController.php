@@ -363,6 +363,9 @@ JS
                                 //->createCommand()->rawSql;
                                 ->asArray()->one();
 
+                            /*print_r($query->select([$tableName.".id", 'total_size' => new Expression("SUM({$tableName}.size)")])->createCommand()->rawSql);
+                            die;*/
+
                             $total_size = ArrayHelper::getValue($result, 'total_size');
                             $size = \Yii::$app->formatter->asShortSize($total_size);
 
