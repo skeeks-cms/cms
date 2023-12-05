@@ -646,7 +646,7 @@ class User
         }
 
         if ($this->username) {
-            $this->username;
+            return $this->username;
         }
 
         return $this->id;
