@@ -55,7 +55,7 @@
 
 <?
 
-$properties = $model->getRelatedProperties()->all();
+$properties = $model->relatedProperties;
 /**
  * @var $property \skeeks\cms\relatedProperties\models\RelatedPropertyModel
  */

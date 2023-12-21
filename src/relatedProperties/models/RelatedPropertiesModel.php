@@ -106,17 +106,19 @@ class RelatedPropertiesModel extends DynamicModel
      * @param bool  $recursive
      * @return array
      */
-    public function toArray(array $fields = [], array $expand = [], $recursive = true)
+    /*public function toArray(array $fields = [], array $expand = [], $recursive = true)
     {
+        $this->initAllProperties();
+
         $result = parent::toArray($fields, $expand, $recursive);
 
-        if (!$result) {
+        /*if (!$result) {
             $this->initAllProperties();
             return parent::toArray($fields, $expand, $recursive);
         }
 
         return $result;
-    }
+    }*/
 
     /**
      * @param RelatedPropertyModel $property
@@ -161,11 +163,18 @@ class RelatedPropertiesModel extends DynamicModel
         }
     }
 
+    protected $_is_initAllProperties = false;
     /**
      *
      */
     public function initAllProperties()
     {
+        if ($this->_is_initAllProperties === true) {
+            return true;
+        }
+
+        \Yii::beginProfile('init initAllProperties ' . $this->relatedElementModel->id);
+
         if ($this->relatedElementModel->relatedProperties) {
             foreach ($this->relatedElementModel->relatedProperties as $property) {
                 $this->_defineByProperty($property);
@@ -177,16 +186,20 @@ class RelatedPropertiesModel extends DynamicModel
                 $this->_initPropertyValue($property, $relatedElementProperties);
             }
         }
+
+        $this->_is_initAllProperties = true;
+
+        \Yii::endProfile('init initAllProperties '  . $this->relatedElementModel->id);
     }
 
     public function init()
     {
-        \Yii::beginProfile('init RP');
+       // \Yii::beginProfile('init RP' . $this->relatedElementModel->id);
 
         parent::init();
-        //$this->_initAllProperties();
+        $this->initAllProperties();
 
-        \Yii::endProfile('init RP');
+        //\Yii::endProfile('init RP' . $this->relatedElementModel->id);
     }
 
 
@@ -549,7 +562,6 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getRelatedProperty($name)
     {
-        $this->hasAttribute($name);
         return ArrayHelper::getValue($this->_properties, $name);
     }
 
@@ -559,7 +571,6 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getRelatedElementProperties($name)
     {
-        $this->hasAttribute($name);
         return ArrayHelper::getValue($this->_propertyValues, $name);
     }
 
@@ -567,20 +578,20 @@ class RelatedPropertiesModel extends DynamicModel
     /**
      * {@inheritdoc}
      */
-    public function __get($name)
+    /*public function __get($name)
     {
         $this->hasAttribute($name);
         return parent::__get($name);
-    }
+    }*/
 
     /**
      * {@inheritdoc}
      */
-    public function __set($name, $value)
+    /*public function __set($name, $value)
     {
         $this->hasAttribute($name);
         return parent::__set($name, $value);
-    }
+    }*/
 
 
     /**
@@ -590,9 +601,18 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function hasAttribute($name)
     {
+        //$this->initAllProperties();
+        return parent::hasAttribute($name);
+
+        //\Yii::beginProfile('RP hasAttribute ' . $name);
         if (in_array($name, $this->attributes())) {
+            //\Yii::endProfile('RP hasAttribute ' . $name);
             return true;
         }
+
+        $profileKey = 'RP hasAttribute ' . $this->relatedElementModel->id . "_" . $name;
+
+        \Yii::beginProfile($profileKey);
 
         $repClass = $this->relatedElementModel->relatedElementPropertyClassName;
         $rpClass = $this->relatedElementModel->relatedPropertyClassName;
@@ -616,13 +636,20 @@ class RelatedPropertiesModel extends DynamicModel
         $dependency = new TagDependency([
             'tags' => $tags,
         ]);
-        
+        \Yii::endProfile($profileKey);
+
         $property = $this->relatedElementModel::getDb()->cache(function ($db) use ($name) {
             return $this->relatedElementModel->getRelatedProperties()->andWhere(['code' => $name])->one();
         }, 3600 * 24, $dependency);
 
+
         if ($property) {
+
+            /*$profileKey = 'RP _defineByProperty ' . $this->relatedElementModel->id . "_" . $name;
+            \Yii::beginProfile($profileKey);*/
             $this->_defineByProperty($property);
+            /*\Yii::endProfile($profileKey);*/
+
 
             $pv = $this->relatedElementModel::getDb()->cache(function ($db) use ($property) {
                 return $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
@@ -630,13 +657,19 @@ class RelatedPropertiesModel extends DynamicModel
 
             //$pv = $this->relatedElementModel->getRelatedElementProperties()->where(['property_id' => $property->id])->all();
 
+            //$profileKey = 'RP _initPropertyValue ' . $this->relatedElementModel->id . "_" . $name;
+            //\Yii::beginProfile($profileKey);
             $this->_initPropertyValue($property, (array)$pv);
+            //\Yii::endProfile($profileKey);
         }
 
+
         if (in_array($name, $this->attributes())) {
+            //\Yii::endProfile('RP hasAttribute ' . $name);
             return true;
         }
 
+        //\Yii::endProfile('RP hasAttribute ' . $name);
         return false;
     }
 
@@ -650,8 +683,13 @@ class RelatedPropertiesModel extends DynamicModel
      */
     public function getAttribute($name)
     {
+        //\Yii::beginProfile('RP getAttribute ' . $name);
+
         if ($this->hasAttribute($name)) {
+            //\Yii::endProfile('RP getAttribute ' . $name);
             return $this->$name;
+        } else {
+            //\Yii::endProfile('RP getAttribute ' . $name);
         }
 
         return null;

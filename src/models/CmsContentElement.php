@@ -524,12 +524,20 @@ class CmsContentElement extends RelatedElementModel
     }
 
     static public $_contents = [];
+    static public $_relatedProperties = [];
+
     /**
      * Все возможные свойства связанные с моделью
-     * @return \yii\db\ActiveQuery
+     * @return CmsContentProperty[]
      */
     public function getRelatedProperties()
     {
+        $siteId = $this->cms_site_id ? $this->cms_site_id : 0;
+        $treeId = $this->tree_id ? $this->tree_id : 0;
+        if (isset(self::$_relatedProperties[$siteId][$this->content_id][$treeId])) {
+            return self::$_relatedProperties[$siteId][$this->content_id][$treeId];
+        }
+
         /**
          * @var $cmsContent CmsContent
          */
@@ -541,22 +549,21 @@ class CmsContentElement extends RelatedElementModel
             $cmsContent = self::$_contents[$this->content_id];
         }
 
-        $q = $cmsContent->getCmsContentProperties();
-        $q->joinWith('cmsContentProperty2trees as map2trees')
+        $q = $cmsContent->getCmsContentProperties()
             ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
 
         if ($this->tree_id) {
+            $q->joinWith('cmsContentProperty2trees as map2trees');
             $q->andWhere([
                 'or',
                 ['map2trees.cms_tree_id' => $this->tree_id],
                 ['map2trees.cms_tree_id' => null],
             ]);
         } else {
-            $q->andWhere(
+            /*$q->andWhere(
                 ['map2trees.cms_tree_id' => null]
-            );
+            );*/
         }
-
 
         if ($this->cms_site_id) {
             $q->andWhere([
@@ -567,6 +574,10 @@ class CmsContentElement extends RelatedElementModel
         }
 
         $q->orderBy(['priority' => SORT_ASC]);
+
+        $result = $q->all();
+        self::$_relatedProperties[$siteId][$this->content_id][$treeId] = $result;
+        return $result;
 
 
         return $q;
