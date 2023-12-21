@@ -394,6 +394,7 @@ class CmsSite extends ActiveRecord
      */
     public function getCmsSiteMainDomain()
     {
+        //return null;
         $query = $this->getCmsSiteDomains()->andWhere(['is_main' => 1]);
         $query->multiple = false;
         return $query;
@@ -496,7 +497,7 @@ class CmsSite extends ActiveRecord
     public function getFaviconType()
     {
         $data = pathinfo($this->faviconUrl);
-        $extension = strtolower(ArrayHelper::getValue($data, "extension"));
+        $extension = strtolower((string) ArrayHelper::getValue($data, "extension"));
         $last = 'x-icon';
         if (in_array($extension, ["png", "jpeg", "gif", "bmp"])) {
             $last = $extension;
