@@ -1,6 +1,13 @@
 CHANGELOG
 ==============
 
+6.0.2
+-----------------
+ * EAV update 
+ * NOT to use $model->getRelatedProperties()->all()
+ * NEED to use $model->relatedProperties;
+ * \skeeks\cms\models\CmsContentElement::find() to use ->with('relatedElementProperties') for optimize
+
 6.0.1
 -----------------
  * New ajax file uploader
