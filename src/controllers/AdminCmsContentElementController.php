@@ -910,14 +910,18 @@ HTML
         $model->content_id = $this->content->id;
         $model->cms_site_id = \Yii::$app->skeeks->site->id;
 
-        $relatedModel = $model->relatedPropertiesModel;
-        $relatedModel->loadDefaultValues();
+
 
         $rr = new RequestResponse();
 
         if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
+
+            $relatedModel = $model->relatedPropertiesModel;
             $relatedModel->load(\Yii::$app->request->post());
+        } else {
+            $relatedModel = $model->relatedPropertiesModel;
+            $relatedModel->loadDefaultValues();
         }
 
         if ($rr->isRequestPjaxPost()) {

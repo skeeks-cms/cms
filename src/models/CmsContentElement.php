@@ -552,17 +552,18 @@ class CmsContentElement extends RelatedElementModel
         $q = $cmsContent->getCmsContentProperties()
             ->groupBy(\skeeks\cms\models\CmsContentProperty::tableName().".id");
 
-        if ($this->tree_id) {
+        if ($treeId) {
             $q->joinWith('cmsContentProperty2trees as map2trees');
             $q->andWhere([
                 'or',
-                ['map2trees.cms_tree_id' => $this->tree_id],
+                ['map2trees.cms_tree_id' => $treeId],
                 ['map2trees.cms_tree_id' => null],
             ]);
         } else {
-            /*$q->andWhere(
+            $q->joinWith('cmsContentProperty2trees as map2trees');
+            $q->andWhere(
                 ['map2trees.cms_tree_id' => null]
-            );*/
+            );
         }
 
         if ($this->cms_site_id) {
@@ -574,8 +575,13 @@ class CmsContentElement extends RelatedElementModel
         }
 
         $q->orderBy(['priority' => SORT_ASC]);
-
+        /*if (YII_ENV_DEV) {
+            print_r($this->toArray());die;
+            var_dump($treeId);die;
+            print_r($q->createCommand()->rawSql);die;
+        }*/
         $result = $q->all();
+
         self::$_relatedProperties[$siteId][$this->content_id][$treeId] = $result;
         return $result;
 
