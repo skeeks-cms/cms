@@ -60,6 +60,35 @@ function contentMenu()
         }
     }
 
+    $contents = \skeeks\cms\models\CmsContent::find()->andWhere(['content_type' => null])->andWhere(['is_visible' => 1])->orderBy('priority')->all();
+    if ($contents) {
+        foreach ($contents as $content)
+        {
+            $result[] = [
+                'label'          => $content->name,
+                'url'            => ["cms/admin-cms-content-element", "content_id" => $content->id],
+                "activeCallback" => function ($adminMenuItem) use ($content) {
+                    return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'cms/admin-cms-content-element');
+                },
+
+                "accessCallback" => function ($adminMenuItem) use ($content) {
+
+                    $permissionNames = "cms/admin-cms-content-element__".$content->id;
+                    foreach ([$permissionNames] as $permissionName) {
+                        if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
+                            if (!\Yii::$app->user->can($permission->name)) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                },
+
+            ];
+        }
+    }
+
     return $result;
 }
 
@@ -382,6 +411,11 @@ return array_merge(dashboardsMenu(), [
 
                     'items' => [
                         [
+                            'url'   => ["cms/admin-cms-content"],
+                            'label' => \Yii::t('skeeks/cms', "Контент"),
+                        ],
+
+                        [
                             'url'   => ["cms/admin-cms-content-property"],
                             'label' => \Yii::t('skeeks/cms', "Properties"),
                         ],
@@ -390,10 +424,7 @@ return array_merge(dashboardsMenu(), [
                             'label' => \Yii::t('skeeks/cms', "Options"),
                         ],
 
-                        [
-                            'url'   => ["cms/admin-cms-content"],
-                            'label' => \Yii::t('skeeks/cms', "Типы контента"),
-                        ],
+
 
                         [
                             'url'   => ["cms/admin-cms-content-type"],

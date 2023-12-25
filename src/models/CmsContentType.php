@@ -47,7 +47,7 @@ class CmsContentType extends Core
         return array_merge(parent::behaviors(), []);
     }
 
-    public function init()
+    /*public function init()
     {
         parent::init();
 
@@ -60,7 +60,7 @@ class CmsContentType extends Core
             throw new Exception(\Yii::t('skeeks/cms',
                 "Before you delete this type of content you want to delete the contents invested in it"));
         }
-    }
+    }*/
 
     /**
      * @inheritdoc

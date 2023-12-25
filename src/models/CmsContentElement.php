@@ -533,9 +533,20 @@ class CmsContentElement extends RelatedElementModel
     public function getRelatedProperties()
     {
         $siteId = $this->cms_site_id ? $this->cms_site_id : 0;
+        $contentId = $this->content_id ? $this->content_id : 0;
         $treeId = $this->tree_id ? $this->tree_id : 0;
-        if (isset(self::$_relatedProperties[$siteId][$this->content_id][$treeId])) {
-            return self::$_relatedProperties[$siteId][$this->content_id][$treeId];
+
+        $cacheKey = "{$siteId}-{$contentId}-{$treeId}";
+
+        /*if (\Yii::$app->request->post()) {
+            print_r($cacheKey);
+        }*/
+
+        if (isset(self::$_relatedProperties[$cacheKey])) {
+            /*if (\Yii::$app->request->post()) {
+                print_r("111111111");
+            }*/
+            return self::$_relatedProperties[$cacheKey];
         }
 
         /**
@@ -575,6 +586,10 @@ class CmsContentElement extends RelatedElementModel
         }
 
         $q->orderBy(['priority' => SORT_ASC]);
+        /*if (\Yii::$app->request->post()) {
+            print_r($q->createCommand()->rawSql);
+        }*/
+
         /*if (YII_ENV_DEV) {
             print_r($this->toArray());die;
             var_dump($treeId);die;
@@ -582,7 +597,15 @@ class CmsContentElement extends RelatedElementModel
         }*/
         $result = $q->all();
 
-        self::$_relatedProperties[$siteId][$this->content_id][$treeId] = $result;
+
+
+        self::$_relatedProperties[$cacheKey] = $result;
+
+        //Память может переполниться...
+        if (count(self::$_relatedProperties[$cacheKey]) > 10) {
+            self::$_relatedProperties = [];
+        }
+
         return $result;
 
 

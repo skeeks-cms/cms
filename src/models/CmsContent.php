@@ -189,7 +189,7 @@ class CmsContent extends Core
             [['is_parent_content_required'], 'integer'],
             [['is_have_page'], 'integer'],
             [['is_show_on_all_sites'], 'integer'],
-            [['name', 'content_type'], 'required'],
+            [['name'], 'required'],
             [['description'], 'string'],
             [['meta_title_template'], 'string'],
             [['meta_description_template'], 'string'],
@@ -226,6 +226,7 @@ class CmsContent extends Core
             ],
 
             [['editable_fields'], 'safe'],
+            [['content_type'], 'default', 'value' => null],
             //[['editable_fields'], 'default', 'value' => null],
 
 
