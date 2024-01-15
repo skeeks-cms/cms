@@ -124,7 +124,8 @@ abstract class PropertyType extends Model implements IHasConfigForm
     public function getStringValue()
     {
         $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
-
+        /*print_r($this->property->relatedPropertiesModel->toArray());*/
+        /*echo "<br />_{$value}-{$this->property->relatedPropertiesModel->relatedElementModel->id}_<br />";*/
         if (is_array($value)) {
             return Json::encode($value);
         } else {

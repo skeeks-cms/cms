@@ -391,10 +391,11 @@ class User
                             ->one()) {
                             $this->addError($attribute, "Этот телефон уже занят");
                         }
-                        if ($this->mainCmsUserPhone && $this->mainCmsUserPhone->is_approved && $this->mainCmsUserPhone->value != $value) {
+                        //todo: доработать в будущем
+                        /*if ($this->mainCmsUserPhone && $this->mainCmsUserPhone->is_approved && $this->mainCmsUserPhone->value != $value) {
                             $this->addError($attribute, "Этот телефон подтвержден, и его менять нельзя. Добавьте другой телефон, а после удалите этот!");
                             return false;
-                        }
+                        }*/
                     }
                 },
             ],

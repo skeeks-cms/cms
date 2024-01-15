@@ -30,6 +30,7 @@ use yii\helpers\Json;
  */
 class RelatedPropertiesModel extends DynamicModel
 {
+    public $id = '';
     /**
      * @var RelatedElementModel
      */
@@ -57,7 +58,6 @@ class RelatedPropertiesModel extends DynamicModel
 
     protected $_attributeLabels = [];
 
-
     /**
      * Инициализация аттрибута
      * @param array $values
@@ -83,7 +83,7 @@ class RelatedPropertiesModel extends DynamicModel
 
     protected function _defineByProperty($property)
     {
-
+        \Yii::info("_defineByProperty: {$this->relatedElementModel->id} {$this->id} {$property->code}", "dev");
         /**
          * @var $property RelatedPropertyModel
          */
@@ -197,6 +197,7 @@ class RelatedPropertiesModel extends DynamicModel
        // \Yii::beginProfile('init RP' . $this->relatedElementModel->id);
 
         parent::init();
+        $this->id = \Yii::$app->security->generateRandomString(5);
         $this->initAllProperties();
 
         //\Yii::endProfile('init RP' . $this->relatedElementModel->id);
@@ -837,10 +838,11 @@ class RelatedPropertiesModel extends DynamicModel
     {
         $property = $this->getRelatedProperty($name);
 
+        /*print_r($property->toArray());*/
+
         if (!$property) {
             return '';
         }
-
         return $property->handler->asText;
     }
 

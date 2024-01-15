@@ -437,7 +437,7 @@ class AuthController extends Controller
                         'type'  => "password",
                     ];
 
-                    if ($user->password_hash) {
+                    if ($user->password_hash  && (int) \Yii::$app->request->post('auth_submit_code_always') == 0) {
                         $rr->data = [
                             'user'  => true,
                             'phone' => $model->phone,
@@ -535,7 +535,7 @@ class AuthController extends Controller
                     //Если пользователь существует
                     //Нужно предложить ему авторизоваться с его паролем
 
-                    if ($user->password_hash) {
+                    if ($user->password_hash && (int) \Yii::$app->request->post('auth_submit_code_always') == 0) {
                         $rr->data = [
                             'user'  => true,
                             'phone' => $model->phone,
@@ -967,7 +967,7 @@ class AuthController extends Controller
                     //Если пользователь существует
                     //Нужно предложить ему авторизоваться с его паролем
 
-                    if ($user->password_hash) {
+                    if ($user->password_hash  && (int) \Yii::$app->request->post('auth_submit_code_always') == 0) {
                         $rr->data = [
                             'user'  => true,
                             'email' => $model->email,
