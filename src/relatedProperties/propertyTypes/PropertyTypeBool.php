@@ -76,14 +76,14 @@ class PropertyTypeBool extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
         $field = parent::renderForActiveForm();
 
         if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
-            if ($this->property->relatedPropertiesModel->relatedElementModel->isNewRecord && $this->defaultValue) {
-                $this->property->relatedPropertiesModel->setAttribute($this->property->code, $this->defaultValue);
+            if ($relatedPropertiesModel->relatedElementModel->isNewRecord && $this->getDefaultValue($relatedPropertiesModel)) {
+                $relatedPropertiesModel->setAttribute($this->property->code, $this->getDefaultValue($relatedPropertiesModel));
             }
 
             if ($fieldElement == 'radioList' || $fieldElement == 'listBox') {
@@ -104,15 +104,15 @@ class PropertyTypeBool extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->property->isRequired) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required', [
+            $relatedPropertiesModel->addRule($this->property->code, 'required', [
                 'requiredValue' => '1',
                 'message' => \Yii::t('yii', '{attribute} cannot be blank.'),
             ]);
         } else {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'boolean', [
+            $relatedPropertiesModel->addRule($this->property->code, 'boolean', [
                 'trueValue' => '1',
                 'falseValue' => '0'
             ]);
@@ -126,7 +126,7 @@ class PropertyTypeBool extends PropertyType
      *
      * @return null
      */
-    public function getDefaultValue()
+    public function getDefaultValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->default_value !== null) {
             return $this->default_value;
@@ -138,9 +138,9 @@ class PropertyTypeBool extends PropertyType
     /**
      * @return string
      */
-    public function getAsText()
+    public function getAsText(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
         return (string)\Yii::$app->formatter->asBoolean($value);
     }
 

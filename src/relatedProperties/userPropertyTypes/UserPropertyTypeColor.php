@@ -9,6 +9,7 @@
 namespace skeeks\cms\relatedProperties\userPropertyTypes;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\ColorInput;
 use yii\helpers\ArrayHelper;
@@ -77,9 +78,9 @@ class UserPropertyTypeColor extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $pluginOptions = [
             'showAlpha'   => (bool)($this->showAlpha === Cms::BOOL_Y),
@@ -134,9 +135,9 @@ class UserPropertyTypeColor extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'string');
+        $relatedPropertiesModel->addRule($this->property->code, 'string');
 
         return $this;
     }

@@ -51,9 +51,9 @@ class UserPropertyTypeSelectFile extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $field->widget(SelectModelDialogStorageFileSrcWidget::class);
 
@@ -66,9 +66,9 @@ class UserPropertyTypeSelectFile extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'string');
+        $relatedPropertiesModel->addRule($this->property->code, 'string');
 
         return $this;
     }

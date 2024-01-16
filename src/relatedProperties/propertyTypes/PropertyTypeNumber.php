@@ -62,9 +62,9 @@ class PropertyTypeNumber extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $append = '';
         if ($this->property->cms_measure_code) {
@@ -88,12 +88,12 @@ class PropertyTypeNumber extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'number');
+        $relatedPropertiesModel->addRule($this->property->code, 'number');
 
         if ($this->property->isRequired) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+            $relatedPropertiesModel->addRule($this->property->code, 'required');
         }
 
         return $this;
@@ -104,7 +104,7 @@ class PropertyTypeNumber extends PropertyType
      *
      * @return null
      */
-    public function getDefaultValue()
+    public function getDefaultValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->default_value !== null) {
             return $this->default_value;

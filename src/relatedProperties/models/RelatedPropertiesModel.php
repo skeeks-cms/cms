@@ -30,6 +30,9 @@ use yii\helpers\Json;
  */
 class RelatedPropertiesModel extends DynamicModel
 {
+    /**
+     * @var string Ненужная вещь, нужна только для тестирования
+     */
     public $id = '';
     /**
      * @var RelatedElementModel
@@ -83,19 +86,17 @@ class RelatedPropertiesModel extends DynamicModel
 
     protected function _defineByProperty($property)
     {
-        \Yii::info("_defineByProperty: {$this->relatedElementModel->id} {$this->id} {$property->code}", "dev");
+        //\Yii::info("_defineByProperty: {$this->relatedElementModel->id} {$this->id} {$property->code}", "dev");
         /**
          * @var $property RelatedPropertyModel
          */
         $this->defineAttribute($property->code, $property->handler->isMultiple ? [] : null);
-
-        $property->relatedPropertiesModel = $this;
-        $property->addRules();
-
-        $this->{$property->code} = $property->defaultValue;
-
+        
+        //$property->relatedPropertiesModel = $this;
+        $property->addRules($this);
+        
+        $this->{$property->code} = $property->getDefaultValue($this);
         $this->_properties[$property->code] = $property;
-
         $this->_attributeLabels[$property->code] = $property->name;
         $this->_attributeHints[$property->code] = $property->hint;
     }
@@ -543,7 +544,7 @@ class RelatedPropertiesModel extends DynamicModel
     {
         foreach ($this->_properties as $property) {
             if ((!$skipIfSet || $this->{$property->code} === null)) {
-                $this->{$property->code} = $property->defaultValue;
+                $this->{$property->code} = $property->getDefaultValue($this);
             }
         }
 
@@ -843,7 +844,7 @@ class RelatedPropertiesModel extends DynamicModel
         if (!$property) {
             return '';
         }
-        return $property->handler->asText;
+        return $property->handler->getAsText($this);
     }
 
 
@@ -859,7 +860,7 @@ class RelatedPropertiesModel extends DynamicModel
             return '';
         }
 
-        return $property->handler->asHtml;
+        return $property->handler->getAsHtml($this);
     }
 
     /**
@@ -875,7 +876,7 @@ class RelatedPropertiesModel extends DynamicModel
             return '';
         }
 
-        return $property->handler->asHtml;
+        return $property->handler->getAsHtml($this);
     }
 
     /**

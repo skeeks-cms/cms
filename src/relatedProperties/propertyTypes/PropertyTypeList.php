@@ -9,6 +9,7 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\AjaxSelect;
 use skeeks\cms\widgets\Select;
@@ -195,9 +196,9 @@ class PropertyTypeList extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $find = CmsContentPropertyEnum::find()->andWhere(['property_id' => $this->property->id]);
 
@@ -360,16 +361,16 @@ class PropertyTypeList extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->isMultiple) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'safe');
+            $relatedPropertiesModel->addRule($this->property->code, 'safe');
         } else {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'integer');
+            $relatedPropertiesModel->addRule($this->property->code, 'integer');
         }
 
         if ($this->property->isRequired) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+            $relatedPropertiesModel->addRule($this->property->code, 'required');
         }
 
         return $this;
@@ -381,9 +382,9 @@ class PropertyTypeList extends PropertyType
     /**
      * @return string
      */
-    public function getAsText()
+    public function getAsText(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
 
         if ($this->isMultiple) {
 

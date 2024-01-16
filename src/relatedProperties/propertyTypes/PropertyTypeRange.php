@@ -84,12 +84,12 @@ class PropertyTypeRange extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'boolean');
+        $relatedPropertiesModel->addRule($this->property->code, 'boolean');
 
         if ($this->property->isRequired) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+            $relatedPropertiesModel->addRule($this->property->code, 'required');
         }
 
         return $this;
@@ -98,9 +98,9 @@ class PropertyTypeRange extends PropertyType
     /**
      * @return string
      */
-    public function getAsText()
+    public function getAsText(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
         return (string)\Yii::$app->formatter->asBoolean($value);
     }
 

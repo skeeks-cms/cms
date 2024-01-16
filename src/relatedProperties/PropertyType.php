@@ -12,9 +12,11 @@ namespace skeeks\cms\relatedProperties;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\IHasConfigForm;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\cms\traits\TConfigForm;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
@@ -76,9 +78,9 @@ abstract class PropertyType extends Model implements IHasConfigForm
      * Drawing form element
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = $this->activeForm->field($this->property->relatedPropertiesModel, $this->property->code);
+        $field = $this->activeForm->field($relatedPropertiesModel, $this->property->code);
 
         if (!$field) {
             return '';
@@ -94,12 +96,12 @@ abstract class PropertyType extends Model implements IHasConfigForm
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'safe');
+        $relatedPropertiesModel->addRule($this->property->code, 'safe');
 
         if ($this->property->isRequired) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+            $relatedPropertiesModel->addRule($this->property->code, 'required');
         }
 
         return $this;
@@ -112,7 +114,7 @@ abstract class PropertyType extends Model implements IHasConfigForm
      *
      * @return null
      */
-    public function getDefaultValue()
+    public function getDefaultValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
         return null;
     }
@@ -121,9 +123,9 @@ abstract class PropertyType extends Model implements IHasConfigForm
      * @return string
      * @depricated
      */
-    public function getStringValue()
+    public function getStringValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
         /*print_r($this->property->relatedPropertiesModel->toArray());*/
         /*echo "<br />_{$value}-{$this->property->relatedPropertiesModel->relatedElementModel->id}_<br />";*/
         if (is_array($value)) {
@@ -133,22 +135,36 @@ abstract class PropertyType extends Model implements IHasConfigForm
         }
     }
 
-    
 
     /**
-     * @return string
+     * @see RelatedPropertyModel::getHandler() //удалить property
+     *
+     * @param array $fields
+     * @param array $expand
+     * @param       $recursive
+     * @return array
      */
-    public function getAsText()
+    public function toArray(array $fields = [], array $expand = [], $recursive = true)
     {
-        return $this->stringValue;
+        $result = parent::toArray($fields, $expand, $recursive);
+        ArrayHelper::remove($result, "property");
+        return $result;
     }
 
     /**
      * @return string
      */
-    public function getAsHtml()
+    public function getAsText(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        return $this->asText;
+        return $this->getStringValue($relatedPropertiesModel);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsHtml(RelatedPropertiesModel $relatedPropertiesModel)
+    {
+        return $this->getAsText($relatedPropertiesModel);
     }
 
     /**

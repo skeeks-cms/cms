@@ -11,6 +11,7 @@ namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -92,9 +93,9 @@ class PropertyTypeTree extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
 
         if ($this->fieldElement == static::FIELD_ELEMENT_SELECT_DIALOG) {
@@ -135,9 +136,9 @@ class PropertyTypeTree extends PropertyType
     /**
      * @return string
      */
-    public function getAsText()
+    public function getAsText(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
 
         if ($this->isMultiple) {
             $data = ArrayHelper::map(CmsTree::find()->where(['id' => $value])->all(), 'id', 'name');

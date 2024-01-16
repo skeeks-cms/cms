@@ -541,11 +541,11 @@ class CmsContentElement extends RelatedElementModel
         /*if (\Yii::$app->request->post()) {
             print_r($cacheKey);
         }*/
+        /*echo $cacheKey;
+        echo "<br>";*/
 
         if (isset(self::$_relatedProperties[$cacheKey])) {
-            /*if (\Yii::$app->request->post()) {
-                print_r("111111111");
-            }*/
+            /*print_r(self::$_relatedProperties[$cacheKey]);die;*/
             return self::$_relatedProperties[$cacheKey];
         }
 
@@ -599,10 +599,15 @@ class CmsContentElement extends RelatedElementModel
 
 
 
+        
         self::$_relatedProperties[$cacheKey] = $result;
 
+        /*print_r(self::$_relatedProperties[$cacheKey]);
+        echo count(self::$_relatedProperties[$cacheKey]);
+        echo "------<br>";*/
+        
         //Память может переполниться...
-        if (count(self::$_relatedProperties[$cacheKey]) > 10) {
+        if (count(self::$_relatedProperties[$cacheKey]) > 20) {
             self::$_relatedProperties = [];
         }
 

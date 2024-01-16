@@ -11,6 +11,7 @@ namespace skeeks\cms\relatedProperties\propertyTypes;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\CmsStorageFile;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use yii\helpers\ArrayHelper;
@@ -99,10 +100,10 @@ class PropertyTypeStorageFile extends PropertyType
     /**
      * @return PropertyType
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->isMultiple) {
-            $this->property->relatedPropertiesModel->attachBehavior(HasStorageFileMulti::class . $this->property->code, [
+            $relatedPropertiesModel->attachBehavior(HasStorageFileMulti::class . $this->property->code, [
                 'class' => HasStorageFileMulti::class,
                 'fields' => [$this->property->code]
             ]);
@@ -112,7 +113,7 @@ class PropertyTypeStorageFile extends PropertyType
                 $extensions = explode(",", $this->allowExtensions);
             }
 
-            $this->property->relatedPropertiesModel->addRule($this->property->code, \skeeks\cms\validators\FileValidator::class, [
+            $relatedPropertiesModel->addRule($this->property->code, \skeeks\cms\validators\FileValidator::class, [
                 'skipOnEmpty' => false,
                 'extensions'  => $extensions,
                 'checkExtensionByMimeType'    => false,
@@ -122,7 +123,7 @@ class PropertyTypeStorageFile extends PropertyType
             ]);
 
         } else {
-            $this->property->relatedPropertiesModel->attachBehavior(HasStorageFile::class . $this->property->code, [
+            $relatedPropertiesModel->attachBehavior(HasStorageFile::class . $this->property->code, [
                 'class' => HasStorageFile::class,
                 'fields' => [$this->property->code]
             ]);
@@ -132,7 +133,7 @@ class PropertyTypeStorageFile extends PropertyType
                 $extensions = explode(",", $this->allowExtensions);
             }
 
-            $this->property->relatedPropertiesModel->addRule($this->property->code, \skeeks\cms\validators\FileValidator::class, [
+            $relatedPropertiesModel->addRule($this->property->code, \skeeks\cms\validators\FileValidator::class, [
                 'skipOnEmpty' => false,
                 'extensions'  => $extensions,
                 'checkExtensionByMimeType'    => false,
@@ -159,9 +160,9 @@ class PropertyTypeStorageFile extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $field->widget(
             AjaxFileUploadWidget::class,
@@ -178,9 +179,9 @@ class PropertyTypeStorageFile extends PropertyType
     /**
      * @return string
      */
-    public function getAsText()
+    public function getAsText(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
 
         if ($this->isMultiple) {
             /**
@@ -207,9 +208,9 @@ class PropertyTypeStorageFile extends PropertyType
     /**
      * @return string
      */
-    public function getAsHtml()
+    public function getAsHtml(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
 
         if ($this->isMultiple) {
             /**

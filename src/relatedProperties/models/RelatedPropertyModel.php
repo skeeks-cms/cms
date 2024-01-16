@@ -66,7 +66,7 @@ abstract class RelatedPropertyModel extends ActiveRecord
     /**
      * @var RelatedPropertiesModel
      */
-    public $relatedPropertiesModel = null;
+    //public $relatedPropertiesModel = null;
     
     /**
      * @var null 
@@ -240,11 +240,11 @@ abstract class RelatedPropertyModel extends ActiveRecord
             return false;
         }
 
-        if ($model && !$this->relatedPropertiesModel) {
+        /*if ($model && !$this->relatedPropertiesModel) {
             $this->relatedPropertiesModel = $model->relatedPropertiesModel;
-        }
+        }*/
 
-        return $handler->renderForActiveForm();
+        return $handler->renderForActiveForm($model->relatedPropertiesModel);
     }
 
     /**
@@ -266,6 +266,7 @@ abstract class RelatedPropertyModel extends ActiveRecord
                 //TODO:: Подумать! Нужно чтобы создавался новый экземляр класса потому что в него передается property объект. В то же время хотелось бы чтобы объект handler собирался согласно настройкам конфига.
                 $component = clone $foundComponent;
                 //$component = \Yii::$app->cms->createRelatedHandler($this->component);
+                //print_r($this->component_settings);die;
                 $component->property = $this;
                 $component->load($this->component_settings, "");
 
@@ -299,18 +300,18 @@ abstract class RelatedPropertyModel extends ActiveRecord
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $elatedPropertiesModel)
     {
-        $this->handler->addRules();
+        $this->handler->addRules($elatedPropertiesModel);
         return $this;
     }
 
     /**
      * @return mixed
      */
-    public function getDefaultValue()
+    public function getDefaultValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        return $this->handler->defaultValue;
+        return $this->handler->getDefaultValue($relatedPropertiesModel);
     }
 
     /**

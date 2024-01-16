@@ -44,15 +44,15 @@ class UserPropertyTypeComboText extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $field->widget(\skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
             [
                 'ckeditorOptions' =>
                     [
-                        'relatedModel' => $this->property->relatedPropertiesModel->relatedElementModel
+                        'relatedModel' => $relatedPropertiesModel->relatedElementModel
                     ]
             ]);
 
@@ -66,9 +66,9 @@ class UserPropertyTypeComboText extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'string');
+        $relatedPropertiesModel->addRule($this->property->code, 'string');
 
         return $this;
     }

@@ -88,9 +88,9 @@ class PropertyTypeText extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
@@ -116,12 +116,12 @@ class PropertyTypeText extends PropertyType
      *
      * @return $this
      */
-    public function addRules()
+    public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $this->property->relatedPropertiesModel->addRule($this->property->code, 'string');
+        $relatedPropertiesModel->addRule($this->property->code, 'string');
 
         if ($this->property->isRequired) {
-            $this->property->relatedPropertiesModel->addRule($this->property->code, 'required');
+            $relatedPropertiesModel->addRule($this->property->code, 'required');
         }
 
         return $this;
@@ -132,7 +132,7 @@ class PropertyTypeText extends PropertyType
      *
      * @return null
      */
-    public function getDefaultValue()
+    public function getDefaultValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
         if ($this->default_value !== null) {
             return $this->default_value;

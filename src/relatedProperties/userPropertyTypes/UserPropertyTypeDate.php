@@ -10,6 +10,7 @@ namespace skeeks\cms\relatedProperties\userPropertyTypes;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -70,9 +71,9 @@ class UserPropertyTypeDate extends PropertyType
     /**
      * @return \yii\widgets\ActiveField
      */
-    public function renderForActiveForm()
+    public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         $field->widget(\kartik\datecontrol\DateControl::classname(), [
             'type' => $this->type,
@@ -94,9 +95,9 @@ class UserPropertyTypeDate extends PropertyType
      * @return string
      * @depricated
      */
-    public function getStringValue()
+    public function getStringValue(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $value = $this->property->relatedPropertiesModel->getAttribute($this->property->code);
+        $value = $relatedPropertiesModel->getAttribute($this->property->code);
         return \Yii::$app->formatter->asDatetime($value);
     }
 }

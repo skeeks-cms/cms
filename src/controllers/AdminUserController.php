@@ -35,7 +35,6 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\cms\shop\models\ShopBonusTransaction;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\ActiveForm;
 use skeeks\cms\widgets\GridView;
@@ -416,18 +415,18 @@ class AdminUserController extends BackendModelStandartController
                 'isVisible' => false,
                 'callback'  => [$this, 'addContractor'],
             ],
-            'send-sms' => [
+            'send-sms'       => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
                 'callback'  => [$this, 'sendSms'],
             ],
-            
+
             'create' => [
                 //"callback"       => [$this, 'create'],
                 'size'           => BackendAction::SIZE_SMALL,
                 'generateAccess' => true,
                 'fields'         => [$this, 'createFields'],
-                'buttons'         => ["save"],
+                'buttons'        => ["save"],
             ],
 
 
@@ -508,8 +507,7 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
-            
-            
+
             'payments' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Платежи',
@@ -537,13 +535,13 @@ class AdminUserController extends BackendModelStandartController
 
 
             ],
-            
+
             "checks" => [
-                'class'           => BackendGridModelRelatedAction::class,
-                'accessCallback'  => true,
-                'name'            => "Чеки",
-                'icon'            => 'fa fa-list',
-                
+                'class'          => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'           => "Чеки",
+                'icon'           => 'fa fa-list',
+
                 'controllerRoute' => "/shop/admin-shop-check",
                 'relation'        => ['cms_user_id' => 'id'],
                 'priority'        => 600,
@@ -561,8 +559,8 @@ class AdminUserController extends BackendModelStandartController
 
                 },
             ],
-            
-            'bills'    => [
+
+            'bills' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Счета',
                 'priority' => 600,
@@ -587,8 +585,8 @@ class AdminUserController extends BackendModelStandartController
                 },
 
             ],
-            
-            
+
+
             "bonus" => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'accessCallback'  => true,
@@ -655,7 +653,7 @@ class AdminUserController extends BackendModelStandartController
 
             'update' => [
                 'fields'         => [$this, 'updateFields'],
-                'buttons'         => ["save"],
+                'buttons'        => ["save"],
                 'isVisible'      => false,
                 'generateAccess' => true,
                 "accessCallback" => function () {
@@ -782,7 +780,7 @@ JS
                 'class'     => SelectField::class,
                 'allowNull' => false,
                 'items'     => [
-                    '0'   => "Человек",
+                    '0' => "Человек",
                     '1' => "Компания",
                 ],
             ],
@@ -809,7 +807,7 @@ JS
                 'content' => '</div><div class="sx-0-block">',
             ],
 
-            'gender'   => [
+            'gender' => [
                 'class'     => SelectField::class,
                 'allowNull' => false,
                 'items'     => [
@@ -828,12 +826,8 @@ JS
             ],
 
 
-
-
-
-
             'email',
-            'phone'    => [
+            'phone'  => [
                 'elementOptions'  => [
                     'placeholder' => '+7 903 722-28-73',
                 ],
@@ -905,7 +899,6 @@ JS
                 'alias',
             ];
         }
-
 
 
         if ((\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $this->model]))
@@ -1016,33 +1009,48 @@ JS
 
         $rr = new RequestResponse();
 
-        if ($post = \Yii::$app->request->post()) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-        }
+        try {
 
 
-        if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
+            if ($post = \Yii::$app->request->post()) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 
-                $model->save();
-
-                if ($relatedModel->save()) {
-
-                    $is_saved = true;
-
-                    if (\Yii::$app->request->post('submit-btn') == 'save') {
-                    } else {
-                        $redirect = $this->url;
-                    }
-
-                    //$model->refresh();
-                    $relatedModel = $model->relatedPropertiesModel;
-                }
             }
 
+            if ($rr->isRequestAjaxPost()) {
+
+                if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
+
+                    $model->load(\Yii::$app->request->post());
+                    $relatedModel->load(\Yii::$app->request->post());
+
+                    $model->save();
+                    if ($relatedModel->save()) {
+
+                        $is_saved = true;
+
+                        if (\Yii::$app->request->post('submit-btn') == 'save') {
+                        } else {
+                            $redirect = $this->url;
+                        }
+
+                        $rr->message = "Сохранено";
+                        $rr->success = true;
+                        //$model->refresh();
+                        $relatedModel = $model->relatedPropertiesModel;
+                    } else {
+                        print_r($relatedModel->errors);
+                        die;
+                    }
+                }
+
+                return $rr;
+
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            die;
         }
 
 
@@ -1251,9 +1259,8 @@ JS
 
         return $rr;
     }
-    
-    
-    
+
+
     public function addContractor()
     {
         $rr = new RequestResponse();
@@ -1272,7 +1279,7 @@ JS
                 //print_r($q->createCommand()->rawSql);die;
                 $contractor = $q->one();
                 if ($contractor) {
-                    
+
                     if ($user->getCmsContractorMaps()->andWhere(['cms_contractor_id' => $contractor->id])->exists()) {
                         throw new Exception("Эта компания уже добавлена");
                     }
