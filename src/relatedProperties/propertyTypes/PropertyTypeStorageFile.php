@@ -144,7 +144,7 @@ class PropertyTypeStorageFile extends PropertyType
 
         }
 
-        return parent::addRules();
+        return parent::addRules($relatedPropertiesModel);
     }
 
     /**

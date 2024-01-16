@@ -78,7 +78,7 @@ class PropertyTypeBool extends PropertyType
      */
     public function renderForActiveForm(RelatedPropertiesModel $relatedPropertiesModel)
     {
-        $field = parent::renderForActiveForm();
+        $field = parent::renderForActiveForm($relatedPropertiesModel);
 
         if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
