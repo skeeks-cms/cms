@@ -364,6 +364,12 @@ return array_merge(dashboardsMenu(), [
                 ],
 
                 [
+                    "name"  => ['skeeks/measure', 'Страны'],
+                    "url"   => ["cms/admin-cms-country"],
+                    "image" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/countries.png'],
+                ],
+
+                [
                     "label" => \Yii::t('skeeks/cms', "Languages"),
                     "url"   => ["cms/admin-cms-lang"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],
@@ -508,6 +514,9 @@ return array_merge(dashboardsMenu(), [
 
                         ],
                 ],
+
+
+
 
 
             ],
