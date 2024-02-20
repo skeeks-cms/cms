@@ -94,4 +94,13 @@ class CmsContentElementActiveQuery extends CmsActiveQuery
 
         return $this;
     }
+
+    /**
+     * @param int $content_id
+     * @return CmsContentElementActiveQuery
+     */
+    public function contentId(int $content_id)
+    {
+        return $this->andWhere([$this->getPrimaryTableName() . '.content_id' => $content_id]);
+    }
 }

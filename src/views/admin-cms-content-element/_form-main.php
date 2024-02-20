@@ -2,6 +2,7 @@
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
+
 ?>
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Main')); ?>
 
@@ -17,36 +18,74 @@
 
 
 
-<?php if ($contentModel->root_tree_id) : ?>
-    <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
-<?php else
-    : ?>
-    <? if ($model->cms_site_id) : ?>
-        <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->andWhere(['cms_site_id' => $model->cms_site_id])->joinWith('cmsSiteRelation')
-            ->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
-        ?>
-    <? else : ?>
-        <?php $rootTreeModels = \skeeks\cms\models\CmsTree::findRootsForSite()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC])->all();
-        ?>
-    <? endif; ?>
+<?php
+if ($contentModel->root_tree_id) {
+    $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id);
+} else {
 
-<?php endif; ?>
+    if ($model->cmsContent->cms_tree_type_id) {
+        if ($model->cms_site_id) {
+            $q = \skeeks\cms\models\CmsTree::find()
+                ->andWhere(['cms_site_id' => $model->cms_site_id])
+                ->andWhere(['level' => 1])
+                ->joinWith('cmsSiteRelation')
+                ->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC]);
+        } else {
+            $q = \skeeks\cms\models\CmsTree::find()->cmsSite()
+                ->andWhere(['level' => 1])
+                ->joinWith('cmsSiteRelation')
+                ->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC]);
+        }
+        $q->andWhere(['tree_type_id' => $model->cmsContent->cms_tree_type_id]);
+
+    } else {
+        if ($model->cms_site_id) {
+            $q = \skeeks\cms\models\CmsTree::findRoots()
+                ->andWhere(['cms_site_id' => $model->cms_site_id])
+                ->joinWith('cmsSiteRelation')
+                ->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC]);
+        } else {
+            $q = \skeeks\cms\models\CmsTree::findRootsForSite()
+                ->joinWith('cmsSiteRelation')
+                ->orderBy([\skeeks\cms\models\CmsSite::tableName().".priority" => SORT_ASC]);
+        }
+    }
+
+    $rootTreeModels = $q->all();
+}
+?>
 
 <?php if ($contentModel->is_allow_change_tree) : ?>
-    <?php if ($rootTreeModels) : ?>
-        <?= $form->field($model, 'tree_id')->widget(
-            \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
-            [
-                'options'           => [
-                    'data-form-reload' => 'true',
-                ],
-                'multiple'          => false,
-                'treeWidgetOptions' =>
-                    [
+        <?php if ($rootTreeModels) : ?>
+            <?
+            $isAllowChangeTree = ((!$model->isNewRecord && $contentModel->is_tree_allow_change) || $model->isNewRecord);
+            echo $form->field($model, 'tree_id')->widget(
+                \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+                [
+                    'options'                   => [
+                        'data-form-reload' => 'true',
+                        //'disabled' => $isAllowChangeTree ? "disabled" : "disabled",
+                    ],
+                    'multiple'                  => false,
+                    'isAllowNodeSelectCallback' => function (\skeeks\cms\models\Tree $t) use ($model, $isAllowChangeTree) {
+                        if (!$isAllowChangeTree) {
+                            return false;
+                        }
+                        if ($model->cmsContent->is_tree_only_max_level) {
+                            if ($t->children) {
+                                return false;
+                            }
+                            return true;
+                        } else {
+                            return true;
+                        }
+
+                    },
+                    'treeWidgetOptions'         => [
                         'models' => $rootTreeModels,
                     ],
-            ]
-        ); ?>
+                ]
+            ); ?>
     <?php endif; ?>
 <?php endif; ?>
 
@@ -201,160 +240,160 @@ CSS
         <?php if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
 
             <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */ ?>
-                    <?
-                    $create = '';
-                    ?>
-                    <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property-enum')[0]) : ?>
-                        <?
-                        /**
-                         * @var \skeeks\cms\backend\BackendAction $actionIndex
-                         * @var \skeeks\cms\backend\BackendAction $actionCreate
-                         */
-                        $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
-                        ?>
+            <?
+            $create = '';
+            ?>
+            <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-property-enum')[0]) : ?>
+                <?
+                /**
+                 * @var \skeeks\cms\backend\BackendAction $actionIndex
+                 * @var \skeeks\cms\backend\BackendAction $actionCreate
+                 */
+                $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+                ?>
 
-                        <?
-                        if ($actionCreate) {
-                            $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                                'property_id' => $property->id,
-                            ]);
+                <?
+                if ($actionCreate) {
+                    $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                        'property_id' => $property->id,
+                    ]);
 
-                            $actionCreate->name = \Yii::t("skeeks/cms", "Добавить опцию");
+                    $actionCreate->name = \Yii::t("skeeks/cms", "Добавить опцию");
 
-                            /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-                                'actions' => ['create' => $actionCreate],
-                                'isOpenNewWindow' => true
-                            ]);*/
+                    /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                        'actions' => ['create' => $actionCreate],
+                        'isOpenNewWindow' => true
+                    ]);*/
 
-                            $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                                'actions'         => ['create' => $actionCreate],
-                                'clientOptions'   => [
-                                    'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
+                    $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                        'actions'         => ['create' => $actionCreate],
+                        'clientOptions'   => [
+                            'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
 function() {
 }
 JS
-                                    ),
-                                ],
-                                'isOpenNewWindow' => true,
-                                'tag'             => 'div',
-                                'minViewCount'    => 1,
-                                'itemWrapperTag'  => 'span',
-                                'itemTag'         => 'button',
-                                'itemOptions'     => ['class' => 'btn btn-default btn-sm'],
-                                'options'         => ['class' => 'sx-controll-actions'],
-                            ]);
-                        }
-                        ?>
-                    <?php endif; ?>
-
-                    <?
-                    $field = $property->renderActiveForm($form, $model);
-
-                    $editBtn = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                        'controllerId' => "/cms/admin-cms-content-property/",
-                        'modelId'      => $property->id,
-                        'tag'          => 'span',
-                        'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
-                        'options'      => [
-                            'class' => 'sx-fast-edit',
+                            ),
                         ],
+                        'isOpenNewWindow' => true,
+                        'tag'             => 'div',
+                        'minViewCount'    => 1,
+                        'itemWrapperTag'  => 'span',
+                        'itemTag'         => 'button',
+                        'itemOptions'     => ['class' => 'btn btn-default btn-sm'],
+                        'options'         => ['class' => 'sx-controll-actions'],
                     ]);
+                }
+                ?>
+            <?php endif; ?>
 
-                    $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
-                    //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
-                    echo $field;
-                    ?>
+            <?
+            $field = $property->renderActiveForm($form, $model);
+
+            $editBtn = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                'controllerId' => "/cms/admin-cms-content-property/",
+                'modelId'      => $property->id,
+                'tag'          => 'span',
+                'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
+                'options'      => [
+                    'class' => 'sx-fast-edit',
+                ],
+            ]);
+
+            $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
+            //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
+            echo $field;
+            ?>
             <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */ ?>
         <?php elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT): ?>
 
             <?php /*$pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); */ ?>
+            <?
+            $create = '';
+            ?>
+            <?php if (1 == 1) : ?>
+                <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
                     <?
-                    $create = '';
+
+                    $controllerProperty->content = \skeeks\cms\models\CmsContent::findOne($property->handler->content_id);
+                    /**
+                     * @var \skeeks\cms\backend\BackendAction $actionIndex
+                     * @var \skeeks\cms\backend\BackendAction $actionCreate
+                     */
+                    $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
                     ?>
-                    <?php if (1 == 1) : ?>
-                        <?php if ($controllerProperty = \Yii::$app->createController('cms/admin-cms-content-element')[0]) : ?>
-                            <?
+                    <?
+                    if ($actionCreate) {
+                        $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
+                            'content_id' => $property->handler->content_id,
+                        ]);
 
-                            $controllerProperty->content = \skeeks\cms\models\CmsContent::findOne($property->handler->content_id);
-                            /**
-                             * @var \skeeks\cms\backend\BackendAction $actionIndex
-                             * @var \skeeks\cms\backend\BackendAction $actionCreate
-                             */
-                            $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
-                            ?>
-                            <?
-                            if ($actionCreate) {
-                                $actionCreate->url = \yii\helpers\ArrayHelper::merge($actionCreate->urlData, [
-                                    'content_id' => $property->handler->content_id,
-                                ]);
+                        $actionCreate->name = \Yii::t("skeeks/cms", "Добавить опцию");
 
-                                $actionCreate->name = \Yii::t("skeeks/cms", "Добавить опцию");
+                        /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                            'actions' => ['create' => $actionCreate],
+                            'isOpenNewWindow' => true
+                        ]);*/
 
-                                /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-                                    'actions' => ['create' => $actionCreate],
-                                    'isOpenNewWindow' => true
-                                ]);*/
-
-                                $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                                    'actions'         => ['create' => $actionCreate],
-                                    'clientOptions'   => [
-                                        'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
+                        $create = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                            'actions'         => ['create' => $actionCreate],
+                            'clientOptions'   => [
+                                'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
 function() {
     
 }
 JS
-                                        ),
-                                    ],
-                                    'isOpenNewWindow' => true,
-                                    'tag'             => 'div',
-                                    'minViewCount'    => 1,
-                                    'itemWrapperTag'  => 'span',
-                                    'itemTag'         => 'button',
-                                    'itemOptions'     => ['class' => 'btn btn-default btn-sm'],
-                                    'options'         => ['class' => 'sx-controll-actions'],
-                                ]);
-                            }
-                            ?>
-                        <?php endif; ?>
-
-                        <?
-
-                        $editBtn = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                            'controllerId' => "/cms/admin-cms-content-property/",
-                            'modelId'      => $property->id,
-                            'tag'          => 'span',
-                            'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
-                            'options'      => [
-                                'class' => 'sx-fast-edit',
+                                ),
                             ],
+                            'isOpenNewWindow' => true,
+                            'tag'             => 'div',
+                            'minViewCount'    => 1,
+                            'itemWrapperTag'  => 'span',
+                            'itemTag'         => 'button',
+                            'itemOptions'     => ['class' => 'btn btn-default btn-sm'],
+                            'options'         => ['class' => 'sx-controll-actions'],
                         ]);
-                        ?>
-                        <? $field = $property->renderActiveForm($form, $model);
-                        //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
-                        $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
-                        echo $field;
-                        ?>
+                    }
+                    ?>
+                <?php endif; ?>
 
-                    <?php else: ?>
-                        <?
+                <?
 
-                        $editBtn = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                            'controllerId' => "/cms/admin-cms-content-property/",
-                            'modelId'      => $property->id,
-                            'tag'          => 'span',
-                            'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
-                            'options'      => [
-                                'class' => 'sx-fast-edit',
-                            ],
-                        ]);
-                        ?>
+                $editBtn = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                    'controllerId' => "/cms/admin-cms-content-property/",
+                    'modelId'      => $property->id,
+                    'tag'          => 'span',
+                    'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
+                    'options'      => [
+                        'class' => 'sx-fast-edit',
+                    ],
+                ]);
+                ?>
+                <? $field = $property->renderActiveForm($form, $model);
+                //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-5">{input}{hint}{error}</div><div class="col-md-3 my-auto">'.$create.'</div></div>';
+                $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
+                echo $field;
+                ?>
 
-                        <? $field = $property->renderActiveForm($form, $model);
-                        $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
-                        //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-8">{input}{hint}{error}</div></div>';
-                        echo $field;
-                        ?>
-                    <?php endif; ?>
+            <?php else: ?>
+                <?
+
+                $editBtn = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                    'controllerId' => "/cms/admin-cms-content-property/",
+                    'modelId'      => $property->id,
+                    'tag'          => 'span',
+                    'content'      => '<i title="Настроить характеристику" class="fas fa-cog"></i>',
+                    'options'      => [
+                        'class' => 'sx-fast-edit',
+                    ],
+                ]);
+                ?>
+
+                <? $field = $property->renderActiveForm($form, $model);
+                $field->template = '{label}<div class="row"><div class="col" style="width: 100%;">{input}</div><div class="col my-auto" style="max-width: 162px;">'.$create.'</div><div class="col my-auto sx-edit-prop-wrapper">'.$editBtn.'</div></div>{hint}{error}';
+                //$field->template = '<div class="row sx-inline-row">'.$editBtn.'<div class="col-md-3 text-md-right my-auto">{label}</div><div class="col-md-8">{input}{hint}{error}</div></div>';
+                echo $field;
+                ?>
+            <?php endif; ?>
             <?php /*\skeeks\cms\modules\admin\widgets\Pjax::end(); */ ?>
 
         <?php else

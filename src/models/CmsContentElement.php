@@ -62,6 +62,10 @@ use yii\web\Application;
  * @property integer|null                $main_cce_at
  * @property integer|null                $main_cce_by
  *
+ * @property integer|null                $shop_is_brand
+ * @property integer|null                $shop_is_collection
+ * @property integer|null                $shop_is_ccountry
+ *
  * @property bool                        $is_active
  * @property bool                        $is_adult
  *
@@ -472,6 +476,19 @@ class CmsContentElement extends RelatedElementModel
                     }
                 },
             ],
+            [
+                "tree_id",
+                "required",
+                'when'       => function (self $model) {
+
+                    if ($model->cmsContent && $model->cmsContent->is_tree_required) {
+                        return true;
+                    }
+
+                    return false;
+                },
+            ],
+
         ]);
     }
     /**

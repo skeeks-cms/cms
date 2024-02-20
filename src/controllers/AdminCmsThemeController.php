@@ -8,27 +8,14 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\BackendController;
-use skeeks\cms\backend\controllers\BackendModelController;
-use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\ViewBackendAction;
-use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTheme;
-use skeeks\cms\shop\models\ShopContent;
-use skeeks\cms\shop\models\ShopSite;
-use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
-use skeeks\yii2\config\ConfigModel;
-use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
-use yii\web\Application;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -54,14 +41,14 @@ class AdminCmsThemeController extends BackendController
         ];
     }
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
 
         //Актуализировать шаблоны в базе данных
         $themes = \Yii::$app->view->availableThemes;
         $themeCodes = [];
         //Добавить шаблоны которых нет в базе данных
-        foreach ($themes as $id => $themeData)
-        {
+        foreach ($themes as $id => $themeData) {
             $themeCodes[$id] = $id;
 
             if (!CmsTheme::find()->cmsSite()->andWhere(['code' => $id])->one()) {
@@ -76,8 +63,7 @@ class AdminCmsThemeController extends BackendController
         //Удалить шаблоны из базы, которые больше недоступны
         $themesForDelete = CmsTheme::find()->cmsSite()->andWhere(['not in', 'code', $themeCodes])->all();
         if ($themesForDelete) {
-            foreach ($themesForDelete as $themesForDelete)
-            {
+            foreach ($themesForDelete as $themesForDelete) {
                 $themesForDelete->delete();
             }
         }
@@ -107,12 +93,12 @@ class AdminCmsThemeController extends BackendController
         if (!$cmsTheme->save()) {
             throw new Exception(print_r($cmsTheme->errors, true));
         }
-        
+
         return $this->redirect(['update', 'code' => $code]);
-        
+
     }
-    
-    
+
+
     public function actionUpdate()
     {
         $rr = new RequestResponse();
@@ -148,11 +134,10 @@ class AdminCmsThemeController extends BackendController
         }
 
         return $this->render($this->action->id, [
-            'cmsTheme' => $cmsTheme,
-            'configModel' => $configModel
+            'cmsTheme'    => $cmsTheme,
+            'configModel' => $configModel,
         ]);
     }
-
 
 
     /**
@@ -175,10 +160,10 @@ class AdminCmsThemeController extends BackendController
         $defaultSettings = [];
 
         if ($setting1Default) {
-            $defaultSettings = ArrayHelper::merge($defaultSettings, (array) $setting1Default->value);
+            $defaultSettings = ArrayHelper::merge($defaultSettings, (array)$setting1Default->value);
         }
         if ($setting2Default) {
-            $defaultSettings = ArrayHelper::merge($defaultSettings, (array) $setting2Default->value);
+            $defaultSettings = ArrayHelper::merge($defaultSettings, (array)$setting2Default->value);
         }
 
         /*if (!$defaultSettings) {
@@ -189,16 +174,14 @@ class AdminCmsThemeController extends BackendController
         /**
          * @var CmsSite $cmsSite
          */
-        foreach (CmsSite::find()->each(10) as $cmsSite)
-        {
-            echo $cmsSite->id . "<br />";
+        foreach (CmsSite::find()->each(10) as $cmsSite) {
+            echo $cmsSite->id."<br />";
 
             //Актуализировать шаблоны в базе данных
             $themes = \Yii::$app->view->getAvailableThemes($cmsSite);
             $themeCodes = [];
             //Добавить шаблоны которых нет в базе данных
-            foreach ($themes as $id => $themeData)
-            {
+            foreach ($themes as $id => $themeData) {
                 $themeCodes[$id] = $id;
 
                 if (!CmsTheme::find()->cmsSite($cmsSite)->andWhere(['code' => $id])->one()) {
@@ -214,8 +197,7 @@ class AdminCmsThemeController extends BackendController
             //Удалить шаблоны из базы, которые больше недоступны
             $themesForDelete = CmsTheme::find()->cmsSite($cmsSite)->andWhere(['not in', 'code', $themeCodes])->all();
             if ($themesForDelete) {
-                foreach ($themesForDelete as $themesForDelete)
-                {
+                foreach ($themesForDelete as $themesForDelete) {
                     $themesForDelete->delete();
                 }
             }
@@ -250,14 +232,14 @@ class AdminCmsThemeController extends BackendController
                 ->one();
 
             if ($setting1) {
-                $siteSettings = ArrayHelper::merge($siteSettings, (array) $setting1->value);
+                $siteSettings = ArrayHelper::merge($siteSettings, (array)$setting1->value);
             }
             if ($setting2) {
-                $siteSettings = ArrayHelper::merge($siteSettings, (array) $setting2->value);
+                $siteSettings = ArrayHelper::merge($siteSettings, (array)$setting2->value);
             }
 
             if ($siteSettings) {
-                
+
                 $cmsThemeActive->config = $siteSettings;
                 $cmsThemeActive->update(true, ['config']);
             }

@@ -27,8 +27,18 @@ $model->load(\Yii::$app->request->get());
         'data'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'asText'),
     ]
 ); ?>
+<?= $form->field($model, 'base_role')->widget(
+    \skeeks\cms\widgets\Select::class, [
+        'options' => [
+            'multiple' => false,
+        ],
+        'data'    => \skeeks\cms\models\CmsContent::baseRoles(),
+    ]
+); ?>
 
 <? $fieldSet::end(); ?>
+
+
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Меню')); ?>
     <?= $form->fieldSelect($model, 'content_type',
@@ -83,6 +93,8 @@ echo $form->field($model, 'editable_fields')->widget(
 ]); ?>
 
 
+<?= $form->field($model, 'is_tree_required')->checkbox([], false); ?>
+
 <?= $form->field($model, 'cms_tree_type_id')->widget(
     \skeeks\cms\widgets\Select::class, [
         'options' => [
@@ -91,6 +103,12 @@ echo $form->field($model, 'editable_fields')->widget(
         'data'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsTreeType::find()->all(), 'id', 'asText'),
     ]
 ); ?>
+
+
+<?= $form->field($model, 'is_tree_only_max_level')->checkbox([], false); ?>
+<?= $form->field($model, 'is_tree_only_no_redirect')->checkbox([], false); ?>
+<?= $form->field($model, 'is_tree_allow_change')->checkbox([], false); ?>
+
 
 <?= $form->field($model, 'default_tree_id')->widget(
     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class

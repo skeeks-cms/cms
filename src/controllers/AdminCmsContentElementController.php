@@ -38,6 +38,10 @@ use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\shop\models\BrandCmsContentElement;
+use skeeks\cms\shop\models\CollectionCmsContentElement;
+use skeeks\cms\shop\models\ShopBrand;
+use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\widgets\AjaxSelect;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\ContentElementBackendFiltersWidget;
@@ -85,6 +89,20 @@ class AdminCmsContentElementController extends BackendModelStandartController
         $this->name = \Yii::t('skeeks/cms', 'Elements');
 
         if ($this->content) {
+            
+            /*if (\Yii::$app->shop->contentBrands && $this->content->id == \Yii::$app->shop->contentBrands->id) {
+                $this->modelClassName = BrandCmsContentElement::class;
+                if ($this->model) {
+                    $this->_model = BrandCmsContentElement::findOne($this->model->id);
+                }
+            }
+            if (\Yii::$app->shop->contentCollections && $this->content->id == \Yii::$app->shop->contentCollections->id) {
+                $this->modelClassName = CollectionCmsContentElement::class;
+                if ($this->model) {
+                    $this->_model = CollectionCmsContentElement::findOne($this->model->id);
+                }
+            }*/
+            
             if ($this->permissionName === null) {
                 $this->permissionName = $this->uniqueId."__".$this->content->id;
             }
@@ -111,6 +129,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
     public function actions()
     {
         $content = $this->content;
+
         
         $result = ArrayHelper::merge(parent::actions(), [
             'index' => [
@@ -911,6 +930,20 @@ HTML
         $model->cms_site_id = \Yii::$app->skeeks->site->id;
 
 
+        /*$shopBrand = null;
+        $shopCollection = null;
+        
+        if (\Yii::$app->shop->contentBrands && $this->content->id == \Yii::$app->shop->contentBrands->id) {
+            $shopBrand = new ShopBrand();
+            $shopBrand->loadDefaultValues();
+            $shopBrand->validate();
+        }
+        
+        if (\Yii::$app->shop->contentCollections && $this->content->id == \Yii::$app->shop->contentCollections->id) {
+            $shopCollection = new ShopCollection();
+            $shopCollection->loadDefaultValues();
+            $shopCollection->validate();
+        }*/
 
         $rr = new RequestResponse();
 
@@ -919,6 +952,14 @@ HTML
 
             $relatedModel = $model->relatedPropertiesModel;
             $relatedModel->load(\Yii::$app->request->post());
+            
+            /*if ($shopBrand) {
+                $shopBrand->load(\Yii::$app->request->post());
+            }
+            if ($shopCollection) {
+                $shopCollection->load(\Yii::$app->request->post());
+            }*/
+            
         } else {
             $relatedModel = $model->relatedPropertiesModel;
             $relatedModel->loadDefaultValues();
@@ -969,6 +1010,20 @@ HTML
                     if (!$relatedModel->save()) {
                         throw new Exception("Ошибка сохранения дополнительных данных");
                     }
+                    
+                    /*if ($shopBrand) {
+                        $shopBrand->id = $model->id;
+                        if (!$shopBrand->save()) {
+                            throw new \yii\base\Exception("Бренд не сохранен: " . print_r($shopBrand->errors, true));
+                        }
+                    }
+                    
+                    if ($shopCollection) {
+                        $shopCollection->id = $model->id;
+                        if (!$shopCollection->save()) {
+                            throw new \yii\base\Exception("Коллекция не сохранена: " . print_r($shopCollection->errors, true));
+                        }
+                    }*/
 
                     $rr->message = '✓ Сохранено';
                     $rr->success = true;
@@ -996,6 +1051,8 @@ HTML
         return $this->render($this->editForm, [
             'model'        => $model,
             'relatedModel' => $relatedModel,
+            //'shopBrand' => $shopBrand,
+            //'shopCollection' => $shopCollection,
 
             'is_create'  => true,
             'is_saved'  => $is_saved,
@@ -1003,6 +1060,7 @@ HTML
             'redirect'  => $redirect,
         ]);
     }
+    
     public function update($adminAction)
     {
         $is_saved = false;
@@ -1024,12 +1082,51 @@ HTML
                 $relatedModel,
             ]);
         }*/
+        
+        
+        /*$shopBrand = null;
+        $shopCollection = null;
+        
+        if (\Yii::$app->shop->contentBrands && $this->content->id == \Yii::$app->shop->contentBrands->id) {
+            /**
+             * @var $model BrandCmsContentElement
+            if (!$shopBrand = $model->shopBrand) {
+                $shopBrand = new ShopBrand([
+                    'id' => $model->id,
+                ]);
+
+                $shopBrand->save(false);
+            }
+        }
+        
+        if (\Yii::$app->shop->contentCollections && $this->content->id == \Yii::$app->shop->contentCollections->id) {
+            /**
+             * @var $model CollectionCmsContentElement
+            if (!$shopCollection = $model->shopCollection) {
+                $shopCollection = new ShopCollection([
+                    'id' => $model->id,
+                ]);
+
+                $shopCollection->save(false);
+            }
+        }*/
+
+        
 
         if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+            
+            /*if ($shopBrand) {
+                $shopBrand->load(\Yii::$app->request->post());
+            }
+            
+            if ($shopCollection) {
+                $shopCollection->load(\Yii::$app->request->post());
+            }*/
         }
 
+        
         if ($rr->isRequestPjaxPost()) {
             if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 $model->load(\Yii::$app->request->post());
@@ -1059,6 +1156,14 @@ HTML
                 $model->validate();
                 $relatedModel->validate();
 
+                /*if ($shopBrand) {
+                    $shopBrand->validate();
+                }
+                
+                if ($shopCollection) {
+                    $shopCollection->validate();
+                }*/
+                
                 if (!$model->errors && !$relatedModel->errors)
                 {
                     if (!$model->save()) {
@@ -1069,6 +1174,18 @@ HTML
                         throw new Exception("Ошибка сохранения дополнительных данных");
                     }
 
+                    /*if ($shopBrand) {
+                    if (!$shopBrand->save()) {
+                        throw new Exception("Ошибка сохранения данных бренда");
+                    }
+                }
+
+                    if ($shopCollection) {
+                        if (!$shopCollection->save()) {
+                            throw new Exception("Ошибка сохранения данных коллекции");
+                        }
+                    }*/
+                    
                     $rr->message = '✓ Сохранено';
                     $rr->success = true;
                     $rr->data = [
@@ -1094,6 +1211,9 @@ HTML
         return $this->render($this->editForm, [
             'model'        => $model,
             'relatedModel' => $relatedModel,
+            /*'shopBrand' => $shopBrand,
+            'shopCollection' => $shopCollection,*/
+            
             'is_saved'     => $is_saved,
             'submitBtn'    => \Yii::$app->request->post('submit-btn'),
             'redirect'     => $redirect,

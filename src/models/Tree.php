@@ -68,6 +68,9 @@ use yii\helpers\Url;
  * @property string|null               $external_id
  * @property integer|null              $main_cms_tree_id
  *
+ * @property bool                      $shop_has_collections Раздел содержит товарные коллекции?
+ * @property bool                      $shop_show_collections Показывать коллекции по умолчанию?
+ *
  * @property integer                   $is_adult Содержит контент для взрослых?
  * @property integer                   $is_index Страница индексируется?
  *
@@ -304,6 +307,10 @@ class Tree extends ActiveRecord
             'active'      => 'Если стоит галочка, то раздел показывается везде на сайте. Если галочка не стоит — раздел скрыт! Но при этому он индексируется и доступен по прямой ссылке!',
             'is_adult'    => 'Если эта страница содержит контент для взрослых, то есть имеет возрастные ограничения 18+ нужно поставить эту галочку!',
             'is_index'    => 'Необходимо поставить эту галочку, чтобы страница была доступна поисковым системам и попадала в карту сайта!',
+
+            'shop_has_collections'           => Yii::t('skeeks/cms', 'Включив эту опцию, добавляя товар в этот раздел, необходим будет заполнять поле "Коллекции"'),
+            'shop_show_collections'           => Yii::t('skeeks/cms', 'Если включен функционал коллекций (опция выше) то по умолчанию в этом разделе можно отображать коллекции или товары. Эта опция отвечает за это.'),
+
         ]);
     }
 
@@ -313,6 +320,9 @@ class Tree extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
+            'shop_has_collections'           => Yii::t('skeeks/cms', 'Раздел содержит товарные коллекции'),
+            'shop_show_collections'           => Yii::t('skeeks/cms', 'Показывать коллекции по умолчанию'),
+
             'published_at'           => Yii::t('skeeks/cms', 'Published At'),
             'published_to'           => Yii::t('skeeks/cms', 'Published To'),
             'priority'               => Yii::t('skeeks/cms', 'Priority'),
@@ -383,6 +393,30 @@ class Tree extends ActiveRecord
             [['canonical_tree_id'], 'integer'],
             [['canonical_content_element_id'], 'integer'],
             [['canonical_saved_filter_id'], 'integer'],
+
+            [
+                [
+                    'shop_has_collections',
+                    'shop_show_collections',
+                ],
+                'integer',
+            ],
+
+            [
+                [
+                    'shop_has_collections',
+                ],
+                'default',
+                'value' => 0,
+            ],
+
+            [
+                [
+                    'shop_show_collections',
+                ],
+                'default',
+                'value' => 1,
+            ],
 
             [
                 [
@@ -568,11 +602,11 @@ class Tree extends ActiveRecord
     public function getCanonicalUrl()
     {
         if ($this->canonical_link) {
-            return (string) $this->canonical_link;
+            return (string)$this->canonical_link;
         }
 
         if ($this->canonical_tree_id) {
-            return (string) $this->canonicalTree->url;
+            return (string)$this->canonicalTree->url;
         }
 
         return "";
@@ -1066,7 +1100,7 @@ class Tree extends ActiveRecord
         } else {
             $newTree = $this->_copyCurrentTree(null, $is_copy_elements);
 
-            $newTree->name = $newTree->name . " (копия)";
+            $newTree->name = $newTree->name." (копия)";
             $newTree->update(false, ['name']);
 
             return $newTree;
@@ -1079,13 +1113,12 @@ class Tree extends ActiveRecord
         $newTree = $this->_copyCurrentTree($parent, $is_copy_elements);
 
         if ($parent == null) {
-            $newTree->name = $newTree->name . " (копия)";
+            $newTree->name = $newTree->name." (копия)";
             $newTree->update(false, ['name']);
         }
 
         if ($this->children) {
-            foreach ($this->children as $child)
-            {
+            foreach ($this->children as $child) {
                 $child->_copyWithChildrens($newTree, $is_copy_elements);
             }
         }
@@ -1176,8 +1209,7 @@ class Tree extends ActiveRecord
             if ($is_copy_elements) {
                 $elements = CmsContentElement::find()->cmsTree($this, false, false);
                 if ($elements->count()) {
-                    foreach ($elements->each(10) as $element)
-                    {
+                    foreach ($elements->each(10) as $element) {
                         $newElement = $element->copy(false);
                         $newElement->tree_id = $newModel->id;
                         $newElement->update(false, ['tree_id']);

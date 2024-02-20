@@ -14,12 +14,14 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsCountry;
 use skeeks\cms\models\CmsTreeProperty;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
 use skeeks\cms\models\CmsUserUniversalProperty;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\shop\models\ShopCollection;
 use yii\web\Controller;
 
 /**
@@ -279,5 +281,74 @@ class AjaxController extends Controller
         }
 
         return $rr;
+    }
+
+    /**
+     * @return array
+     */
+    public function actionAutocompleteCountries()
+    {
+        $result = [];
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+
+        $query = CmsCountry::find();
+
+        if ($q = \Yii::$app->request->get('q')) {
+            $query->search($q);
+        }
+
+        $data = $query->limit(100)
+            ->all();
+
+        if ($data) {
+
+            /**
+             * @var $model CmsCountry
+             */
+            foreach ($data as $model) {
+                $result[] = [
+                    'id'   => $model->alpha2,
+                    'text' => $model->name,
+                ];
+            }
+        }
+
+        return ['results' => $result];
+    }
+    
+    /**
+     * @return array
+     */
+    public function actionAutocompleteCollections()
+    {
+        $result = [];
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $query = ShopCollection::find();
+
+        if ($q = \Yii::$app->request->get('q')) {
+            $query->search($q);
+        }
+
+        $data = $query->limit(100)
+            ->all();
+
+        if ($data) {
+
+            /**
+             * @var $model CmsContentElement
+             */
+            foreach ($data as $model) {
+                $result[] = [
+                    'id'   => $model->id,
+                    'text' => $model->name,
+                ];
+            }
+        }
+
+        return ['results' => $result];
     }
 }

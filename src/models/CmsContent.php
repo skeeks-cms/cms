@@ -10,6 +10,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\models\queries\CmsContentQuery;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -27,6 +28,12 @@ use yii\helpers\ArrayHelper;
  * @property integer              $priority
  * @property string               $description
  * @property string               $content_type
+ *
+ * @property bool                 $is_tree_only_max_level Разрешено привязывать только к разделам, без подразделов
+ * @property bool                 $is_tree_only_no_redirect Разрешено привязывать только к разделам, не редирректам
+ * @property bool                 $is_tree_required Раздел необходимо выбирать обязательно
+ * @property bool                 $is_tree_allow_change Разраешено менять раздел при редактировании
+ *
  * @property string               $index_for_search
  * @property string               $tree_chooser
  * @property string               $list_mode
@@ -42,6 +49,7 @@ use yii\helpers\ArrayHelper;
  * @property array                $editable_fields
  * @property integer              $cms_tree_type_id
  * @property integer              $saved_filter_tree_type_id
+ * @property string|null          $base_role
  *
  * @property string               $meta_title_template
  * @property string               $meta_description_template
@@ -74,6 +82,25 @@ class CmsContent extends Core
     const CASCADE = 'CASCADE';
     const RESTRICT = 'RESTRICT';
     const SET_NULL = 'SET_NULL';
+
+    const ROLE_PRODUCTS = "products";
+
+    /**
+     * @param string|null $code
+     * @return string|string[]
+     */
+    static public function baseRoles(string $code = null)
+    {
+        $roles = [
+            self::ROLE_PRODUCTS    => "Товары",
+        ];
+
+        if ($code === null) {
+            return $roles;
+        }
+
+        return (string)ArrayHelper::getValue($roles, $code);
+    }
 
     /**
      * @return array
@@ -121,6 +148,11 @@ class CmsContent extends Core
             'editable_fields'           => Yii::t('skeeks/cms', 'Поля которые отображаются при редактировании. Если ничего не выбрано, то показываются все!'),
             'cms_tree_type_id'          => Yii::t('skeeks/cms', 'Этот параметр ограничевает возможность привязки элементов этого контента к разделам только этого типа'),
             'saved_filter_tree_type_id' => Yii::t('skeeks/cms', 'Элементы этого контента не имеют самостоятельной страницы а создают посадочную на корневой раздел этого типа'),
+            'base_role'                 => Yii::t('skeeks/cms', 'Базовый сценарий определяет поведение этого контента'),
+            'is_tree_only_max_level'    => Yii::t('skeeks/cms', 'То есть разрешено привязывать элементы к разделам у которых нет подразделов'),
+            'is_tree_only_no_redirect'    => Yii::t('skeeks/cms', 'Если раздел является редирректом на другой раздел или ссылку, то к такому разделу нельзя привязывать элементы'),
+            'is_tree_required'    => Yii::t('skeeks/cms', 'Нельзя просто создать элемент, не выбрав его категорию-раздел'),
+            'is_tree_allow_change'    => Yii::t('skeeks/cms', 'Эта настройка касается только редактирования. По хорошему, раздел должен выбираться у элемента только в момент создания! Потому что от этого зависят и характеристики элемента.'),
         ]);
     }
 
@@ -130,7 +162,7 @@ class CmsContent extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'cms_tree_type_id'          => Yii::t('skeeks/cms', 'Основной тип разделов'),
+            'cms_tree_type_id'          => Yii::t('skeeks/cms', 'Привязывать только к разделам этого типа'),
             'saved_filter_tree_type_id' => Yii::t('skeeks/cms', 'Тип раздела для посадочной страницы'),
             'id'                        => Yii::t('skeeks/cms', 'ID'),
             'created_by'                => Yii::t('skeeks/cms', 'Created By'),
@@ -148,6 +180,12 @@ class CmsContent extends Core
             'list_mode'                 => Yii::t('skeeks/cms', 'View Mode Sections And Elements'),
             'name_meny'                 => Yii::t('skeeks/cms', 'The Name Of The Elements (Plural)'),
             'name_one'                  => Yii::t('skeeks/cms', 'The Name One Element'),
+            'is_tree_only_max_level'    => Yii::t('skeeks/cms', 'Привязывать элементы только к разделам максимального уровня?'),
+            'is_tree_only_no_redirect'    => Yii::t('skeeks/cms', 'Разрешено привязывать только к разделам - не редирректам'),
+            'is_tree_required'    => Yii::t('skeeks/cms', 'Раздел выбирать обязательно'),
+            'is_tree_allow_change'    => Yii::t('skeeks/cms', 'Разраешено менять раздел при редактировании'),
+
+            'base_role' => Yii::t('skeeks/cms', 'Базовый сценарий'),
 
             'default_tree_id'      => Yii::t('skeeks/cms', 'Default Section'),
             'is_allow_change_tree' => Yii::t('skeeks/cms', 'Is Allow Change Default Section'),
@@ -197,6 +235,11 @@ class CmsContent extends Core
             [['name', 'view_file'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
             [['code'], 'unique'],
+
+            [['base_role'], 'unique'],
+            [['base_role'], 'string'],
+            [['base_role'], 'default', 'value' => null],
+
             [['is_access_check_element'], 'integer'],
             [['code'], 'validateCode'],
             [['index_for_search', 'tree_chooser', 'list_mode'], 'string', 'max' => 1],
@@ -210,9 +253,27 @@ class CmsContent extends Core
             ['name_one', 'default', 'value' => Yii::t('skeeks/cms', 'Element')],
 
 
+            [
+                [
+                    'is_tree_only_max_level',
+                    'is_tree_only_no_redirect',
+                    'is_tree_required',
+                    'is_tree_allow_change'
+                ]
+                , 'integer'],
             ['is_visible', 'default', 'value' => 1],
             ['is_have_page', 'default', 'value' => 1],
             ['is_parent_content_required', 'default', 'value' => 0],
+
+            [[
+                'is_tree_only_no_redirect',
+                'is_tree_only_max_level',
+                'is_tree_allow_change',
+            ], 'default', 'value' => 1],
+            [[
+                'is_tree_required',
+            ], 'default', 'value' => 0],
+
             ['parent_content_on_delete', 'default', 'value' => self::CASCADE],
 
             ['parent_content_id', 'integer'],
@@ -414,5 +475,12 @@ class CmsContent extends Core
 
         return (bool)in_array((string)$code, (array)$this->editable_fields);
     }
-    
+
+    /**
+     * @return CmsContentQuery
+     */
+    public static function find()
+    {
+        return (new CmsContentQuery(get_called_class()));
+    }
 }

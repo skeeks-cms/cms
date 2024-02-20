@@ -41,6 +41,14 @@ class CmsCountryQuery extends CmsActiveQuery
         return $this->andWhere(['iso' => $iso]);
     }
 
+    /**
+     * @param string $name
+     * @return CmsCountryQuery
+     */
+    public function name(string $name)
+    {
+        return $this->andWhere(['name' => $name]);
+    }
 
     /**
      * @param mixed $phone_code

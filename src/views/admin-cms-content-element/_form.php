@@ -10,8 +10,11 @@ use yii\helpers\Html;
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 /* @var $model \skeeks\cms\models\CmsLang */
+/* @var $shopBrand \skeeks\cms\shop\models\ShopBrand */
 $controller = $this->context;
 $action = $controller->action;
+$shopBrand = @$shopBrand;
+$shopCollection = @$shopCollection;
 ?>
 
 
@@ -56,6 +59,42 @@ if ($model->isNewRecord) {
     'contentModel' => $contentModel,
     'model'        => $model,
 ]); ?>
+
+<!--
+<?php /*if ($shopBrand) : */?>
+    <?/* $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Данные по бренду'), ['isOpen' => true]); */?>
+        <?/*= $form->field($shopBrand, 'country_id')->widget(
+            \skeeks\cms\widgets\AjaxSelectModel::class,
+            [
+                'modelClass' => \skeeks\cms\shop\models\CountryCmsContentElement::class,
+                "ajaxUrl" => \yii\helpers\Url::to([
+                    '/cms/ajax/autocomplete-countries',
+                    //'property_id' => $this->property->id,
+                    'cms_site_id' => \Yii::$app->skeeks->site->id,
+                ]),
+            ]
+        ); */?>
+        <?/*= $form->field($shopBrand, 'url'); */?>
+    <?/* $fieldSet::end(); */?>
+<?php /*endif; */?>
+
+
+<?php /*if ($shopCollection) : */?>
+    <?/* $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Данные по коллекции'), ['isOpen' => true]); */?>
+        <?/*= $form->field($shopCollection, 'brand_id')->widget(
+        \skeeks\cms\widgets\AjaxSelectModel::class,
+        [
+            'modelClass' => \skeeks\cms\shop\models\BrandCmsContentElement::class,
+            "ajaxUrl" => \yii\helpers\Url::to([
+                '/cms/ajax/autocomplete-brands',
+                //'property_id' => $this->property->id,
+                'cms_site_id' => \Yii::$app->skeeks->site->id,
+            ]),
+        ]
+    ); */?>
+    <?/* $fieldSet::end(); */?>
+--><?php /*endif; */?>
+
 
 <?= $this->render('_form-images', [
     'form'         => $form,

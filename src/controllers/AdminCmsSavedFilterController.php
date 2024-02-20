@@ -15,13 +15,17 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSavedFilter;
+use skeeks\cms\queryfilters\filters\FilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
@@ -61,6 +65,9 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                 "filters" => [
                     'visibleFilters' => [
                         'q',
+                        'cms_content_property_id',
+                        'shop_brand_id',
+                        'country_alpha2',
                     ],
                     'filtersModel'   => [
                         'rules'            => [
@@ -87,18 +94,56 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
 
                                         $query->joinWith("valueContentElement as valueContentElement");
                                         $query->joinWith("valueContentPropertyEnum as valueContentPropertyEnum");
+                                        $query->joinWith("brand as brand");
+                                        $query->joinWith("country as country");
 
                                         $query->andWhere([
                                             'or',
                                             ['like', CmsSavedFilter::tableName() .'.short_name', $e->field->value],
                                             ['like', 'valueContentElement.name', $e->field->value],
                                             ['like', 'valueContentPropertyEnum.value', $e->field->value],
+                                            ['like', 'brand.name', $e->field->value],
+                                            ['like', 'country.name', $e->field->value],
                                         ]);
 
                                         $query->groupBy([CmsSavedFilter::tableName().'.id']);
                                     }
                                 },
                             ],
+
+                            /*'cms_content_property_id'     => [
+                                'class' => FilterField::class,
+                                'field'             => [
+                                    'class'             => WidgetField::class,
+                                    'widgetClass' => AjaxSelectModel::class,
+                                    'widgetConfig'      => [
+                                        'modelClass' => CmsContentProperty::class,
+                                        'multiple' => true,
+                                        'searchQuery' => function($word = '') {
+
+                                            $query = CmsContentProperty::find()->cmsSite();
+
+                                            if ($word) {
+                                                $query->search($word);
+                                            }
+
+                                            return $query;
+                                        },
+                                    ],
+                                ],
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                    $query = $e->dataProvider->query;
+                                    if ($e->field->value) {
+                                        $query->innerJoin(['auth_assignment_role' => 'auth_assignment'], 'auth_assignment_role.cms_user_id = cms_user.id');
+                                        $query->andFilterWhere([
+                                            'auth_assignment_role.item_name' => $e->field->value,
+                                        ]);
+                                    }
+
+                                },
+                            ],*/
                         ],
                     ],
                 ],
@@ -124,6 +169,14 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
 
                         'custom',
                         //'code',
+                        'cms_content_property_id',
+                        'v',
+
+                        'shop_brand_id',
+                        'country_alpha2',
+
+                        //'value_content_element_id',
+                        //'value_content_property_enum_id',
                         'priority',
                         'view',
                     ],
@@ -134,13 +187,68 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                         'updated_at'       =>  [
                             'class' => DateTimeColumnData::class
                         ],
+                        'shop_brand_id'       => [
+                            'attribute' => 'shop_brand_id',
+                            'format' => 'raw',
+                            'value' => function (CmsSavedFilter $model) {
+                                return $model->shop_brand_id ? $model->brand->name : "";
+                            }
+                        ],
+                        'country_alpha2'       => [
+                            'attribute' => 'country_alpha2',
+                            'format' => 'raw',
+                            'value' => function (CmsSavedFilter $model) {
+                                return $model->country_alpha2 ? $model->country->name : "";
+                            }
+                        ],
+                        'cms_content_property_id'       => [
+                            'attribute' => 'cms_content_property_id',
+                            'format' => 'raw',
+                            'value' => function (CmsSavedFilter $model) {
+                                return $model->cms_content_property_id ? $model->cmsContentProperty->name : "";
+                            }
+                        ],
+
+                        'value_content_element_id'       => [
+                            'attribute' => 'value_content_element_id',
+                            'format' => 'raw',
+                            'value' => function (CmsSavedFilter $model) {
+                                return $model->value_content_element_id ? $model->valueContentElement->name : "";
+                            }
+                        ],
+
+                        'value_content_property_enum_id'       => [
+                            'attribute' => 'value_content_property_enum_id',
+                            'format' => 'raw',
+                            'value' => function (CmsSavedFilter $model) {
+                                return $model->value_content_property_enum_id ? $model->valueContentPropertyEnum->value : "";
+                            }
+                        ],
+
+                        'v'       => [
+                            'label' => 'Значение',
+                            'format' => 'raw',
+                            'value' => function (CmsSavedFilter $model) {
+
+                                if ($model->value_content_property_enum_id) {
+                                    return $model->valueContentPropertyEnum->value;
+                                }
+
+                                if ($model->value_content_element_id) {
+                                    return $model->valueContentElement->name;
+                                }
+
+                                return "";
+                            }
+                        ],
+
                         'custom'       => [
                             'attribute' => 'id',
                             'format' => 'raw',
                             'value' => function (CmsSavedFilter $model) {
 
                                 $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = Html::a($model->seoName, "#", ['class' => 'sx-trigger-action']);
 
 
                                 if ($model->cmsTree) {

@@ -18,8 +18,11 @@ use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsCountry;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -76,10 +79,41 @@ class AdminCmsCountryController extends BackendModelStandartController
                         'domain',
                         'phone_code',
                         //'code',
+                        'countProducts',
                         'is_active',
                         'priority',
                     ],
                     'columns'        => [
+                        'countProducts'   => [
+                            'format'    => 'raw',
+                            'value'     => function (CmsCountry $cmsCountry) {
+                                return $cmsCountry->raw_row['countProducts'];
+                            },
+                            'attribute' => 'countProducts',
+                            'label'     => 'Количество товаров',
+                            'beforeCreateCallback' => function (GridView $gridView) {
+                                $query = $gridView->dataProvider->query;
+    
+                                $countProductsQuery = ShopProduct::find()
+                                    ->select(["total" => new \yii\db\Expression("count(id)"),])
+                                    ->andWhere([
+                                        'country_alpha2' => new Expression(CmsCountry::tableName().".alpha2"),
+                                    ]);
+    
+                                $query->addSelect([
+                                    'countProducts' => $countProductsQuery,
+                                ]);
+    
+                                $gridView->sortAttributes['countProducts'] = [
+                                    'asc'     => ['countProducts' => SORT_ASC],
+                                    'desc'    => ['countProducts' => SORT_DESC],
+                                    'label'   => '',
+                                    'default' => SORT_ASC,
+                                ];
+                            },
+    
+                        ],
+                            
                         'domain'       => [
                             'value' => function($model) {
                                 return (string) $model->domain;
@@ -101,12 +135,13 @@ class AdminCmsCountryController extends BackendModelStandartController
                                 $info = implode("<br />", $data);
 
                                 return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
+                                            <div class='sx-trigger-action' style='width: 50px;'>
                                                 <a href='#' style='text-decoration: none; border-bottom: 0;'>
                                                     <img src='". ($model->flag ? $model->flag->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a>
-                                                </div>
-                                                <div style='margin-left: 5px;'>" . $info  . "</div></div>";
+                                            </div>
+                                            <div style='margin: auto 5px;'>" . $info  . "</div>
+                                        </div>";
 
                                             ;
                             }

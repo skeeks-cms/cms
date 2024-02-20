@@ -15,6 +15,7 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
+use skeeks\cms\shop\models\ShopBrand;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -43,6 +44,8 @@ use yii\web\Application;
  * @property integer|null           $value_content_element_id
  * @property integer|null           $value_content_property_enum_id
  * @property integer|null           $cms_content_property_id
+ * @property string|null            $country_alpha2
+ * @property integer|null           $shop_brand_id
  * @property string                 $description_short_type
  * @property string                 $description_full_type
  *
@@ -57,6 +60,8 @@ use yii\web\Application;
  * @property CmsContentElement      $valueContentElement
  * @property CmsContentPropertyEnum $valueContentPropertyEnum
  * @property CmsContentProperty     $cmsContentProperty
+ * @property ShopBrand              $brand
+ * @property CmsCountry             $country
  *
  * @property string                 $seoName Полное seo название фильтра. Seo название раздела + склоненное название опции. Например (Строительные краски зеленого цвета).
  * @property string                 $shortSeoName Короткое название фильтра. Название раздела + склоненное название опции. Например (Краски зеленого цвета).
@@ -125,6 +130,11 @@ class CmsSavedFilter extends ActiveRecord
             'description_full_type'  => Yii::t('skeeks/cms', 'Description Full Type'),
             'cms_image_id'           => Yii::t('skeeks/cms', 'Main Image'),
             'seo_h1'                 => Yii::t('skeeks/cms', 'SEO заголовок h1'),
+            'country_alpha2'         => Yii::t('skeeks/cms', 'Страна'),
+            'shop_brand_id'          => Yii::t('skeeks/cms', 'Бренд'),
+            'cms_content_property_id'          => Yii::t('skeeks/cms', 'Характеристика'),
+            'value_content_element_id'          => Yii::t('skeeks/cms', 'Значение'),
+            'value_content_property_enum_id'          => Yii::t('skeeks/cms', 'Значение'),
         ]);
     }
 
@@ -155,12 +165,25 @@ class CmsSavedFilter extends ActiveRecord
                     'cms_content_property_id',
                     'value_content_element_id',
                     'value_content_property_enum_id',
+                    'shop_brand_id',
                 ],
                 'integer',
+            ],
+            [
+                [
+                    'cms_content_property_id',
+                    'value_content_element_id',
+                    'value_content_property_enum_id',
+                    'country_alpha2',
+                    'shop_brand_id',
+                ],
+                'default',
+                'value' => null,
             ],
 
             [['short_name'], 'trim'],
 
+            [['country_alpha2'], 'string'],
             [['description_short', 'description_full'], 'string'],
 
             [['short_name', 'code'], 'string', 'max' => 255],
@@ -275,6 +298,21 @@ class CmsSavedFilter extends ActiveRecord
         return $this->hasOne(CmsContentProperty::className(), ['id' => 'cms_content_property_id']);
     }
 
+    /**
+     * @return ShopBrand
+     */
+    public function getBrand()
+    {
+        return $this->hasOne(ShopBrand::class, ['id' => 'shop_brand_id'])->from(['shopBrand' => ShopBrand::tableName()]);
+
+    }
+    /**
+     * @return CmsCountry|null
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(CmsCountry::class, ['alpha2' => 'country_alpha2']);
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -283,6 +321,7 @@ class CmsSavedFilter extends ActiveRecord
     {
         return $this->hasOne(CmsContentPropertyEnum::className(), ['id' => 'value_content_property_enum_id']);
     }
+
 
     /**
      * @return CmsStorageFile|null
@@ -331,6 +370,14 @@ class CmsSavedFilter extends ActiveRecord
     }
 
     /**
+     * @var CmsCountry
+     */
+    protected $_country = null;
+    /**
+     * @var null|ShopBrand
+     */
+    protected $_brand = null;
+    /**
      * @var null|CmsContentPropertyEnum
      */
     protected $_enum = null;
@@ -345,7 +392,8 @@ class CmsSavedFilter extends ActiveRecord
      */
     protected $_initNames = null;
 
-    protected function _initNames() {
+    protected function _initNames()
+    {
         $last = '';
 
         if ($this->_initNames === null) {
@@ -377,6 +425,36 @@ class CmsSavedFilter extends ActiveRecord
                         $last = StringHelper::lcfirst($this->_enum->value_for_saved_filter ? $this->_enum->value_for_saved_filter : $this->_enum->value);
                     }
                 }
+            } elseif ($this->shop_brand_id) {
+
+                //преобразуем вторую часть в нижний регистр
+
+                if ($this->isNewRecord) {
+                    $this->_brand = ShopBrand::findOne($this->shop_brand_id);
+                    if ($this->_brand) {
+                        $last = $this->_brand->name;
+                    }
+                } else {
+                    $this->_brand = $this->brand;
+                    if ($this->_brand) {
+                        $last = $this->_brand->name;
+                    }
+                }
+            } elseif ($this->country_alpha2) {
+
+                //преобразуем вторую часть в нижний регистр
+
+                if ($this->isNewRecord) {
+                    $this->_country = CmsCountry::find()->alpha2($this->country_alpha2)->one();
+                    if ($this->_country) {
+                        $last = $this->_country->name;
+                    }
+                } else {
+                    $this->_country = $this->country;
+                    if ($this->_country) {
+                        $last = $this->_country->name;
+                    }
+                }
             }
         }
 
@@ -394,8 +472,12 @@ class CmsSavedFilter extends ActiveRecord
 
         if ($this->_enum) {
             return StringHelper::ucfirst($this->_enum->value);
-        } elseif($this->_element) {
+        } elseif ($this->_element) {
             return StringHelper::ucfirst($this->_element->name);
+        } elseif ($this->_brand) {
+            return StringHelper::ucfirst($this->_brand->name);
+        } elseif ($this->_country) {
+            return StringHelper::ucfirst($this->_country->name);
         }
 
         return '';
@@ -412,9 +494,15 @@ class CmsSavedFilter extends ActiveRecord
 
         if ($this->_enum) {
             return StringHelper::ucfirst($this->_enum->value_for_saved_filter ? $this->_enum->value_for_saved_filter : $this->_enum->value);
-        } elseif($this->_element) {
+        } elseif ($this->_element) {
             //todo: доработать склонение тут
             return StringHelper::ucfirst($this->_element->name);
+        } elseif ($this->_country) {
+            //todo: доработать склонение тут
+            return $this->_country->name;
+        } elseif ($this->_brand) {
+            //todo: доработать склонение тут
+            return $this->_brand->name;
         }
 
         return '';
@@ -436,7 +524,12 @@ class CmsSavedFilter extends ActiveRecord
                 $this->_seoName = $this->name;
             } else {
                 $this->_initNames();
-                $this->_seoName = $this->cmsTree->seoName." ". StringHelper::lcfirst($this->propertyValueNameInflected);
+                if ($this->_brand || $this->_country) {
+                    $this->_seoName = $this->cmsTree->seoName." ".$this->propertyValueNameInflected;
+                } else {
+                   $this->_seoName = $this->cmsTree->seoName." ".StringHelper::lcfirst($this->propertyValueNameInflected);
+                }
+
             }
         }
 
@@ -453,7 +546,13 @@ class CmsSavedFilter extends ActiveRecord
         $result = "";
 
         $this->_initNames();
-        $this->_shortSeoName = $this->cmsTree->name." ". StringHelper::lcfirst($this->propertyValueNameInflected);
+
+        if ($this->_brand || $this->_country) {
+            $this->_shortSeoName = $this->cmsTree->name." ".$this->propertyValueNameInflected;
+        } else {
+           $this->_shortSeoName = $this->cmsTree->name." ".StringHelper::lcfirst($this->propertyValueNameInflected);
+        }
+
 
 
         return $this->_shortSeoName;
@@ -467,6 +566,39 @@ class CmsSavedFilter extends ActiveRecord
         $result[] = $this->seoName;
 
         return implode("", $result);
+    }
+
+    /**
+     * @param array $savedFilters
+     * @return array
+     */
+    static public function formatFilters(array $savedFilters)
+    {
+        $savedFiltersData = [];
+
+        foreach ($savedFilters as $sf) {
+            /**
+             * @var $sf \skeeks\cms\models\CmsSavedFilter
+             */
+            $pr_id = "";
+            $n = "";
+
+            if ($sf->cms_content_property_id) {
+                $pr_id = $sf->cms_content_property_id;
+                $n = $sf->cmsContentProperty->name;
+            } elseif ($sf->shop_brand_id) {
+                $pr_id = "shop_brand_id";
+                $n = "Бренд";
+            } elseif ($sf->country_alpha2) {
+                $pr_id = "country";
+                $n = "Страна";
+            }
+
+            $savedFiltersData[$pr_id]['savedFilters'][$sf->id] = $sf;
+            $savedFiltersData[$pr_id]['name'] = $n;
+        }
+
+        return $savedFiltersData;
     }
 }
 

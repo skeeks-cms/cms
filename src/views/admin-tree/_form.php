@@ -205,7 +205,7 @@ CSS
             $property->handler->setEnumClass(\skeeks\cms\models\CmsTreeTypePropertyEnum::class);
         }
         ?>
-        <?= $property->renderActiveForm($form); ?>
+        <?= $property->renderActiveForm($form, $model); ?>
     <?php endforeach; ?>
 
 <?php else
@@ -216,6 +216,35 @@ CSS
 
 <? $fieldSet::end(); ?>
 
+
+<?php
+$prodcutsContent = \skeeks\cms\models\CmsContent::find()->isProducts()->andWhere(['cms_tree_type_id' => $model->tree_type_id])->one();
+if ($prodcutsContent && \Yii::$app->shop->contentCollections) :
+?>
+    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Настройки магазина'), ['isOpen' => true]); ?>
+        <?php
+        $this->registerJs(<<<JS
+        if ($(".field-tree-shop_has_collections input").is(":checked")) {
+            $(".field-tree-shop_show_collections").slideDown();
+        } else {
+            $(".field-tree-shop_show_collections").slideUp();
+        }
+        
+        $(".field-tree-shop_has_collections input").on("change", function () {
+            if ($(this).is(":checked")) {
+                $(".field-tree-shop_show_collections").slideDown();
+            } else {
+                $(".field-tree-shop_show_collections").slideUp();
+            }
+        });
+JS
+        );
+
+        ?>
+        <?php echo $form->field($model, 'shop_has_collections')->checkbox(); ?>
+        <?php echo $form->field($model, 'shop_show_collections')->checkbox(); ?>
+    <? $fieldSet::end(); ?>
+<?php endif; ?>
 
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Announcement'), ['isOpen' => false]); ?>
 
