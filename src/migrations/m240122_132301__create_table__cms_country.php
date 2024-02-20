@@ -8,7 +8,7 @@
 
 use yii\db\Migration;
 
-class m240124_132301__create_table__cms_country extends Migration
+class m240122_132301__create_table__cms_country extends Migration
 {
     public function safeUp()
     {
