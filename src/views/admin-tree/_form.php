@@ -219,7 +219,7 @@ CSS
 
 <?php
 $prodcutsContent = \skeeks\cms\models\CmsContent::find()->isProducts()->andWhere(['cms_tree_type_id' => $model->tree_type_id])->one();
-if ($prodcutsContent && \Yii::$app->shop->contentCollections) :
+if ($prodcutsContent) :
 ?>
     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Настройки магазина'), ['isOpen' => true]); ?>
         <?php
