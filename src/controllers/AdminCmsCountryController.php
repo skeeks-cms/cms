@@ -45,7 +45,7 @@ class AdminCmsCountryController extends BackendModelStandartController
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
-            return \Yii::$app->user->can($this->uniqueId);
+            return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
         };
 
 

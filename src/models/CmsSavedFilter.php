@@ -15,6 +15,7 @@ use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
+use skeeks\cms\models\queries\CmsSavedFilterQuery;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
@@ -600,6 +601,18 @@ class CmsSavedFilter extends ActiveRecord
 
         return $savedFiltersData;
     }
+
+
+
+    /**
+     * @return CmsContentQuery
+     */
+    public static function find()
+    {
+        return (new CmsSavedFilterQuery(get_called_class()));
+    }
+
+
 }
 
 
