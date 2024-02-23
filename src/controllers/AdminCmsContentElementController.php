@@ -520,6 +520,18 @@ HTML;
                             },
                             'format' => 'raw',
                         ],
+                        'show_counter'    => [
+                            'attribute' => 'show_counter',
+                            'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
+                                if ($model->show_counter) {
+                                    return $model->show_counter;
+                                } else {
+                                    return '';
+                                }
+
+                            },
+                            'format' => 'raw',
+                        ],
                         'published_at' => [
                             'class' => DateTimeColumnData::class,
                         ],
@@ -1441,6 +1453,8 @@ HTML
     public static function getDefaultColumns($cmsContent = null)
     {
         $columns = [
+
+
             [
                 'class' => \skeeks\cms\grid\ImageColumn2::class,
             ],
@@ -1490,6 +1504,8 @@ HTML
                 //'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
                 'attribute' => 'tree_id',
             ],
+
+
             'additionalSections' => [
                 'class'   => \yii\grid\DataColumn::class,
                 'value'   => function (\skeeks\cms\models\CmsContentElement $model) {
@@ -1524,6 +1540,16 @@ HTML
                 },
                 'format' => 'raw',
             ],
+
+            /*"show_counter1" => [
+                'label'  => "Смотреть",
+                'attribute' => 'show_counter1',
+                'class'     => \yii\grid\DataColumn::class,
+                'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
+                    return $model->show_counter ? $model->show_counter : "";
+                },
+                'format'    => 'raw',
+            ],*/
         ];
         return $columns;
     }

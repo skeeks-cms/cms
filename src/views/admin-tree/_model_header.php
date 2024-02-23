@@ -34,17 +34,17 @@ $controller = $this->context;
                 </span>
             <? endif; ?>
 
-            <? if ($model->is_index == 0) : ?>
+            <? if (!$model->isAllowIndex) : ?>
                 <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
                     <span data-toggle="tooltip" title="Эта страница не индексируется поисковыми системами!">[no index]</span>
                 </span>
             <? endif; ?>
 
-            <? if ($model->is_index == 0 || $model->isRedirect || $model->isCanonical) : ?>
+            <?/* if ($model->is_index == 0 || $model->isRedirect || $model->isCanonical) : */?><!--
                 <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
                     <span data-toggle="tooltip" title="Эта страница не попадает в карту сайта!">[no sitemap]</span>
                 </span>
-            <? endif; ?>
+            --><?/* endif; */?>
 
             <? if ($model->isCanonical) : ?>
                 <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">

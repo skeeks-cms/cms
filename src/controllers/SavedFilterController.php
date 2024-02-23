@@ -92,6 +92,10 @@ class SavedFilterController extends Controller
 
         $viewFile = $this->action->id;
 
+        if (!$this->model->isAllowIndex) {
+            \Yii::$app->seo->setNoIndexNoFollow();
+        }
+
         if ($cmsTree) {
             if ($cmsTree->view_file) {
                 $viewFile = $cmsTree->view_file;

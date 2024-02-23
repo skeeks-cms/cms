@@ -222,6 +222,10 @@ class ContentElementController extends Controller
         $contentElement = $this->model;
         $tree = $contentElement->cmsTree;
 
+        if (!$this->model->isAllowIndex) {
+            \Yii::$app->seo->setNoIndexNoFollow();
+        }
+
         $this->_getSavedFilter();
 
         //TODO: Может быть не сбрасывать GET параметры

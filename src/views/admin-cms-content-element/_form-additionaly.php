@@ -43,6 +43,10 @@
         <?= $form->field($model, 'priority')->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class); ?>
     <? endif; ?>
 
+    <? if ($contentModel->isAllowEdit("show_counter")) : ?>
+        <?= $form->field($model, 'show_counter')->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class); ?>
+    <? endif; ?>
+
 
     <?= $form->field($model, 'is_adult')->checkbox(); ?>
 

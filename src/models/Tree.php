@@ -120,6 +120,7 @@ use yii\helpers\Url;
  * @property CmsContentProperty[]      $cmsContentProperties
  *
  * @property string                    $seoName
+ * @property bool                      $isAllowIndex
  *
  * @property Tree                      $parent
  * @property Tree[]                    $parents
@@ -308,8 +309,8 @@ class Tree extends ActiveRecord
             'is_adult'    => 'Если эта страница содержит контент для взрослых, то есть имеет возрастные ограничения 18+ нужно поставить эту галочку!',
             'is_index'    => 'Необходимо поставить эту галочку, чтобы страница была доступна поисковым системам и попадала в карту сайта!',
 
-            'shop_has_collections'           => Yii::t('skeeks/cms', 'Включив эту опцию, добавляя товар в этот раздел, необходим будет заполнять поле "Коллекции"'),
-            'shop_show_collections'           => Yii::t('skeeks/cms', 'Если включен функционал коллекций (опция выше) то по умолчанию в этом разделе можно отображать коллекции или товары. Эта опция отвечает за это.'),
+            'shop_has_collections'  => Yii::t('skeeks/cms', 'Включив эту опцию, добавляя товар в этот раздел, необходим будет заполнять поле "Коллекции"'),
+            'shop_show_collections' => Yii::t('skeeks/cms', 'Если включен функционал коллекций (опция выше) то по умолчанию в этом разделе можно отображать коллекции или товары. Эта опция отвечает за это.'),
 
         ]);
     }
@@ -320,8 +321,8 @@ class Tree extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'shop_has_collections'           => Yii::t('skeeks/cms', 'Раздел содержит товарные коллекции'),
-            'shop_show_collections'           => Yii::t('skeeks/cms', 'Показывать коллекции по умолчанию'),
+            'shop_has_collections'  => Yii::t('skeeks/cms', 'Раздел содержит товарные коллекции'),
+            'shop_show_collections' => Yii::t('skeeks/cms', 'Показывать коллекции по умолчанию'),
 
             'published_at'           => Yii::t('skeeks/cms', 'Published At'),
             'published_to'           => Yii::t('skeeks/cms', 'Published To'),
@@ -1231,6 +1232,25 @@ class Tree extends ActiveRecord
             throw $e;
         }
     }
+
+    /**
+     * @return bool
+     */
+    public function getIsAllowIndex()
+    {
+        //Не разрешено индексировать
+        if (!$this->is_index) {
+            return false;
+        }
+
+        //Если страница 18+, и не разрешено индексировать такой контент, то не индексируем!
+        if ($this->is_adult && !\Yii::$app->seo->is_allow_index_adult_content) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
 
 

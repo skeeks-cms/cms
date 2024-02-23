@@ -312,7 +312,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
 
         return [
 
-            'cms_tree_id' => [
+            /*'cms_tree_id' => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => SelectTreeInputWidget::class,
                 'widgetConfig' => [
@@ -325,12 +325,12 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                             'models' => $rootTreeModels,
                         ],
                 ]
-            ],
+            ],*/
 
-            'cms_content_property_id',
+            /*'cms_content_property_id',
 
             'value_content_element_id',
-            'value_content_property_enum_id',
+            'value_content_property_enum_id',*/
 
             'short_name',
 

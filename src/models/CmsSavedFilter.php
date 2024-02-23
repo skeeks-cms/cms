@@ -54,6 +54,7 @@ use yii\web\Application;
  *
  * @property string                 $absoluteUrl
  * @property string                 $url
+ * @property bool                 $isAllowIndex
  *
  * @property CmsTree                $cmsTree
  * @property CmsSite                $cmsSite
@@ -604,12 +605,26 @@ class CmsSavedFilter extends ActiveRecord
 
 
 
+
     /**
      * @return CmsContentQuery
      */
     public static function find()
     {
         return (new CmsSavedFilterQuery(get_called_class()));
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsAllowIndex()
+    {
+        //Если страница 18+, и не разрешено индексировать такой контент, то не индексируем!
+        if ($this->cmsTree && $this->cmsTree->is_adult && !\Yii::$app->seo->is_allow_index_adult_content) {
+            return false;
+        }
+
+        return true;
     }
 
 

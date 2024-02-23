@@ -99,6 +99,7 @@ use yii\web\Application;
  * @property CmsStorageFile[]            $files
  * @property CmsStorageFile[]            $images
  *
+ * @property bool                        $isAllowIndex
  * @version > 2.4.8
  * @property CmsContentElement           $parentContentElement
  * @property CmsContentElement[]         $childrenContentElements
@@ -273,7 +274,7 @@ class CmsContentElement extends RelatedElementModel
             'external_id'               => Yii::t('skeeks/cms', 'Уникальный код'),
             'main_cce_id'               => Yii::t('skeeks/cms', 'Инфо карточка'),
 
-            'is_adult'               => Yii::t('skeeks/cms', 'Контент для взрослых?'),
+            'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
         ]);
     }
     /**
@@ -285,8 +286,10 @@ class CmsContentElement extends RelatedElementModel
             'treeIds'     => Yii::t('skeeks/cms', 'You can specify some additional sections that will show your records.'),
             'seo_h1'      => 'Заголовок будет показан на детальной странице, в случае если его использование задано в шаблоне.',
             'external_id' => Yii::t('skeeks/cms', 'Обычно заполняется если этот элемент выгружается из какой-либо внешней системы'),
-            'is_adult' => Yii::t('skeeks/cms', 'Если эта страница содержит контент для взрослых, то есть имеет возрастные ограничения 18+ нужно поставить эту галочку!'),
-            'active' => Yii::t('skeeks/cms', 'Если эта галочка не стоит, то контент не показывается и не индексируется поисковыми системами'),
+            'is_adult'    => Yii::t('skeeks/cms', 'Если эта страница содержит контент для взрослых, то есть имеет возрастные ограничения 18+ нужно поставить эту галочку!'),
+            'active'      => Yii::t('skeeks/cms', 'Если эта галочка не стоит, то контент не показывается и не индексируется поисковыми системами'),
+            'priority'      => Yii::t('skeeks/cms', 'В некоторых блоках сортировка товаров производится согласно значению в этмо поле'),
+            'show_counter'      => Yii::t('skeeks/cms', 'Количество просмотров, от этого зависит популярность товара. По умолчанию чем популярнее товар, тем он выше в списке, в разделе.'),
         ]);
     }
     /**
@@ -479,7 +482,7 @@ class CmsContentElement extends RelatedElementModel
             [
                 "tree_id",
                 "required",
-                'when'       => function (self $model) {
+                'when' => function (self $model) {
 
                     if ($model->cmsContent && $model->cmsContent->is_tree_required) {
                         return true;
@@ -615,14 +618,12 @@ class CmsContentElement extends RelatedElementModel
         $result = $q->all();
 
 
-
-        
         self::$_relatedProperties[$cacheKey] = $result;
 
         /*print_r(self::$_relatedProperties[$cacheKey]);
         echo count(self::$_relatedProperties[$cacheKey]);
         echo "------<br>";*/
-        
+
         //Память может переполниться...
         if (count(self::$_relatedProperties[$cacheKey]) > 20) {
             self::$_relatedProperties = [];
@@ -753,9 +754,9 @@ class CmsContentElement extends RelatedElementModel
         $mainCmsTree = ArrayHelper::getValue(static::$_contentSavedFilter, $content_id, false);
         if ($mainCmsTree === false) {
             static::$_contentSavedFilter[$content_id] = null;
-            
+
             $dependencyContent = new TagDependency([
-            'tags' => [
+                'tags' => [
                     (new CmsContent())->getTableCacheTag(),
                 ],
             ]);
@@ -764,7 +765,7 @@ class CmsContentElement extends RelatedElementModel
             $cmsContent = CmsContent::getDb()->cache(function ($db) use ($content_id) {
                 return CmsContent::findOne($content_id);
             }, null, $dependencyContent);
-                
+
             if ($cmsContent) {
                 if ($cmsContent->saved_filter_tree_type_id) {
                     $mainCmsTree = CmsTree::find()
@@ -948,7 +949,7 @@ class CmsContentElement extends RelatedElementModel
             $newModel = new static($data);
 
             if ($add_copy_name) {
-                $newModel->name = $newModel->name . " (копия)";
+                $newModel->name = $newModel->name." (копия)";
             }
 
 
@@ -1046,6 +1047,19 @@ class CmsContentElement extends RelatedElementModel
         return $this->hasMany(static::class, ['main_cce_id' => 'id'])->from(['secondaryCCE' => static::tableName()]);
     }
 
+
+    /**
+     * @return bool
+     */
+    public function getIsAllowIndex()
+    {
+        //Если страница 18+, и не разрешено индексировать такой контент, то не индексируем!
+        if ($this->is_adult && !\Yii::$app->seo->is_allow_index_adult_content) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @return \skeeks\cms\query\CmsActiveQuery|CmsContentElementActiveQuery

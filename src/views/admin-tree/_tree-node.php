@@ -37,13 +37,13 @@ if ($model->is_adult) {
 }
 
 
-if ($model->is_index == 0) {
-    $result .= " <span title='Эта страница не индексируется поисковыми системами!' data-toggle='tooltip' class='sx-is-adult'>[no index]</span>";
+if (!$model->isAllowIndex) {
+    $result .= " <span title='Эта страница не индексируется поисковыми системами!' data-toggle='tooltip' class='sx-is-adult'>[noindex]</span>";
 }
 
-if ($model->is_index == 0 || $model->isRedirect || $model->isCanonical) {
+/*if ($model->is_index == 0 || $model->isRedirect || $model->isCanonical) {
     $result .= " <span title='Эта страница не попадает в карту сайта!' data-toggle='tooltip' class='sx-is-adult'>[no sitemap]</span>";
-}
+}*/
 
 if ($model->isCanonical) {
     $result .= " <span title='У этой страницы задана атрибут rel=canonical на сатраницу: {$model->canonicalUrl}' data-toggle='tooltip' class='sx-is-adult'>[canonical]</span>";

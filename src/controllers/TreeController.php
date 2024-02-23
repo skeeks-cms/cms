@@ -91,8 +91,8 @@ class TreeController extends Controller
         if ($this->model->isCanonical) {
             \Yii::$app->seo->setCanonical($this->model->canonicalUrl);
         }
-        if (!$this->model->is_index) {
 
+        if (!$this->model->isAllowIndex) {
             \Yii::$app->seo->setNoIndexNoFollow();
         }
 
