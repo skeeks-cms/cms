@@ -73,6 +73,7 @@ $items = [
     'treeIds'           => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "treeIds"),
     'external_id'       => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), "external_id"),
     'published_at'      => "Время публикации",
+    'show_counter'      => "Количество просмотров",
 ];
 echo $form->field($model, 'editable_fields')->widget(
     \skeeks\cms\widgets\Select::class, [
