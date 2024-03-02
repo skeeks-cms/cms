@@ -57,10 +57,13 @@ use yii\web\Application;
  * @property string                      $meta_keywords
  * @property string                      $seo_h1
  * @property integer|null                $cms_site_id
+ * 
  * @property string|null                 $external_id
  * @property integer|null                $main_cce_id
  * @property integer|null                $main_cce_at
  * @property integer|null                $main_cce_by
+ * 
+ * @property integer|null                $sx_id
  *
  * @property integer|null                $shop_is_brand
  * @property integer|null                $shop_is_collection
@@ -273,6 +276,7 @@ class CmsContentElement extends RelatedElementModel
             'seo_h1'                    => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'               => Yii::t('skeeks/cms', 'Уникальный код'),
             'main_cce_id'               => Yii::t('skeeks/cms', 'Инфо карточка'),
+            'sx_id'               => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
 
             'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
         ]);
@@ -316,6 +320,7 @@ class CmsContentElement extends RelatedElementModel
                     'main_cce_at',
                     'main_cce_by',
                     'is_adult',
+                    'sx_id',
                 ],
                 'integer',
             ],
@@ -353,6 +358,7 @@ class CmsContentElement extends RelatedElementModel
             ['description_short_type', 'default', 'value' => "text"],
             ['description_full_type', 'default', 'value' => "text"],
             ['main_cce_id', 'default', 'value' => null],
+            ['sx_id', 'default', 'value' => null],
 
             [
                 ['main_cce_at'],

@@ -41,6 +41,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                                $priority
  * @property integer                                $cms_site_id
  * @property integer                                $external_id
+ * @property integer|null                                $sx_id
  *
  * @property string                                 $fileName
  *
@@ -81,7 +82,7 @@ class StorageFile extends Core
     {
         return array_merge(parent::rules(), [
             [
-                ['created_by', 'priority', 'updated_by', 'created_at', 'updated_at', 'size', 'cms_site_id', 'image_height', 'image_width'],
+                ['created_by', 'priority', 'updated_by', 'created_at', 'updated_at', 'size', 'cms_site_id', 'image_height', 'image_width', 'sx_id'],
                 'integer',
             ],
             [['description_short', 'description_full'], 'string'],
@@ -94,6 +95,11 @@ class StorageFile extends Core
                 'targetAttribute' => ['cluster_id', 'cluster_file'],
                 'message'         => Yii::t('skeeks/cms',
                     'The combination of Cluster ID and Cluster Src has already been taken.'),
+            ],
+            [
+                'sx_id',
+                'default',
+                'value' => null
             ],
             [
                 'cms_site_id',
@@ -144,6 +150,7 @@ class StorageFile extends Core
             'description_full'  => Yii::t('skeeks/cms', 'Description Full'),
             'image_height'      => Yii::t('skeeks/cms', 'Image Height'),
             'image_width'       => Yii::t('skeeks/cms', 'Image Width'),
+            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
 

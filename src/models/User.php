@@ -432,11 +432,14 @@ class User
                             $this->addError($attribute, "Этот email уже занят");
                             return false;
                         }
-                        $this->mainCmsUserEmail->value = StringHelper::strtolower($this->mainCmsUserEmail->value);
-                        $value = StringHelper::strtolower($value);
-                        if ($this->mainCmsUserEmail && $this->mainCmsUserEmail->is_approved && $this->mainCmsUserEmail->value != $value) {
-                            $this->addError($attribute, "Этот email подтвержден, и его менять нельзя. Добавьте другой email, а после удалите этот!");
-                            return false;
+                        
+                        if ($this->mainCmsUserEmail) {
+                            $this->mainCmsUserEmail->value = StringHelper::strtolower($this->mainCmsUserEmail->value);
+                            $value = StringHelper::strtolower($value);
+                            if ($this->mainCmsUserEmail && $this->mainCmsUserEmail->is_approved && $this->mainCmsUserEmail->value != $value) {
+                                $this->addError($attribute, "Этот email подтвержден, и его менять нельзя. Добавьте другой email, а после удалите этот!");
+                                return false;
+                            }
                         }
                     }
                 },

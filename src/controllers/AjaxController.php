@@ -21,6 +21,7 @@ use skeeks\cms\models\CmsTreeTypePropertyEnum;
 use skeeks\cms\models\CmsUserUniversalProperty;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCollection;
 use yii\web\Controller;
 
@@ -351,4 +352,41 @@ class AjaxController extends Controller
 
         return ['results' => $result];
     }
+    
+    
+
+    /**
+     * @return array
+     */
+    public function actionAutocompleteBrands()
+    {
+        $result = [];
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $query = ShopBrand::find();
+
+        if ($q = \Yii::$app->request->get('q')) {
+            $query->search($q);
+        }
+
+        $data = $query->limit(100)
+            ->all();
+
+        if ($data) {
+
+            /**
+             * @var $model CmsContentElement
+             */
+            foreach ($data as $model) {
+                $result[] = [
+                    'id'   => $model->id,
+                    'text' => $model->name,
+                ];
+            }
+        }
+
+        return ['results' => $result];
+    }
+
 }

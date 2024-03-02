@@ -17,6 +17,7 @@ use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;
  * @property string|null        $value_for_saved_filter Название (для сохраненных фильтров)
  * @property string|null        $description Описание
  * @property int|null           $cms_image_id Фото/Изображение
+ * @property int|null           $sx_id
  *
  * @property CmsStorageFile     $cmsImage
  *
@@ -54,6 +55,7 @@ class CmsContentPropertyEnum extends RelatedPropertyEnumModel
             'value_for_saved_filter' => 'Название (для сохраненных фильтров)',
             'description'            => 'Описание',
             'cms_image_id'           => 'Фото/Изображение',
+            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
 
@@ -75,6 +77,8 @@ class CmsContentPropertyEnum extends RelatedPropertyEnumModel
     {
         return array_merge(parent::rules(), [
             [['value_for_saved_filter'], 'string'],
+            [['sx_id'], 'integer'],
+            [['sx_id'], 'default', 'value' => null],
             [['description'], 'string'],
 
             [['cms_image_id'], 'safe'],

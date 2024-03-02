@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                      $is_vendor
  * @property integer                      $is_vendor_code
  * @property integer                      $is_country
+ * @property integer|null                 $sx_id
  *
  * @property CmsContent[]                 $cmsContents
  * @property CmsContentProperty2content[] $cmsContentProperty2contents
@@ -80,11 +81,13 @@ class CmsContentProperty extends RelatedPropertyModel
             'cmsTrees'    => Yii::t('skeeks/cms', 'Linked to sections'),
             'cms_site_id' => Yii::t('skeeks/cms', 'Сайт'),
 
-            'is_offer_property' => \Yii::t('skeeks/cms', 'Свойство предложения?'),
+            'is_offer_property'     => \Yii::t('skeeks/cms', 'Свойство предложения?'),
             'is_img_offer_property' => \Yii::t('skeeks/cms', 'Отображать свойство картинкой?'),
-            'is_vendor'         => \Yii::t('skeeks/cms', 'Производитель?'),
-            'is_vendor_code'    => \Yii::t('skeeks/cms', 'Код производителя?'),
-            'is_country'        => \Yii::t('skeeks/cms', 'Страна'),
+            'is_vendor'             => \Yii::t('skeeks/cms', 'Производитель?'),
+            'is_vendor_code'        => \Yii::t('skeeks/cms', 'Код производителя?'),
+            'is_country'            => \Yii::t('skeeks/cms', 'Страна'),
+
+            'sx_id'               => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
     /**
@@ -93,11 +96,11 @@ class CmsContentProperty extends RelatedPropertyModel
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_img_offer_property'          => \Yii::t('skeeks/cms', 'В карточке будет отображатсья картинка при выборе этого варианта.'),
-            'is_offer_property'          => \Yii::t('skeeks/cms', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
-            'cms_site_id' => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
-            'cmsContents' => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
-            'cmsTrees'    => Yii::t('skeeks/cms',
+            'is_img_offer_property' => \Yii::t('skeeks/cms', 'В карточке будет отображатсья картинка при выборе этого варианта.'),
+            'is_offer_property'     => \Yii::t('skeeks/cms', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
+            'cms_site_id'           => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
+            'cmsContents'           => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
+            'cmsTrees'              => Yii::t('skeeks/cms',
                 'Так же есть возможность ограничить отображение поля только для определенных разделов. Если будут выбраны разделы, то добавляя элемент в соответствующий раздел будет показываться это поле.'),
         ]);
     }
@@ -110,7 +113,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         $rules = ArrayHelper::merge(parent::rules(), [
             [
-                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property', 'is_img_offer_property'],
+                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property', 'is_img_offer_property', 'sx_id'],
                 'integer',
             ],
 
@@ -121,17 +124,22 @@ class CmsContentProperty extends RelatedPropertyModel
             ],*/
             [
                 ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
-                function($attr) {
+                function ($attr) {
                     if ($this->{$attr} != 1) {
                         $this->{$attr} = null;
                     }
                 },
-                
+
             ],
             [
                 ['is_img_offer_property'],
                 'default',
-                'value' => 0
+                'value' => 0,
+            ],
+            [
+                ['sx_id'],
+                'default',
+                'value' => null,
             ],
 
             [['cmsContents'], 'safe'],

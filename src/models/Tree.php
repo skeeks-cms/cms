@@ -67,6 +67,7 @@ use yii\helpers\Url;
  * @property string                    $seo_h1
  * @property string|null               $external_id
  * @property integer|null              $main_cms_tree_id
+ * @property integer|null              $sx_id
  *
  * @property bool                      $shop_has_collections Раздел содержит товарные коллекции?
  * @property bool                      $shop_show_collections Показывать коллекции по умолчанию?
@@ -352,6 +353,7 @@ class Tree extends ActiveRecord
             'view_file'              => Yii::t('skeeks/cms', 'Template'),
             'seo_h1'                 => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'            => Yii::t('skeeks/cms', 'ID из внешней системы'),
+            'sx_id'               => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
 
             'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
             'is_index' => Yii::t('skeeks/cms', 'Страница индексируется?'),
@@ -369,6 +371,7 @@ class Tree extends ActiveRecord
             [['description_short', 'description_full'], 'string'],
 
             ['active', 'default', 'value' => Cms::BOOL_Y],
+            ['sx_id', 'default', 'value' => null],
 
             [['redirect_code'], 'default', 'value' => 301],
             [['redirect_code'], 'in', 'range' => [301, 302]],
@@ -377,6 +380,7 @@ class Tree extends ActiveRecord
             [['redirect_saved_filter_id'], 'integer'],
             [['redirect_tree_id'], 'integer'],
             [['redirect_code'], 'integer'],
+            [['sx_id'], 'integer'],
 
             [
                 [
