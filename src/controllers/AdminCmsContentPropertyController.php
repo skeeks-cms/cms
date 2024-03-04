@@ -253,7 +253,11 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                             'attribute' => "name",
                             'format'    => "raw",
                             'value'     => function (CmsContentProperty $model) {
-                                return Html::a($model->asText, "#", [
+                                $name = $model->asText;
+                                if ($model->sx_id) {
+                                    $name = $name . " <small data-toggle='tooltip' title='SkeekS Suppliers ID: {$model->sx_id}'><i class='fas fa-link'></i></small>" ;
+                                }
+                                return Html::a($name, "#", [
                                         'class' => "sx-trigger-action",
                                     ]).
                                     "<br />".Html::tag('small', $model->handler->name).

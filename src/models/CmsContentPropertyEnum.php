@@ -55,7 +55,7 @@ class CmsContentPropertyEnum extends RelatedPropertyEnumModel
             'value_for_saved_filter' => 'Название (для сохраненных фильтров)',
             'description'            => 'Описание',
             'cms_image_id'           => 'Фото/Изображение',
-            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'           => \Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
 
