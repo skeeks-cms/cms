@@ -56,4 +56,19 @@ class DateTimeColumnData extends DataColumn
 
         //return \Yii::$app->formatter->asDatetime($timestamp) . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
     }
+    /**
+     * @inheritdoc
+     */
+    public function renderDataCellContentForExport($model, $key, $index)
+    {
+        if ($this->view_type == self::VIEW_RELITIVE_TYME) {
+            $timestamp = $model->{$this->attribute};
+            return \Yii::$app->formatter->asDatetime($timestamp, "php:Y-m-d H:i:s");
+        } elseif ($this->view_type == self::VIEW_DATE) {
+            $timestamp = $model->{$this->attribute};
+            return \Yii::$app->formatter->asDatetime($timestamp, "php:Y-m-d ");
+        }
+
+        //return \Yii::$app->formatter->asDatetime($timestamp) . "<br /><small>" . \Yii::$app->formatter->asRelativeTime($timestamp) . "</small>";
+    }
 }
