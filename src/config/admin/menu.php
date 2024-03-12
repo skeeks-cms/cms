@@ -517,6 +517,11 @@ return array_merge(dashboardsMenu(), [
 
 
 
+                'clear' => [
+                    "label" => \Yii::t('skeeks/cms', "Clearing temporary data"),
+                    "url"   => ["cms/admin-clear"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/clear.png'],
+                ],
 
 
             ],
@@ -539,11 +544,11 @@ return array_merge(dashboardsMenu(), [
             'items' =>
                 [
 
-                    'dev' => [
+                    /*'dev' => [
                         "label" => \Yii::t('skeeks/cms', "Для разработчика"),
                         "url"   => ["cms/admin-info"],
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.infoblock.png'],
-                    ],
+                    ],*/
 
                     /*[
                         'label'    => \Yii::t('skeeks/cms', 'Instruments'),
@@ -561,11 +566,11 @@ return array_merge(dashboardsMenu(), [
                                 ],
                             ],
                     ],*/
-                    'clear' => [
+                    /*'clear' => [
                         "label" => \Yii::t('skeeks/cms', "Clearing temporary data"),
                         "url"   => ["cms/admin-clear"],
                         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/clear.png'],
-                    ],
+                    ],*/
                 ],
         ],
 
