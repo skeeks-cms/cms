@@ -443,7 +443,7 @@ class ContentElementsCmsWidget extends WidgetRenderable
                     ],
                     'orderBy' => [
                         'class' => SelectField::class,
-                        'items' => (new \skeeks\cms\models\Tree())->attributeLabels(),
+                        'items' => (new \skeeks\cms\models\CmsContentElement())->attributeLabels(),
                     ],
                     'order'   => [
                         'class' => SelectField::class,

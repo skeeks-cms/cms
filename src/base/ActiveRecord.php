@@ -97,6 +97,32 @@ class ActiveRecord extends \yii\db\ActiveRecord
                         }
                     },
                 ];
+            } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_by')) {
+
+                $result[BlameableBehavior::class] = [
+                    'class'      => BlameableBehavior::class,
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => ['created_by'],
+                        ActiveRecord::EVENT_BEFORE_VALIDATE => ['created_by'],
+                        ActiveRecord::EVENT_BEFORE_UPDATE => [],
+                    ],
+                    'value' => function ($event) {
+                        if (\Yii::$app instanceof \yii\console\Application) {
+                            return null;
+                        } else {
+                            $user = Yii::$app->get('user', false);
+                            return $user && !$user->isGuest ? $user->id : null;
+                        }
+                    },
+                ];
+            } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('updated_by')) {
+                $result[BlameableBehavior::class] = [
+                    'class'      => BlameableBehavior::class,
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => ['updated_by'],
+                        ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_by'],
+                    ],
+                ];
             }
 
             if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_at') && self::safeGetTableSchema()->getColumn('updated_at')) {
