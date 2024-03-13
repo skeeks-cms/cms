@@ -33,6 +33,11 @@ $controller = $this->context;
                             <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[no index]</span>
                         </span>
                     <? endif; ?>
+                    <? if ($model->sx_id) : ?>
+                        <span style="font-size: 17px; font-weight: bold;">
+                            <span data-toggle='tooltip' title='SkeekS Suppliers ID: <?php echo $model->sx_id; ?>'><i class='fas fa-link'></i></span>
+                        </span>
+                    <? endif; ?>
 
                 </h1>
                 <div class="sx-small-info" style="font-size: 10px; color: silver;">

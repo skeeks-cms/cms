@@ -36,4 +36,13 @@ class CmsStorageFileActiveQuery extends CmsActiveQuery
             ->andWhere([$this->getPrimaryTableName().'.cluster_id' => $clusterId])
         ;
     }
+
+    /**
+     * @param mixed $id
+     * @return CmsStorageFileActiveQuery
+     */
+    public function sxId(mixed $id)
+    {
+        return $this->andWhere(['sx_id' => $id]);
+    }
 }

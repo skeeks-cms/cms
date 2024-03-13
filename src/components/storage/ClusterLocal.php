@@ -21,6 +21,7 @@ class ClusterLocal extends Cluster
      * @var bool
      */
     public $publicBaseUrlIsAbsolute = false;
+
     public $hostInfo = "";
 
     public function init()

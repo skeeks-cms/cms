@@ -123,16 +123,19 @@ class Storage extends Component
                     $extension = pathinfo($file, PATHINFO_EXTENSION);
                     
                     $fileNameData = $file;
-                   
+
+                    $pos = strpos($fileNameData, "?");
+                    if ($pos !== false) {
+                        $fileNameData = substr($fileNameData, 0, $pos);
+                    }
+
                     $fileNameData = str_replace(".", "_", $fileNameData);
                     $fileNameData = str_replace("?", "_", $fileNameData);
                     $fileNameData = str_replace("&", "_", $fileNameData);
-                    $fileNameData = str_replace("?", "_", $fileNameData);
-                    
+
                     $original_file_name = pathinfo($fileNameData, PATHINFO_BASENAME);
                     
                     $pos = strpos($extension, "?");
-
                     if ($pos === false) {
 
                     } else {

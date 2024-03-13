@@ -24,6 +24,7 @@ use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
+use skeeks\cms\query\CmsTreeActiveQuery;
 use skeeks\yii2\slug\SlugRuleProvider;
 use skeeks\yii2\yaslug\YaSlugHelper;
 use Yii;
@@ -1253,6 +1254,14 @@ class Tree extends ActiveRecord
         }
 
         return true;
+    }
+
+    /**
+     * @return CmsTreeActiveQuery
+     */
+    public static function find()
+    {
+        return (new CmsTreeActiveQuery(get_called_class()));
     }
 
 }

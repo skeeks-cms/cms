@@ -40,6 +40,11 @@ $controller = $this->context;
                 </span>
             <? endif; ?>
 
+            <? if (isset($model->sx_id) && $model->sx_id) : ?>
+                <span style="font-size: 17px; font-weight: bold;">
+                    <span data-toggle='tooltip' title='SkeekS Suppliers ID: <?php echo $model->sx_id; ?>'><i class='fas fa-link'></i></span>
+                </span>
+            <? endif; ?>
             <?/* if ($model->is_index == 0 || $model->isRedirect || $model->isCanonical) : */?><!--
                 <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
                     <span data-toggle="tooltip" title="Эта страница не попадает в карту сайта!">[no sitemap]</span>
