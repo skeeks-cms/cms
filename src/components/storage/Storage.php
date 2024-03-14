@@ -101,26 +101,9 @@ class Storage extends Component
                         throw new Exception("Не удалось скачать файл: {$file} " . $response->statusCode);
                     }
 
-                    /*$curl_session = curl_init($file);
-
-                    if (!$curl_session) {
-                        throw new Exception("Неверная ссылка");
-                    }
-
-                    curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($curl_session, CURLOPT_BINARYTRANSFER, true);
-                    curl_setopt($curl_session, CURLOPT_FOLLOWLOCATION, true);
-
-                    $file_content = curl_exec($curl_session);
-
-                    curl_close($curl_session);*/
-
                     if (!$file_content) {
                         throw new Exception("Скачанный файл пустой: {$file}");
                     }
-
-
-                    $extension = pathinfo($file, PATHINFO_EXTENSION);
                     
                     $fileNameData = $file;
 
@@ -128,6 +111,15 @@ class Storage extends Component
                     if ($pos !== false) {
                         $fileNameData = substr($fileNameData, 0, $pos);
                     }
+                    
+                    $extension = pathinfo($fileNameData, PATHINFO_EXTENSION);
+                    
+                    //Если расширение определено прям в названии файла
+                    if ($extension) {
+                        $fileNameData = str_replace(".{$extension}", "", $fileNameData);
+                    }
+                    
+                    
 
                     $fileNameData = str_replace(".", "_", $fileNameData);
                     $fileNameData = str_replace("?", "_", $fileNameData);
@@ -172,6 +164,8 @@ class Storage extends Component
                                 $extension = 'jpg';
                             } elseif(in_array("png", $extensions)) {
                                 $extension = 'png';
+                            } elseif(in_array("webp", $extensions)) {
+                                $extension = 'webp';
                             } elseif(in_array("gif", $extensions)) {
                                 $extension = 'gif';
                             } else {
@@ -206,6 +200,8 @@ class Storage extends Component
         $newData["size"] = $tmpfile->size()->getBytes();
         $newData["extension"] = $tmpfile->getExtension();
         $newData["original_name"] = $original_file_name;
+
+                                    
 
         //Елси это изображение
         if ($tmpfile->getType() == 'image') {

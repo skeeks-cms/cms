@@ -197,11 +197,11 @@ class HasStorageFileMulti extends Behavior
                                 continue;
                             }
                             
-                            //Если файл еще не был привязан, то нужно привязать
-                            if (!in_array($fileId, $oldIds)) {
-                                if ($this->owner->isNewRecord) {
-                                    $this->_linkFiles[$relation][] = $storageFile;
-                                } else {
+                            if ($this->owner->isNewRecord) {
+                                $this->_linkFiles[$relation][] = $storageFile;
+                            } else {
+                                //Если файл еще не был привязан, то нужно привязать
+                                if (!in_array($fileId, $oldIds)) {
                                     $this->owner->link($relation, $storageFile);
                                 }
                             }
