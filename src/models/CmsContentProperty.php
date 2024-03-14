@@ -9,6 +9,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\query\CmsContentPropertyActiveQuery;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -227,5 +228,13 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         return parent::asText();
         return $result." ($this->code)";
+    }
+
+    /**
+     * @return CmsContentPropertyActiveQuery
+     */
+    public static function find()
+    {
+        return (new CmsContentPropertyActiveQuery(get_called_class()));
     }
 }

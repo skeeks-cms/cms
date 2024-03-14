@@ -8,20 +8,14 @@
 
 namespace skeeks\cms\query;
 
-use skeeks\cms\models\CmsContentElementTree;
-use skeeks\cms\models\CmsTree;
-use skeeks\cms\models\Tree;
-use yii\helpers\ArrayHelper;
-
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class CmsTreeActiveQuery extends CmsActiveQuery
+class CmsContentPropertyActiveQuery extends CmsActiveQuery
 {
-    public $is_active = false;
     /**
      * @param mixed $id
-     * @return CmsTreeActiveQuery
+     * @return CmsContentPropertyActiveQuery
      */
     public function sxId(mixed $id)
     {

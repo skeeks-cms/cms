@@ -191,7 +191,24 @@ class HasStorageFileMulti extends Behavior
                             } catch (\Exception $e) {
                             }
                         } else {
+                            
+                            //Если файл не существует, то будет удален
+                            if (!$storageFile = CmsStorageFile::findOne($fileId)) {
+                                continue;
+                            }
+                            
+                            //Если файл еще не был привязан, то нужно привязать
+                            if (!in_array($fileId, $oldIds)) {
+                                if ($this->owner->isNewRecord) {
+                                    $this->_linkFiles[$relation][] = $storageFile;
+                                } else {
+                                    $this->owner->link($relation, $storageFile);
+                                }
+                            }
+                            
+                            //Файл попадает в перечень файлов
                             $files[] = $fileId;
+                            //Удаляется ID из претендентов на удаление
                             ArrayHelper::remove($oldIds, $fileId);
                         }
                     }

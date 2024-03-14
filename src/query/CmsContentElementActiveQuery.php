@@ -19,6 +19,14 @@ use yii\helpers\ArrayHelper;
 class CmsContentElementActiveQuery extends CmsActiveQuery
 {
 
+    /**
+     * @param mixed $id
+     * @return CmsTreeActiveQuery
+     */
+    public function sxId(mixed $id)
+    {
+        return $this->andWhere(['sx_id' => $id]);
+    }
 
     /**
      * Фильтрация по дате публикации

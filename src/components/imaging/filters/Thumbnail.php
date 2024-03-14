@@ -11,9 +11,8 @@
 
 namespace skeeks\cms\components\imaging\filters;
 
-use yii\base\Component;
-use skeeks\imagine\Image;
 use Imagine\Image\ManipulatorInterface;
+use skeeks\imagine\Image;
 use yii\base\Exception;
 
 /**
@@ -28,6 +27,12 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
      * @var int Качество сохраняемого фото
      */
     public $q;
+
+    /**
+     * @var int Если не задана ширина или высота, то проверять оригинальный размер файла и новый файл не будет крупнее
+     */
+    public $s = 1;
+    
     public $m = ManipulatorInterface::THUMBNAIL_INSET;
 
     public function init()
@@ -38,12 +43,12 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
             throw new Exception("Необходимо указать ширину или высоту");
         }
 
-        $q = (int) $this->q;
+        $q = (int)$this->q;
         if (!$q) {
-            $this->q = (int) \Yii::$app->seo->img_preview_quality;
+            $this->q = (int)\Yii::$app->seo->img_preview_quality;
         }
 
-        $q = (int) $this->q;
+        $q = (int)$this->q;
 
         if ($q < 10) {
             $this->q = 10;
@@ -61,30 +66,49 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
             $this->m = ManipulatorInterface::THUMBNAIL_INSET;
         }*/
         if (!$this->w) {
+            //Если ширина не указана нужно ее расчитать
             $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
+
+            //Если размер оригинальной кратинки больше, то уменьшаем его
+            if ($this->s == 1) {
+                if ($this->h > $size->getHeight()) {
+                    $this->h = $size->getHeight();
+                }
+            }
+            
+
             $width = ($size->getWidth() * $this->h) / $size->getHeight();
 
             Image::thumbnailV2($this->_originalRootFilePath, (int)round($width), $this->h,
                 $this->m)->save($this->_newRootFilePath, [
-                        'jpeg_quality' => $this->q,
-                        'webp_quality' => $this->q,
-                    ]);
+                'jpeg_quality' => $this->q,
+                'webp_quality' => $this->q,
+            ]);
 
         } else {
             if (!$this->h) {
                 $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
+                
+                //Если размер оригинальной кратинки больше, то уменьшаем его
+                if ($this->s == 1) {
+                    if ($this->w > $size->getWidth()) {
+                        $this->w = $size->getWidth();
+                    }
+                }
+                
+                
                 $height = ($size->getHeight() * $this->w) / $size->getWidth();
                 Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height),
                     $this->m)->save($this->_newRootFilePath, [
-                        'jpeg_quality' => $this->q,
-                        'webp_quality' => $this->q,
-                    ]);
+                    'jpeg_quality' => $this->q,
+                    'webp_quality' => $this->q,
+                ]);
             } else {
                 $image = Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h,
                     $this->m)->save($this->_newRootFilePath, [
-                        'jpeg_quality' => $this->q,
-                        'webp_quality' => $this->q,
-                    ]);
+                    'jpeg_quality' => $this->q,
+                    'webp_quality' => $this->q,
+                ]);
             }
         }
     }
