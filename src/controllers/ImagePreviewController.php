@@ -154,19 +154,29 @@ class ImagePreviewController extends Controller
                     symlink(Imaging::DEFAULT_THUMBNAIL_FILENAME . "." . $newExtension, $newFileRoot);
                 }
             }
-
-            $url = \Yii::$app->request->getUrl().($params ?
+            
+            
+            /*$url = \Yii::$app->request->getUrl().($params ?
                     ""//"?" . http_build_query($params) . '&sx-refresh'
-                    : '?sx-refresh');
+                    : '?sx-refresh');*/
             /*echo $url;die;*/
 
+            $showOptions = [];
+            //TODO:обратиться к фильтру и получить эти данные из него
+            if ($q = ArrayHelper::getValue($params, "q")) {
+                $showOptions = [
+                    'jpeg_quality' => $q,
+                    'webp_quality' => $q,
+                ];
+            }
+            
             Header("HTTP/1.0 200 OK");
-            Image::getImagine()->open($newFileRootDefault)->show('png');
+            Image::getImagine()->open($newFileRootDefault)->show($newExtension, $showOptions);
             die;
             return '';
 
-            /*\Yii::$app->response->redirect($url, 302);
-            \Yii::$app->end();*/
+            \Yii::$app->response->redirect($url, 302);
+            \Yii::$app->end();
 
         } catch (\Exception $e) {
             throw $e;
