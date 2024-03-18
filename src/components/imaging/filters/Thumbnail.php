@@ -32,6 +32,16 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
      * @var int Если не задана ширина или высота, то проверять оригинальный размер файла и новый файл не будет крупнее
      */
     public $s = 1;
+
+    /**
+     * @var int прозрачность фона картинки
+     */
+    public $ta = 0;
+
+    /**
+     * @var string фоновый цвет превью картинки
+     */
+    public $tb = "FFF";
     
     public $m = ManipulatorInterface::THUMBNAIL_INSET;
 
@@ -79,8 +89,7 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 
             $width = ($size->getWidth() * $this->h) / $size->getHeight();
 
-            Image::thumbnailV2($this->_originalRootFilePath, (int)round($width), $this->h,
-                $this->m)->save($this->_newRootFilePath, [
+            Image::thumbnailV2($this->_originalRootFilePath, (int)round($width), $this->h, $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
                 'jpeg_quality' => $this->q,
                 'webp_quality' => $this->q,
             ]);
@@ -98,14 +107,12 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
                 
                 
                 $height = ($size->getHeight() * $this->w) / $size->getWidth();
-                Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height),
-                    $this->m)->save($this->_newRootFilePath, [
+                Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height), $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
                     'jpeg_quality' => $this->q,
                     'webp_quality' => $this->q,
                 ]);
             } else {
-                $image = Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h,
-                    $this->m)->save($this->_newRootFilePath, [
+                $image = Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h, $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
                     'jpeg_quality' => $this->q,
                     'webp_quality' => $this->q,
                 ]);
