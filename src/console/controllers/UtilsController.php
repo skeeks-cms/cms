@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentProperty2content;
 use skeeks\cms\models\CmsSearchPhrase;
+use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\models\StorageFile;
@@ -72,6 +73,9 @@ class UtilsController extends Controller
         ini_set('memory_limit', '2048M');
 
         if ($files = StorageFile::find()->count()) {
+            /**
+             * @var $file CmsStorageFile
+             */
             foreach (StorageFile::find()->orderBy(['id' => SORT_ASC])->each(100) as $file) {
                 $this->stdout("{$file->id}");
                 if ($file->deleteTmpDir()) {
