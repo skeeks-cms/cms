@@ -34,9 +34,9 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
     public $s = 1;
 
     /**
-     * @var int прозрачность фона картинки
+     * @var int прозрачность фона картинки 100 - непрозрачный 0 - прозрачный
      */
-    public $ta = 0;
+    public $ta = 100;
 
     /**
      * @var string фоновый цвет превью картинки
