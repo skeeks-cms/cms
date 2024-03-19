@@ -85,7 +85,7 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
     {
         $result = [];
         
-        if ($cmsStorageFile instanceof SkeeksSuppliersCluster) {
+        if ($cmsStorageFile->cluster instanceof SkeeksSuppliersCluster) {
             return parent::getDimensions($cmsStorageFile);
         }
 
@@ -130,6 +130,9 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
 
                 if ($this->m == ManipulatorInterface::THUMBNAIL_OUTBOUND) {
                     //TODO: доработать
+                    $result['width'] = (int)$this->w;
+                    $result['height'] = (int)$this->h;
+                    
                 } else {
                     $result['width'] = (int)$this->w;
                     $result['height'] = (int)$this->h;
@@ -164,29 +167,36 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
                 'webp_quality' => $this->q,
             ]);
 
-        } else {
-            if (!$this->h) {
-                $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
-                
-                //Если размер оригинальной кратинки больше, то уменьшаем его
-                if ($this->s == 1) {
-                    if ($this->w > $size->getWidth()) {
-                        $this->w = $size->getWidth();
-                    }
+        } else if (!$this->h) {
+            $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
+            
+            //Если размер оригинальной кратинки больше, то уменьшаем его
+            if ($this->s == 1) {
+                if ($this->w > $size->getWidth()) {
+                    $this->w = $size->getWidth();
                 }
-                
-                
-                $height = ($size->getHeight() * $this->w) / $size->getWidth();
-                Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height), $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
-                    'jpeg_quality' => $this->q,
-                    'webp_quality' => $this->q,
-                ]);
-            } else {
-                $image = Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h, $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
-                    'jpeg_quality' => $this->q,
-                    'webp_quality' => $this->q,
-                ]);
             }
+            
+            
+            $height = ($size->getHeight() * $this->w) / $size->getWidth();
+            Image::thumbnailV2($this->_originalRootFilePath, $this->w, (int)round($height), $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
+                'jpeg_quality' => $this->q,
+                'webp_quality' => $this->q,
+            ]);
+        } else {
+            $size = Image::getImagine()->open($this->_originalRootFilePath)->getSize();
+
+            //Для этого режима важно чтобы оригинальное фото было больше
+            if ($this->m == ImageInterface::THUMBNAIL_OUTBOUND) {
+                if ($size->getWidth() < $this->w || $size->getHeight() < $this->h) {
+                    $this->m = ImageInterface::THUMBNAIL_INSET;
+                }
+            }
+            
+            $image = Image::thumbnailV2($this->_originalRootFilePath, $this->w, $this->h, $this->m, $this->tb, $this->ta)->save($this->_newRootFilePath, [
+                'jpeg_quality' => $this->q,
+                'webp_quality' => $this->q,
+            ]);
         }
     }
 }

@@ -167,7 +167,7 @@ abstract class RelatedPropertyModel extends ActiveRecord
                 'code',
                 'default',
                 'value' => function ($model, $attribute) {
-                    return "property".StringHelper::ucfirst(md5(rand(1, 10).time()));
+                    return "property".StringHelper::ucfirst(md5(\Yii::$app->security->generateRandomString(). time()));
                 },
             ],
             ['priority', 'default', 'value' => 500],
