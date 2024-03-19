@@ -304,12 +304,12 @@ JS
 
                                     if ($model->isImage() && $model->size < 1024 * 1024 * 4) {
 
-                                        $smallImage = \Yii::$app->imaging->getImagingUrl($model->src,
-                                            new \skeeks\cms\components\imaging\filters\Thumbnail());
+                                        $preview = \Yii::$app->imaging->getPreview($model, new \skeeks\cms\components\imaging\filters\Thumbnail());
+
                                         return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
                                                 <div class='' style='width: 50px;'>
                                                 <a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>
-                                                    <img src='".$smallImage."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                    <img src='".$preview->src."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a></div>
                                                 <div style='margin-left: 5px;'>".$info."</div></div>";;
                                     }
@@ -341,7 +341,7 @@ JS
                                     'style' => 'width: 110px;'
                                 ],
                                 'value'  => function (StorageFile $model) {
-                                    return \Yii::$app->formatter->asShortSize($model->size);
+                                    return $model->size ? \Yii::$app->formatter->asShortSize($model->size) : "";
                                 },
                                 'format' => 'raw',
                             ],

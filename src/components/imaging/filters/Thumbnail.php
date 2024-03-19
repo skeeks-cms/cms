@@ -11,9 +11,15 @@
 
 namespace skeeks\cms\components\imaging\filters;
 
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
 use Imagine\Image\ManipulatorInterface;
+use skeeks\cms\components\storage\SkeeksSuppliersCluster;
+use skeeks\cms\models\CmsStorageFile;
+use skeeks\cms\models\StorageFile;
 use skeeks\imagine\Image;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Thumbnail
@@ -22,6 +28,7 @@ use yii\base\Exception;
 class Thumbnail extends \skeeks\cms\components\imaging\Filter
 {
     public $w = 50;
+    
     public $h = 50;
     /**
      * @var int Качество сохраняемого фото
@@ -44,6 +51,7 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
     public $tb = "FFF";
     
     public $m = ManipulatorInterface::THUMBNAIL_INSET;
+    
 
     public function init()
     {
@@ -67,7 +75,69 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
         if ($q > 100) {
             $this->q = 100;
         }
+    }
 
+    /**
+     * @param StorageFile $cmsStorageFile
+     * @return array|int[]
+     */
+    public function getDimensions(StorageFile $cmsStorageFile)
+    {
+        $result = [];
+        
+        if ($cmsStorageFile instanceof SkeeksSuppliersCluster) {
+            return parent::getDimensions($cmsStorageFile);
+        }
+
+        if (!$cmsStorageFile->image_height || !$cmsStorageFile->image_width) {
+            return $result;
+        }
+
+        if (!$this->w) {
+            //Если ширина не указана нужно ее расчитать
+
+            //Если размер оригинальной кратинки больше, то уменьшаем его
+            if ($this->s == 1) {
+                if ($this->h > $cmsStorageFile->image_height) {
+                    $this->h = $cmsStorageFile->image_height;
+                }
+            }
+
+            $width = ($cmsStorageFile->image_width * $this->h) / $cmsStorageFile->image_height;
+
+            //Готовый результат
+            $result['width'] = (int)$width;
+            $result['height'] = (int)$this->h;
+
+        } else {
+            if (!$this->h) {
+
+                //Если размер оригинальной кратинки больше, то уменьшаем его
+                if ($this->s == 1) {
+                    if ($this->w > $cmsStorageFile->image_width) {
+                        $this->w = $cmsStorageFile->image_width;
+                    }
+                }
+
+                $height = ($cmsStorageFile->image_height * $this->w) / $cmsStorageFile->image_width;
+
+                //Готовый результат
+
+                $result['width'] = (int)$this->w;
+                $result['height'] = (int)round($height);
+
+            } else {
+
+                if ($this->m == ManipulatorInterface::THUMBNAIL_OUTBOUND) {
+                    //TODO: доработать
+                } else {
+                    $result['width'] = (int)$this->w;
+                    $result['height'] = (int)$this->h;
+                }
+            }
+        }
+
+        return $result;
     }
 
     protected function _save()

@@ -89,6 +89,11 @@ class ClusterLocal extends Cluster
      */
     public function delete(StorageFile $clusterFile)
     {
+        if (!$clusterFile->cluster_file) {
+            //Если не задан путь к файлу, то не нужно удлаять, может удалиться все хранилище
+            return true;
+        }
+
         $file = new File($this->getRootSrc($clusterFile));
         if ($file->isExist()) {
             $file->remove();
@@ -106,6 +111,16 @@ class ClusterLocal extends Cluster
      */
     public function deleteTmpDir(StorageFile $clusterFile)
     {
+        if (!$clusterFile->cluster_file) {
+            //Если не задан путь к файлу, то не нужно удлаять, может удалиться все хранилище
+            return true;
+        }
+
+        if ($this->rootBasePath == $this->rootTmpDir($clusterFile)) {
+            //Если не задан путь к файлу, то не нужно удлаять, может удалиться все хранилище
+            return true;
+        }
+
         $dir = new Dir($this->rootTmpDir($clusterFile), false);
         if ($dir->isExist()) {
             $dir->remove();

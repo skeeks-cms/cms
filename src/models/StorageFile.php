@@ -13,6 +13,7 @@ namespace skeeks\cms\models;
 use skeeks\cms\components\storage\ClusterLocal;
 use skeeks\cms\models\behaviors\CanBeLinkedToModel;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\helpers\ModelFilesGroup;
 use skeeks\cms\query\CmsStorageFileActiveQuery;
 use Yii;
@@ -42,6 +43,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                                $cms_site_id
  * @property integer                                $external_id
  * @property integer|null                                $sx_id
+ * @property array|null                                $sx_data
  *
  * @property string                                 $fileName
  *
@@ -65,6 +67,19 @@ class StorageFile extends Core
     public static function tableName()
     {
         return '{{%cms_storage_file}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            HasJsonFieldsBehavior::class => [
+                'class' => HasJsonFieldsBehavior::class,
+                'fields' => ['sx_data']
+            ]
+        ]);
     }
 
     /**
@@ -97,7 +112,7 @@ class StorageFile extends Core
                     'The combination of Cluster ID and Cluster Src has already been taken.'),
             ],
             [
-                'sx_id',
+                ['sx_id', 'sx_data'],
                 'default',
                 'value' => null
             ],
@@ -168,6 +183,10 @@ class StorageFile extends Core
         //Сначала удалить файл
         try {
             $cluster = $this->cluster;
+
+            if (!$cluster) {
+                return parent::delete();
+            }
 
             $cluster->deleteTmpDir($this);
             $cluster->delete($this);

@@ -12,7 +12,14 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\components\imaging\Filter;
+use skeeks\cms\components\imaging\filters\Thumbnail;
+use skeeks\cms\components\imaging\Preview;
+use skeeks\cms\components\storage\ClusterLocal;
+use skeeks\cms\components\storage\SkeeksSuppliersCluster;
+use skeeks\cms\helpers\Image;
+use skeeks\cms\models\StorageFile;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Imaging
@@ -46,10 +53,81 @@ class Imaging extends Component
     
     const DEFAULT_THUMBNAIL_FILENAME = "sx-file";
 
+    //TODO: подумать над этим
+    /*public $previewFilters = [
+        'micro' => [
+            'local' => [
+                'class' => Thumbnail::class,
+            ],
+            'sx' => [
+                'class' => Thumbnail::class,
+            ]
+        ],
+        'small' => [
+            'local' => [
+                'class' => Thumbnail::class,
+            ],
+            'sx' => [
+                'class' => Thumbnail::class,
+            ]
+        ],
+        'medium' => [
+            'local' => [
+                'class' => Thumbnail::class,
+            ],
+            'sx' => [
+                'class' => Thumbnail::class,
+            ]
+        ],
+        'big' => [
+            'local' => [
+                'class' => Thumbnail::class,
+            ],
+            'sx' => [
+                'class' => Thumbnail::class,
+            ]
+        ],
+    ];*/
+
+
+    /**
+     * @param StorageFile $image
+     * @param Filter      $filter
+     * @param             $nameForSave
+     * @param             $isWebP
+     * @return Preview|void
+     */
+    public function getPreview(StorageFile $image = null, Filter $filter, $nameForSave = '', $isWebP = null)
+    {
+        if (!$image) {
+            return new Preview([
+                'src' => Image::getCapSrc(),
+            ]);
+        }
+        
+        if ($image->cluster instanceof ClusterLocal) {
+            $data = $filter->getDimensions($image);
+            $data['src'] = $this->thumbnailUrlOnRequest($image->src, $filter, $nameForSave, $isWebP);
+            return new Preview($data);
+        }
+
+        if ($image->cluster instanceof SkeeksSuppliersCluster) {
+            $data = $filter->getDimensions($image);
+            $data['src'] = (string) ArrayHelper::getValue($image->sx_data, "previews.{$filter->sx_preview}.src", "");
+            return new Preview($data);
+        }
+
+        return new Preview([
+            'width' => $image->image_width,
+            'height' => $image->image_height,
+            'src' => $image->absoluteSrc,
+        ]);
+    }
 
     /**
      * Собрать URL на thumbnail, который будет сгенерирован автоматически в момент запроса.
      *
+     * @deprecated
      *
      * @param $originalSrc          Путь к оригинальному изображению
      * @param Filter $filter Объект фильтр, который будет заниматься преобразованием
@@ -162,7 +240,8 @@ class Imaging extends Component
     }
 
     /**
-     * TODO:: depricated
+     * @depricated
+     *
      * @param $imageSrc
      * @param Filter $filter
      */

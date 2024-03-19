@@ -12,6 +12,8 @@
 namespace skeeks\cms\components\imaging;
 
 use Faker\Provider\File;
+use skeeks\cms\components\storage\SkeeksSuppliersCluster;
+use skeeks\cms\models\StorageFile;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
@@ -24,13 +26,27 @@ abstract class Filter extends Component
 {
     protected $_config = [];
 
+    /**
+     * Если файл храниться на SkeekS Suppliers Server какую превью брать?
+     * @var string 
+     */
+    public $sx_preview = "micro";
+
     protected $_originalRootFilePath = null;
     protected $_newRootFilePath = null;
 
     public function __construct($config = [])
     {
         $this->_config = $config;
+        
         parent::__construct($config);
+
+        /**
+         * Из url убрать лишние параметры
+         */
+        if (isset($this->_config['sx_preview'])) {
+            unset($this->_config['sx_preview']);
+        }
     }
 
     /**
@@ -103,6 +119,24 @@ abstract class Filter extends Component
         return $file;
     }
 
+    /**
+     * @param StorageFile $cmsStorageFile
+     * @return int[]
+     */
+    public function getDimensions(StorageFile $cmsStorageFile)
+    {
+        if ($cmsStorageFile->cluster instanceof SkeeksSuppliersCluster) {
+            return [
+                'width' => (int) ArrayHelper::getValue($cmsStorageFile->sx_data, "previews.{$this->sx_preview}.width", 0),
+                'height' => (int) ArrayHelper::getValue($cmsStorageFile->sx_data, "previews.{$this->sx_preview}.height", 0),
+            ];
+        }
+
+        return [
+            'width' => 0,
+            'height' => 0,
+        ];
+    }
 
     /**
      * @return $this
