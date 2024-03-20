@@ -374,15 +374,88 @@ class UtilsController extends Controller
      *
      * @return void
      */
-    public function actionRemoveFilesNotStorage($onlyCheck = 1)
+    public function actionRemoveEmptyDirs($onlyCheck = 1)
     {
-        //Skeeks::unlimited();
-        ini_set("memory_limit", "50G");
+        Skeeks::unlimited();;
         
         $clusters = \Yii::$app->storage->getClusters();
         foreach ($clusters as $cluster) {
-            $this->stdout("cluster: {$cluster->id}\n");
-            $this->stdout("cluster: {$cluster->rootBasePath}\n");
+            
+            $this->stdout("Хранилище: {$cluster->name}", Console::BG_BLUE);
+            $this->stdout("\n");
+            
+            if (!$cluster instanceof ClusterLocal) {
+                $this->stdout("Это не локальное хранилище!\n");
+                continue;
+            }
+            
+            if ($onlyCheck != 1) {
+                $this->stdout("Запуск скрипта через 5 сек.");
+                sleep(1);
+                $this->stdout(" (5");
+                sleep(1);
+                $this->stdout(" 4");
+                sleep(1);
+                $this->stdout(" 3");
+                sleep(1);
+                $this->stdout(" 2");
+                sleep(1);
+                $this->stdout(" 1)\n\n");
+                sleep(1);
+            }
+            
+            $dirs = FileHelper::findDirectories($cluster->rootBasePath, ['recursive' => true]);
+            //$dirs = FileHelper::findDirectories($cluster->rootBasePath, ['recursive' => true]);
+            $realFileSizes = 0;
+            
+            foreach ($dirs as $dirPath)
+            {
+                if (!is_dir($dirPath)) {
+                    continue;
+                }
+                
+                $this->stdout("{$dirPath}\n");
+                $files = FileHelper::findFiles($dirPath, ['recursive' => true]);
+                if ($files) {
+                    $realFileSizesTmp = 0;
+                    
+                    foreach ($files as $filePath)
+                    {
+                        $realFileSizes = $realFileSizes + filesize($filePath);
+                        $realFileSizesTmp = $realFileSizesTmp + filesize($filePath);
+                    }
+                    
+                    $this->stdout("\t" . \Yii::$app->formatter->asShortSize($realFileSizesTmp) . "\n", Console::FG_GREEN);
+                    
+                } else {
+                    
+                    if ($onlyCheck == 1) {
+                        $this->stdout("\tУдалить пустая\n", Console::FG_RED);
+                    } else {
+                        FileHelper::removeDirectory($dirPath);
+                        $this->stdout("\tУдалить пустая\n", Console::FG_RED);
+                    }
+                }
+            }
+            
+            $this->stdout("\tРазмер всех файлов: " . \Yii::$app->formatter->asShortSize($realFileSizes) . "\n", Console::FG_GREEN);
+        }
+    }
+
+    /**
+     * Удаляет файлы которые остались в хранилище но нет в базе хранилища
+     *
+     * @return void
+     */
+    public function actionRemoveFilesNotStorage($onlyCheck = 1)
+    {
+        //Skeeks::unlimited();
+        Skeeks::unlimited();;
+        
+        $clusters = \Yii::$app->storage->getClusters();
+        foreach ($clusters as $cluster) {
+            /*$this->stdout("cluster: {$cluster->id}\n");
+            $this->stdout("cluster: {$cluster->rootBasePath}\n");*/
             //sleep(3);
             $totalStorageSize = StorageFile::find()
                 /*->cluster($cluster->id)*/
@@ -397,27 +470,38 @@ class UtilsController extends Controller
                 ->count();
             
 
-            $this->stdout("{$cluster->id}\n");
+            $this->stdout("Хранилище: {$cluster->name}", Console::BG_BLUE);
+            $this->stdout("\n");
             $this->stdout("Total files: {$totalStorageFies}\n");
-            $this->stdout("Total files size: " . \Yii::$app->formatter->asShortSize(ArrayHelper::getValue($totalStorageSize, "total_size")) . "\n\n");
+            if (ArrayHelper::getValue($totalStorageSize, "total_size")) {
+                $this->stdout("Total files size: " . \Yii::$app->formatter->asShortSize(ArrayHelper::getValue($totalStorageSize, "total_size")) . "\n\n");
+            } else {
+                $this->stdout("Total files size: " . 0 . "\n\n");
+            }
+            
             
             
             if (!$cluster instanceof ClusterLocal) {
                 $this->stdout("Это не локальное хранилище!\n");
                 continue;
             }
-            $this->stdout("Запуск скрипта через 5 сек.");
-            sleep(1);
-            $this->stdout(" (5");
-            sleep(1);
-            $this->stdout(" 4");
-            sleep(1);
-            $this->stdout(" 3");
-            sleep(1);
-            $this->stdout(" 2");
-            sleep(1);
-            $this->stdout(" 1)\n\n");
-            sleep(1);
+            
+            if ($onlyCheck != 1) {
+                $this->stdout("Запуск скрипта через 5 сек.");
+                sleep(1);
+                $this->stdout(" (5");
+                sleep(1);
+                $this->stdout(" 4");
+                sleep(1);
+                $this->stdout(" 3");
+                sleep(1);
+                $this->stdout(" 2");
+                sleep(1);
+                $this->stdout(" 1)\n\n");
+                sleep(1);
+            }
+            
+            
 
             $counterFiles = 0;
             $counterFileSizes = 0;
@@ -425,9 +509,14 @@ class UtilsController extends Controller
             $needDeleteFiles = 0;
             $needDeleteFileSizes = 0;
             
+            $realFileSizes = 0;
+            
             $firstLevel = FileHelper::findFiles($cluster->rootBasePath, ['recursive' => true]);
+            
             foreach ($firstLevel as $filePath)
             {
+                $realFileSizes = $realFileSizes + filesize($filePath);
+                //$this->stdout("{$filePath}\n");
                 //Нормализация пути к файлу
                 $clusterFilePath = str_replace($cluster->rootBasePath, "", $filePath);
                 $tmpExplode = explode("/", $clusterFilePath);
@@ -466,14 +555,14 @@ class UtilsController extends Controller
                     }
 
                 } elseif ($fileDirLevel > $cluster->directoryLevel) {
-                    //$this->stdout("\t{$clusterFilePath} " . $fileDirLevel . "\n");
-                    //$this->stdout("\t\tБольше уровня не трогать!\n");
+                    /*$this->stdout("\t{$clusterFilePath} " . $fileDirLevel . "\n");
+                    $this->stdout("\t\tБольше уровня не трогать!\n");*/
                 } else {
                     $counterFiles = $counterFiles + 1;
                     $counterFileSizes = $counterFileSizes + filesize($filePath);
                     
-                    //$this->stdout("\t{$clusterFilePath} " . $fileDirLevel . "\n");
-                    //$this->stdout("\t\tПроверить в базе!\n");
+                    /*$this->stdout("\t{$clusterFilePath} " . $fileDirLevel . "\n");
+                    $this->stdout("\t\tПроверить в базе!\n");*/
                     
                     $cmsStorageFile = StorageFile::find()
                         ->andWhere(['cluster_id' => $cluster->id])
@@ -502,6 +591,8 @@ class UtilsController extends Controller
             
             $this->stdout("Total files (data from db): {$totalStorageFies}\n");
             $this->stdout("Total files size (data from db): " . \Yii::$app->formatter->asShortSize(ArrayHelper::getValue($totalStorageSize, "total_size")) . "\n\n");
+            
+            $this->stdout("Calc total files (all, with thumbs): " . \Yii::$app->formatter->asShortSize($realFileSizes) . "\n");
             
             $this->stdout("Calc total files: {$counterFiles}\n");
             $this->stdout("Calc files size: " . \Yii::$app->formatter->asShortSize($counterFileSizes) . "\n\n");
