@@ -60,6 +60,10 @@ class Thumbnail extends \skeeks\cms\components\imaging\Filter
         if (!$this->w && !$this->h) {
             throw new Exception("Необходимо указать ширину или высоту");
         }
+        
+        if (!$this->m) {
+            $this->m = ManipulatorInterface::THUMBNAIL_INSET;
+        }
 
         $q = (int)$this->q;
         if (!$q) {

@@ -38,7 +38,7 @@ class ImagePreviewController extends Controller
         $imaging = \Yii::$app->imaging;
         if (!$imaging) {
             //TODO: можно добавить проверку YII ensure...
-            throw new \yii\base\Exception("Component Imaging not found");
+            throw new NotFoundHttpException("Component Imaging not found");
         }
 
         $newFileSrc = \Yii::$app->request->getPathInfo();
@@ -55,12 +55,12 @@ class ImagePreviewController extends Controller
 
 
         if (!$extension) {
-            throw new \yii\base\Exception("Extension not found: ".$newFileSrc);
+            throw new NotFoundHttpException("Extension not found: ".$newFileSrc);
         }
 
 
         if (!$imaging->isAllowExtension($extension)) {
-            throw new \yii\base\Exception("Extension '{$extension}' not supported in Imaging component");
+            throw new NotFoundHttpException("Extension '{$extension}' not supported in Imaging component");
         }
 
 
@@ -99,12 +99,12 @@ class ImagePreviewController extends Controller
         if ($params = \Yii::$app->request->get()) {
             $pramsCheckArray = explode(DIRECTORY_SEPARATOR, $filterSting);
             if (count($pramsCheckArray) < 3) {
-                throw new \yii\base\Exception("the control line not found: ".$newFileSrc);
+                throw new NotFoundHttpException("the control line not found: ".$newFileSrc);
             }
 
             $string = $imaging->getParamsCheckString($params);
             if ($pramsCheckArray[1] != $string) {
-                throw new \yii\base\Exception("Parameters invalid: ".$newFileSrc);
+                throw new NotFoundHttpException("Parameters invalid: ".$newFileSrc);
             }
         }
 
@@ -114,7 +114,7 @@ class ImagePreviewController extends Controller
 
 
         if (!class_exists($filterClass)) {
-            throw new \ErrorException("Filter class is not created: ".$newFileSrc);
+            throw new NotFoundHttpException("Filter class is not created: ".$newFileSrc);
         }
 
         ArrayHelper::remove($params, "ext");
@@ -134,6 +134,9 @@ class ImagePreviewController extends Controller
 
 
         try {
+            /*if (YII_ENV_DEV) {
+                print_r($filter);die;
+            }*/
             //Проверяем а создан ли уже файл, и если да то просто делаем на него ссылку.
             $filter
                 ->setOriginalRootFilePath($originalFileRoot)

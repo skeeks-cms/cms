@@ -61,6 +61,17 @@ class AuthController extends Controller
                 'class'   => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'auth-by-callcheck-phone-password' => ['post'],
+                    'auth-by-phone' => ['post'],
+                    'auth-by-callcheck-phone' => ['post'],
+                    'auth-by-phone-password' => ['post'],
+                    'auth-by-phone-sms-code' => ['post'],
+                    'auth-by-callcheck-phone-code' => ['post'],
+                    'auth-by-email-code' => ['post'],
+                    'generate-phone-code' => ['post'],
+                    'generate-callcheck-phone-code' => ['post'],
+                    'generate-email-code' => ['post'],
+                    'generate-email-code' => ['post'],
                 ],
             ],
         ];
@@ -606,6 +617,7 @@ class AuthController extends Controller
     public function actionAuthByPhonePassword()
     {
         $rr = new RequestResponse();
+        $rr->setResponseFormatJson();
 
         //Запрос ajax post
         if ($rr->isRequestAjaxPost() && \Yii::$app->user->isGuest) {
@@ -660,6 +672,7 @@ class AuthController extends Controller
     public function actionAuthByCallcheckPhonePassword()
     {
         $rr = new RequestResponse();
+        $rr->setResponseFormatJson();
 
         //Запрос ajax post
         if ($rr->isRequestAjaxPost() && \Yii::$app->user->isGuest) {
