@@ -109,4 +109,9 @@ class CmsContentPropertyEnum extends RelatedPropertyEnumModel
     {
         return $this->hasOne(CmsContentProperty::className(), ['id' => 'property_id']);
     }
+
+    public function asText()
+    {
+        return $this->value;
+    }
 }
