@@ -14,7 +14,7 @@ $controller = $this->context;
 <div class="row" style="margin-bottom: 5px;">
     <? if ($model->image) : ?>
         <div class="col my-auto" style="max-width: 60px">
-            <img style="border: 2px solid #ededed; border-radius: 5px;" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
+            <img style="border: 2px solid #ededed; border-radius: 5px; width: 50px;" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
                 new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
         </div>
     <? endif; ?>
