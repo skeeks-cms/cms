@@ -115,7 +115,7 @@ class AuthController extends Controller
                 $rr->message = 'Не удалось выполнить запрос на восстановление пароля';
             }
 
-            return (array)$rr;
+            return $rr;
 
         } else {
             if (\Yii::$app->request->isPost) {
@@ -165,7 +165,7 @@ class AuthController extends Controller
                 $rr->message = 'Не удалось авторизоваться';
             }
 
-            return (array)$rr;
+            return $rr;
 
         } else {
             if (\Yii::$app->request->isPost) {
@@ -218,7 +218,7 @@ class AuthController extends Controller
                 $rr->message = 'Не удалось зарегистрироваться';
             }
 
-            return (array)$rr;
+            return $rr;
 
         } else {
             if (\Yii::$app->request->isPost) {
@@ -291,7 +291,7 @@ class AuthController extends Controller
                 $rr->message = 'Не удалось зарегистрироваться';
             }
 
-            return (array)$rr;
+            return $rr;
 
         }
 
@@ -344,7 +344,7 @@ class AuthController extends Controller
             $rr->message = 'Ошибка, скорее всего данная ссылка уже устарела';
         }
 
-        return $this->render('reset-password', (array)$rr);
+        return $this->render('reset-password', $rr);
     }
 
 
@@ -509,7 +509,7 @@ class AuthController extends Controller
             }
         }
 
-        return (array)$rr;
+        return $rr;
     }
 
 
@@ -605,7 +605,7 @@ class AuthController extends Controller
             }
         }
 
-        return (array)$rr;
+        return $rr;
     }
 
 
@@ -666,7 +666,7 @@ class AuthController extends Controller
             }
         }
 
-        return (array)$rr;
+        return $rr;
     }
 
     public function actionAuthByCallcheckPhonePassword()
@@ -721,7 +721,7 @@ class AuthController extends Controller
             }
         }
 
-        return (array)$rr;
+        return $rr;
     }
 
 
@@ -1047,7 +1047,7 @@ class AuthController extends Controller
             }
         }
 
-        return (array)$rr;
+        return $rr;
     }
 
     /**
@@ -1105,7 +1105,7 @@ class AuthController extends Controller
             }
         }
 
-        return (array)$rr;
+        return $rr;
     }
 
     /**
