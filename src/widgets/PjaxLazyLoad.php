@@ -18,7 +18,7 @@ class PjaxLazyLoad extends Pjax
     /**
      * @var int
      */
-    public $delay = 1000;
+    public $delay = 200;
 
 
     public static $autoIdPrefix = 'PjaxLazyLoad';
@@ -40,8 +40,9 @@ class PjaxLazyLoad extends Pjax
     setTimeout(function() {
         $.pjax.reload("#{$this->id}", {
             'timeout': $this->timeout,
-            async: false
+            async: true
         });
+        $.pjax.xhr = null;
     }, $this->delay);
 JS
             );

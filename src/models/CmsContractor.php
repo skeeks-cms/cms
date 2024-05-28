@@ -191,7 +191,7 @@ class CmsContractor extends ActiveRecord
 
             [['phone'], 'string', 'max' => 64],
             [['phone'], PhoneValidator::class],
-            [['phone'], "filter", 'filter' => 'trim'],
+            //[['phone'], "filter", 'filter' => 'trim'],
             [
                 ['phone'],
                 "filter",
@@ -202,7 +202,8 @@ class CmsContractor extends ActiveRecord
 
             [['email'], 'string', 'max' => 64],
             [['email'], EmailValidator::class],
-            [['email'], "filter", 'filter' => 'trim'],
+            //[['email'], "filter", 'filter' => 'trim'],
+
             [
                 ['email'],
                 "filter",

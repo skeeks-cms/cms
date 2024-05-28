@@ -1316,6 +1316,7 @@ JS
             }
 
         } catch (\Exception $e) {
+            throw $e;
             $rr->success = false;
             $rr->message = $e->getMessage();
         }

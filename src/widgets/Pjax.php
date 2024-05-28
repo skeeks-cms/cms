@@ -102,7 +102,7 @@ CSS
                 (function(sx, $, _)
                 {
                     var blockerPanel = new sx.classes.Blocker('#{$this->id}');
-
+                    
                     $(document).on('pjax:send', function(e)
                     {
                         if ('{$this->id}' == e.target.id) {
