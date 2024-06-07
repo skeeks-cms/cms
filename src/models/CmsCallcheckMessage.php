@@ -97,7 +97,7 @@ class CmsCallcheckMessage extends \skeeks\cms\base\ActiveRecord
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'cms_callcheck_provider_id'], 'integer'],
             [['phone'], 'required'],
             [['provider_response_data'], 'safe'],
-            [['user_ip'], 'string', 'max' => 20],
+            [['user_ip'], 'string', 'max' => 255],
             [['phone', 'status', 'code', 'error_message', 'provider_status', 'provider_call_id'], 'string', 'max' => 255],
             [['cms_callcheck_provider_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsCallcheckProvider::className(), 'targetAttribute' => ['cms_callcheck_provider_id' => 'id']],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
