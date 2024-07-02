@@ -11,6 +11,8 @@ namespace skeeks\cms\console\controllers;
 use skeeks\imagine\Image;
 use skeeks\cms\models\CmsStorageFile;
 use yii\base\Exception;
+use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 /**
@@ -45,8 +47,15 @@ class ImageController extends \yii\console\Controller
             ->orderBy(['size' => SORT_DESC])
         ;
 
+
+
         if ($total = $query->count()) {
-            $this->stdout("Неоптимизированных картинок: {$total} \n");
+            $sizeQuery = clone $query;
+            $sizeQuery->select(['sumsize' => new Expression('sum(size)')]);
+            $data = $sizeQuery->asArray()->one();
+            $formatedSumSize = \Yii::$app->formatter->asShortSize((float)ArrayHelper::getValue($data, 'sumsize'));
+
+            $this->stdout("Неоптимизированных картинок: {$total} шт. ({$formatedSumSize}) \n");
         } else {
             $this->stdout("Неоптимизированных картинок нет\n");
             return;
@@ -63,16 +72,17 @@ class ImageController extends \yii\console\Controller
             $fileRoot = $storageFile->getRootSrc();
             $this->stdout("\tКартинка: {$storageFile->id}\n");
             $this->stdout("\t\t{$fileRoot}\n");
-            $this->stdout("\t\t{$storageFile->image_width}x{$storageFile->image_height}\n");
+            $this->stdout("\t\tРазрешение: {$storageFile->image_width}x{$storageFile->image_height}\n");
             $fileSize = filesize($fileRoot);
-            $this->stdout("\t\t{$fileSize}\n");
+            $fileSizeFormated = \Yii::$app->formatter->asShortSize($fileSize);
+            $this->stdout("\t\tРазмер: {$fileSizeFormated}\n");
 
             $size = Image::getImagine()->open($fileRoot)->getSize();
             $height = ($size->getHeight() * $maxWidth) / $size->getWidth();
 
             $newHeight = (int)round($height);
             $newWidth = $maxWidth;
-            $this->stdout("\t\tnew: {$newWidth}x{$newHeight}\n");
+            $this->stdout("\t\tНовое разрешение: {$newWidth}x{$newHeight}\n");
 
             Image::thumbnail($fileRoot, $newWidth, $newHeight)->save($fileRoot);
 
@@ -84,7 +94,8 @@ class ImageController extends \yii\console\Controller
 
             clearstatcache();
             $fileSize = filesize($fileRoot);
-            $this->stdout("\t\tnew: {$fileSize}\n");
+            $fileSizeFormated = \Yii::$app->formatter->asShortSize($fileSize);
+            $this->stdout("\t\tНовый размер файла: {$fileSizeFormated}\n");
 
             $storageFile->size = $fileSize;
 

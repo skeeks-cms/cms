@@ -1296,6 +1296,7 @@ JS
                         //Создать компанию
                         $party = new PartyModel($dadata[0]);
                         $contractor = new CmsContractor();
+
                         $contractor->setAttributesFromDadata($party);
                         if (!$contractor->save()) {
                             throw new Exception("Не удалось создать компанию: ".print_r($contractor->errors, true));

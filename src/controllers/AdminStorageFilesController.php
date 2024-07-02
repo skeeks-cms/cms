@@ -130,7 +130,6 @@ JS
                         ],
                         'autoFilters' => [
                             'id',
-                            ''
                         ],
                         'filtersModel'   => [
                             'fields' => [
