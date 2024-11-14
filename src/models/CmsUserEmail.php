@@ -94,7 +94,7 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
                     return StringHelper::strtolower($value);
                 },
             ],
-            [['value'], "email"],
+            [['value'], "email", 'enableIDN' => true],
         ]);
     }
 

@@ -87,9 +87,7 @@ class CmsSiteEmail extends ActiveRecord
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::class, 'targetAttribute' => ['cms_site_id' => 'id']],
 
             [['value'], 'string', 'max' => 64],
-            [['value'], 'email'],
-
-
+            [['value'], "email", 'enableIDN' => true],
         ]);
     }
 
