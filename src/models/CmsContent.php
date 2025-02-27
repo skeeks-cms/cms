@@ -249,8 +249,12 @@ class CmsContent extends Core
             ['is_active', 'default', 'value' => 1],
             ['is_allow_change_tree', 'default', 'value' => 1],
             ['is_access_check_element', 'default', 'value' => 0],
-            ['name_meny', 'default', 'value' => Yii::t('skeeks/cms', 'Elements')],
-            ['name_one', 'default', 'value' => Yii::t('skeeks/cms', 'Element')],
+            ['name_meny', 'default', 'value' => function () {
+                return $this->name;
+            }],
+            ['name_one', 'default', 'value' => function () {
+                return $this->name;
+            }],
 
 
             [
@@ -332,6 +336,18 @@ class CmsContent extends Core
 
                 static::$_selectData[$cmsContentType->name] = ArrayHelper::map($query->all(), 'id', 'name');
             }
+        }
+
+        $query = CmsContent::find()->andWhere(['code' => null]);
+        if ($contentQueryCallback && is_callable($contentQueryCallback)) {
+            $contentQueryCallback($query);
+        }
+
+        static::$_selectData["Прочее"] = ArrayHelper::map($query->all(), 'id', 'name');
+        
+        $otherContents = CmsContent::find()->andWhere(['content_type' => null])->all();
+        if ($otherContents) {
+            static::$_selectData = ArrayHelper::merge(static::$_selectData, ArrayHelper::map($otherContents, 'id', 'name'));
         }
 
         return static::$_selectData;
