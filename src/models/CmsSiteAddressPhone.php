@@ -45,7 +45,7 @@ class CmsSiteAddressPhone extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'value' => 'Email',
+            'value' => 'Телефон',
             'name' => 'Название',
             'priority' => 'Сортировка',
         ]);
