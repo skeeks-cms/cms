@@ -40,6 +40,7 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_TELEGRAM = 'telegram';
     const SOCIAL_OTHER = 'other';
     const SOCIAL_PINTEREST = 'pinterest';
+    const SOCIAL_YANDEX = 'yandex';
 
     /**
      * @inheritdoc
@@ -55,13 +56,16 @@ class CmsSiteSocial extends ActiveRecord
     static public function getSocialTypes()
     {
         return [
+            self::SOCIAL_TELEGRAM  => 'Telegram',
+            self::SOCIAL_WHATSAPP  => 'WatsApp',
+
+            self::SOCIAL_YANDEX     => 'Yandex',
             self::SOCIAL_FACEBOOK  => 'Facebook',
             self::SOCIAL_INSTAGRAM => 'Instagram',
             self::SOCIAL_YOUTUBE   => 'Youtube',
             self::SOCIAL_VK        => 'Вконтакте',
             self::SOCIAL_OK        => 'Одноклассники',
-            self::SOCIAL_TELEGRAM  => 'Telegram',
-            self::SOCIAL_WHATSAPP  => 'WatsApp',
+
             self::SOCIAL_PINTEREST => 'Pinterest',
             self::SOCIAL_OTHER     => 'Другое',
         ];
