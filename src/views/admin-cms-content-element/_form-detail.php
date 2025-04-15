@@ -7,15 +7,15 @@
 
     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Полное описание'), ['isOpen' => false]); ?>
 
-    <?/* if ($contentModel->isAllowEdit("image_full_id")) : */?><!--
-        <?/*= $form->field($model, 'image_full_id')->widget(
+    <? if ($contentModel->isAllowEdit("image_full_id")) : ?>
+        <?= $form->field($model, 'image_full_id')->widget(
             \skeeks\cms\widgets\AjaxFileUploadWidget::class,
             [
                 'accept'   => 'image/*',
                 'multiple' => false,
             ]
-        ); */?>
-    --><?/* endif; */?>
+        ); ?>
+    <? endif; ?>
 
     <? if ($contentModel->isAllowEdit("description_full")) : ?>
         <?= $form->field($model, 'description_full')->widget(
