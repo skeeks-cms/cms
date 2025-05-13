@@ -81,7 +81,12 @@ class FileValidator extends \yii\validators\FileValidator
                 }
             }
         } else {
-            return parent::validateAttribute($model, $attribute);
+            $result = $this->validateValue($model->$attribute);
+            if (!empty($result)) {
+                $this->addError($model, $attribute, $result[0], $result[1]);
+            }
+            //TODO: не работает в yii > 2.0.52
+            //return parent::validateAttribute($model, $attribute);
         }
     }
 
