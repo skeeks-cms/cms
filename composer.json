@@ -27,7 +27,7 @@
     "require": {
         "php": "^7.4|^8.0",
 
-        "yiisoft/yii2": "2.0.49.4 || dev-master@dev",
+        "yiisoft/yii2": "^2.0.52 || dev-master@dev",
         "yiisoft/yii2-jui": "^2.0.7",
         "yiisoft/yii2-bootstrap": "^2.0.9 || dev-master@dev",
 
