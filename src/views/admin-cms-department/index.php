@@ -108,6 +108,15 @@ $this->registerCss(<<<CSS
 }
 CSS
 );
+if (!$models) {
+    $cmsDepartment = new \skeeks\cms\models\CmsDepartment();
+    $cmsDepartment->name = "Главный отдел";
+    $cmsDepartment->worker_id = \Yii::$app->user->id;
+    $cmsDepartment->makeRoot();
+    $cmsDepartment->save();
+    
+    $models = [$cmsDepartment];
+}
 ?>
 <div class="h1">Структура компании</div>
 <div class="col-md-12">

@@ -400,18 +400,18 @@ CSS
                 ],
             ],
 
-            "properties" => [
+            /*"properties" => [
                 'class'        => BackendModelMultiDialogEditAction::class,
                 "name"         => "Свойства сделки",
                 "viewDialog"   => "@skeeks/crm/views/crm-deal/_pact-properties",
                 "eachCallback" => [$this, 'eachPactProperty'],
-                /*"eachAccessCallback" => function ($model) {
+                "eachAccessCallback" => function ($model) {
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
                     return (\Yii::$app->user->can($this->permissionName."/update"));
-                },*/
-            ],
+                },
+            ],*/
 
             'activate-multi'   => [
                 'class'     => BackendModelMultiActivateAction::class,

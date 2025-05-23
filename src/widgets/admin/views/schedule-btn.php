@@ -204,7 +204,7 @@ if ($cmsSchedulesByDate) : ?>
 
     <div class="my-auto">
         <a href="#" style="cursor: unset;" data-toggle="tooltip" data-html="true"
-           title="Сегодня: <?php echo \skeeks\crm\helpers\CrmScheduleHelper::durationAsTextBySchedules($cmsSchedulesByDate)."<br>".\skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules($cmsSchedulesByDate); ?>">
+           title="Сегодня: <?php echo \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($cmsSchedulesByDate)."<br>".\skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules($cmsSchedulesByDate); ?>">
             <i class="fas fa-info"></i>
         </a>
     </div>

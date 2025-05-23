@@ -10,10 +10,17 @@ return [
     'rules' => [
         [
             'class' => \skeeks\cms\rbac\AuthorRule::class,
+        ],
+        [
             'class' => \skeeks\cms\rbac\CmsLogRule::class,
-            /*'class' => \skeeks\cms\rbac\CmsWorkerRule::class,*/
+        ],
+        [
             'class' => \skeeks\cms\rbac\CmsUserRule::class,
+        ],
+        [
             'class' => \skeeks\cms\rbac\CmsTaskRule::class,
+        ],
+        [
             'class' => \skeeks\cms\rbac\CmsCompanyRule::class,
         ],
     ],
