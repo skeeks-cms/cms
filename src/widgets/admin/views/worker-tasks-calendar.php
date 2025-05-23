@@ -456,7 +456,7 @@ CSS
                         <tbody>
 
                         <?
-                        $dayTime = \skeeks\crm\helpers\CrmScheduleHelper::durationBySchedules($timesForCalculate);
+                        $dayTime = \skeeks\cms\helpers\CmsScheduleHelper::durationBySchedules($timesForCalculate);
                         /*echo $dayTime;*/
                         $dayTime = $dayTime + $elseDayTime;
                         /*echo "/" . $dayTime;*/
