@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\urlRules\UrlRuleContentElement;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
@@ -17,6 +18,7 @@ use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\HasTrees;
 use skeeks\cms\models\behaviors\TimestampPublishedBehavior;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\HasTreesTrait;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
@@ -119,6 +121,7 @@ class CmsContentElement extends RelatedElementModel
     use HasRelatedPropertiesTrait;
     use HasTreesTrait;
     use HasUrlTrait;
+    use HasLogTrait;
 
     protected $_image_ids = null;
     protected $_file_ids = null;
@@ -129,11 +132,15 @@ class CmsContentElement extends RelatedElementModel
     {
         return '{{%cms_content_element}}';
     }
+
     public function init()
     {
         parent::init();
 
-        $this->cms_site_id = \Yii::$app->skeeks->site->id;
+        if (\Yii::$app->skeeks->site) {
+            $this->cms_site_id = \Yii::$app->skeeks->site->id;
+        }
+
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, '_beforeDeleteE']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, '_afterDeleteE']);
@@ -237,6 +244,18 @@ class CmsContentElement extends RelatedElementModel
                 'slugAttribute' => 'code',
                 'ensureUnique'  => false,
                 'maxLength'     => \Yii::$app->cms->element_max_code_length,
+            ],
+
+            CmsLogBehavior::class     => [
+                'class' => CmsLogBehavior::class,
+                'no_log_fields' => [
+                    'description_short_type',
+                    'description_full_type',
+                ],
+                'relation_map' => [
+                    'content_id' => 'cmsContent',
+                    'tree_id' => 'cmsTree',
+                ],
             ],
         ]);
     }
@@ -408,7 +427,7 @@ class CmsContentElement extends RelatedElementModel
             [
                 ['image_id', 'image_full_id'],
                 \skeeks\cms\validators\FileValidator::class,
-                'skipOnEmpty' => false,
+                'skipOnEmpty' => true,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 1,
                 'maxSize'     => 1024 * 1024 * 10,

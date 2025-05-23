@@ -13,10 +13,9 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsUserUniversalProperty;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -41,10 +40,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
         $this->modelClassName = CmsUserUniversalProperty::class;
 
         $this->generateAccessActions = false;
-        
-        $this->accessCallback = function () {
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
 
@@ -64,7 +60,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                     ],
                 ],
 
-                'grid'    => [
+                'grid' => [
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
@@ -73,7 +69,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                         'hint',
                         'is_active',
                     ],
-                    'columns' => [
+                    'columns'        => [
                         'custom' => [
                             'attribute' => "name",
                             'format'    => "raw",
@@ -83,17 +79,17 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                                     ])."<br />".Html::tag('small', $model->handler->name);
                             },
                         ],
-                        
+
                         'is_active' => [
                             'class' => BooleanColumn::class,
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
             ],
 
             'create' => [
                 'fields' => [$this, 'updateFields'],
-                'size' => BackendAction::SIZE_SMALL,
+                'size'   => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -110,7 +106,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
             ],
             'update' => [
                 'fields' => [$this, 'updateFields'],
-                'size' => BackendAction::SIZE_SMALL,
+                'size'   => BackendAction::SIZE_SMALL,
 
                 'on beforeSave' => function (Event $e) {
                     $model = $e->sender->model;
@@ -136,7 +132,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                 'relation'        => ['property_id' => 'id'],
                 'priority'        => 150,
 
-                'on gridInit'        => function($e) {
+                'on gridInit' => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -167,10 +163,9 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                     return true;
                 },
             ],
-            
+
         ]);
     }
-
 
 
     public function updateFields($action)
@@ -206,7 +201,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                 'fields' => [
                     'name',
 
-                    'component'        => [
+                    'component' => [
                         'class'          => SelectField::class,
                         'elementOptions' => ArrayHelper::merge([
                             'data' => [
@@ -216,7 +211,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                         'items'          => function () {
                             return array_merge(['' => ' — '], \Yii::$app->cms->relatedHandlersDataForSelect);
                         },
-                        'hint' => $message
+                        'hint'           => $message,
                     ],
 
                     'cms_measure_code' => [
@@ -258,7 +253,7 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                                 $content = $handler->renderConfigFormFields($formElement->activeForm);
 
                                 if ($content) {
-                                    $formElement->content = \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]) . $content;
+                                    $formElement->content = \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]).$content;
                                 }
                             }
                         },
@@ -267,10 +262,10 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
             ],
 
             'captions' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/cms', 'Additionally'),
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/cms', 'Additionally'),
                 'elementOptions' => ['isOpen' => false],
-                'fields' => [
+                'fields'         => [
 
                     'is_active' => [
                         'class'     => BoolField::class,

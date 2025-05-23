@@ -13,6 +13,7 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HiddenField;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -32,7 +33,7 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
         $this->modelClassName = CmsSiteDomain::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-site';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -45,14 +46,14 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
                 "backendShowings" => false,
-                "filters" => [
+                "filters"         => [
                     'visibleFilters' => [
                         //'id',
                         'domain',
                         //'cms_site_id',
                     ],
                 ],
-                'grid'    => [
+                'grid'            => [
                     'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
@@ -73,21 +74,21 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
                         'is_main',
                         'is_https',
                     ],
-                    'columns' => [
-                        'domain' => [
-                            'class' => DefaultActionColumn::class
+                    'columns'        => [
+                        'domain'   => [
+                            'class' => DefaultActionColumn::class,
                         ],
-                        'is_main' => [
-                            'class' => BooleanColumn::class,
-                            'trueValue' => 1,
+                        'is_main'  => [
+                            'class'      => BooleanColumn::class,
+                            'trueValue'  => 1,
                             'falseValue' => 0,
                         ],
                         'is_https' => [
-                            'class' => BooleanColumn::class,
-                            'trueValue' => 1,
+                            'class'      => BooleanColumn::class,
+                            'trueValue'  => 1,
                             'falseValue' => 0,
                         ],
-                    ]
+                    ],
                 ],
             ],
             "create" => [
@@ -104,41 +105,40 @@ class AdminCmsSiteDomainController extends BackendModelStandartController
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
-        if ($code = \Yii::$app->request->get('cms_site_id'))
-        {
+        if ($code = \Yii::$app->request->get('cms_site_id')) {
             $model->cms_site_id = $code;
             $field = [
                 'class' => HiddenField::class,
-                'label' => false
+                'label' => false,
             ];
         } else {
             $field = [
                 'class' => SelectField::class,
-                'items' => function() {
+                'items' => function () {
                     return ArrayHelper::map(CmsSite::find()->all(), 'id', 'asText');
-                }
+                },
             ];
         }
         $updateFields = [
             'domain',
-            'is_main' => [
-                'class' => BoolField::class,
-                'allowNull' => false,
+            'is_main'     => [
+                'class'       => BoolField::class,
+                'allowNull'   => false,
                 'formElement' => BoolField::ELEMENT_CHECKBOX,
             ],
-            'is_https' => [
-                'class' => BoolField::class,
-                'allowNull' => false,
+            'is_https'    => [
+                'class'       => BoolField::class,
+                'allowNull'   => false,
                 'formElement' => BoolField::ELEMENT_CHECKBOX,
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => "<div style='display: none;'>"
+                'class'   => HtmlBlock::class,
+                'content' => "<div style='display: none;'>",
             ],
             'cms_site_id' => $field,
             [
-                'class' => HtmlBlock::class,
-                'content' => "</div>"
+                'class'   => HtmlBlock::class,
+                'content' => "</div>",
             ],
         ];
 

@@ -476,7 +476,7 @@ class GridView extends \yii\grid\GridView
 
             foreach ($this->columns as $column) {
                 /* @var $column DataColumn */
-                $cells[] = iconv("UTF-8", "windows-1251", strip_tags($column->renderHeaderCell()));
+                $cells[] = iconv("UTF-8", "windows-1251//IGNORE", (string)strip_tags((string)$column->renderHeaderCell()));
             }
 
             fputcsv($out, $cells, ";");

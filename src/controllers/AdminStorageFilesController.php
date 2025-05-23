@@ -27,7 +27,6 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\GridView;
 use Yii;
-use yii\base\ActionEvent;
 use yii\base\Event;
 use yii\base\WidgetEvent;
 use yii\bootstrap\Alert;
@@ -50,8 +49,10 @@ class AdminStorageFilesController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = "Управление файлами хранилища";
+        $this->name = "Файловое хранилище";
         $this->modelClassName = StorageFile::class;
+
+        $this->permissionName = 'cms/admin-storage-files';
         $this->generateAccessActions = true;
 
         parent::init();
@@ -79,15 +80,15 @@ class AdminStorageFilesController extends BackendModelStandartController
             [
                 'upload' => [
                     'generateAccess' => false,
-                    'class'     => BackendAction::class,
-                    'name'      => "Загрузить файлы",
-                    'isVisible' => false,
-                    'priority'  => 10,
-                    'callback'  => [$this, 'actionUpload'],
+                    'class'          => BackendAction::class,
+                    'name'           => "Загрузить файлы",
+                    'isVisible'      => false,
+                    'priority'       => 10,
+                    'callback'       => [$this, 'actionUpload'],
                 ],
 
                 'index' => [
-                    'generateAccess' => false,
+                    'generateAccess'  => false,
                     'accessCallback'  => function () {
                         return (\Yii::$app->user->can("cms/admin-storage-files/index") || \Yii::$app->user->can("cms/admin-storage-files/index/own"));
                     },
@@ -109,26 +110,26 @@ JS
 
                         $event->content = \skeeks\cms\widgets\StorageFileManager::widget([
                                 'clientOptions' => [
-                                        'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+                                    'completeUploadFile' => new \yii\web\JsExpression(<<<JS
         function(data)
         {
             window.location.reload();
         }
 JS
-                                        ),
-                                    ],
+                                    ),
+                                ],
                             ])."<br />";
                     },
                     'on init'         => function ($e) {
                         $action = $e->sender;
-                        
+
                     },
                     "filters"         => [
                         'visibleFilters' => [
                             'q',
                             //'id',
                         ],
-                        'autoFilters' => [
+                        'autoFilters'    => [
                             'id',
                         ],
                         'filtersModel'   => [
@@ -168,16 +169,16 @@ JS
                                 $query = $event->sender->dataProvider->query;
                                 $query->andWhere(['created_by' => \Yii::$app->user->identity->id]);
                             }
-                            
-                        
+
+
                             /**
                              * @var $dataProvider ActiveDataProvider
                              * @var $query ActiveQuery
                              */
                             $query = $event->sender->dataProvider->query;
-        
+
                             $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
-                            
+
                             /*/**
                              * @var $query ActiveQuery
                             $query = $event->sender->dataProvider->query;
@@ -217,10 +218,10 @@ JS
                         ],
                         'columns'        => [
                             'created_by' => [
-                                'class' => UserColumnData::class  
+                                'class' => UserColumnData::class,
                             ],
                             'updated_by' => [
-                                'class' => UserColumnData::class
+                                'class' => UserColumnData::class,
                             ],
                             'created_at' => [
                                 'class' => DateTimeColumnData::class,
@@ -333,16 +334,16 @@ JS
 
 
                             'size' => [
-                                'headerOptions' => [
-                                    'style' => 'width: 110px;'
+                                'headerOptions'  => [
+                                    'style' => 'width: 110px;',
                                 ],
                                 'contentOptions' => [
-                                    'style' => 'width: 110px;'
+                                    'style' => 'width: 110px;',
                                 ],
-                                'value'  => function (StorageFile $model) {
+                                'value'          => function (StorageFile $model) {
                                     return $model->size ? \Yii::$app->formatter->asShortSize($model->size) : "";
                                 },
-                                'format' => 'raw',
+                                'format'         => 'raw',
                             ],
 
 
@@ -368,21 +369,24 @@ JS
                             $total_size = ArrayHelper::getValue($result, 'total_size');
                             $size = \Yii::$app->formatter->asShortSize($total_size);
 
-                            $event->result = Alert::widget([
-                                'options' => [
-                                    'class' => 'alert alert-info',
-                                ],
-                                'body'    => <<<HTML
-<div class="g-font-weight-300">
-<span class="g-font-size-40">Всего: <span title="" style="">{$size}</span></span>
-</div>
-HTML
-                                ,
-                            ]);
+                            if ($total_size > 0) {
+                                $event->result = Alert::widget([
+                                    'closeButton' => false,
+                                    'options' => [
+                                        'class' => 'alert alert-default',
+                                    ],
+                                    'body'    => <<<HTML
+    <div class="g-font-weight-300">
+    <span class="g-font-size-40">Всего: <span title="" style="">{$size}</span></span>
+    </div>
+    HTML
+                                    ,
+                                ]);
+                            }
+
                         },
                     ],
                 ],
-
 
 
                 'stat' => [

@@ -7,6 +7,7 @@
  */
 return [
 
+    'bootstrap' => ['skeeks'],
     'vendorPath' => '@vendor',
 
     'aliases' => [

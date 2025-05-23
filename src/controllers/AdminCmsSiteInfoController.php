@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\WidgetField;
 
 /**
@@ -27,6 +28,7 @@ class AdminCmsSiteInfoController extends BackendModelController
 
         $this->defaultAction = "update";
         $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {

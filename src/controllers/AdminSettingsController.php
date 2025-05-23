@@ -13,6 +13,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\config\ConfigBehavior;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -27,8 +28,10 @@ class AdminSettingsController extends BackendController
     public function init()
     {
         $this->name = "Управление настройками";
+
         $this->generateAccessActions = false;
-        //$this->permissionName = "cms/admin-settings";
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+
         parent::init();
     }
 

@@ -58,18 +58,19 @@ class AdminProfileController extends BackendController
                 'class'     => BackendAction::class,
                 'name'      => ['skeeks/cms', 'Personal data'],
                 "callback"  => [$this, 'actionUpdate'],
-                "isVisible" => false,
+                "icon" => 'hs-admin-user',
+                "isVisible" => true,
             ],
 
             'password' =>
             [
                 'class'           => BackendAction::class,
                 'name'            => 'Смена пароля',
-                "icon"            => "glyphicon glyphicon-warning-sign",
+                "icon"            => "hs-admin-settings",
                 "permissionNames" => [],
                 "callback"        => [$this, 'actionPassword'],
                 "priority"        => 10,
-                "isVisible"       => false,
+                "isVisible"       => true,
             ],
         ]);
 

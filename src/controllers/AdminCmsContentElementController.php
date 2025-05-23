@@ -86,10 +86,15 @@ class AdminCmsContentElementController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = \Yii::t('skeeks/cms', 'Elements');
+        if (!$this->name) {
+            $this->name = \Yii::t('skeeks/cms', 'Elements');
+        }
 
+
+        $this->generateAccessActions = false;
         if ($this->content) {
             
+            $this->name = \Yii::t('skeeks/cms', $this->content->name);
             /*if (\Yii::$app->shop->contentBrands && $this->content->id == \Yii::$app->shop->contentBrands->id) {
                 $this->modelClassName = BrandCmsContentElement::class;
                 if ($this->model) {
@@ -104,9 +109,15 @@ class AdminCmsContentElementController extends BackendModelStandartController
             }*/
             
             if ($this->permissionName === null) {
-                $this->permissionName = $this->uniqueId."__".$this->content->id;
+                /*$this->permissionName = $this->uniqueId."__".$this->content->id;*/
+                /*$this->permissionName = "cms/admin-cms-content-element";*/
             }
         }
+
+        if ($this->permissionName === null) {
+            $this->permissionName = "cms/admin-element";
+        }
+
 
         $this->modelHeader = function () {
             /**
@@ -628,20 +639,38 @@ HTML;
             ],
 
             "delete" => [
-                'generateAccess' => true,
+                //'generateAccess' => true,
+                "accessCallback"     => function () {
+                    if ($this->model) {
+                        return \Yii::$app->user->can($this->permissionName."/delete", [
+                            'model' => $this->model
+                        ]);
+                    }
+
+                    return false;
+                },
             ],
             "create" => [
-                'generateAccess' => true,
+                //'generateAccess' => true,
                 "callback" => [$this, 'create'],
             ],
 
             "update" => [
-                'generateAccess' => true,
+                //'generateAccess' => true,
                 "callback" => [$this, 'update'],
+                "accessCallback"     => function () {
+                    if ($this->model) {
+                        return \Yii::$app->user->can($this->permissionName."/update", [
+                            'model' => $this->model
+                        ]);
+                    }
+
+                    return false;
+                },
             ],
 
             'stat' => [
-                'generateAccess' => true,
+                //'generateAccess' => true,
                 'class'          => ViewBackendAction::class,
                 'name'           => 'Статистика',
                 'icon'           => 'fas fa-info-circle',
@@ -666,7 +695,7 @@ HTML;
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
-                    return \Yii::$app->user->can($this->permissionName."/update");
+                    return (\Yii::$app->user->can($this->permissionName . "/update") || \Yii::$app->user->can($this->permissionName . "/update/own"));
                 },
 
             ],
@@ -679,6 +708,13 @@ HTML;
                     if ($this->content) {
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     }
+                },
+
+                "eachAccessCallback" => function($model) {
+                    return \Yii::$app->user->can($this->permissionName . "/delete", ['model' => $model]);
+                },
+                "accessCallback" => function() {
+                    return (\Yii::$app->user->can($this->permissionName . "/delete") || \Yii::$app->user->can($this->permissionName . "/delete/own"));
                 },
             ],
             "deactivate-multi" => [
@@ -699,7 +735,7 @@ HTML;
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
-                    return \Yii::$app->user->can($this->permissionName."/update");
+                    return (\Yii::$app->user->can($this->permissionName . "/update") || \Yii::$app->user->can($this->permissionName . "/update/own"));
                 },
             ],
 
@@ -918,7 +954,7 @@ HTML;
 
         $e->content = Alert::widget([
             'options'     => [
-                'class' => 'sx-bg-gray-light',
+                //'class' => 'sx-bg-gray-light',
             ],
             'closeButton' => false,
 
@@ -1372,7 +1408,8 @@ HTML
      */
     public function setContent($content)
     {
-        $this->permissionName = $this->uniqueId . "__" . $content->id;
+        //$this->permissionName = $this->uniqueId . "__" . $content->id;
+        $this->permissionName = "cms/admin-element";
         $this->_content = $content;
         return $this;
     }
@@ -1395,10 +1432,8 @@ HTML
     public function beforeAction($action)
     {
         if ($this->content) {
-            if ($this->content->name_meny) {
+            if ($this->content->name_meny && $this->content->name_meny != "Элементы") {
                 $this->name = $this->content->name_meny;
-            } else {
-                $this->name = $this->content->name;
             }
         }
 

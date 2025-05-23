@@ -102,11 +102,12 @@ class ActiveRecord extends \yii\db\ActiveRecord
                 $result[BlameableBehavior::class] = [
                     'class'      => BlameableBehavior::class,
                     'attributes' => [
-                        ActiveRecord::EVENT_BEFORE_INSERT => ['created_by'],
-                        ActiveRecord::EVENT_BEFORE_VALIDATE => ['created_by'],
-                        ActiveRecord::EVENT_BEFORE_UPDATE => [],
+                        ActiveRecord::EVENT_BEFORE_INSERT   => ['created_by'],
+                        ActiveRecord::EVENT_BEFORE_VALIDATE => [],
+                        //ActiveRecord::EVENT_BEFORE_VALIDATE => ['created_by'],
+                        ActiveRecord::EVENT_BEFORE_UPDATE   => [],
                     ],
-                    'value' => function ($event) {
+                    'value'      => function ($event) {
                         if (\Yii::$app instanceof \yii\console\Application) {
                             return null;
                         } else {
@@ -128,7 +129,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
             if (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_at') && self::safeGetTableSchema()->getColumn('updated_at')) {
                 $result[TimestampBehavior::class] = [
                     'class' => TimestampBehavior::class,
-                    'preserveNonEmptyValues' => true,
+                    //'preserveNonEmptyValues' => true,
                     /*'value' => function () {
                         return date('U');
                     },*/
@@ -136,7 +137,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
             } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('created_at')) {
                 $result[TimestampBehavior::class] = [
                     'class'      => TimestampBehavior::class,
-                    'preserveNonEmptyValues' => true,
+                    //'preserveNonEmptyValues' => true,
                     'attributes' => [
                         ActiveRecord::EVENT_BEFORE_INSERT => ['created_at'],
                         ActiveRecord::EVENT_BEFORE_UPDATE => [],
@@ -145,7 +146,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
             } elseif (self::safeGetTableSchema() && self::safeGetTableSchema()->getColumn('updated_at')) {
                 $result[TimestampBehavior::class] = [
                     'class'      => TimestampBehavior::class,
-                    'preserveNonEmptyValues' => true,
+                    //'preserveNonEmptyValues' => true,
                     'attributes' => [
                         ActiveRecord::EVENT_BEFORE_INSERT => ['updated_at'],
                         ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],

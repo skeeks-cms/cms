@@ -11,8 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use yii\helpers\Json;
+use skeeks\cms\rbac\CmsManager;
 
 /**
  * Class AdminUniversalComponentSettingsController
@@ -23,6 +22,10 @@ class AdminUniversalComponentSettingsController extends AdminController
     public function init()
     {
         $this->name = "Управление настройками компонента";
+
+        $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+
         parent::init();
     }
 
@@ -63,7 +66,7 @@ class AdminUniversalComponentSettingsController extends AdminController
 
         return $this->render($this->action->id, [
             "component" => $component,
-            "forSave" => $forSave,
+            "forSave"   => $forSave,
         ]);
     }
 
@@ -88,7 +91,7 @@ class AdminUniversalComponentSettingsController extends AdminController
 
             $rr->data =
                 [
-                    'forSave' => $forSave
+                    'forSave' => $forSave,
                 ];
 
             return $rr;

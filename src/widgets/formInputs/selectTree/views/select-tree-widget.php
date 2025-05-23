@@ -6,7 +6,7 @@
  * @date 19.12.2016
  */
 /* @var $this yii\web\View */
-/* @var $widget \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget */
+/* @var $widget \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget */
 $widget = $this->context;
 ?>
 <?= \yii\helpers\Html::beginTag('div', $widget->wrapperOptions); ?>

@@ -12,7 +12,6 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserPhone;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
@@ -29,7 +28,7 @@ class AdminUserPhoneController extends BackendModelStandartController
         $this->name = "Управление телефонами";
         $this->modelShowAttribute = "value";
         $this->modelClassName = CmsUserPhone::className();
-        
+
         $this->permissionName = 'cms/admin-user';
         $this->generateAccessActions = false;
 
@@ -45,26 +44,28 @@ class AdminUserPhoneController extends BackendModelStandartController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
             "create" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'         => [$this, 'updateFields'],
                 'size'           => BackendAction::SIZE_SMALL,
-                "accessCallback" => function ($model) {
-            
+                'buttons'        => ['save'],
+                /*"accessCallback" => function ($model) {
+
                     $cmsUserEmail = new CmsUserPhone();
                     $cmsUserEmail->load(\Yii::$app->request->get());
-                    
+
                     if ($model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $cmsUserEmail->cmsUser]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $cmsUserEmail->cmsUser]);
                     }
-                    
+
                     return false;
-                },
+                },*/
             ],
             "update" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'         => [$this, 'updateFields'],
                 'size'           => BackendAction::SIZE_SMALL,
+                'buttons'        => ['save'],
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -93,7 +94,7 @@ class AdminUserPhoneController extends BackendModelStandartController
 
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -110,7 +111,7 @@ class AdminUserPhoneController extends BackendModelStandartController
             "delete" => [
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -127,14 +128,14 @@ class AdminUserPhoneController extends BackendModelStandartController
 
         $result = [
             [
-                'class' => HtmlBlock::class,
-                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 500px;">'
+                'class'   => HtmlBlock::class,
+                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 500px;">',
             ],
             'value' => [
-                'class' => TextField::class,
-                'elementOptions' => [
-                    'placeholder' => 'Телефон',
-                    'autocomplete' => 'off'
+                'class'           => TextField::class,
+                'elementOptions'  => [
+                    'placeholder'  => 'Телефон',
+                    'autocomplete' => 'off',
                 ],
                 'on beforeRender' => function (Event $e) {
                     /**
@@ -150,27 +151,27 @@ JS
                 },
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => '</div><div class="col-12" style="max-width: 500px;">'
+                'class'   => HtmlBlock::class,
+                'content' => '</div><div class="col-12" style="max-width: 500px;">',
             ],
-            'name' => [
-                'class' => TextField::class,
+            'name'  => [
+                'class'          => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Например рабочий телефон'
-                ]
+                    'placeholder' => 'Например рабочий телефон',
+                ],
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => '</div></div>'
+                'class'   => HtmlBlock::class,
+                'content' => '</div></div>',
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => '<div style="display: none;">'
+                'class'   => HtmlBlock::class,
+                'content' => '<div style="display: none;">',
             ],
             'cms_user_id',
             [
-                'class' => HtmlBlock::class,
-                'content' => '</div>'
+                'class'   => HtmlBlock::class,
+                'content' => '</div>',
             ],
 
         ];

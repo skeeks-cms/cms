@@ -376,7 +376,9 @@ class UtilsController extends Controller
      */
     public function actionRemoveEmptyDirs($onlyCheck = 1)
     {
-        Skeeks::unlimited();;
+        /*set_time_limit(0);
+        ini_set("memory_limit", "50G");*/
+        Skeeks::unlimited();
         
         $clusters = \Yii::$app->storage->getClusters();
         foreach ($clusters as $cluster) {
@@ -405,7 +407,6 @@ class UtilsController extends Controller
             }
             
             $dirs = FileHelper::findDirectories($cluster->rootBasePath, ['recursive' => true]);
-            //$dirs = FileHelper::findDirectories($cluster->rootBasePath, ['recursive' => true]);
             $realFileSizes = 0;
             
             foreach ($dirs as $dirPath)
@@ -414,6 +415,7 @@ class UtilsController extends Controller
                     continue;
                 }
                 
+                /*$this->stdout("--------------\n");*/
                 $this->stdout("{$dirPath}\n");
                 $files = FileHelper::findFiles($dirPath, ['recursive' => true]);
                 if ($files) {
@@ -421,11 +423,20 @@ class UtilsController extends Controller
                     
                     foreach ($files as $filePath)
                     {
-                        $realFileSizes = $realFileSizes + filesize($filePath);
+                        /*$this->stdout("\t\t{$filePath}\n", Console::FG_RED);
+                        $this->stdout("\t\t\t" . \Yii::$app->formatter->asShortSize(filesize($filePath)) . "\n", Console::FG_GREEN);*/
+
                         $realFileSizesTmp = $realFileSizesTmp + filesize($filePath);
                     }
                     
+                    $realFileSizes = $realFileSizes + $realFileSizesTmp;
                     $this->stdout("\t" . \Yii::$app->formatter->asShortSize($realFileSizesTmp) . "\n", Console::FG_GREEN);
+
+                    /*$this->stdout("\t" . \Yii::$app->formatter->asShortSize($realFileSizesTmp) . "\n", Console::FG_GREEN);
+                    $this->stdout("\ttotal: " . \Yii::$app->formatter->asShortSize($realFileSizes) . "\n", Console::FG_GREEN);
+                    if ($realFileSizes > 1024*5) {
+                        die;
+                    }*/
                     
                 } else {
                     
@@ -438,7 +449,8 @@ class UtilsController extends Controller
                 }
             }
             
-            $this->stdout("\tРазмер всех файлов: " . \Yii::$app->formatter->asShortSize($realFileSizes) . "\n", Console::FG_GREEN);
+            //TODO: размер считается некорректно
+            //$this->stdout("\tРазмер всех файлов: " . \Yii::$app->formatter->asShortSize($realFileSizes) . "\n", Console::FG_GREEN);
         }
     }
 
@@ -450,7 +462,7 @@ class UtilsController extends Controller
     public function actionRemoveFilesNotStorage($onlyCheck = 1)
     {
         //Skeeks::unlimited();
-        Skeeks::unlimited();;
+        Skeeks::unlimited();
         
         $clusters = \Yii::$app->storage->getClusters();
         foreach ($clusters as $cluster) {

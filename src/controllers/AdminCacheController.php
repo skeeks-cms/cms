@@ -16,6 +16,7 @@ use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\sx\Dir;
 use yii\caching\TagDependency;
 use yii\db\Schema;
@@ -29,6 +30,10 @@ class AdminCacheController extends BackendController
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Управление кэшем");
+
+        $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+
         parent::init();
     }
 

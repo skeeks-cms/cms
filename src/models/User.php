@@ -14,17 +14,26 @@ namespace skeeks\cms\models;
 use Imagine\Image\ManipulatorInterface;
 use skeeks\cms\authclient\models\UserAuthClient;
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
+use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\helpers\StringHelper;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasSubscribes;
 use skeeks\cms\models\behaviors\HasTableCache;
 use skeeks\cms\models\behaviors\HasUserLog;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\queries\CmsTaskQuery;
 use skeeks\cms\models\queries\CmsUserQuery;
+use skeeks\cms\models\queries\CmsUserScheduleQuery;
+use skeeks\cms\models\queries\CmsWebNotifyQuery;
 use skeeks\cms\models\user\UserEmail;
 use skeeks\cms\rbac\models\CmsAuthAssignment;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopBonusTransaction;
+use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\validators\PhoneValidator;
 use Yii;
 use yii\base\Exception;
@@ -52,8 +61,12 @@ use yii\web\IdentityInterface;
  * @property string                      $patronymic
  * @property integer                     $is_company
  * @property string                      $company_name
- * @property integer                      $birthday_at
+ * @property integer                     $birthday_at
+ * @property integer                     $is_worker сотрудник?
+ * @property string|null                 $post должность
+ * @property array|null                  $work_shedule рабочий график
  *
+ * @property CmsUserSchedule[]           $schedules
  * @property string                      $gender
  * @property string                      $alias
  * @property integer                     $is_active
@@ -100,12 +113,33 @@ use yii\web\IdentityInterface;
  * @property ShopBonusTransaction[]      $bonusTransactions
  * @property float                       $bonusBalance
  *
+ * @property CmsDepartment[]             $departments Отделы где работает сотрудник
+ * @property CmsUser[]                   $subordinates Подчиненные
+ * @property CmsUser[]                   $leaders Руководители
+ *
+ * @property CmsUser[]                   $managers Сотрудники работающие с клиентом
+ * @property CmsCompany[]                $companies Сотрудники работающие с клиентом
+ * @property CmsCompany[]                $companiesAll Сотрудники работающие с клиентом
+ * @property CmsTask[]                   $executorTasks Задачи где пользователь является исполнителем
+ * @property CmsWebNotify[]              $CmsWebNotifies Веб уведомления
+ *
+ * @property bool                        $isWorkingNow Сейчас в работе?
+ *
  */
 class User
     extends ActiveRecord
     implements IdentityInterface
 {
+    use HasLogTrait;
     use HasRelatedPropertiesTrait;
+
+    /**
+     * @return string
+     */
+    public function getSkeeksModelCode()
+    {
+        return CmsUser::class;
+    }
 
     /**
      * @inheritdoc
@@ -137,6 +171,67 @@ class User
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "_cmsAfterSave"]);
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
+    }
+
+
+    /**
+     * @return queries\CmsLogQuery
+     */
+    public function getUserLogs() {
+        $q = CmsLog::find()
+            ->andWhere([
+                'and',
+                ['model_code' => $this->skeeksModelCode],
+                ['model_id' => $this->id],
+            ]);
+
+        $q->multiple = true;
+
+        return $q;
+    }
+
+    /**
+     * @return queries\CmsLogQuery
+     */
+    public function getLogs()
+    {
+        $q = CmsLog::find()
+            ->andWhere([
+                'and',
+                ['model_code' => $this->skeeksModelCode],
+                ['model_id' => $this->id],
+            ])
+            ->orWhere([
+                'and',
+                ['model_code' => (new CmsDeal())->skeeksModelCode],
+                ['model_id' => $this->getDeals()->select(['id'])],
+            ])
+            ->orWhere([
+                'and',
+                ['model_code' => (new ShopBill())->skeeksModelCode],
+                ['model_id' => $this->getBills()->select(['id'])],
+            ])
+            ->orWhere([
+                'and',
+                ['model_code' => (new ShopPayment())->skeeksModelCode],
+                ['model_id' => $this->getPayments()->select(['id'])],
+            ])
+            ->orWhere([
+                'and',
+                ['model_code' => (new CmsTask())->skeeksModelCode],
+                ['model_id' => $this->getTasks()->select(['id'])],
+            ])
+            ->orWhere([
+                'and',
+                ['model_code' => (new ShopBonusTransaction())->skeeksModelCode],
+                ['model_id' => $this->getBonusTransactions()->select(['id'])],
+            ])
+
+            ->orderBy(['created_at' => SORT_DESC]);
+
+        $q->multiple = true;
+
+        return $q;
     }
 
     public function _cmsCheckBeforeSave($e)
@@ -198,6 +293,8 @@ class User
                 }
             }
         }
+
+        //TODO: Если сотрудник, надо проверить чтобы добавилась нужная роль CmsManager::ROLE_WORKER
 
         //Если пытаюсь поменять главный email
         if ($this->_mainEmail) {
@@ -268,6 +365,10 @@ class User
     {
         $behaviors = array_merge(parent::behaviors(), [
 
+            RelationalBehavior::class => [
+                'class' => RelationalBehavior::class,
+            ],
+
             TimestampBehavior::class,
 
             /*HasUserLog::class => [
@@ -287,6 +388,24 @@ class User
                 'relatedElementPropertyClassName' => CmsUserProperty::class,
                 'relatedPropertyClassName'        => CmsUserUniversalProperty::class,
             ],
+
+            HasJsonFieldsBehavior::class => [
+                'class'  => HasJsonFieldsBehavior::class,
+                'fields' => ['work_shedule'],
+            ],
+
+
+            CmsLogBehavior::class => [
+                'class'        => CmsLogBehavior::class,
+                'no_log_fields' => [
+                    'last_activity_at',
+                    'last_admin_activity_at',
+                ]
+                /*'relation_map' => [
+                /*'relation_map' => [
+                    'cms_company_status_id' => 'status',
+                ],*/
+            ],
         ]);
 
         if (isset($behaviors[HasTableCache::class])) {
@@ -301,6 +420,9 @@ class User
     public function rules()
     {
         return [
+            ['is_worker', 'default', 'value' => 0],
+            ['is_worker', 'integer'],
+
             ['birthday_at', 'default', 'value' => null],
             ['alias', 'default', 'value' => null],
             ['is_active', 'default', 'value' => 1],
@@ -308,6 +430,9 @@ class User
             ['gender', 'in', 'range' => ['men', 'women']],*/
 
             [['company_name'], 'string'],
+
+            [['managers'], 'safe'],
+
             [
                 ['company_name'],
                 'required',
@@ -402,7 +527,7 @@ class User
 
 
             [['email'], 'string', 'max' => 64],
-            [['email'], 'email'],
+            [['email'], 'email', 'enableIDN' => true],
             [['email'], "filter", 'filter' => 'trim'],
             [
                 ['email'],
@@ -432,7 +557,7 @@ class User
                             $this->addError($attribute, "Этот email уже занят");
                             return false;
                         }
-                        
+
                         if ($this->mainCmsUserEmail) {
                             $this->mainCmsUserEmail->value = StringHelper::strtolower($this->mainCmsUserEmail->value);
                             $value = StringHelper::strtolower($value);
@@ -472,6 +597,11 @@ class User
             [['roleNames'], 'default', 'value' => \Yii::$app->cms->registerRoles],
 
             [['first_name', 'last_name'], 'trim'],
+
+            [['work_shedule'], 'safe'],
+            [['post'], 'string', 'max' => 255],
+
+            [['work_shedule', 'post'], 'default', 'value' => null],
         ];
     }
 
@@ -512,7 +642,7 @@ class User
             'last_name'              => \Yii::t('skeeks/cms', 'Last name'),
             'patronymic'             => \Yii::t('skeeks/cms', 'Patronymic'),
             'gender'                 => Yii::t('skeeks/cms', 'Gender'),
-            'birthday_at'                 => Yii::t('skeeks/cms', 'Дата рождения'),
+            'birthday_at'            => Yii::t('skeeks/cms', 'Дата рождения'),
             'logged_at'              => Yii::t('skeeks/cms', 'Logged At'),
             'last_activity_at'       => Yii::t('skeeks/cms', 'Last Activity At'),
             'last_admin_activity_at' => Yii::t('skeeks/cms', 'Last Activity In The Admin At'),
@@ -520,6 +650,10 @@ class User
             'roleNames'              => Yii::t('skeeks/cms', 'Группы'),
             'is_company'             => "Тип аккаунта",
             'company_name'           => "Название компании",
+            'work_shedule'           => "Рабочий график",
+            'post'                   => "Должность",
+            'is_worker'              => "Сотрудник?",
+            'managers'               => "Работают с клиентом",
         ];
     }
 
@@ -817,7 +951,7 @@ class User
         return static::find()
             ->cmsSite()
             ->joinWith('cmsAuthAssignments as cmsAuthAssignments')
-            ->where(['cmsAuthAssignments.item_name' => $assignments]);
+            ->andWhere(['cmsAuthAssignments.item_name' => $assignments]);
     }
 
     /**
@@ -900,7 +1034,7 @@ class User
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, (string) $this->password_hash);
+        return Yii::$app->security->validatePassword($password, (string)$this->password_hash);
     }
 
     /**
@@ -1149,6 +1283,15 @@ class User
         return $this->hasMany(ShopBonusTransaction::class, ['cms_user_id' => 'id']);
     }
 
+
+    /**
+     * @return CmsWebNotifyQuery
+     */
+    public function getCmsWebNotifies()
+    {
+        return $this->hasMany(CmsWebNotify::class, ['cms_user_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+    }
+
     public function getBonusBalance()
     {
         $result = $this->getBonusTransactions()->addSelect([
@@ -1226,6 +1369,189 @@ class User
     public function getCmsContractors()
     {
         return $this->hasMany(CmsContractor::class, ['id' => 'cms_contractor_id'])
-            ->via('cmsContractorMaps');;
+            ->via('cmsContractorMaps');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsUser2managers()
+    {
+        return $this->hasMany(CmsUser2manager::class, ['client_id' => 'id'])
+            ->from(['cmsUser2managers' => CmsUser2manager::tableName()]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getManagers()
+    {
+        $class = \Yii::$app->user->identityClass;
+        return $this->hasMany($class, ['id' => 'worker_id'])
+            ->via('cmsUser2managers');
+    }
+
+    /**
+     * Подчиненные
+     * @return \skeeks\cms\query\CmsActiveQuery
+     */
+    public function getSubordinates()
+    {
+        //Отделы где пользователь является руководителем
+        $needDepartmentsQuery = CmsDepartment::find()->andWhere(['worker_id' => $this->id])->select(['id']);
+
+        //Отделы где нужно искать сотрудников
+        $subQuery = CmsDepartment2worker::find()->andWhere(['cms_department_id' => $needDepartmentsQuery])->select(['worker_id']);
+
+        $userClass = \Yii::$app->user->identityClass;
+
+        $q = $userClass::find();
+        $q->multiple = true;
+
+        $q->isWorker();
+
+        $q->andWhere([CmsUser::tableName().'.id' => $subQuery]);
+
+        return $q;
+    }
+
+    /**
+     * Руководители
+     * @return \skeeks\cms\query\CmsActiveQuery
+     */
+    public function getLeaders()
+    {
+        //Отделы где нужно искать руководителей
+        $subQuery = CmsDepartment2worker::find()->andWhere(['worker_id' => $this->id])->select(['cms_department_id']);
+        //Отделы где пользователь является руководителем
+        $needDepartmentsQuery = CmsDepartment::find()->andWhere(['id' => $subQuery])->select(['worker_id']);
+
+        $userClass = \Yii::$app->user->identityClass;
+
+        $q = $userClass::find();
+        $q->multiple = true;
+
+        $q->isWorker();
+
+        $q->andWhere([CmsUser::tableName().'.id' => $needDepartmentsQuery]);
+
+        return $q;
+    }
+
+    /**
+     * Отделы с которыми связан сотрудник
+     * @return \skeeks\cms\query\CmsActiveQuery
+     */
+    public function getDepartments()
+    {
+        $q = CmsDepartment::find();
+        $q->multiple = true;
+
+        $subQuery = CmsDepartment2worker::find()->andWhere(['worker_id' => $this->id])->select(['cms_department_id']);
+
+        $q->where([
+            'or',
+            ['worker_id' => $this->id],
+            ['id' => $subQuery],
+        ]);
+
+        $q->groupBy([CmsDepartment::tableName().".id"]);
+
+        return $q;
+
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsCompany2usersAll()
+    {
+        return $this->hasMany(CmsCompany2user::class, ['cms_user_id' => 'id'])
+            ->from(['cmsCompany2usersAll' => CmsCompany2user::tableName()]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsCompany2users()
+    {
+        return $this->hasMany(CmsCompany2user::class, [
+            'cms_user_id' => 'id',
+        ])->andWhere(['is_root' => 1])
+            ->from(['cmsCompany2users' => CmsCompany2user::tableName()]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompanies()
+    {
+        return $this->hasMany(CmsCompany::class, ['id' => 'cms_company_id'])
+            ->via('cmsCompany2users');
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompaniesAll()
+    {
+        return $this->hasMany(CmsCompany::class, ['id' => 'cms_company_id'])
+            ->via('cmsCompany2usersAll');
+    }
+
+
+    /**
+     * @return CmsUserScheduleQuery
+     */
+    public function getSchedules()
+    {
+        return $this->hasMany(CmsUserSchedule::class, ['cms_user_id' => 'id']);
+    }
+
+    /**
+     * @return CmsTaskQuery
+     */
+    public function getExecutorTasks()
+    {
+        return $this->hasMany(CmsTask::class, ['executor_id' => 'id']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsWorkingNow()
+    {
+        return (bool)$this->getSchedules()->notEnd()->one();
+    }
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeals()
+    {
+        return $this->hasMany(CmsDeal::class, ['cms_user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBills()
+    {
+        return $this->hasMany(ShopBill::class, ['cms_user_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments()
+    {
+        return $this->hasMany(ShopPayment::class, ['cms_user_id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTasks()
+    {
+        return $this->hasMany(CmsTask::class, ['cms_user_id' => 'id']);
     }
 }

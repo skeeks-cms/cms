@@ -9,8 +9,10 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\StringHelper;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\validators\PhoneValidator;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -38,6 +40,7 @@ use yii\helpers\ArrayHelper;
  */
 class CmsUserPhone extends ActiveRecord
 {
+    use HasLogTrait;
     /**
      * @inheritdoc
      */
@@ -46,13 +49,15 @@ class CmsUserPhone extends ActiveRecord
         return '{{%cms_user_phone}}';
     }
 
-    /**
-     * @return \skeeks\cms\query\CmsActiveQuery
-     */
-    /*public static function find()
+    public function behaviors()
     {
-        return parent::find()->cmsSite();
-    }*/
+        return ArrayHelper::merge(parent::behaviors(), [
+            CmsLogBehavior::class => [
+                'class'           => CmsLogBehavior::class,
+                'parent_relation' => 'cmsUser',
+            ],
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -113,5 +118,13 @@ class CmsUserPhone extends ActiveRecord
     {
         $userClass = isset(\Yii::$app->user) ? \Yii::$app->user->identityClass : CmsUser::class;
         return $this->hasOne($userClass, ['id' => 'cms_user_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        return $this->value;
     }
 }

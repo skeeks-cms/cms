@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTheme;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
@@ -25,7 +26,10 @@ class AdminCmsThemeController extends BackendController
     public function init()
     {
         $this->name = "Дизайн сайта";
-        //$this->generateAccessActions = false;
+
+        $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+
         parent::init();
     }
 

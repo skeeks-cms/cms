@@ -11,8 +11,8 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsSiteAddress;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
-use skeeks\cms\ya\map\widgets\YaMapInput;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -35,7 +35,7 @@ class AdminCmsSiteAddressController extends BackendModelStandartController
         $this->modelClassName = CmsSiteAddress::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-site-address';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -47,7 +47,7 @@ class AdminCmsSiteAddressController extends BackendModelStandartController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
 
-            'index'  => [
+            'index' => [
                 'on beforeRender' => function (Event $e) {
                     $e->content = Alert::widget([
                         'closeButton' => false,
@@ -110,14 +110,14 @@ HTML
 
 
             "emails" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Email-ы",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-site-address-email",
                 'relation'        => ['cms_site_address_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -132,14 +132,14 @@ HTML
             ],
 
             "phones" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Телефоны",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-site-address-phone",
                 'relation'        => ['cms_site_address_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -173,8 +173,8 @@ HTML
             $result[] = [
                 'class'   => HtmlBlock::class,
                 'content' => Alert::widget([
-                    'body'    => 'У вас не настроен компонент для работы с yandex картами, в настройках компонента yandex карты пропишите api ключ.',
-                    'options' => [
+                    'body'        => 'У вас не настроен компонент для работы с yandex картами, в настройках компонента yandex карты пропишите api ключ.',
+                    'options'     => [
                         'class' => 'alert alert-danger',
                     ],
                     'closeButton' => false,
@@ -184,7 +184,6 @@ HTML
 
         $result = ArrayHelper::merge($result, [
 
-            
 
             'name',
 
@@ -192,17 +191,17 @@ HTML
                 'class'   => HtmlBlock::class,
                 'content' => '<div style="display: block;">',
             ],
-            
+
             'value' => [
-                'class' => WidgetField::class,
-                'widgetClass' => YaMapDecodeInput::class,
+                'class'        => WidgetField::class,
+                'widgetClass'  => YaMapDecodeInput::class,
                 'widgetConfig' => [
-                    'modelLatitudeAttr' => 'latitude',
+                    'modelLatitudeAttr'  => 'latitude',
                     'modelLongitudeAttr' => 'longitude',
-                ]
+                ],
             ],
-            
-            
+
+
             [
                 'class'   => HtmlBlock::class,
                 'content' => '</div>',

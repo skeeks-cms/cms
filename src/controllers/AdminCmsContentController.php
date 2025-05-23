@@ -15,6 +15,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -32,14 +33,7 @@ class AdminCmsContentController extends BackendModelStandartController
         $this->modelClassName = CmsContent::class;
 
         $this->generateAccessActions = false;
-
-        $this->generateAccessActions = false;
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

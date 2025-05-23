@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
@@ -24,6 +25,7 @@ use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\modules\admin\widgets\ControllerActions;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\Skeeks;
+use skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\WidgetField;
 use Yii;
@@ -44,7 +46,8 @@ class AdminTreeController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = "Дерево страниц";
+        $this->name = "Разделы сайта";
+        $this->generateAccessActions = true;
         $this->modelShowAttribute = "name";
         $this->modelHeader = function () {
             $model = $this->model;
@@ -226,12 +229,16 @@ class AdminTreeController extends BackendModelStandartController
                 'isVisible' => false,
                 'name'      => "Сортировать подразделы",
                 'callback'  => [$this, 'actionResort'],
+                "generateAccess" => true,
             ],
+
+            
 
             "update" => [
                 'class'    => BackendModelUpdateAction::className(),
                 "callback" => [$this, 'update'],
                 "priority" => 100,
+                "generateAccess" => true,
             ],
 
             "properties" => [
@@ -261,7 +268,8 @@ class AdminTreeController extends BackendModelStandartController
                 'class'          => BackendModelUpdateAction::class,
                 "name"           => \Yii::t('skeeks/cms', 'Move'),
                 "icon"           => "fas fa-expand-arrows-alt",
-                "beforeContent"  => "Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p>",
+                "generateAccess" => true,
+                "beforeContent"  => "<div class='sx-block'>Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p></div>",
                 "successMessage" => "Раздел успешно перемещен",
 
                 'on initFormModels' => function (Event $e) {
@@ -313,6 +321,7 @@ class AdminTreeController extends BackendModelStandartController
                     } else {
                         throw new Exception(print_r($model->errors, true));
                     }
+                    
 
                 },
 
@@ -365,7 +374,15 @@ class AdminTreeController extends BackendModelStandartController
 
                 },
             ],
+            
+            "delete" => [
+                "generateAccess" => true,
+            ],
 
+            "log" => [
+                'class'    => BackendModelLogAction::class,
+                "generateAccess" => true,
+            ],
         ]);
 
 

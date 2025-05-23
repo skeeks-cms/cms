@@ -11,7 +11,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
-use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
@@ -22,9 +21,7 @@ use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HiddenField;
-use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -47,13 +44,7 @@ class AdminCmsSiteController extends BackendModelStandartController
         $this->modelClassName = \Yii::$app->skeeks->siteClass;
 
         $this->generateAccessActions = false;
-        
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -96,13 +87,13 @@ class AdminCmsSiteController extends BackendModelStandartController
 
 
                         'fields' => [
-                            'name'     => [
+                            'name' => [
                                 'isAllowChangeMode' => false,
                             ],
-                         
-                            'is_active'   => $bool,
-                            'is_default'      => $bool,
-                            'image_id' => [
+
+                            'is_active'  => $bool,
+                            'is_default' => $bool,
+                            'image_id'   => [
                                 'isAllowChangeMode' => true,
                                 'modes'             => [
                                     FilterModeNotEmpty::class,
@@ -138,7 +129,7 @@ class AdminCmsSiteController extends BackendModelStandartController
                 ],
 
                 "grid" => [
-                    'on init'       => function (Event $e) {
+                    'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
@@ -148,26 +139,26 @@ class AdminCmsSiteController extends BackendModelStandartController
 
                         $query->joinWith('cmsSiteDomains as cmsSiteDomains');
 
-                        $qCountDomains = CmsSiteDomain::find()->select(["total" => "count(*)"])->where(['cms_site_id' => new Expression(CmsSite::tableName() . ".id")]);
+                        $qCountDomains = CmsSiteDomain::find()->select(["total" => "count(*)"])->where(['cms_site_id' => new Expression(CmsSite::tableName().".id")]);
 
-                        $query->groupBy(CmsSite::tableName() . ".id");
+                        $query->groupBy(CmsSite::tableName().".id");
                         $query->select([
-                            CmsSite::tableName() . '.*',
-                            'countDomains' => $qCountDomains
+                            CmsSite::tableName().'.*',
+                            'countDomains' => $qCountDomains,
                         ]);
                     },
 
                     'sortAttributes' => [
                         'countDomains' => [
-                            'asc' => ['countDomains' => SORT_ASC],
-                            'desc' => ['countDomains' => SORT_DESC],
-                            'label' => 'Количество доменов',
-                            'default' => SORT_ASC
-                        ]
+                            'asc'     => ['countDomains' => SORT_ASC],
+                            'desc'    => ['countDomains' => SORT_DESC],
+                            'label'   => 'Количество доменов',
+                            'default' => SORT_ASC,
+                        ],
                     ],
-                    'defaultOrder' => [
+                    'defaultOrder'   => [
                         //'def' => SORT_DESC,
-                        'priority' => SORT_ASC
+                        'priority' => SORT_ASC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
@@ -182,22 +173,22 @@ class AdminCmsSiteController extends BackendModelStandartController
                         //'domains',
                     ],
                     'columns'        => [
-                        'custom'       => [
+                        'custom' => [
                             'attribute' => 'name',
-                            'format' => 'raw',
-                            'value' => function (CmsSite $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSite $model) {
 
                                 $data = [];
-                                $data[] = ($model->is_default ? '<span class="text-success" title="Сайт по умолчанию">✓</span> ' : '') . Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = ($model->is_default ? '<span class="text-success" title="Сайт по умолчанию">✓</span> ' : '').Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
 
                                 if ($model->cmsSiteMainDomain) {
                                     /*foreach ($model->cmsSiteDomains as $cmsSiteDomain)
                                     {*/
-                                        $data[] = Html::a($model->cmsSiteMainDomain->url, $model->cmsSiteMainDomain->url, [
-                                            'data-pjax' => '0',
-                                            'target' => '_blank',
-                                            'style' => 'color: #333; max-width: 200px;'
-                                        ]);
+                                    $data[] = Html::a($model->cmsSiteMainDomain->url, $model->cmsSiteMainDomain->url, [
+                                        'data-pjax' => '0',
+                                        'target'    => '_blank',
+                                        'style'     => 'color: #333; max-width: 200px;',
+                                    ]);
                                     //}
 
                                 }
@@ -207,49 +198,47 @@ class AdminCmsSiteController extends BackendModelStandartController
                                 return "<div class='row no-gutters'>
                                                 <div class='sx-trigger-action' style='width: 50px;'>
                                                 <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                    <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>" . $info . "</div></div>";
-
-                                            ;
-                            }
+                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
+                            },
                         ],
 
-                        'is_active'   => [
-                            'class' => BooleanColumn::class,
-                            'trueValue' => 1,
+                        'is_active'    => [
+                            'class'      => BooleanColumn::class,
+                            'trueValue'  => 1,
                             'falseValue' => 0,
                         ],
-                        'is_default'      => [
-                            'class' => BooleanColumn::class,
-                            'trueValue' => 1,
+                        'is_default'   => [
+                            'class'      => BooleanColumn::class,
+                            'trueValue'  => 1,
                             'falseValue' => 0,
                         ],
-                        'image_id' => [
+                        'image_id'     => [
                             'class' => ImageColumn2::class,
                         ],
                         'countDomains' => [
-                            'value' => function(CmsSite $cmsSite) {
+                            'value'     => function (CmsSite $cmsSite) {
                                 return $cmsSite->raw_row['countDomains'];
                             },
                             'attribute' => 'countDomains',
-                            'label' => 'Количество доменов'
+                            'label'     => 'Количество доменов',
                         ],
-                        'domains' => [
-                            'value' => function(CmsSite $cmsSite) {
-                                $result = ArrayHelper::map($cmsSite->cmsSiteDomains, "id", function($domain) {
+                        'domains'      => [
+                            'value'     => function (CmsSite $cmsSite) {
+                                $result = ArrayHelper::map($cmsSite->cmsSiteDomains, "id", function ($domain) {
                                     return Html::a($domain->domain, $domain->url, [
-                                        'target' => '_blank',
-                                        'data-pjax' => 0
+                                        'target'    => '_blank',
+                                        'data-pjax' => 0,
                                     ]);
                                 });
 
                                 return implode("<br />", $result);
                             },
                             'attribute' => 'countDomains',
-                            'format' => 'raw',
-                            'label' => 'Домены'
+                            'format'    => 'raw',
+                            'label'     => 'Домены',
                         ],
                     ],
                 ],
@@ -260,14 +249,14 @@ class AdminCmsSiteController extends BackendModelStandartController
             ],
 
             "domains" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Домены",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-site-domain",
                 'relation'        => ['cms_site_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -282,14 +271,14 @@ class AdminCmsSiteController extends BackendModelStandartController
             ],
 
             "emails" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Email-ы",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-site-email",
                 'relation'        => ['cms_site_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -304,14 +293,14 @@ class AdminCmsSiteController extends BackendModelStandartController
             ],
 
             "phones" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Телефоны",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-site-phone",
                 'relation'        => ['cms_site_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -327,14 +316,14 @@ class AdminCmsSiteController extends BackendModelStandartController
 
 
             "socials" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Социальные сети",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/cms/admin-cms-site-social",
                 'relation'        => ['cms_site_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -354,12 +343,12 @@ class AdminCmsSiteController extends BackendModelStandartController
             ],
 
             "activate-multi" => [
-                'class' => BackendModelMultiActivateAction::class,
+                'class'          => BackendModelMultiActivateAction::class,
                 'accessCallback' => true,
             ],
 
             "deactivate-multi" => [
-                'class' => BackendModelMultiDeactivateAction::class,
+                'class'          => BackendModelMultiDeactivateAction::class,
                 'accessCallback' => true,
             ],
         ]);
@@ -382,12 +371,12 @@ class AdminCmsSiteController extends BackendModelStandartController
 
         if ($action->model->is_default) {
             $active = [
-                'class'     => HiddenField::class,
-                'hint'      => \Yii::t('skeeks/cms', 'Site selected by default always active')
+                'class' => HiddenField::class,
+                'hint'  => \Yii::t('skeeks/cms', 'Site selected by default always active'),
             ];
             $def = [
-                'class'     => HiddenField::class,
-                'hint'      => \Yii::t('skeeks/cms', 'This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.')
+                'class' => HiddenField::class,
+                'hint'  => \Yii::t('skeeks/cms', 'This site is the site selected by default. If you want to change it, you need to choose a different site, the default site.'),
             ];
         }
 
@@ -402,8 +391,8 @@ class AdminCmsSiteController extends BackendModelStandartController
             ],
             'name',
             'internal_name',
-            'is_active'      => $active,
-            'is_default'         => $def,
+            'is_active'   => $active,
+            'is_default'  => $def,
             'description' => [
                 'class' => TextareaField::class,
             ],

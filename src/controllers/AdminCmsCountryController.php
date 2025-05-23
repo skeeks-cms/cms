@@ -39,15 +39,7 @@ class AdminCmsCountryController extends BackendModelStandartController
         $this->modelClassName = CmsCountry::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = CmsManager::PERMISSION_ADMIN_ACCESS;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
-        };
-
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

@@ -23,6 +23,7 @@ use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
@@ -51,13 +52,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
         $this->modelClassName = CmsContentProperty::class;
 
         $this->generateAccessActions = false;
-
-        /*$this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };*/
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

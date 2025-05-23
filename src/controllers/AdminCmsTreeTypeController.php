@@ -14,6 +14,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsTreeType;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -36,13 +37,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
         $this->modelClassName = CmsTreeType::className();
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -140,7 +135,7 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                                 return $model->raw_row['countCmsTrees'];
                             },
                         ],
-                        'is_active'        => [
+                        'is_active'     => [
                             'class' => BooleanColumn::class,
                         ],
                         'custom'        => [
@@ -184,9 +179,9 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                     'name',
                     'code',
                     'view_file',
-                    'is_active'                     => [
-                        'class'      => BoolField::class,
-                        'allowNull'  => false,
+                    'is_active'                  => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
                     'default_children_tree_type' => [
                         'class' => SelectField::class,
@@ -197,12 +192,12 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                 ],
             ],
 
-            'seo' => [
+            'seo'      => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/cms', 'SEO'),
                 'fields' => [
                     [
-                        'class' => HtmlBlock::class,
+                        'class'   => HtmlBlock::class,
                         'content' => <<<HTML
 <div class="col-12">
 <div class="alert alert-default" style="margin-top: 10px;">
@@ -233,16 +228,17 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
 </div>
 </div>
 HTML
+    ,
 
                     ],
-                    'meta_title_template' => [
-                        'class' => TextareaField::class
+                    'meta_title_template'       => [
+                        'class' => TextareaField::class,
                     ],
                     'meta_description_template' => [
-                        'class' => TextareaField::class
+                        'class' => TextareaField::class,
                     ],
-                    'meta_keywords_template' => [
-                        'class' => TextareaField::class
+                    'meta_keywords_template'    => [
+                        'class' => TextareaField::class,
                     ],
                 ],
             ],

@@ -11,7 +11,6 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserEmail;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\TextField;
 use yii\helpers\ArrayHelper;
@@ -33,7 +32,7 @@ class AdminUserEmailController extends BackendModelStandartController
 
         parent::init();
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -41,26 +40,28 @@ class AdminUserEmailController extends BackendModelStandartController
     {
         $actions = ArrayHelper::merge(parent::actions(), [
             "create" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'         => [$this, 'updateFields'],
                 'size'           => BackendAction::SIZE_SMALL,
-                "accessCallback" => function ($model) {
-            
+                'buttons'        => ['save'],
+                /*"accessCallback" => function ($model) {
+
                     $cmsUserEmail = new CmsUserEmail();
                     $cmsUserEmail->load(\Yii::$app->request->get());
-                    
+
                     if ($model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $cmsUserEmail->cmsUser]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $cmsUserEmail->cmsUser]);
                     }
-                    
+
                     return false;
-                },
+                },*/
             ],
             "update" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'         => [$this, 'updateFields'],
                 'size'           => BackendAction::SIZE_SMALL,
+                'buttons'        => ['save'],
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -68,7 +69,7 @@ class AdminUserEmailController extends BackendModelStandartController
             "delete" => [
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -85,38 +86,38 @@ class AdminUserEmailController extends BackendModelStandartController
 
         $result = [
             [
-                'class' => HtmlBlock::class,
-                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 500px;">'
+                'class'   => HtmlBlock::class,
+                'content' => '<div class="row no-gutters"><div class="col-12" style="max-width: 500px;">',
             ],
             'value' => [
-                'class' => TextField::class,
+                'class'          => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Email',
-                    'autocomplete' => 'off'
-                ]
+                    'placeholder'  => 'Email',
+                    'autocomplete' => 'off',
+                ],
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => '</div><div class="col-12" style="max-width: 500px;">'
+                'class'   => HtmlBlock::class,
+                'content' => '</div><div class="col-12" style="max-width: 500px;">',
             ],
-            'name' => [
-                'class' => TextField::class,
+            'name'  => [
+                'class'          => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Например рабочий email'
-                ]
+                    'placeholder' => 'Например рабочий email',
+                ],
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => '</div></div>'
+                'class'   => HtmlBlock::class,
+                'content' => '</div></div>',
             ],
             [
-                'class' => HtmlBlock::class,
-                'content' => '<div style="display: none;">'
+                'class'   => HtmlBlock::class,
+                'content' => '<div style="display: none;">',
             ],
             'cms_user_id',
             [
-                'class' => HtmlBlock::class,
-                'content' => '</div>'
+                'class'   => HtmlBlock::class,
+                'content' => '</div>',
             ],
 
         ];

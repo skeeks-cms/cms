@@ -8,18 +8,43 @@
 
 namespace skeeks\cms;
 
+use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsCompanyAddress;
+use skeeks\cms\models\CmsCompanyEmail;
+use skeeks\cms\models\CmsCompanyLink;
+use skeeks\cms\models\CmsCompanyPhone;
+use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsDeal;
+use skeeks\cms\models\CmsLog;
+use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
+use skeeks\cms\models\CmsTask;
+use skeeks\cms\models\CmsTree;
+use skeeks\cms\models\CmsUser;
+use skeeks\cms\models\CmsUserAddress;
+use skeeks\cms\models\CmsUserEmail;
+use skeeks\cms\models\CmsUserPhone;
+use skeeks\cms\models\CmsWebNotify;
+use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopBonusTransaction;
+use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopPayment;
+use yii\base\BootstrapInterface;
 use yii\base\Component;
+use yii\base\Event;
 use yii\caching\TagDependency;
 use yii\console\Application;
+use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
+ * @property array   $logTypes
  * @property CmsSite $site
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class Skeeks extends Component
+class Skeeks extends Component implements BootstrapInterface
 {
     /**
      * @var CmsSite
@@ -30,6 +55,293 @@ class Skeeks extends Component
      * @var string
      */
     public $siteClass = CmsSite::class;
+
+    /**
+     * @var array
+     */
+    public $_logTypes = [];
+
+    /**
+     * @var string[]
+     */
+    public $defaultLogTypes = [
+        CmsLog::LOG_TYPE_COMMENT => 'Комментарий',
+
+        CmsLog::LOG_TYPE_DELETE => 'Удаление',
+        CmsLog::LOG_TYPE_UPDATE => 'Обновление',
+        CmsLog::LOG_TYPE_INSERT => 'Создание',
+    ];
+
+    public function bootstrap($application)
+    {
+        //Уведомления для пользователей
+        Event::on(CmsLog::class, BaseActiveRecord::EVENT_AFTER_INSERT, function (Event $event) {
+            /**
+             * @var $sender CmsLog
+             */
+            $sender = $event->sender;
+
+            //Поставлена задача
+            if ($sender->log_type == CmsLog::LOG_TYPE_INSERT) {
+                if ($sender->model_code == CmsTask::class) {
+                    /**
+                     * @var $model CmsTask
+                     */
+                    $model = $sender->model;
+                    if ($model->executor_id && $model->executor_id != $model->created_by) {
+                        $notify = new CmsWebNotify();
+                        $notify->cms_user_id = $model->executor_id;
+                        $notify->name = "Вам поставлена новая задача";
+                        $notify->model_id = $sender->model_id;
+                        $notify->model_code = $sender->model_code;
+                        $notify->save();
+                    }
+                }
+            }
+
+            if ($sender->log_type == CmsLog::LOG_TYPE_UPDATE) {
+                if ($sender->model_code == CmsTask::class) {
+                    /**
+                     * @var $model CmsTask
+                     */
+                    $model = $sender->model;
+                    //Только если не сам себе ставил задачу
+                    if ($model->executor_id != $model->created_by) {
+
+                        $executor = ArrayHelper::getValue($sender->data, "executor_id.value");
+                        $status = ArrayHelper::getValue($sender->data, "status.value");
+                        $oldStatus = ArrayHelper::getValue($sender->data, "status.old_value");
+
+                        //У задачи поменялся исполнитель
+                        if ($executor) {
+                            $notify = new CmsWebNotify();
+                            $notify->cms_user_id = $executor;
+                            $notify->name = "Вам передали задачу";
+                            $notify->model_id = $sender->model_id;
+                            $notify->model_code = $sender->model_code;
+                            $notify->save();
+                        }
+                        //У задачи поменялся статус
+                        if ($status) {
+                            if ($status == CmsTask::STATUS_ON_CHECK) {
+                                $notify = new CmsWebNotify();
+                                $notify->cms_user_id = $model->created_by;
+                                $notify->name = "Вам необходимо проверить задачу";
+                                $notify->model_id = $sender->model_id;
+                                $notify->model_code = $sender->model_code;
+                                $notify->save();
+                            }
+
+                            /*if ($status == CmsTask::STATUS_READY) {
+                                $notify = new CmsWebNotify();
+                                $notify->cms_user_id = $model->created_by;
+                                $notify->name = "Ваша задача проверена";
+                                $notify->model_id = $sender->model_id;
+                                $notify->model_code = $sender->model_code;
+                                $notify->save();
+                            }*/
+
+                            if ($status == CmsTask::STATUS_CANCELED) {
+                                $notify = new CmsWebNotify();
+                                $notify->cms_user_id = $model->created_by;
+                                $notify->name = "Задача отменена";
+                                $notify->model_id = $sender->model_id;
+                                $notify->model_code = $sender->model_code;
+                                $notify->save();
+
+                                $notify = new CmsWebNotify();
+                                $notify->cms_user_id = $model->executor_id;
+                                $notify->name = "Задача отменена";
+                                $notify->model_id = $sender->model_id;
+                                $notify->model_code = $sender->model_code;
+                                $notify->save();
+                            }
+
+                            if ($status == CmsTask::STATUS_IN_WORK && $oldStatus == CmsTask::STATUS_ON_CHECK) {
+                                $notify = new CmsWebNotify();
+                                $notify->cms_user_id = $model->executor_id;
+                                $notify->name = "Задача возобновлена";
+                                $notify->model_id = $sender->model_id;
+                                $notify->model_code = $sender->model_code;
+                                $notify->save();
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+
+            //Добавлен комментарий
+            if ($sender->log_type == CmsLog::LOG_TYPE_COMMENT) {
+                //Комментарий к задаче
+                if ($sender->model_code == CmsTask::class) {
+                    /**
+                     * @var $model CmsTask
+                     */
+                    $model = $sender->model;
+
+                    $notify = new CmsWebNotify();
+
+                    $notify->cms_user_id = $model->executor_id;
+                    $notify->name = "Добавлен новый комментарий к задаче";
+                    $notify->model_id = $sender->model_id;
+                    $notify->model_code = $sender->model_code;
+
+                    $notify2 = clone $notify;
+
+                    $user_ids = [];
+
+                    if ($model->executor_id) {
+                        $user_ids[] = $model->executor_id;
+                    }
+
+                    if ($model->created_by) {
+                        $user_ids[] = $model->created_by;
+                    }
+
+                    $user_ids = array_unique($user_ids);
+                    if ($user_ids) {
+                        foreach ($user_ids as $id)
+                        {
+                            if ($id != \Yii::$app->user->id) {
+                                $notifyTmp = clone $notify;
+                                $notifyTmp->cms_user_id = $id;
+                                $notifyTmp->save();
+                            }
+                        }
+                    }
+
+
+                }
+            }
+        });
+    }
+
+
+    public $modelsConfig = [
+        CmsTree::class           => [
+            'name'       => 'Разделы',
+            'name_one'   => 'Раздел',
+            'controller' => 'cms/admin-tree',
+        ],
+
+
+
+
+        CmsCompany::class        => [
+            'name'       => 'Компании',
+            'name_one'   => 'Компания',
+            'controller' => 'cms/admin-cms-company',
+        ],
+        CmsCompanyEmail::class   => [
+            'name'       => 'Email-ы компаний',
+            'name_one'   => 'Email компании',
+            'controller' => 'cms/admin-cms-company-email',
+        ],
+        CmsCompanyPhone::class   => [
+            'name'       => 'Телефоны компаний',
+            'name_one'   => 'Телефон компании',
+            'controller' => 'cms/admin-cms-company-phone',
+        ],
+        CmsCompanyAddress::class => [
+            'name'       => 'Адреса компаний',
+            'name_one'   => 'Адрес компании',
+            'controller' => 'cms/admin-cms-company-address',
+        ],
+        CmsCompanyLink::class    => [
+            'name'       => 'Ссылки компаний',
+            'name_one'   => 'Ссылка компании',
+            'controller' => 'cms/admin-cms-company-link',
+        ],
+
+
+        CmsUser::class        => [
+            'name'       => 'Пользователи',
+            'name_one'   => 'Пользователь',
+            'controller' => 'cms/admin-user',
+        ],
+        CmsUserEmail::class   => [
+            'name'       => 'Email-ы клиентов',
+            'name_one'   => 'Email клиента',
+            'controller' => 'cms/admin-user-email',
+        ],
+        CmsUserPhone::class   => [
+            'name'       => 'Телефоны клиентов',
+            'name_one'   => 'Телефон клиента',
+            'controller' => 'cms/admin-user-phone',
+        ],
+        CmsUserAddress::class => [
+            'name'       => 'Адреса клиентов',
+            'name_one'   => 'Адрес клиента',
+            'controller' => 'cms/admin-user-address',
+        ],
+
+
+
+
+        CmsDeal::class           => [
+            'name'       => 'Сделки',
+            'name_one'   => 'Сделка',
+            'controller' => 'cms/admin-cms-deal',
+        ],
+        CmsProject::class        => [
+            'name'       => 'Проекты',
+            'name_one'   => 'Проект',
+            'controller' => 'cms/admin-cms-project',
+        ],
+        CmsTask::class        => [
+            'name'       => 'Задачи',
+            'name_one'   => 'Задача',
+            'controller' => 'cms/admin-cms-task',
+        ],
+
+        ShopBill::class        => [
+            'name'       => 'Счета',
+            'name_one'   => 'Счет',
+            'controller' => 'cms/admin-cms-bill',
+        ],
+        ShopPayment::class        => [
+            'name'       => 'Платежи',
+            'name_one'   => 'Платеж',
+            'controller' => 'shop/admin-payment',
+        ],
+        ShopBonusTransaction::class        => [
+            'name'       => 'Бонусы',
+            'name_one'   => 'Бонус',
+            'controller' => 'shop/admin-bonus-transaction',
+        ],
+
+
+        CmsContentElement::class        => [
+            'name'       => 'Контент',
+            'name_one'   => 'Контент',
+            'controller' => 'cms/admin-cms-content-element',
+        ],
+        ShopCmsContentElement::class        => [
+            'name'       => 'Товары',
+            'name_one'   => 'Товар',
+            'controller' => 'shop/admin-cms-content-element',
+        ],
+    ];
+
+    /**
+     * @return array
+     */
+    public function setLogTypes(array $logTypes)
+    {
+        $this->_logTypes = ArrayHelper::merge((array)$this->_logTypes, (array)$logTypes);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLogTypes()
+    {
+        return ArrayHelper::merge((array)$this->defaultLogTypes, (array)$this->_logTypes);
+    }
 
     /**
      * @var null
@@ -60,12 +372,11 @@ class Skeeks extends Component
                     }
                 }
 
-                
 
             } else {
                 $this->_serverName = \Yii::$app->getRequest()->getServerName();
                 $dependencySiteDomain = new TagDependency([
-                'tags' => [
+                    'tags' => [
                         (new CmsSiteDomain())->getTableCacheTag(),
                     ],
                 ]);
@@ -107,8 +418,8 @@ class Skeeks extends Component
                     );
                 }
             }
-            
-            
+
+
         }
 
         if (\Yii::$app instanceof Application) {

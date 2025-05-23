@@ -35,16 +35,36 @@ $qTree = \skeeks\cms\models\CmsTree::find()->from([
     ->select([
         'count'        => new \yii\db\Expression("count(1)"),
     ]);
+
+$qCollection = \skeeks\cms\shop\models\ShopCollection::find()->from([
+        't' => \skeeks\cms\shop\models\ShopCollection::tableName(),
+    ])
+    ->andWhere(['t.created_by' => $model->id])
+    ->select([
+        'count'        => new \yii\db\Expression("count(1)"),
+    ]);
+
+$qBrand = \skeeks\cms\shop\models\ShopBrand::find()->from([
+        't' => \skeeks\cms\shop\models\ShopBrand::tableName(),
+    ])
+    ->andWhere(['t.created_by' => $model->id])
+    ->select([
+        'count'        => new \yii\db\Expression("count(1)"),
+    ]);
     
 if ($dm->from) {
     $start = strtotime($dm->from . " 00:00:00");
     $q->andWhere(['>=', 'c.created_at', $start]);
     $qTree->andWhere(['>=', 't.created_at', $start]);
+    $qCollection->andWhere(['>=', 't.created_at', $start]);
+    $qBrand->andWhere(['>=', 't.created_at', $start]);
 }
 if ($dm->to) {
     $to = strtotime($dm->to . " 23:59:59");
     $q->andWhere(['<=', 'c.created_at', $to]);
     $qTree->andWhere(['<=', 't.created_at', $to]);
+    $qCollection->andWhere(['<=', 't.created_at', $to]);
+    $qBrand->andWhere(['<=', 't.created_at', $to]);
 }
 
 $all = $q
@@ -52,6 +72,14 @@ $all = $q
     ->all();
 
 $allTree = $qTree
+    ->asArray()
+    ->all();
+
+$allCollection = $qCollection
+    ->asArray()
+    ->all();
+
+$allBrand = $qBrand
     ->asArray()
     ->all();
 
@@ -84,6 +112,22 @@ $allTree = $qTree
             <?php foreach ($allTree as $data) : ?>
                 <div>
                     Разделов добавлено: <b><?php echo $data['count']; ?></b>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if ($allCollection) : ?>
+            <?php foreach ($allCollection as $data) : ?>
+                <div>
+                    Коллекции: <b><?php echo $data['count']; ?></b>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if ($allBrand) : ?>
+            <?php foreach ($allBrand as $data) : ?>
+                <div>
+                    Бренды: <b><?php echo $data['count']; ?></b>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>

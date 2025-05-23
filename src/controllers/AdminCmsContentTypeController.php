@@ -13,6 +13,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -29,14 +30,7 @@ class AdminCmsContentTypeController extends BackendModelStandartController
         $this->modelClassName = CmsContentType::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-content';
-        
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->permissionName);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

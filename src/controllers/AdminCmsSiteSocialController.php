@@ -9,9 +9,8 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\models\CmsSiteEmail;
-use skeeks\cms\models\CmsSitePhone;
 use skeeks\cms\models\CmsSiteSocial;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
@@ -33,7 +32,7 @@ class AdminCmsSiteSocialController extends BackendModelStandartController
         $this->modelClassName = CmsSiteSocial::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-site-social';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -125,12 +124,12 @@ HTML
         $result = [
             'social_type' => [
                 'class' => SelectField::class,
-                'items' => CmsSiteSocial::getSocialTypes()
+                'items' => CmsSiteSocial::getSocialTypes(),
             ],
             'url',
             'name',
-            'priority' => [
-                'class' => NumberField::class
+            'priority'    => [
+                'class' => NumberField::class,
             ],
         ];
 

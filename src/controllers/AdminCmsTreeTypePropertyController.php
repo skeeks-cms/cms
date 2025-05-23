@@ -16,6 +16,7 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\yii2\form\Element;
 use skeeks\yii2\form\fields\BoolField;
@@ -42,13 +43,7 @@ class AdminCmsTreeTypePropertyController extends BackendModelStandartController
         $this->modelClassName = CmsTreeTypeProperty::className();
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

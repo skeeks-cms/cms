@@ -31,15 +31,24 @@ $class = 'g-brd-gray-light-v4';
                 'style'       => 'border: 0;',
             ],
         ]); ?>
+        <? if ($cmsUser->image) : ?>
             <img src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($cmsUser->image ? $cmsUser->image->src : \skeeks\cms\helpers\Image::getCapSrc(),
                 new \skeeks\cms\components\imaging\filters\Thumbnail([
                     'h' => $widget->prviewImageSize,
                     'w' => $widget->prviewImageSize,
+                    'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
                 ])); ?>" alt=""
-                 class="sx-photo <?= $class; ?> sx-img-size-<?= $widget->prviewImageSize; ?>"
+                 class="sx-photo <?= $class; ?> sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>"
                  data-toggle="tooltip"
                  data-html="true"
             >
+        <? else : ?>
+            <div class="sx-no-photo g-brd-gray-light-v4 sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>">
+                <?= \skeeks\cms\helpers\StringHelper::strtoupper(
+                    \skeeks\cms\helpers\StringHelper::substr($cmsUser->shortDisplayNameWithAlias, 0, 2)
+                ); ?>
+            </div>
+        <? endif; ?>
         <?php $w::end(); ?>
     </div>
 

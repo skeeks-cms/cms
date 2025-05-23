@@ -24,7 +24,6 @@ $(function() {
     var jInputWrapper = $("#" + wrapperId);
     var jInput = $("input", jInputWrapper);
     
-    console.log(jInput);
     
   jInput.daterangepicker({
       autoUpdateInput: false,

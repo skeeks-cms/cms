@@ -15,12 +15,14 @@ use paulzi\adjacencyList\AdjacencyListBehavior;
 use paulzi\autotree\AutoTreeTrait;
 use paulzi\materializedPath\MaterializedPathBehavior;
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\components\Cms;
 use skeeks\cms\components\urlRules\UrlRuleTree;
 use skeeks\cms\models\behaviors\CanBeLinkedToTree;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\behaviors\traits\TreeBehaviorTrait;
 use skeeks\cms\models\behaviors\TreeBehavior;
@@ -143,6 +145,7 @@ class Tree extends ActiveRecord
 {
     use HasRelatedPropertiesTrait;
     use AutoTreeTrait;
+    use HasLogTrait;
 
     /**
      * @inheritdoc
@@ -150,6 +153,14 @@ class Tree extends ActiveRecord
     public static function tableName()
     {
         return '{{%cms_tree}}';
+    }
+
+    /**
+     * @return string
+     */
+    public function getSkeeksModelCode()
+    {
+        return CmsTree::class;
     }
 
     const PRIORITY_STEP = 100; //Шаг приоритета
@@ -203,6 +214,17 @@ class Tree extends ActiveRecord
                 'depthAttribute' => 'level',
                 'sortable'       => [
                     'sortAttribute' => 'priority',
+                ],
+            ],
+
+            CmsLogBehavior::class     => [
+                'class' => CmsLogBehavior::class,
+                'no_log_fields' => [
+                    'description_short_type',
+                    'description_full_type',
+                ],
+                'relation_map' => [
+                    'tree_type_id' => 'treeType',
                 ],
             ],
         ]);
@@ -358,6 +380,11 @@ class Tree extends ActiveRecord
 
             'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
             'is_index' => Yii::t('skeeks/cms', 'Страница индексируется?'),
+
+            'dir' => Yii::t('skeeks/cms', 'Дирректория'),
+            'level' => Yii::t('skeeks/cms', 'Уровень вложенности'),
+            'pids' => Yii::t('skeeks/cms', 'Родительские разделы'),
+            'pid' => Yii::t('skeeks/cms', 'Родительский раздел'),
 
         ]);
     }

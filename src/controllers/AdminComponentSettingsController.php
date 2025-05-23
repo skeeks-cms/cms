@@ -11,17 +11,13 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\THasActiveForm;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\base\Component;
-use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsComponentSettings;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\User;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use yii\base\ActionEvent;
-use yii\base\Theme;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\UserException;
 use yii\helpers\ArrayHelper;
-use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 /**
@@ -37,8 +33,10 @@ class AdminComponentSettingsController extends BackendController
     public function init()
     {
         $this->name = "Управление настройками компонентов";
+
         $this->generateAccessActions = false;
-        $this->permissionName = "cms/admin-settings";
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+
         parent::init();
     }
 

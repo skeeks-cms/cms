@@ -8,8 +8,11 @@
 
 namespace skeeks\cms\models\queries;
 
+use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContractor;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\rbac\CmsManager;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -110,6 +113,48 @@ class CmsContractorQuery extends CmsActiveQuery
     public function our($value = 1)
     {
         return $this->andWhere(['is_our' => (int) $value]);
+    }
+
+    /**
+     * Поиск компаний доступных пользователю
+     *
+     * @param User|null $user
+     * @return $this
+     */
+    public function forManager(User $user = null)
+    {
+        if ($user === null) {
+            $user = \Yii::$app->user->identity;
+            $isCanAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        } else {
+            $isCanAdmin = \Yii::$app->authManager->checkAccess($user->id, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        }
+
+        if (!$user) {
+            return $this;
+        }
+
+
+        //Если нет прав админа, нужно показать только доступные сделки
+        if (!$isCanAdmin) {
+
+            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id');
+            $cmsUserQuery = CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id');
+
+            $this->joinWith("users as users");
+            $this->joinWith("companies as companies");
+
+            //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
+            $this->andWhere([
+                'or',
+                //Связь клиентов с менеджерами
+                ["companies.id" => $cmsCompanyQuery],
+                //Искать конткты по всем доступным компаниям
+                ["users.id" => $cmsUserQuery],
+            ]);
+        }
+
+        return $this;
     }
 
 

@@ -8,7 +8,9 @@
 
 namespace skeeks\cms\models;
 
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\helpers\StringHelper;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
@@ -36,6 +38,7 @@ use yii\helpers\Url;
  */
 class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
 {
+    use HasLogTrait;
     /**
      * @inheritdoc
      */
@@ -44,13 +47,15 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
         return '{{%cms_user_email}}';
     }
 
-    /**
-     * @return \skeeks\cms\query\CmsActiveQuery
-     */
-    /*public static function find()
+    public function behaviors()
     {
-        return static::find()->cmsSite();
-    }*/
+        return ArrayHelper::merge(parent::behaviors(), [
+            CmsLogBehavior::class => [
+                'class'           => CmsLogBehavior::class,
+                'parent_relation' => 'cmsUser',
+            ],
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -176,5 +181,13 @@ class CmsUserEmail extends \skeeks\cms\base\ActiveRecord
     public function getApproveUrl($scheme = true)
     {
         return Url::to(['/cms/auth/approve-email', 'token' => $this->approved_key], $scheme);
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        return $this->value;
     }
 }

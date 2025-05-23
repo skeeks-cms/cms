@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -39,14 +40,7 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
         $this->modelClassName = CmsContentPropertyEnum::class;
 
         $this->generateAccessActions = false;
-
-        //$this->generateAccessActions = false;
-        /*$this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };*/
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

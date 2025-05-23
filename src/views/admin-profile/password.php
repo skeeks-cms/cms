@@ -91,7 +91,7 @@ JS
 );
 
 ?>
-<h1>Смена пароля</h1>
+<!--<h1>Смена пароля</h1>-->
 <div class="row">
     <div class="col-12" style="max-width: 50rem;">
 

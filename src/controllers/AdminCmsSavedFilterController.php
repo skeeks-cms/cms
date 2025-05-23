@@ -22,7 +22,7 @@ use skeeks\cms\queryfilters\filters\FilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
-use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
+use skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
@@ -46,6 +46,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
         $this->modelClassName = CmsSavedFilter::class;
 
         $this->generateAccessActions = false;
+        $this->permissionName = "cms/admin-cms-saved-filter";
 
         parent::init();
     }

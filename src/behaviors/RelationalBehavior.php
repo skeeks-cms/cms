@@ -10,6 +10,7 @@
 
 namespace skeeks\cms\behaviors;
 
+use skeeks\cms\models\CmsCompany;
 use yii\base\Behavior;
 use yii\base\ErrorException;
 use yii\base\BaseObject;
@@ -27,6 +28,9 @@ class RelationalBehavior extends Behavior
      * @var ActiveRecord
      */
     public $owner;
+    /**
+     * @var array обновлять только указанные связи
+     */
     public $relationNames = [];
 
     public function attach($owner)
@@ -47,6 +51,8 @@ class RelationalBehavior extends Behavior
         return [
             ActiveRecord::EVENT_AFTER_INSERT => 'saveRelations',
             ActiveRecord::EVENT_AFTER_UPDATE => 'saveRelations',
+
+            /*ActiveRecord::EVENT_BEFORE_UPDATE => 'beforeSaveRelations',*/
         ];
     }
 
@@ -59,8 +65,31 @@ class RelationalBehavior extends Behavior
         return parent::canSetProperty($name, $checkVars);
     }
 
+    private $_oldRelations = [];
+    private $_changedRelations = [];
+
+    public function getOldRelations()
+    {
+        return $this->_oldRelations;
+    }
+    public function getChangedRelations()
+    {
+        return $this->_changedRelations;
+    }
+
     public function __set($name, $value)
     {
+        //Если указаны определенные связи с которыми идет работа, то проверяем
+        if ($this->relationNames && !in_array($name, $this->relationNames)) {
+            return;
+        }
+
+        //Перед установкой новых значений зафиксировать старые
+        if (!isset($this->_oldRelations[$name])) {
+            $oldModels = $this->owner->{$name};
+            $this->_oldRelations[$name] = $oldModels;
+        }
+
         if ($value == '') {
             $this->owner->populateRelation($name, []);
             return;
@@ -72,7 +101,6 @@ class RelationalBehavior extends Behavior
             {
                 if (!($val instanceof BaseObject)) {
                     $first = true;
-                    
                 }
                 
                 break;
@@ -80,10 +108,6 @@ class RelationalBehavior extends Behavior
         }
 
         if ($first || !is_array($value) && !($value instanceof BaseObject)) {
-
-        /*if (is_array($value) && count($value) > 0 && !($value[0] instanceof BaseObject) ||
-            !is_array($value) && !($value instanceof BaseObject)
-        ) {*/
             $getter = 'get' . $name;
             /** @var ActiveQuery $query */
             $query = $this->owner->$getter();
@@ -91,6 +115,7 @@ class RelationalBehavior extends Behavior
             $modelClass = $query->modelClass;
             $value = $modelClass::findAll($value);
         }
+
         $this->owner->populateRelation($name, $value);
     }
 
@@ -106,6 +131,9 @@ class RelationalBehavior extends Behavior
                 continue;
             }
 
+            //Необходимо проверить изменились ли записи сравнить $relationRecords с $this->_oldRelations
+            $oldRelationRecords = (array) ArrayHelper::getValue($this->_oldRelations, $relationName);
+
             $activeQuery = $model->getRelation($relationName);
             if (!empty($activeQuery->via)) { // works only for many-to-many relation
                 /* @var $viaQuery ActiveQuery */
@@ -120,13 +148,40 @@ class RelationalBehavior extends Behavior
                 $primaryModelColumn = array_keys($viaQuery->link)[0];
                 $relatedModelColumn = reset($activeQuery->link);
                 $junctionRows = [];
-                $relationPks = ArrayHelper::getColumn($relationRecords, array_keys($activeQuery->link)[0], false);
+
+                $relationPks = (array) ArrayHelper::getColumn($relationRecords, array_keys($activeQuery->link)[0], false);
+                $oldRelationPks = (array) ArrayHelper::getColumn($oldRelationRecords, array_keys($activeQuery->link)[0], false);
+
+                asort($relationPks);
+                asort($oldRelationPks);
+
+                $isChange = false;
+                if (array_diff($relationPks, $oldRelationPks) || array_diff($oldRelationPks, $relationPks)) {
+                    $isChange = true;
+                }
+                //Проверить а вообще что либо изменилось ли?
+                /*if ($model instanceof CmsCompany) {
+                    print_r("-----------");
+                    print_r($oldRelationPks);
+                    print_r($relationPks);
+                    var_dump($isChange);
+                }*/
+
+                if ($isChange === false) {
+                    continue;
+                }
+
+
                 $passedRecords = count($relationPks);
                 $relationPks = array_filter($relationPks);
                 $savedRecords = count($relationPks);
+
                 if ($passedRecords != $savedRecords) {
                     throw new ErrorException(\Yii::t('skeeks/cms', 'All relation records must be saved'));
                 }
+
+                $this->_changedRelations[$relationName] = $relationPks;
+
                 foreach ($relationPks as $relationPk) {
                     $junctionRows[] = [$model->primaryKey, $relationPk];
                 }

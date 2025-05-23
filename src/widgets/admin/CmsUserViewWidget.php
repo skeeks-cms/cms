@@ -48,6 +48,8 @@ class CmsUserViewWidget extends Widget
      */
     public $prviewImageSize = 50;
 
+    public $isSmall = false;
+
     public function run()
     {
         if ($this->cmsUser) {

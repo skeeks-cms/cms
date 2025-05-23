@@ -15,6 +15,7 @@ use skeeks\cms\admin\AdminController;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\sx\Dir;
 use yii\helpers\ArrayHelper;
 
@@ -28,12 +29,7 @@ class AdminClearController extends AdminController
         $this->name = \Yii::t('skeeks/cms', "Deleting temporary files");
 
         $this->generateAccessActions = false;
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

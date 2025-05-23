@@ -25,7 +25,9 @@ $controller = $this->context;
     <? if ($model->image) : ?>
         <div class="col my-auto" style="max-width: 60px">
             <img style="border: 2px solid #ededed; border-radius: 50%;" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
-                new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
+                new \skeeks\cms\components\imaging\filters\Thumbnail([
+                    'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
+                ])); ?>"/>
         </div>
     <? endif; ?>
     <div class="col my-auto">
@@ -62,8 +64,8 @@ $controller = $this->context;
 
             <div class="col my-auto">
 
-        <span>
-            <?
+                <!--<span>
+            <? /*
 
             $actionData = \yii\helpers\Json::encode([
                 "isOpenNewWindow" => true,
@@ -73,15 +75,15 @@ $controller = $this->context;
                     'pk' => $model->id,
                 ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
             ]);
-            ?>
+            */ ?>
 
-            <a href="#" class="btn btn-default" onclick='<?= new \yii\web\JsExpression(<<<JS
+            <a href="#" class="btn btn-default" onclick='<? /*= new \yii\web\JsExpression(<<<JS
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
-            ); ?>' title="Редактировать основную информацию: фото, активность, имя, фамилия и т.д." data-toggle="tooltip">
+            ); */ ?>' title="Редактировать основную информацию: фото, активность, имя, фамилия и т.д." data-toggle="tooltip">
                 <i class="fas fa-pencil-alt"></i>
             </a>
-</span>
+</span>-->
 
                 <span>
             <?

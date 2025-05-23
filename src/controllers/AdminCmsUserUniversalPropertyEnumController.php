@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
@@ -28,13 +29,7 @@ class AdminCmsUserUniversalPropertyEnumController extends BackendModelStandartCo
         $this->modelClassName = CmsUserUniversalPropertyEnum::class;
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

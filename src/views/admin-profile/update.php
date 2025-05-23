@@ -8,7 +8,7 @@
 /* @var $this \yii\web\View */
 /* @var \yii\web\User $model */
 ?>
-<h1>Личные данные</h1>
+<!--<h1>Личные данные</h1>-->
 
 <div class="row">
     <div class="col-12" style="max-width: 50rem;">

@@ -333,6 +333,9 @@ class AjaxController extends Controller
         if ($q = \Yii::$app->request->get('q')) {
             $query->search($q);
         }
+        if ($brand_id = \Yii::$app->request->get('brand_id')) {
+            $query->andWhere(['shop_brand_id' => $brand_id]);
+        }
 
         $data = $query->limit(100)
             ->all();
@@ -353,7 +356,111 @@ class AjaxController extends Controller
         return ['results' => $result];
     }
     
-    
+    public function actionWebNotifiesNew() {
+        $rr = new RequestResponse();
+        $rr->success = true;
+
+        if (\Yii::$app->user->isGuest) {
+            $rr->data = [
+                'total' => 0,
+                'items' => [],
+            ];
+
+            return $rr;
+        }
+
+        $qNotifies = \Yii::$app->user->identity->getCmsWebNotifies()->notRead()->limit(3);
+
+        if ($last_notify_id = (int) \Yii::$app->request->post("last_notify_id")) {
+            $qNotifies->andWhere(['>', 'id', $last_notify_id]);
+        }
+
+        $qNotifiesNotPopups = $qNotifies->all();
+        $qNotifiesNotPopupsArray = [];
+
+        if ($qNotifiesNotPopups) {
+            /**
+             * @var \skeeks\cms\models\CmsWebNotify[] $qNotifiesNotPopups
+             */
+            foreach ($qNotifiesNotPopups as $qNotifiesNotPopup)
+            {
+                $qNotifiesNotPopupsArray[] = \yii\helpers\ArrayHelper::merge(['render' => $qNotifiesNotPopup->getHtml()], $qNotifiesNotPopup->toArray());
+            }
+        }
+
+        $rr->data = [
+            'total' => \Yii::$app->user->identity->getCmsWebNotifies()->notRead()->count(),
+            'items' => $qNotifiesNotPopupsArray,
+        ];
+
+        return $rr;
+    }
+    public function actionWebNotifiesClear() {
+        $rr = new RequestResponse();
+        $rr->success = true;
+
+        if (\Yii::$app->user->isGuest) {
+
+            return $rr;
+        }
+
+        $qNotifies = \Yii::$app->user->identity->getCmsWebNotifies();
+
+        if ($qNotifies->count()) {
+            /**
+             * @var \skeeks\cms\models\CmsWebNotify[] $qNotifiesNotPopups
+             */
+            foreach ($qNotifies->each(10) as $qNotifiesNotPopup)
+            {
+                $qNotifiesNotPopup->delete();
+            }
+        }
+
+        return $rr;
+    }
+
+    public function actionWebNotifies()
+    {
+        $rr = new RequestResponse();
+        $rr->success = true;
+
+        if (\Yii::$app->user->isGuest) {
+            $rr->data = [
+                'total' => 0,
+                'items' => [],
+            ];
+
+            return $rr;
+        }
+
+
+        $qNotifiesAll = \Yii::$app->user->identity->getCmsWebNotifies()->orderBy(['is_read' => SORT_ASC, 'created_at' => SORT_DESC])->limit(40);
+
+        $qNotifiesNotPopupsArray = [];
+        $qNotifiesNotPopups = $qNotifiesAll->all();
+
+        if ($qNotifiesNotPopups) {
+            /**
+             * @var \skeeks\cms\models\CmsWebNotify[] $qNotifiesNotPopups
+             */
+            foreach ($qNotifiesNotPopups as $qNotifiesNotPopup)
+            {
+                $qNotifiesNotPopupsArray[] = \yii\helpers\ArrayHelper::merge(['render' => $qNotifiesNotPopup->getHtml()], $qNotifiesNotPopup->toArray());
+
+                $qNotifiesNotPopup->is_read = 1;
+                $qNotifiesNotPopup->update(false, ['is_read']);
+            }
+        }
+
+        $qNotifies = \Yii::$app->user->identity->getCmsWebNotifies()->notRead();
+
+        $rr->data = [
+            'total' => $qNotifies->count(),
+            'items' => $qNotifiesNotPopupsArray,
+        ];
+
+        return $rr;
+    }
 
     /**
      * @return array

@@ -8,7 +8,7 @@
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\widgets\tree\CmsTreeWidget */
 /* @var $model \skeeks\cms\models\CmsTree */
-/* @var $selectTreeInputWidget \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget */
+/* @var $selectTreeInputWidget \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget */
 $widget = $this->context;
 $selectTreeInputWidget = \yii\helpers\ArrayHelper::getValue($widget->contextData, 'selectTreeInputWidget');
 ?>

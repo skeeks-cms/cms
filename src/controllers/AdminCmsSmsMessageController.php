@@ -18,6 +18,7 @@ use skeeks\cms\models\CmsSiteSocial;
 use skeeks\cms\models\CmsSmsMessage;
 use skeeks\cms\models\CmsSmsProvider;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -43,7 +44,7 @@ class AdminCmsSmsMessageController extends BackendModelStandartController
         $this->modelClassName = CmsSmsMessage::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-settings';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

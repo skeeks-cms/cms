@@ -9,7 +9,9 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -40,6 +42,7 @@ use yii\helpers\ArrayHelper;
  */
 class CmsUserAddress extends ActiveRecord
 {
+    use HasLogTrait;
     /**
      * @inheritdoc
      */
@@ -57,6 +60,10 @@ class CmsUserAddress extends ActiveRecord
             HasStorageFile::class => [
                 'class'  => HasStorageFile::class,
                 'fields' => ['cms_image_id'],
+            ],
+            CmsLogBehavior::class => [
+                'class'           => CmsLogBehavior::class,
+                'parent_relation' => 'cmsUser',
             ],
         ]);
     }
@@ -190,5 +197,13 @@ class CmsUserAddress extends ActiveRecord
     public function getCmsSite()
     {
         return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        return $this->value;
     }
 }

@@ -13,23 +13,17 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCallcheckProvider;
-use skeeks\cms\models\CmsSiteEmail;
-use skeeks\cms\models\CmsSitePhone;
-use skeeks\cms\models\CmsSiteSocial;
-use skeeks\cms\models\CmsSmsProvider;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\bootstrap\Alert;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -43,7 +37,7 @@ class AdminCmsCallcheckProviderController extends BackendModelStandartController
         $this->modelClassName = CmsCallcheckProvider::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-settings';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -97,21 +91,21 @@ HTML
                         'is_main',
                     ],
                     'columns'        => [
-                        'custom' => [
+                        'custom'  => [
                             'attribute' => 'name',
                             'format'    => "raw",
-                            'class' => DefaultActionColumn::class
+                            'class'     => DefaultActionColumn::class,
                         ],
                         'is_main' => [
-                            'class' => BooleanColumn::class,
-                            'trueValue' => true,
+                            'class'      => BooleanColumn::class,
+                            'trueValue'  => true,
                             'falseValue' => false,
                         ],
                     ],
                 ],
             ],
             "create" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'        => [$this, 'updateFields'],
                 'on beforeSave' => function (Event $e) {
                     /**
                      * @var $action BackendModelUpdateAction;
@@ -135,7 +129,7 @@ HTML
                 },
             ],
             "update" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'        => [$this, 'updateFields'],
                 'on beforeSave' => function (Event $e) {
                     /**
                      * @var $action BackendModelUpdateAction;
@@ -206,8 +200,8 @@ CSS
 
 
                     'component' => [
-                        'class'   => SelectField::class,
-                        'items'   => \Yii::$app->cms->getCallcheckHandlersForSelect(),
+                        'class'          => SelectField::class,
+                        'items'          => \Yii::$app->cms->getCallcheckHandlersForSelect(),
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
                         ],
@@ -222,8 +216,8 @@ CSS
                 'handler' => [
                     'class'  => FieldSet::class,
                     'name'   => "Настройки обработчика",
-                    'fields' => $handlerFields
-                ]
+                    'fields' => $handlerFields,
+                ],
             ]);
         }
 

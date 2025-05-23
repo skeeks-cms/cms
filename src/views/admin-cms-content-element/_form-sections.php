@@ -39,7 +39,7 @@
 
     <?php if ($rootTreeModels) : ?>
         <?= $form->field($model, 'treeIds')->widget(
-            \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+            \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::class,
             [
                 'options'           => [
                     //'data-form-reload' => 'true'

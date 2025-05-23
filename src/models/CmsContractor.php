@@ -7,6 +7,7 @@ use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\queries\CmsContractorQuery;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\validators\PhoneValidator;
 use skeeks\yii2\dadataClient\models\PartyModel;
 use yii\helpers\ArrayHelper;
@@ -14,46 +15,57 @@ use yii\validators\EmailValidator;
 /**
  * This is the model class for table "cms_contractor".
  *
- * @property int            $id
- * @property int|null       $created_by
- * @property int|null       $updated_by
- * @property int|null       $created_at
- * @property int|null       $updated_at
- * @property int            $cms_site_id
- * @property string         $contractor_type Тип контрагента (Ип, Юр, Физ лицо)
- * @property string|null    $name Название
- * @property string|null    $full_name Полное название
- * @property string|null    $international_name Интернациональное название
- * @property string|null    $first_name
- * @property string|null    $last_name
- * @property string|null    $patronymic
- * @property string         $inn ИНН
- * @property string|null    $ogrn ОГРН
- * @property string|null    $kpp КПП
- * @property string|null    $okpo ОКПО
- * @property string|null    $address Адрес организации
- * @property string|null    $mailing_address Почтовый адрес (для отправки писем)
- * @property string|null    $mailing_postcode Почтовый индекс
- * @property int|null       $cms_image_id Фото
- * @property int|null       $stamp_id Печать
- * @property int|null       $director_signature_id Подпись директора
- * @property int|null       $signature_accountant_id Подпись гл. бухгалтера
- * @property int            $is_our Это наш контрагент?
- * @property string         $description Описание
- * @property string         $phone Телефон
- * @property string         $email Email
+ * @property int                 $id
+ * @property int|null            $created_by
+ * @property int|null            $updated_by
+ * @property int|null            $created_at
+ * @property int|null            $updated_at
+ * @property int                 $cms_site_id
+ * @property string              $contractor_type Тип контрагента (Ип, Юр, Физ лицо)
+ * @property string|null         $name Название
+ * @property string|null         $full_name Полное название
+ * @property string|null         $international_name Интернациональное название
+ * @property string|null         $first_name
+ * @property string|null         $last_name
+ * @property string|null         $patronymic
+ * @property string              $inn ИНН
+ * @property string|null         $ogrn ОГРН
+ * @property string|null         $kpp КПП
+ * @property string|null         $okpo ОКПО
+ * @property string|null         $address Адрес организации
+ * @property string|null         $mailing_address Почтовый адрес (для отправки писем)
+ * @property string|null         $mailing_postcode Почтовый индекс
+ * @property int|null            $cms_image_id Фото
+ * @property int|null            $stamp_id Печать
+ * @property int|null            $director_signature_id Подпись директора
+ * @property int|null            $signature_accountant_id Подпись гл. бухгалтера
+ * @property int                 $is_our Это наш контрагент?
+ * @property string              $description Описание
+ * @property string              $phone Телефон
+ * @property string              $email Email
  *
- * @property CmsStorageFile $cmsImage
- * @property CmsSite        $cmsSite
- * @property CmsStorageFile $directorSignature
- * @property CmsStorageFile $signatureAccountant
- * @property CmsStorageFile $stamp
+ * @property string              $asShortText
+ *
+ * @property CmsStorageFile      $cmsImage
+ * @property CmsSite             $cmsSite
+ * @property CmsStorageFile      $directorSignature
+ * @property CmsStorageFile      $signatureAccountant
+ * @property CmsStorageFile      $stamp
+ * @property CmsCompany[]        $companies
+ * @property CmsUser[]           $users
+ * @property CmsContractorBank[] $banks
+ *
+ * @property ShopBill[]          $receiverBills
+ * @property ShopBill[]          $senderBills
  */
 class CmsContractor extends ActiveRecord
 {
 
     const TYPE_LEGAL = 'legal';
+
     const TYPE_INDIVIDUAL = 'individual';
+    const TYPE_SELFEMPLOYED = 'selfemployed';
+    const TYPE_HUMAN = 'human';
 
     /**
      * {@inheritdoc}
@@ -105,7 +117,7 @@ class CmsContractor extends ActiveRecord
             [['director_signature_id'], 'safe'],
             [['signature_accountant_id'], 'safe'],
 
-            [
+            /*[
                 [
                     'inn',
                     'ogrn',
@@ -114,7 +126,7 @@ class CmsContractor extends ActiveRecord
                 ],
                 "filter",
                 'filter' => 'trim',
-            ],
+            ],*/
 
             [
                 'cms_site_id',
@@ -125,8 +137,6 @@ class CmsContractor extends ActiveRecord
                     }
                 },
             ],
-
-            [['cms_site_id', 'inn'], 'unique', 'targetAttribute' => ['cms_site_id', 'inn'], 'message' => 'Этот ИНН уже используется'],
 
             [
                 [
@@ -142,13 +152,23 @@ class CmsContractor extends ActiveRecord
                 'default',
                 'value' => null,
             ],
+            
+            [['cms_site_id', 'inn'], 'unique', 'when' => function() {
+                return $this->inn;
+            }, 'targetAttribute' => ['cms_site_id', 'inn'], 'message' => 'Этот ИНН уже используется'],
+            
+            [['inn'], 'unique', 'when' => function() {
+                return $this->inn;
+            }, 'targetAttribute' => ['inn'], 'message' => 'Этот ИНН уже используется'],
+
+            
 
 
             [
                 ['inn'],
                 'required',
                 'when' => function () {
-                    return (bool)(in_array($this->contractor_type, [self::TYPE_INDIVIDUAL, self::TYPE_LEGAL]));
+                    return (bool)(in_array($this->contractor_type, [self::TYPE_INDIVIDUAL, self::TYPE_SELFEMPLOYED, self::TYPE_LEGAL]));
                 },
             ],
 
@@ -237,13 +257,26 @@ class CmsContractor extends ActiveRecord
             'mailing_address'         => 'Почтовый адрес',
             'mailing_postcode'        => 'Индекс',
             'cms_image_id'            => 'Фото или логотип',
-            'stamp_id'                => 'Подпись',
+            'stamp_id'                => 'Печать',
             'director_signature_id'   => 'Подпись директора',
             'signature_accountant_id' => 'Подпись бухгалтера',
-            'is_our'                  => 'Is Our',
+            'is_our'                  => 'Контрагент нашей компании',
             'phone'                   => 'Телефон',
             'email'                   => 'Email',
             'description'             => 'Описание',
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeLabels(), [
+
+            'stamp_id'                => 'Используется при формировании счетов',
+            'director_signature_id'   => 'Используется при формировании счетов',
+            'signature_accountant_id' => 'Используется при формировании счетов',
         ]);
     }
 
@@ -254,8 +287,10 @@ class CmsContractor extends ActiveRecord
     static public function optionsForType()
     {
         return [
-            self::TYPE_LEGAL      => 'Компания',
-            self::TYPE_INDIVIDUAL         => 'ИП',
+            self::TYPE_LEGAL        => 'Компания',
+            self::TYPE_INDIVIDUAL   => 'ИП',
+            self::TYPE_SELFEMPLOYED => 'Самозанятый',
+            self::TYPE_HUMAN        => 'Физическое лицо',
             //self::TYPE_INDIVIDUAL => 'Физическое лицо',
         ];
     }
@@ -268,6 +303,8 @@ class CmsContractor extends ActiveRecord
 
         if (in_array($this->contractor_type, [
             self::TYPE_INDIVIDUAL,
+            self::TYPE_SELFEMPLOYED,
+            self::TYPE_HUMAN,
         ])) {
             $parent .= $this->typeAsText." ";
         }
@@ -288,7 +325,7 @@ class CmsContractor extends ActiveRecord
         //return "#" . $this->id . " " . $parent;
         return $parent;
     }
-    
+
     /**
      * @return string
      */
@@ -355,8 +392,7 @@ class CmsContractor extends ActiveRecord
     public function getCmsContractorMap()
     {
         return $this->hasMany(CmsContractorMap::class, ['cms_contractor_id' => 'id'])
-            ->from(['cmsContractorMap' => CmsContractorMap::tableName()])
-        ;
+            ->from(['cmsContractorMap' => CmsContractorMap::tableName()]);
     }
 
     /**
@@ -366,8 +402,8 @@ class CmsContractor extends ActiveRecord
     {
         return $this->hasMany(CrmContractor::class, ['id' => 'crm_child_contractor_id'])->via('crmContractorMapCompanies');
     }*/
-    
-    
+
+
     /**
      * {@inheritdoc}
      * @return CmsContractorQuery the active query used by this AR class.
@@ -378,7 +414,6 @@ class CmsContractor extends ActiveRecord
     }
 
 
-
     /**
      * @param PartyModel $party
      * @return $this
@@ -387,7 +422,7 @@ class CmsContractor extends ActiveRecord
     {
         $this->name = $party->unrestricted_value;
         $this->full_name = $party->unrestricted_value;
-        
+
         $this->kpp = $party->kpp;
         $this->ogrn = $party->ogrn;
         $this->okpo = $party->getDataValue("okpo");
@@ -411,4 +446,85 @@ class CmsContractor extends ActiveRecord
         return $this;
     }
 
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsCompany2contractors()
+    {
+        return $this->hasMany(CmsCompany2contractor::class, ['cms_contractor_id' => 'id'])
+            ->from(['cmsCompany2contractors' => CmsCompany2contractor::tableName()]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompanies()
+    {
+        return $this->hasMany(CmsCompany::class, ['id' => 'cms_company_id'])
+            ->via('cmsCompany2contractors');;
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBanks()
+    {
+        return $this->hasMany(CmsContractorBank::class, ['cms_contractor_id' => 'id'])->orderBy(['sort' => SORT_ASC]);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsers()
+    {
+        return $this->hasMany(CmsUser::class, ['id' => 'cms_user_id'])
+            ->via('cmsContractorMap');;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getAsShortText()
+    {
+        $parent = "";
+
+
+        if (!in_array($this->contractor_type, [self::TYPE_LEGAL])) {
+            $parent = implode(" ", [
+                $this->last_name,
+                $this->first_name,
+                $this->patronymic,
+            ]);
+
+            if ($this->contractor_type == self::TYPE_INDIVIDUAL) {
+                $parent = "ИП ".$parent;
+            }
+            if ($this->contractor_type == self::TYPE_SELFEMPLOYED) {
+                $parent = "Самозанятый ".$parent;
+            }
+
+        } else {
+            $parent = $this->name;
+        }
+
+        return $parent;
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSenderBills()
+    {
+        return $this->hasMany(ShopBill::class, ['sender_contractor_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getReceiverBills()
+    {
+        return $this->hasMany(ShopBill::class, ['receiver_contractor_id' => 'id']);
+    }
 }

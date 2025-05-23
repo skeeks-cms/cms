@@ -30,6 +30,89 @@ class ImageController extends \yii\console\Controller
         }
     }
 
+
+    /**
+     * @param $maxHeight Максимальная высота картинки
+     * @param $maxFileSize Размер файла в МБ
+     * @param $quantity Качество на выходе
+     * @return void
+     */
+    public function actionResizeOriginalImagesVertical($maxHeight = 1600, $maxFileSize = 1, $quantity = 95)
+    {
+        $query = CmsStorageFile::find()
+            ->andWhere(['>', 'image_height', 'image_width'])
+            ->andWhere(['>', 'image_height', $maxHeight])
+            ->andWhere(['>', 'size', 1024*1024*$maxFileSize])
+            ->orderBy(['size' => SORT_DESC])
+        ;
+
+
+        if ($total = $query->count()) {
+            $sizeQuery = clone $query;
+            $sizeQuery->select(['sumsize' => new Expression('sum(size)')]);
+            $data = $sizeQuery->asArray()->one();
+            $formatedSumSize = \Yii::$app->formatter->asShortSize((float)ArrayHelper::getValue($data, 'sumsize'));
+
+            $this->stdout("Неоптимизированных картинок: {$total} шт. ({$formatedSumSize}) \n");
+        } else {
+            $this->stdout("Неоптимизированных картинок нет\n");
+            return;
+        }
+
+
+        $this->_wait(5);
+
+
+        /**
+         * @var CmsStorageFile $storageFile
+         */
+        foreach ($query->each(50) as $storageFile) {
+
+            $fileRoot = $storageFile->getRootSrc();
+            $this->stdout("\tКартинка: {$storageFile->id}\n");
+            $this->stdout("\t\t{$fileRoot}\n");
+            $this->stdout("\t\tРазрешение: {$storageFile->image_width}x{$storageFile->image_height}\n");
+            $fileSize = filesize($fileRoot);
+            $fileSizeFormated = \Yii::$app->formatter->asShortSize($fileSize);
+            $this->stdout("\t\tРазмер: {$fileSizeFormated}\n");
+
+            $size = Image::getImagine()->open($fileRoot)->getSize();
+            $width = ($size->getWidth() * $maxHeight) / $size->getHeight();
+
+            $newWidth = (int)round($width);
+            $newHeight = $maxHeight;
+            $this->stdout("\t\tНовое разрешение: {$newWidth}x{$newHeight}\n");
+            
+
+            Image::thumbnail($fileRoot, $newWidth, $newHeight)->save($fileRoot,[
+                'jpeg_quality' => $quantity,
+                'webp_quality' => $quantity,
+            ]);
+
+            $newSize = Image::getImagine()->open($fileRoot)->getSize();
+            $storageFile->image_height = $newSize->getHeight();
+            $storageFile->image_width = $newSize->getWidth();
+
+
+
+            clearstatcache();
+            $fileSize = filesize($fileRoot);
+            $fileSizeFormated = \Yii::$app->formatter->asShortSize($fileSize);
+            $this->stdout("\t\tНовый размер файла: {$fileSizeFormated}\n");
+
+            $storageFile->size = $fileSize;
+
+            if (!$storageFile->save()) {
+                $error = "Не сохранились данные по новой картинке: " . print_r($storageFile->errors, true);
+                //throw new Exception("Не сохранились данные по новой картинке: " . print_r($storageFile->errors, true));
+                $this->stdout("\t\t{$error}\n");
+                continue;
+            }
+
+            $this->stdout("\t\tsaved\n");
+        }
+    }
+
     /**
      * Изменение размера у оригинальных картинок в хранилище
      *
@@ -38,7 +121,7 @@ class ImageController extends \yii\console\Controller
      *
      * @throws Exception
      */
-    public function actionResizeOriginalImages($maxWidth = 1024, $maxHeight = 768)
+    public function actionResizeOriginalImages($maxWidth = 1920, $maxHeight = 1200, $quantity = 100)
     {
         $query = CmsStorageFile::find()
             ->andWhere(['>', 'image_height', $maxHeight])
@@ -84,7 +167,10 @@ class ImageController extends \yii\console\Controller
             $newWidth = $maxWidth;
             $this->stdout("\t\tНовое разрешение: {$newWidth}x{$newHeight}\n");
 
-            Image::thumbnail($fileRoot, $newWidth, $newHeight)->save($fileRoot);
+            Image::thumbnail($fileRoot, $newWidth, $newHeight)->save($fileRoot,[
+                'jpeg_quality' => $quantity,
+                'webp_quality' => $quantity,
+            ]);
 
             $newSize = Image::getImagine()->open($fileRoot)->getSize();
             $storageFile->image_height = $newSize->getHeight();
@@ -105,6 +191,7 @@ class ImageController extends \yii\console\Controller
                 $this->stdout("\t\t{$error}\n");
                 continue;
             }
+
 
             $this->stdout("\t\tsaved\n");
         }

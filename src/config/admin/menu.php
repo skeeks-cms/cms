@@ -248,20 +248,24 @@ return array_merge(dashboardsMenu(), [
             'items' => dashboardsMenu(),
         ],*/
 
-    'tree' => [
-        'priority' => 100,
-        "label"    => \Yii::t('skeeks/cms', "Sections"),
-        "url"      => ["cms/admin-tree"],
-        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
-    ],
+
+
+
 
     'content' =>
         [
             'priority' => 180,
-            'label'    => \Yii::t('skeeks/cms', 'Content'),
-            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+            'label'    => \Yii::t('skeeks/cms', 'Сайт'),
+            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
+            "url"      => ["cms/admin-tree"],
 
             'items' => array_merge([
+
+                'tree' => [
+                    "label"    => \Yii::t('skeeks/cms', "Разделы сайта"),
+                    "url"      => ["cms/admin-tree"],
+                    "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
+                ],
 
                 /*[
                     "label" => \Yii::t('skeeks/cms', "Sections"),
@@ -275,11 +279,7 @@ return array_merge(dashboardsMenu(), [
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/folder.png'],
                 ],*/
 
-                [
-                    "label" => \Yii::t('skeeks/cms', "Files"),
-                    "url"   => ["cms/admin-storage-files"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
-                ],
+
 
                 [
                     "label" => \Yii::t('skeeks/cms', "Сохраненные фильтры"),
@@ -291,24 +291,88 @@ return array_merge(dashboardsMenu(), [
             ], contentMenu()),
         ],
 
-    'users' =>
-        [
-            'label'    => \Yii::t('skeeks/cms', 'Users'),
-            'priority' => 200,
-            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
-            "url"      => ["cms/admin-user"],
+    'file-storage' => [
+        'priority' => 2000,
+        "label" => \Yii::t('skeeks/cms', "Файловое хранилище"),
+        "url"   => ["cms/admin-storage-files"],
+        "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+    ],
 
-            /*'items' => [
-                [
-                    "label"    => \Yii::t('skeeks/cms', "Users"),
-                    "url"      => ["cms/admin-user"],
-                    "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
-                    'priority' => 0,
-                ],
-            ],*/
-        ],
+    'crm' => [
+        'label'    => \Yii::t('skeeks/cms', 'Клиенты и сделки'),
+        'priority' => 190,
+        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
+        "url"      => ["cms/admin-cms-company"],
+        'items' => [
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Компании'),
+                'priority' => 190,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
+                "url"      => ["cms/admin-cms-company"],
+            ],
+
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Клиенты'),
+                'priority' => 200,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
+                "url"      => ["cms/admin-user"],
+
+                /*'items' => [
+                    [
+                        "label"    => \Yii::t('skeeks/cms', "Users"),
+                        "url"      => ["cms/admin-user"],
+                        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/user.png'],
+                        'priority' => 0,
+                    ],
+                ],*/
+            ],
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Сделки'),
+                'priority' => 200,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icons-parnter.png'],
+                "url"      => ["cms/admin-cms-deal"],
+            ],
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Счета'),
+                'priority' => 215,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+                "url"      => ["cms/admin-cms-bill"],
+            ],
+
+            [
+                "label" => \Yii::t('skeeks/cms', 'Реквизиты'),
+                'priority' => 215,
+                "url"   => ["/cms/admin-cms-contractor"],
+                "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/company.png'],
+            ],
+        ]
+    ],
 
 
+
+    'task' => [
+        'label'    => \Yii::t('skeeks/cms', 'Задачи'),
+        'priority' => 190,
+        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+        "url"      => ["cms/admin-cms-task"],
+        'items' => [
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Задачи'),
+                'priority' => 190,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+                "url"      => ["cms/admin-cms-task"],
+            ],
+
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Проекты'),
+                'priority' => 190,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+                "url"      => ["cms/admin-cms-project"],
+            ],
+
+
+        ]
+    ],
 
     'settings' => [
         'priority' => 300,
@@ -319,7 +383,7 @@ return array_merge(dashboardsMenu(), [
             [
                 'siteinfo' => [
                     //'priority' => 290,
-                    'label'    => \Yii::t('skeeks/cms', 'Информация'),
+                    'label'    => \Yii::t('skeeks/cms', 'Моя компания'),
                     "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/information.png'],
 
                     'items' => [
@@ -344,18 +408,66 @@ return array_merge(dashboardsMenu(), [
                             'url'   => ['cms/admin-cms-site-social'],
                         ],
                         [
+                            'label' => 'Структура',
+                            /*"img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],*/
+                            'url'   => ['cms/admin-cms-department'],
+                        ],
+                        [
+                            'label' => 'Сотрудники',
+                            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/users_clients_group.png'],
+                            'url'   => ['cms/admin-worker'],
+                        ],
+                        [
+                            "label" => \Yii::t('skeeks/cms', 'Реквизиты'),
+                            "url"   => ["/cms/admin-cms-contractor-our"],
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/company.png'],
+                        ],
+                        [
                             'label' => 'Домены',
                             'url'   => ['cms/admin-cms-site-domain'],
                         ],
                     ],
                 ],
 
-                [
-                    "label" => \Yii::t('skeeks/cms', 'Юр. Лица'),
-                    "url"   => ["/cms/admin-cms-contractor"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/company.png'],
+                'list' => [
+                    //'priority' => 290,
+                    'label'    => \Yii::t('skeeks/cms', 'Справочники'),
+                    "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/information.png'],
 
+                    'items' => [
+[
+                        "name"  => ['skeeks/measure', 'Страны'],
+                            "url"   => ["cms/admin-cms-country"],
+                            "image" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/countries.png'],
+                        ],
+
+                        [
+                            "label" => \Yii::t('skeeks/cms', "Languages"),
+                            "url"   => ["cms/admin-cms-lang"],
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],
+                        ],
+                        [
+                            "label" => \Yii::t('skeeks/cms', "Типы сделок"),
+                            "url"   => ["cms/admin-cms-deal-type"],
+                            'priority' => 900,
+                            /*"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],*/
+                        ],
+                        [
+                            "label" => \Yii::t('skeeks/cms', "Статусы компаний"),
+                            "url"   => ["cms/admin-cms-company-status"],
+                            'priority' => 900,
+                            /*"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],*/
+                        ],
+                        [
+                            "label" => \Yii::t('skeeks/cms', "Категории компаний"),
+                            "url"   => ["cms/admin-cms-company-category"],
+                            'priority' => 900,
+                            /*"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],*/
+                        ],
+                    ],
                 ],
+
+
                 [
                     "label" => \Yii::t('skeeks/cms', 'Дизайн'),
                     "url"   => ["/cms/admin-cms-theme"],
@@ -363,17 +475,7 @@ return array_merge(dashboardsMenu(), [
 
                 ],
 
-                [
-                    "name"  => ['skeeks/measure', 'Страны'],
-                    "url"   => ["cms/admin-cms-country"],
-                    "image" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/countries.png'],
-                ],
 
-                [
-                    "label" => \Yii::t('skeeks/cms', "Languages"),
-                    "url"   => ["cms/admin-cms-lang"],
-                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],
-                ],
 
 
                 [
@@ -521,6 +623,15 @@ return array_merge(dashboardsMenu(), [
                     "label" => \Yii::t('skeeks/cms', "Clearing temporary data"),
                     "url"   => ["cms/admin-clear"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/clear.png'],
+                ],
+
+                'activity' => [
+                    "label" => "Активность",
+                    "url"   => ["cms/admin-cms-log/index"],
+                    "accessCallback"   => function() {
+                        return \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+                    },
+                    //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/clear.png'],
                 ],
 
 

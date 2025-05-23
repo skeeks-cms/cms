@@ -13,7 +13,7 @@ use yii\helpers\Html;
 $controller = $this->context;
 $action = $controller->action;
 ?>
-
+<div class="sx-block">
 <? $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'clientCallback' => new \yii\web\JsExpression(<<<JS
     function (ActiveFormAjaxSubmit) {
@@ -37,3 +37,4 @@ JS
 </div>
 
 <? $form::end(); ?>
+</div>

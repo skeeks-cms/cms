@@ -17,6 +17,7 @@ use skeeks\cms\models\CmsSitePhone;
 use skeeks\cms\models\CmsSiteSocial;
 use skeeks\cms\models\CmsSmsProvider;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -42,7 +43,7 @@ class AdminCmsSmsProviderController extends BackendModelStandartController
         $this->modelClassName = CmsSmsProvider::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-settings';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -193,7 +194,7 @@ CSS
         $result = [
             'main' => [
                 'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
+                'name'   => \Yii::t('skeeks/cms', 'Main'),
                 'fields' => [
 
                     'is_main' => [

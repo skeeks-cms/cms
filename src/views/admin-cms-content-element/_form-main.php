@@ -60,7 +60,7 @@ if ($contentModel->root_tree_id) {
             <?
             $isAllowChangeTree = ((!$model->isNewRecord && $contentModel->is_tree_allow_change) || $model->isNewRecord);
             echo $form->field($model, 'tree_id')->widget(
-                \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+                \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::class,
                 [
                     'options'                   => [
                         'data-form-reload' => 'true',

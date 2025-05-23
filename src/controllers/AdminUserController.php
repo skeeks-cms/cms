@@ -16,6 +16,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
@@ -25,18 +26,20 @@ use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContractor;
 use skeeks\cms\models\CmsContractorMap;
 use skeeks\cms\models\CmsSite;
-use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\models\queries\CmsUserQuery;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModel;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\ActiveForm;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\dadataClient\models\PartyModel;
 use skeeks\yii2\form\fields\BoolField;
@@ -60,9 +63,11 @@ class AdminUserController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = "Управление пользователями";
+        $this->name = "Клиенты";
         $this->modelShowAttribute = "shortDisplayNameWithAlias";
         $this->modelClassName = CmsUser::class;
+
+        $this->permissionName = 'cms/admin-user';
 
         $this->generateAccessActions = false;
         /*$this->accessCallback = function () {
@@ -71,7 +76,7 @@ class AdminUserController extends BackendModelStandartController
             }
             return true;
         };*/
-        /*$this->permissionName = 'cms/admin-user';*/
+
 
         $this->modelHeader = function () {
             /**
@@ -97,6 +102,12 @@ class AdminUserController extends BackendModelStandartController
                         'is_active',
                         'role',
                         'isOnline',
+                    ],
+
+                    "disableAutoFilters" => [
+                        'auth_key',
+                        'password_hash',
+                        'password_reset_token',
                     ],
 
                     "filtersModel" => [
@@ -140,6 +151,7 @@ class AdminUserController extends BackendModelStandartController
 
                                 },
                             ],
+                            
                             'isOnline' => [
                                 'class'    => SelectField::class,
                                 'multiple' => false,
@@ -210,6 +222,9 @@ class AdminUserController extends BackendModelStandartController
 
                     'on init' => function (Event $event) {
 
+                        /**
+                         * @var $query CmsUserQuery
+                         */
                         $query = $event->sender->dataProvider->query;
 
                         if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROOT_ACCESS)) {
@@ -222,6 +237,8 @@ class AdminUserController extends BackendModelStandartController
                             ]);
                             $query->groupBy([CmsUser::tableName().".id"]);
                         }
+
+                        $query->forManager();
 
                         $query->cmsSite();
                     },
@@ -415,6 +432,7 @@ class AdminUserController extends BackendModelStandartController
                 'isVisible' => false,
                 'callback'  => [$this, 'addContractor'],
             ],
+
             'send-sms'       => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
@@ -435,23 +453,22 @@ class AdminUserController extends BackendModelStandartController
                 'name'           => 'Профиль',
                 'icon'           => 'fa fa-user',
                 "callback"       => [$this, 'view'],
-                'permissionName' => 'cms/admin-user/update',
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return true;
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
                 },
             ],
 
-            'stat' => [
+            /*'stat' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Статистика',
                 'icon'     => 'far fa-chart-bar',
                 'priority' => 500,
 
-                'permissionName' => 'cms/admin-user/update-advanced',
+                'permissionName' => 'cms/admin-user/manage-advanced',
 
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
@@ -470,7 +487,7 @@ class AdminUserController extends BackendModelStandartController
 
                     return true;
                 },
-            ],
+            ],*/
 
 
             "orders" => [
@@ -503,7 +520,7 @@ class AdminUserController extends BackendModelStandartController
                         return ShopOrder::find()->cmsSite()->andWhere(['cms_user_id' => $this->model->id])->exists();
                     }
 
-                    return true;
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
                 },
             ],
 
@@ -516,6 +533,13 @@ class AdminUserController extends BackendModelStandartController
                 'icon'     => 'fas fa-credit-card',
 
 
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
                 'controllerRoute' => "/shop/admin-payment",
                 'relation'        => ['cms_user_id' => 'id'],
                 'priority'        => 400,
@@ -545,6 +569,13 @@ class AdminUserController extends BackendModelStandartController
                 'controllerRoute' => "/shop/admin-shop-check",
                 'relation'        => ['cms_user_id' => 'id'],
                 'priority'        => 600,
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
                 'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
@@ -570,6 +601,13 @@ class AdminUserController extends BackendModelStandartController
                 'controllerRoute' => "/shop/admin-bill",
                 'relation'        => ['cms_user_id' => 'id'],
                 'priority'        => 600,
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
                 'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
@@ -595,6 +633,13 @@ class AdminUserController extends BackendModelStandartController
                 'controllerRoute' => "/shop/admin-bonus-transaction",
                 'relation'        => ['cms_user_id' => 'id'],
                 'priority'        => 700,
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
                 'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
@@ -618,13 +663,58 @@ class AdminUserController extends BackendModelStandartController
                 },*/
             ],
 
+            'tasks' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'priority' => 900,
+                'name'     => 'Задачи',
+                //'priority' => 90,
+                /*'callback' => [$this, 'shift'],*/
+                'icon'     => 'fas fa-list',
+
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
+
+                'controllerRoute' => "/cms/admin-cms-task",
+                'relation'        => ['cms_user_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    /*$action->relatedIndexAction->filters = false;*/
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    /*ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');*/
+
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+            "log" => [
+                'class' => BackendModelLogAction::class,
+                "accessCallback" => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
+            ],
+
             'add-site-permission' => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
                 'name'      => 'Профиль',
                 "callback"  => [$this, 'addSite'],
 
-                'permissionName' => 'cms/admin-user/update-advanced',
+                'permissionName' => 'cms/admin-user/manage-advanced',
 
                 "accessCallback" => function () {
 
@@ -641,7 +731,7 @@ class AdminUserController extends BackendModelStandartController
                 'isVisible'      => false,
                 'name'           => 'Профиль',
                 "callback"       => [$this, 'saveSitePermissions'],
-                'permissionName' => 'cms/admin-user/update-advanced',
+                'permissionName' => 'cms/admin-user/manage-advanced',
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
@@ -654,14 +744,13 @@ class AdminUserController extends BackendModelStandartController
             'update' => [
                 'fields'         => [$this, 'updateFields'],
                 'buttons'        => ["save"],
-                'isVisible'      => false,
-                'generateAccess' => true,
+                'isVisible'      => true,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
                     }
 
-                    return true;
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
                 },
             ],
 
@@ -678,7 +767,7 @@ class AdminUserController extends BackendModelStandartController
                         return false;
                     }
 
-                    return true;
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
                 },
 
             ],
@@ -687,29 +776,29 @@ class AdminUserController extends BackendModelStandartController
             "activate-multi" => [
                 'class'              => BackendModelMultiActivateAction::class,
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
-                    return \Yii::$app->user->can("cms/admin-user/update-advanced");
+                    return \Yii::$app->user->can("cms/admin-user/manage");
                 },
             ],
 
             "deactivate-multi" => [
                 'class'              => BackendModelMultiDeactivateAction::class,
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
-                    return \Yii::$app->user->can("cms/admin-user/update-advanced");
+                    return \Yii::$app->user->can("cms/admin-user/manage");
                 },
             ],
 
             "delete-multi" => [
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-user/delete", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
                 },
                 "accessCallback"     => function () {
-                    return \Yii::$app->user->can("cms/admin-user/delete");
+                    return \Yii::$app->user->can("cms/admin-user/manage");
                 },
             ],
         ]);
@@ -755,7 +844,7 @@ class AdminUserController extends BackendModelStandartController
 
         \Yii::$app->view->registerJs(<<<JS
 function updateFields() {
-    $(".sx-0-block").hide();
+    $(".sx-0-block").show();
     $(".sx-1-block").hide();
     
     var contType = $("#cmsuser-is_company").val();
@@ -776,14 +865,14 @@ JS
         );
 
         return [
-            'is_company' => [
+            /*'is_company' => [
                 'class'     => SelectField::class,
                 'allowNull' => false,
                 'items'     => [
                     '0' => "Человек",
                     '1' => "Компания",
                 ],
-            ],
+            ],*/
 
             'image_id' => [
                 'class'        => WidgetField::class,
@@ -807,6 +896,12 @@ JS
                 'content' => '</div><div class="sx-0-block">',
             ],
 
+
+            'last_name',
+            'first_name',
+            'patronymic',
+            'alias',
+
             'gender' => [
                 'class'     => SelectField::class,
                 'allowNull' => false,
@@ -815,10 +910,6 @@ JS
                     'women' => \Yii::t('skeeks/cms', 'Female'),
                 ],
             ],
-            'last_name',
-            'first_name',
-            'patronymic',
-            'alias',
 
             [
                 'class'   => HtmlBlock::class,
@@ -897,11 +988,30 @@ JS
                 'patronymic',
 
                 'alias',
+
+
+                'managers' => [
+                    'class'        => WidgetField::class,
+                    'widgetClass'  => AjaxSelectModel::class,
+                    'widgetConfig' => [
+                        'modelClass'  => CmsUser::class,
+                        'multiple'    => true,
+                        'searchQuery' => function ($word = '') {
+                            $query = CmsUser::find()->isWorker();
+                            if ($word) {
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                            }
+                            return $query;
+                        },
+                    ],
+                ],
             ];
         }
 
 
-        if ((\Yii::$app->user->can("cms/admin-user/update-advanced", ['model' => $this->model]))
+        if ((\Yii::$app->user->can("cms/admin-user/manage-advanced", ['model' => $this->model]))
             || \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROOT_ACCESS)) {
 
             $roles = \Yii::$app->authManager->getAvailableRoles();

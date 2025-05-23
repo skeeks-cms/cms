@@ -18,6 +18,7 @@ use skeeks\cms\models\CmsExtension;
 use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSmsProvider;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Site;
 use skeeks\cms\models\Tree;
 use skeeks\cms\models\TreeType;
@@ -805,5 +806,41 @@ class Cms extends \skeeks\cms\base\Component
         return $this;
     }
 
+    /**
+     * @see https://github.com/berandal666/Passwords/blob/master/500-worst-passwords.txt
+     * @return string[]
+     */
+    public function getBadPasswords()
+    {
+        return [
+            'skeeks',
+            'skeeks123',
+        ];
+    }
+
+
+    /**
+     * @param CmsUser $user
+     * @return bool
+     */
+    public function isBadPassword(CmsUser $user)
+    {
+        \Yii::beginProfile("isBadPassword");
+        if ($user->password_hash) {
+
+            foreach ($this->getBadPasswords() as $password)
+            {
+                \Yii::beginProfile("$password");
+                if ($user->validatePassword($password)) {
+                    return true;
+                }
+                \Yii::endProfile("$password");
+            }
+        }
+        
+        \Yii::endProfile("isBadPassword");
+        
+        return false;
+    }
 
 }

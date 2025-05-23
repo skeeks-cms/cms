@@ -11,16 +11,12 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsUserAddress;
 use skeeks\cms\models\CmsUserPhone;
-use skeeks\cms\ya\map\assets\YaMapAsset;
 use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
-use skeeks\yii2\form\elements\HtmlColBegin;
 use skeeks\yii2\form\fields\HtmlBlock;
-use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 /**
  * Class AdminUserEmailController
@@ -52,17 +48,17 @@ class AdminUserAddressController extends BackendModelStandartController
                 'fields'         => [$this, 'updateFields'],
                 'buttons'        => ['save'],
                 //'size'           => BackendAction::SIZE_SMALL,
-                "accessCallback" => function ($model) {
+                /*"accessCallback" => function ($model) {
 
                     $cmsUserEmail = new CmsUserPhone();
                     $cmsUserEmail->load(\Yii::$app->request->get());
 
                     if ($model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $cmsUserEmail->cmsUser]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $cmsUserEmail->cmsUser]);
                     }
 
                     return false;
-                },
+                },*/
             ],
             "update" => [
                 'fields'         => [$this, 'updateFields'],
@@ -70,7 +66,7 @@ class AdminUserAddressController extends BackendModelStandartController
                 //'size'           => BackendAction::SIZE_SMALL,
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -78,7 +74,7 @@ class AdminUserAddressController extends BackendModelStandartController
             "delete" => [
                 "accessCallback" => function ($model) {
                     if ($this->model) {
-                        return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
+                        return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model->cmsUser]);
                     }
                     return false;
                 },
@@ -113,20 +109,18 @@ class AdminUserAddressController extends BackendModelStandartController
 
         $result = ArrayHelper::merge($result, [
 
-            
-
 
             [
                 'class'   => HtmlBlock::class,
                 'content' => '<div style="display: block;">',
             ],
             'value' => [
-                'class' => WidgetField::class,
-                'widgetClass' => YaMapDecodeInput::class,
+                'class'        => WidgetField::class,
+                'widgetClass'  => YaMapDecodeInput::class,
                 'widgetConfig' => [
-                    'modelLatitudeAttr' => 'latitude',
+                    'modelLatitudeAttr'  => 'latitude',
                     'modelLongitudeAttr' => 'longitude',
-                ]
+                ],
             ],
 
             [
@@ -145,8 +139,8 @@ class AdminUserAddressController extends BackendModelStandartController
                 'class'   => HtmlBlock::class,
                 'content' => '</div>',
             ],
-            
-           
+
+
             [
                 'class'   => HtmlBlock::class,
                 'content' => '<div class="row"><div class="col-md-4">',
@@ -166,21 +160,19 @@ class AdminUserAddressController extends BackendModelStandartController
                 'class'   => HtmlBlock::class,
                 'content' => '</div></div>',
             ],
-            
-            
-            
 
-            'name' => [
-                'class' => TextField::class,
+
+            'name'         => [
+                'class'          => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Например, домашний адрес или рабочий адрес'
-                ]
+                    'placeholder' => 'Например, домашний адрес или рабочий адрес',
+                ],
             ],
-            'comment' => [
-                'class' => TextareaField::class,
+            'comment'      => [
+                'class'          => TextareaField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Дополнительные примечания в свободной форме. Например код домофона или прочие особенности.'
-                ]
+                    'placeholder' => 'Дополнительные примечания в свободной форме. Например код домофона или прочие особенности.',
+                ],
             ],
             'cms_image_id' => [
                 'class'        => WidgetField::class,

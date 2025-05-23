@@ -10,12 +10,9 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsSiteAddressPhone;
-use skeeks\cms\models\CmsSitePhone;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\NumberField;
 use yii\base\Event;
-use yii\bootstrap\Alert;
-use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -31,7 +28,7 @@ class AdminCmsSiteAddressPhoneController extends BackendModelStandartController
         $this->modelClassName = CmsSiteAddressPhone::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-site-address-phone';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -96,7 +93,7 @@ class AdminCmsSiteAddressPhoneController extends BackendModelStandartController
         $model->load(\Yii::$app->request->get());
 
         $result = [
-            'value' => [
+            'value'    => [
                 'elementOptions'  => [
                     'placeholder' => '+7 903 722-28-73',
                 ],
@@ -115,7 +112,7 @@ JS
             ],
             'name',
             'priority' => [
-                'class' => NumberField::class
+                'class' => NumberField::class,
             ],
         ];
 

@@ -118,7 +118,7 @@ class PropertyTypeTree extends PropertyType
                 $rootTreeModels = CmsTree::findAll($this->root_tree_id);
             }
             $field->widget(
-                \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::className(),
+                \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::className(),
                 [
                     "multiple" => $this->isMultiple ? true : false,
                     'treeWidgetOptions' =>

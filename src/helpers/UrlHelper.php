@@ -227,7 +227,7 @@ class UrlHelper
      */
     public function createUrl()
     {
-        //return Url::to($this->toArray());
+        return Url::to($this->toArray());
         return \Yii::$app->urlManager->createUrl($this->toArray());
     }
 
@@ -236,7 +236,7 @@ class UrlHelper
      */
     public function createAbsoluteUrl()
     {
-        //return Url::to($this->toArray(), true);
+        return Url::to($this->toArray(), true);
         return \Yii::$app->urlManager->createAbsoluteUrl($this->toArray());
     }
 

@@ -207,11 +207,11 @@ ul.sx-properties .sx-properties--name:after {
 }
 .sx-block {
     margin-bottom: 20px;
-    padding: 10px;
+    /*padding: 10px;*/
 }
 .sx-block .sx-block-content {
-    padding: 10px;
-    background: #f9f9f9;
+    /*padding: 10px;
+    background: #f9f9f9;*/
 }
 
 .sx-label {
@@ -241,10 +241,30 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
 
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
-    <div class="row no-gutters">
+    <div class="row">
 
 
         <div class="col-lg-4 col-sm-6 col-12">
+
+            <?php if ($model->companiesAll) : ?>
+                <div class="sx-block">
+                    <div class="sx-block-title">Компании <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                            title="Компании с которыми связан клиент"
+                                                            class="far fa-question-circle"></i>
+                    </div>
+                    <div class="sx-block-content">
+
+                    <?php foreach ($model->companiesAll as $company) : ?>
+                        <div class="sx-value-row d-flex">
+                            <div style="width: 100%;">
+                                <?php echo $company->name; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
 
             <div class="sx-block">
                 <div class="sx-block-title">Общие данные <i style="color: silver;" data-toggle="tooltip" data-html="true"
@@ -252,7 +272,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                                             class="far fa-question-circle"></i>
                 </div>
 
-                <?php if(isset(\Yii::$app->shop)) : ?>
+                <?php if (isset(\Yii::$app->shop)) : ?>
                     <div class="sx-block-content">
                         <div class="sx-value-row d-flex">
 
@@ -261,7 +281,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                             </div>
 
                             <div class="my-auto">
-                                <?php if($model->bonusBalance > 0) : ?>
+                                <?php if ($model->bonusBalance > 0) : ?>
                                     <a href="<?php echo \yii\helpers\Url::to(['bonus', 'pk' => $model->id]); ?>" data-pjax="0" style="color: green;">
                                         +&nbsp;<?php echo $model->bonusBalance ? \Yii::$app->formatter->asDecimal($model->bonusBalance) : "нет бонусов"; ?>
                                     </a>
@@ -280,7 +300,6 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                         </div>
                     </div>
                 <?php endif; ?>
-
 
 
             </div>
@@ -551,8 +570,8 @@ JS
             </div>
 
             <div class="sx-block">
-                <div class="sx-block-title">Юр. лица <i style="color: silver;" data-toggle="tooltip" data-html="true"
-                                                        title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
+                <div class="sx-block-title">Реквизиты <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                                                         title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
 
 
                 <? foreach ($model->cmsContractors as $cmsContractor) : ?>
@@ -656,24 +675,61 @@ JS
             </button>
             </div>-->
             </div>
-            <div class="sx-block">
-                <div class="sx-block-title">Менеджер <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этим клиентом."
-                                                        class="far fa-question-circle"></i></div>
-                <div class="sx-block-content">
-                    <button class="btn btn-default btn-sm">Добавить</button>
+
+            <? if ($model->managers) : ?>
+                <div class="sx-block">
+                    <div class="sx-block-title">Работают с клиентом <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этой компанией."
+                                                                       class="far fa-question-circle"></i></div>
+
+                    <div class="sx-block-content">
+                        <div class="sx-users-block">
+                            <? foreach ($model->managers as $manager) : ?>
+                                <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
+                                    'user' => $manager,
+                                ]); ?>
+                                <?php /*echo \yii\helpers\Html::tag("div", "Добавить", [
+                                    'class' => 'btn btn-sm btn-primary sx-btn-select',
+                                    'style' => '    position: absolute;
+                    right: 20px;
+                    top: calc(50% - 15px);',
+                                    'data'  => $model->toArray(),
+                                ]); */ ?>
+                            <? endforeach; ?>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            <? endif; ?>
+
+            <!--<div class="sx-block-content">
+                <button class="btn btn-default btn-sm">Добавить</button>
+            </div>-->
         </div>
 
         <div class="col-lg-8 col-sm-6 col-12" style="padding-left: 10px;">
-            <div class="sx-block">
-                <div class="sx-block-title">Лента <i style="color: silver;" data-toggle="tooltip" data-html="true"
-                                                     title="Лента активности по этому пользователю, заметки, письма, звонки, задачи. Распологаются на временной линии. Сверху самые новые события."
-                                                     class="far fa-question-circle"></i></b></div>
-                <div class="sx-block-content">
-                    Добавить комментарий
+            <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
+                'id' => 'sx-comments',
+            ]); ?>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="sx-block">
+                            <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
+                                'model' => $model,
+                            ]); ?>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                            'query'         => $model->getUserLogs()->comments(),
+                            'is_show_model' => false,
+                        ]); ?>
+                    </div>
+                </div>
+
+            <?php $pjax::end(); ?>
         </div>
     </div>
 <?php $pjax = \skeeks\cms\widgets\Pjax::end(); ?>

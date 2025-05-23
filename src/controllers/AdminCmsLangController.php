@@ -15,6 +15,7 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsLang;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;
@@ -32,13 +33,7 @@ class AdminCmsLangController extends BackendModelStandartController
         $this->modelClassName = CmsLang::class;
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
         
         parent::init();
     }

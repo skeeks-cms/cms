@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -26,13 +27,7 @@ class AdminCmsTreeTypePropertyEnumController extends BackendModelStandartControl
         $this->modelClassName = CmsTreeTypePropertyEnum::class;
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
 

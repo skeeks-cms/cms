@@ -10,7 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsSiteEmail;
-use skeeks\cms\models\CmsSitePhone;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\NumberField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
@@ -31,7 +31,7 @@ class AdminCmsSiteEmailController extends BackendModelStandartController
         $this->modelClassName = CmsSiteEmail::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = 'cms/admin-cms-site-email';
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -127,7 +127,7 @@ HTML
             'value',
             'name',
             'priority' => [
-                'class' => NumberField::class
+                'class' => NumberField::class,
             ],
         ];
 

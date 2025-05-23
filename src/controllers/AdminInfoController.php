@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\modules\admin\controllers\helpers\rules\NoModel;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\sx\File;
 
 /**
@@ -21,14 +22,9 @@ class AdminInfoController extends BackendController
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Information about the system");
-        $this->generateAccessActions = false;
 
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
