@@ -39,6 +39,10 @@ return [
             'class' => '\skeeks\cms\Skeeks',
         ],
 
+        'legal' => [
+            'class' => \skeeks\cms\components\LegalComponent::class,
+        ],
+
         'imaging' => [
             'class' => '\skeeks\cms\components\Imaging',
         ],

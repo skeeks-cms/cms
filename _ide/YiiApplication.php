@@ -18,6 +18,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\components\CmsToolbar;
 use skeeks\cms\components\ConsoleComponent;
 use skeeks\cms\components\Imaging;
+use skeeks\cms\components\LegalComponent;
 use skeeks\cms\components\storage\Storage;
 use skeeks\cms\i18n\I18N;
 use skeeks\cms\Skeeks;
@@ -25,6 +26,7 @@ use skeeks\cms\Skeeks;
 /**
  * @property Storage                                           $storage
  * @property Cms                                               $cms
+ * @property LegalComponent                                    $legal
  * @property Imaging                                           $imaging
  * @property Breadcrumbs                                       $breadcrumbs
  * @property Skeeks                                            $skeeks
