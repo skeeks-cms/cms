@@ -975,7 +975,7 @@ TEXT;
     background: white;
     padding: 1rem;
     z-index: 99;
-    opacity: 0.8;
+    opacity: 1;
     border-radius: var(--base-radius);
 }
 CSS
