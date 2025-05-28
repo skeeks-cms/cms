@@ -49,7 +49,7 @@ class m250312_132301__create_table__cms_task extends Migration
             'status' => $this->string(255)->defaultValue("new")->comment("Статус"),
 
             'executor_sort' => $this->integer(11)->null()->comment("Сортировка у исполнителя"),
-            'executor_date' => $this->date()->null()->comment("Ориентировочная дата исполнения задачи исполнителем"),
+            'executor_end_at' => $this->integer()->comment("Ориентировочная дата исполнения задачи исполнителем"),
 
         ], $tableOptions);
 
@@ -63,6 +63,8 @@ class m250312_132301__create_table__cms_task extends Migration
         $this->createIndex($tableName.'__cms_project_id', $tableName, 'cms_project_id');
         $this->createIndex($tableName.'__cms_company_id', $tableName, 'cms_company_id');
         $this->createIndex($tableName.'__cms_user_id', $tableName, 'cms_user_id');
+        $this->createIndex($tableName.'__executor_end_at', $tableName, 'executor_end_at');
+        $this->createIndex($tableName.'__executor_sort', $tableName, 'executor_sort');
 
         $this->addCommentOnTable($tableName, 'Задачи');
 
