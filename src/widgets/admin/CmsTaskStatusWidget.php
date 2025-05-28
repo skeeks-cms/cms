@@ -12,7 +12,6 @@ use common\models\User;
 use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsTask;
 use skeeks\cms\widgets\user\assets\UserOnlineWidgetAsset;
-use skeeks\crm\helpers\CrmScheduleHelper;
 use skeeks\crm\models\CrmSchedule;
 use skeeks\crm\models\CrmTask;
 use yii\base\Widget;

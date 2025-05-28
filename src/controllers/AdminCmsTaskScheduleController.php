@@ -32,7 +32,6 @@ use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
 use skeeks\cms\widgets\formInputs\SmartDurationInputWidget;
 use skeeks\cms\widgets\formInputs\SmartTimeInputWidget;
 use skeeks\cms\widgets\GridView;
-use skeeks\crm\helpers\CrmScheduleHelper;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;

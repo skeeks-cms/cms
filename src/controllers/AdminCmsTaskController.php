@@ -14,6 +14,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsProject;
@@ -31,7 +32,6 @@ use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
 use skeeks\cms\widgets\formInputs\SmartDurationInputWidget;
 use skeeks\cms\widgets\formInputs\SmartTimeInputWidget;
 use skeeks\cms\widgets\GridView;
-use skeeks\crm\helpers\CrmScheduleHelper;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
@@ -62,7 +62,7 @@ class AdminCmsTaskController extends BackendModelStandartController
              * @var $model CmsTask
              */
             $model = $this->model;
-            
+
             return $this->renderPartial("@skeeks/cms/views/admin-cms-task/_model_header", [
                 'model' => $model
             ]);
@@ -97,10 +97,10 @@ class AdminCmsTaskController extends BackendModelStandartController
                         'cms_project_id',
                         'cms_company_id',
                         'cms_user_id',
-                        
+
                         'created_by',
                         'executor_id',
-                        
+
                         'status',
 
                         'ready',
@@ -133,7 +133,7 @@ class AdminCmsTaskController extends BackendModelStandartController
                                         $query->joinWith("cmsProject");
 
                                         $logsQuery = CmsLog::find()->andWhere(['like', 'comment', $e->field->value])->andWhere(['model_code' => CmsTask::class])->select(["model_id"]);
-                                        
+
                                         $query->andWhere([
                                             'or',
 
@@ -142,7 +142,7 @@ class AdminCmsTaskController extends BackendModelStandartController
                                             ['like', CmsTask::tableName().'.id', $e->field->value],
                                             ['like', CmsTask::tableName().'.name', $e->field->value],
                                             ['like', CmsTask::tableName().'.description', $e->field->value],
-                                            
+
                                             ['like', CmsProject::tableName().'.id', $e->field->value],
                                             ['like', CmsProject::tableName().'.name', $e->field->value],
                                             ['like', CmsProject::tableName().'.description', $e->field->value],
@@ -161,7 +161,7 @@ class AdminCmsTaskController extends BackendModelStandartController
                                     //'multiple'    => new UnsetArrayValue(),
                                 ],
                             ],
-                            
+
                             'ready' => [
                                 'class'    => SelectField::class,
                                 'label' => "Готовый фильтр",
@@ -286,7 +286,7 @@ class AdminCmsTaskController extends BackendModelStandartController
                         'sort' => SORT_ASC,
                         'id' => SORT_DESC,
                     ],
-                    
+
                     /*'sortAttributes' => [
                         'sort' => [
                             'asc'  => ['sort' => SORT_ASC],
@@ -320,7 +320,7 @@ class AdminCmsTaskController extends BackendModelStandartController
                             'attribute' => 'scheduleTotalTime',
                             'value'     => function (CmsTask $CmsTask) {
                                 if ($CmsTask->raw_row['scheduleTotalTime']) {
-                                    return CrmScheduleHelper::durationAsText($CmsTask->raw_row['scheduleTotalTime']);
+                                    return CmsScheduleHelper::durationAsText($CmsTask->raw_row['scheduleTotalTime']);
                                 } else {
                                     return " - ";
                                 }
@@ -373,7 +373,7 @@ JS
                             'label'  => 'Задача',
                             'value'  => function (CmsTask $CmsTask) {
                                 $result = "";
-                           
+
                                 return CmsTaskViewWidget::widget(['task' => $CmsTask]);
                             },
 

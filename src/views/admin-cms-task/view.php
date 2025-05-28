@@ -193,7 +193,7 @@ JS
                 Длительност по плану
             </span>
                     <span class="sx-properties--value">
-                <?php echo \skeeks\crm\helpers\CrmScheduleHelper::durationAsText($model->plan_duration); ?>
+                <?php echo \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($model->plan_duration); ?>
             </span>
                 </li>
                 <li>
