@@ -159,7 +159,7 @@ CSS
                     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
                 ) */ ?>
                 <?= $form->field($model, 'redirect_tree_id')->widget(
-                    \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::class,
+                    \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                     [
                         'multiple' => false,
                     ]
@@ -341,7 +341,7 @@ JS
                     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
                 ) */ ?>
                     <?= $form->field($model, 'canonical_tree_id')->widget(
-                        \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::class,
+                        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                         [
                             'multiple' => false,
                         ]
