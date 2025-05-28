@@ -6,7 +6,7 @@ use skeeks\cms\mail\helpers\Html;
 /* @var $user common\models\User */
 /* @var $resetLink */
 if (!$resetLink) {
-    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password',
+    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('/admin/auth/reset-password',
         ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
 }
 ?>

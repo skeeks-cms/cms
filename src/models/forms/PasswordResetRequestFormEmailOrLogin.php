@@ -90,10 +90,10 @@ class PasswordResetRequestFormEmailOrLogin extends Model
                 }
 
                 if ($this->isAdmin) {
-                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('admin/auth/reset-password',
+                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('/admin/auth/reset-password',
                         ['token' => $user->password_reset_token])->enableAbsolute()->enableAdmin();
                 } else {
-                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('cms/auth/reset-password',
+                    $resetLink = \skeeks\cms\helpers\UrlHelper::construct('/cms/auth/reset-password',
                         ['token' => $user->password_reset_token])->enableAbsolute();
                 }
 

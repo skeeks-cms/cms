@@ -86,7 +86,7 @@ class StorageImage extends InputWidget
     public function getJsonString()
     {
         return Json::encode([
-            'backendUrl' => UrlHelper::construct('cms/admin-storage-files/link-to-model')->enableAdmin()->toString(),
+            'backendUrl' => UrlHelper::construct('/cms/admin-storage-files/link-to-model')->enableAdmin()->toString(),
             'modelId' => $this->model->id,
             'modelClassName' => $this->model->className(),
             'modelAttribute' => $this->attribute,

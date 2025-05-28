@@ -210,7 +210,7 @@ class AdminCmsContentController extends BackendModelStandartController
         }
 
         return UrlHelper::construct([
-            "cms/admin-cms-content-type/update",
+            "/cms/admin-cms-content-type/update",
             'pk' => $contentTypePk,
         ])->enableAdmin()->toString();
     }

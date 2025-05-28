@@ -25,7 +25,7 @@ $this->title = \Yii::t('skeeks/cms', 'Registration');
                 <div class="col-lg-6">
 
                     <?php $form = ActiveForm::begin([
-                        'validationUrl' => UrlHelper::construct('cms/auth/register')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString()
+                        'validationUrl' => UrlHelper::construct('/cms/auth/register')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString()
                     ]); ?>
                     <?= $form->field($model, 'username') ?>
                     <?= $form->field($model, 'email') ?>

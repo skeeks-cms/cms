@@ -25,7 +25,7 @@ $this->title = \Yii::t('skeeks/cms', 'Request for password recovery');
                 <div class="col-lg-6">
 
                     <?php $form = ActiveForm::begin([
-                        'validationUrl' => UrlHelper::construct('cms/auth/forget')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString()
+                        'validationUrl' => UrlHelper::construct('/cms/auth/forget')->setSystemParam(\skeeks\cms\helpers\RequestResponse::VALIDATION_AJAX_FORM_SYSTEM_NAME)->toString()
                     ]); ?>
                     <?= $form->field($model, 'identifier') ?>
 

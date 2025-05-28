@@ -31,8 +31,8 @@ class ActiveFormRelatedProperties extends ActiveForm
 
     public function __construct($config = [])
     {
-        $this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/validate')->toString();
-        $this->action = \skeeks\cms\helpers\UrlHelper::construct('cms/model-properties/submit')->toString();
+        $this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('/cms/model-properties/validate')->toString();
+        $this->action = \skeeks\cms\helpers\UrlHelper::construct('/cms/model-properties/submit')->toString();
 
         $this->enableAjaxValidation = true;
 

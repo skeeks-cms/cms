@@ -66,7 +66,7 @@ class ModelStorageFiles extends InputWidget
         parent::init();
 
         if ($this->backendUrl === null) {
-            $this->backendUrl = UrlHelper::construct('cms/admin-storage-files/link-to-models')->enableAdmin()->toString();
+            $this->backendUrl = UrlHelper::construct('/cms/admin-storage-files/link-to-models')->enableAdmin()->toString();
         }
     }
 
