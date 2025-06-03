@@ -644,19 +644,19 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                 'elementOptions' => ['isOpen' => false],
                 'fields' => [
 
-                    'is_vendor' => [
+                    /*'is_vendor' => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
+                        //'allowNull' => false,
                     ],
 
                     'is_vendor_code' => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
+                        //'allowNull' => false,
                     ],
                     'is_country' => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],
+                        //'allowNull' => false,
+                    ],*/
                     'is_offer_property' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
