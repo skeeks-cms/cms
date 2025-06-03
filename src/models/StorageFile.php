@@ -101,7 +101,7 @@ class StorageFile extends Core
                 'integer',
             ],
             [['description_short', 'description_full'], 'string'],
-            [['cluster_file', 'original_name', 'name'], 'string', 'max' => 255],
+            [['cluster_file', 'original_name', 'name'], 'string', 'max' => 400],
             [['cluster_id', 'mime_type', 'extension'], 'string', 'max' => 255],
             [['name_to_save'], 'string', 'max' => 32],
             [
