@@ -123,7 +123,7 @@ class CmsContentProperty extends RelatedPropertyModel
                 'default',
                 'value' => null,
             ],*/
-            [
+            /*[
                 ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property'],
                 function ($attr) {
                     if ($this->{$attr} != 1) {
@@ -131,9 +131,9 @@ class CmsContentProperty extends RelatedPropertyModel
                     }
                 },
 
-            ],
+            ],*/
             [
-                ['is_img_offer_property'],
+                ['is_img_offer_property', 'is_offer_property'],
                 'default',
                 'value' => 0,
             ],
