@@ -50,7 +50,7 @@ class CmsUserRule extends Rule
             //Если пользователь доступен для текущего
             if (CmsUser::find()
                 ->forManager($currentUser) //Поиск пользователей доступных текущему пользователю
-                ->andWhere([CmsUser::tableName() . 'id' => $model->id]) //Пользователь которого проверяем
+                ->andWhere([CmsUser::tableName() . '.id' => $model->id]) //Пользователь которого проверяем
                 ->exists() ) {
                 return true;
             }
