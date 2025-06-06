@@ -978,6 +978,13 @@ TEXT;
     opacity: 1;
     border-radius: var(--base-radius);
 }
+@media (max-width: 768px) {
+    .sx-legal-cookie {
+        bottom: 5rem;
+    }
+}
+
+
 CSS
         );
 
