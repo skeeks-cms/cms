@@ -418,6 +418,7 @@ JS
                 'name' => 'Мой календарь',
                 'icon' => 'fa fa-calendar',
                 'priority' => 100,
+                /*'isOpenNewWindow' => false,*/
             ],
 
 
