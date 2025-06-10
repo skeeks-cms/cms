@@ -66,7 +66,7 @@ class AdminTreeController extends BackendModelStandartController
              */
             $model = $this->model;
             return $this->renderPartial("@skeeks/cms/views/admin-tree/_model_header", [
-                'model' => $model
+                'model' => $model,
             ]);
         };
 
@@ -87,10 +87,10 @@ class AdminTreeController extends BackendModelStandartController
 
             'list' => [
                 'isVisible' => false,
-                'class'    => BackendGridModelAction::className(),
-                'name'     => \Yii::t('skeeks/cms', 'List'),
-                "icon"     => "fa fa-list",
-                "priority" => 10,
+                'class'     => BackendGridModelAction::className(),
+                'name'      => \Yii::t('skeeks/cms', 'List'),
+                "icon"      => "fa fa-list",
+                "priority"  => 10,
 
                 'on beforeRender' => function (Event $event) {
                     if ($pid = \Yii::$app->request->get("pid")) {
@@ -225,42 +225,41 @@ class AdminTreeController extends BackendModelStandartController
             ],
 
             'resort' => [
-                'class'     => BackendAction::class,
-                'isVisible' => false,
-                'name'      => "Сортировать подразделы",
-                'callback'  => [$this, 'actionResort'],
+                'class'          => BackendAction::class,
+                'isVisible'      => false,
+                'name'           => "Сортировать подразделы",
+                'callback'       => [$this, 'actionResort'],
                 "generateAccess" => true,
             ],
 
-            
 
             "update" => [
-                'class'    => BackendModelUpdateAction::className(),
-                "callback" => [$this, 'update'],
-                "priority" => 100,
+                'class'          => BackendModelUpdateAction::className(),
+                "callback"       => [$this, 'update'],
+                "priority"       => 100,
                 "generateAccess" => true,
             ],
 
             "properties" => [
-                "priority"       => 150,
-                'name'      => "Характеристики",
-                'icon'      => "fa fa-list",
-                'class'          => BackendModelAction::class,
+                "priority" => 150,
+                'name'     => "Характеристики",
+                'icon'     => "fa fa-list",
+                'class'    => BackendModelAction::class,
 
-                'accessCallback' => function($action) {
+                'accessCallback' => function ($action) {
                     if (!$action->model) {
                         return false;
                     }
                     return \skeeks\cms\models\CmsContent::find()->andWhere(['cms_tree_type_id' => $action->model->tree_type_id])->exists();
-                }
+                },
             ],
 
             "copy-tree" => [
-                "priority"       => 300,
-                'class'          => BackendModelUpdateAction::class,
-                "name"           => \Yii::t('skeeks/cms', 'Copy'),
-                "icon"           => "fas fa-copy",
-                "callback"           => [$this, 'copyTree'],
+                "priority" => 300,
+                'class'    => BackendModelUpdateAction::class,
+                "name"     => \Yii::t('skeeks/cms', 'Copy'),
+                "icon"     => "fas fa-copy",
+                "callback" => [$this, 'copyTree'],
             ],
 
             "move" => [
@@ -321,7 +320,7 @@ class AdminTreeController extends BackendModelStandartController
                     } else {
                         throw new Exception(print_r($model->errors, true));
                     }
-                    
+
 
                 },
 
@@ -374,17 +373,16 @@ class AdminTreeController extends BackendModelStandartController
 
                 },
             ],
-            
+
             "delete" => [
                 "generateAccess" => true,
             ],
 
             "log" => [
-                'class'    => BackendModelLogAction::class,
+                'class'          => BackendModelLogAction::class,
                 "generateAccess" => true,
             ],
         ]);
-
 
 
         unset($actions['create']);
@@ -395,15 +393,15 @@ class AdminTreeController extends BackendModelStandartController
     public function copyTree()
     {
         $dm = new \skeeks\cms\base\DynamicModel(['is_copy_childs', 'is_copy_elements']);
-        
+
         $dm->addRule(['is_copy_childs'], 'integer');
         $dm->addRule(['is_copy_elements'], 'integer');
 
         $dm->setAttributeLebel("is_copy_childs", 'Копировать дочерние разделы?');
         $dm->setAttributeLebel("is_copy_elements", 'Копировать привязанные элементы?');
-        
+
         Skeeks::unlimited();
-        
+
         $rr = new RequestResponse();
 
         if ($rr->isRequestAjaxPost()) {
@@ -415,8 +413,8 @@ class AdminTreeController extends BackendModelStandartController
                  */
                 $currentTree = $this->model;
 
-                $currentTree->copy((bool) $dm->is_copy_childs, (bool) $dm->is_copy_elements);
-    
+                $currentTree->copy((bool)$dm->is_copy_childs, (bool)$dm->is_copy_elements);
+
                 /*$newTree = $currentTree->copyCurrentTree();
                 $newTree->name = $newTree->name . " (копия)";
                 $newTree->update(false, ['name']);
@@ -438,21 +436,20 @@ class AdminTreeController extends BackendModelStandartController
                 $rr->success = false;
                 $rr->message = $exception->getMessage();
             }
-            
 
-            
 
             return $rr;
         }
-        
+
         return $this->render($this->action->id, [
-            'dm' => $dm
+            'dm' => $dm,
         ]);
     }
 
-    
-    protected function _copyTree(CmsTree $cmsTree) {
-        
+
+    protected function _copyTree(CmsTree $cmsTree)
+    {
+
     }
 
     public function update(BackendModelUpdateAction $adminAction)
@@ -510,10 +507,9 @@ class AdminTreeController extends BackendModelStandartController
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
 
-                if (!$model->errors && !$relatedModel->errors)
-                {
+                if (!$model->errors && !$relatedModel->errors) {
                     if (!$model->save()) {
-                        throw new Exception("Ошибка сохранения данных: " . print_r($model->errors, true));
+                        throw new Exception("Ошибка сохранения данных: ".print_r($model->errors, true));
                     }
 
                     if (!$relatedModel->save()) {
@@ -523,7 +519,7 @@ class AdminTreeController extends BackendModelStandartController
                     $rr->message = '✓ Сохранено';
                     $rr->success = true;
                     $rr->data = [
-                        'type' => 'update'
+                        'type' => 'update',
                     ];
                 } else {
                     $rr->success = false;
@@ -531,7 +527,7 @@ class AdminTreeController extends BackendModelStandartController
                         'validation' => ArrayHelper::merge(
                             ActiveForm::validate($model),
                             ActiveForm::validate($relatedModel),
-                        )
+                        ),
                     ];
                 }
             } catch (\Exception $exception) {

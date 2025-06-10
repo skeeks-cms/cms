@@ -8,24 +8,14 @@
 
 namespace skeeks\cms\controllers;
 
-use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
-use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
-use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
-use skeeks\cms\models\CmsContentProperty;
-use skeeks\cms\models\CmsLang;
 use skeeks\cms\models\CmsSavedFilter;
-use skeeks\cms\queryfilters\filters\FilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
-use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget;
-use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
-use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
@@ -100,7 +90,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
 
                                         $query->andWhere([
                                             'or',
-                                            ['like', CmsSavedFilter::tableName() .'.short_name', $e->field->value],
+                                            ['like', CmsSavedFilter::tableName().'.short_name', $e->field->value],
                                             ['like', 'valueContentElement.name', $e->field->value],
                                             ['like', 'valueContentPropertyEnum.value', $e->field->value],
                                             ['like', 'brand.name', $e->field->value],
@@ -149,8 +139,8 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
-                    
-                    'on init'       => function (Event $e) {
+
+                    'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
@@ -159,10 +149,10 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                         $dataProvider = $e->sender->dataProvider;
                         $query->cmsSite();
                     },
-                    
-                    'defaultOrder' => [
+
+                    'defaultOrder'   => [
                         'priority' => SORT_ASC,
-                        'id' => SORT_DESC,
+                        'id'       => SORT_DESC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
@@ -182,54 +172,54 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                         'view',
                     ],
                     'columns'        => [
-                        'created_at'       =>  [
-                            'class' => DateTimeColumnData::class
+                        'created_at'              => [
+                            'class' => DateTimeColumnData::class,
                         ],
-                        'updated_at'       =>  [
-                            'class' => DateTimeColumnData::class
+                        'updated_at'              => [
+                            'class' => DateTimeColumnData::class,
                         ],
-                        'shop_brand_id'       => [
+                        'shop_brand_id'           => [
                             'attribute' => 'shop_brand_id',
-                            'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSavedFilter $model) {
                                 return $model->shop_brand_id ? $model->brand->name : "";
-                            }
+                            },
                         ],
-                        'country_alpha2'       => [
+                        'country_alpha2'          => [
                             'attribute' => 'country_alpha2',
-                            'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSavedFilter $model) {
                                 return $model->country_alpha2 ? $model->country->name : "";
-                            }
+                            },
                         ],
-                        'cms_content_property_id'       => [
+                        'cms_content_property_id' => [
                             'attribute' => 'cms_content_property_id',
-                            'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSavedFilter $model) {
                                 return $model->cms_content_property_id ? $model->cmsContentProperty->name : "";
-                            }
+                            },
                         ],
 
-                        'value_content_element_id'       => [
+                        'value_content_element_id' => [
                             'attribute' => 'value_content_element_id',
-                            'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSavedFilter $model) {
                                 return $model->value_content_element_id ? $model->valueContentElement->name : "";
-                            }
+                            },
                         ],
 
-                        'value_content_property_enum_id'       => [
+                        'value_content_property_enum_id' => [
                             'attribute' => 'value_content_property_enum_id',
-                            'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSavedFilter $model) {
                                 return $model->value_content_property_enum_id ? $model->valueContentPropertyEnum->value : "";
-                            }
+                            },
                         ],
 
-                        'v'       => [
-                            'label' => 'Значение',
+                        'v' => [
+                            'label'  => 'Значение',
                             'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'value'  => function (CmsSavedFilter $model) {
 
                                 if ($model->value_content_property_enum_id) {
                                     return $model->valueContentPropertyEnum->value;
@@ -240,13 +230,13 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                                 }
 
                                 return "";
-                            }
+                            },
                         ],
 
-                        'custom'       => [
+                        'custom' => [
                             'attribute' => 'id',
-                            'format' => 'raw',
-                            'value' => function (CmsSavedFilter $model) {
+                            'format'    => 'raw',
+                            'value'     => function (CmsSavedFilter $model) {
 
                                 $data = [];
                                 $data[] = Html::a($model->seoName, "#", ['class' => 'sx-trigger-action']);
@@ -265,24 +255,22 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                                 return "<div class='row no-gutters'>
                                                 <div class='sx-trigger-action' style='width: 50px;'>
                                                 <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                    <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
                                                 </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>" . $info  . /*. "<br />(" . $model->code . ")*/
-                                                    "</div></div>";
-
-                                            ;
-                            }
+                                                <div style='margin-left: 5px;'>".$info. /*. "<br />(" . $model->code . ")*/
+                                    "</div></div>";;
+                            },
                         ],
 
-                        'priority'     => [
-                            'headerOptions'  => [
+                        'priority' => [
+                            'headerOptions' => [
                                 'style' => 'max-width: 100px; width: 100px;',
                             ],
                         ],
 
                         'view' => [
-                            'value'          => function (CmsSavedFilter $model) {
+                            'value'         => function (CmsSavedFilter $model) {
                                 return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $model->absoluteUrl,
                                     [
                                         'target'    => '_blank',
@@ -291,9 +279,9 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                                         'class'     => 'btn btn-sm',
                                     ]);
                             },
-                            'format'         => 'raw',
+                            'format'        => 'raw',
                             /*'label'  => "Смотреть",*/
-                            'headerOptions'  => [
+                            'headerOptions' => [
                                 'style' => 'max-width: 40px; width: 40px;',
                             ],
                         ],
@@ -335,7 +323,7 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
 
             'short_name',
 
-            'cms_image_id' => [
+            'cms_image_id'     => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
                 'widgetConfig' => [
@@ -345,34 +333,34 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
             ],
 
             'code',
-            'priority' => [
-                'class' => NumberField::class
+            'priority'         => [
+                'class' => NumberField::class,
             ],
 
             'seo_h1',
-            'meta_title' => [
-                'class' => TextareaField::class
+            'meta_title'       => [
+                'class' => TextareaField::class,
             ],
             'meta_description' => [
-                'class' => TextareaField::class
+                'class' => TextareaField::class,
             ],
-            'meta_keywords' => [
-                'class' => TextareaField::class
+            'meta_keywords'    => [
+                'class' => TextareaField::class,
             ],
 
             'description_short' => [
-                'class' => WidgetField::class,
-                'widgetClass' => ComboTextInputWidget::class,
+                'class'        => WidgetField::class,
+                'widgetClass'  => ComboTextInputWidget::class,
                 'widgetConfig' => [
                     'modelAttributeSaveType' => 'description_short_type',
-                ]
+                ],
             ],
-            'description_full' => [
-                'class' => WidgetField::class,
-                'widgetClass' => ComboTextInputWidget::class,
+            'description_full'  => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => ComboTextInputWidget::class,
                 'widgetConfig' => [
                     'modelAttributeSaveType' => 'description_full_type',
-                ]
+                ],
             ],
         ];
     }

@@ -9,7 +9,6 @@
 namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
@@ -37,7 +36,7 @@ class PropertyTypeTree extends PropertyType
     public static function fieldElements()
     {
         return [
-            self::FIELD_ELEMENT_DEFAULT => \Yii::t('skeeks/cms', 'Standard selection element'),
+            self::FIELD_ELEMENT_DEFAULT       => \Yii::t('skeeks/cms', 'Standard selection element'),
             self::FIELD_ELEMENT_SELECT_DIALOG => \Yii::t('skeeks/cms', 'Selection in the dialog box'),
         ];
     }
@@ -52,7 +51,7 @@ class PropertyTypeTree extends PropertyType
         $result = $activeForm->field($this, 'is_multiple')->checkbox(\Yii::$app->formatter->booleanFormat);
         $result .= $activeForm->fieldSelect($this, 'fieldElement', static::fieldElements());
         $result .= $activeForm->field($this, 'root_tree_id')->widget(
-            ///\skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
+        ///\skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class
             SelectModelDialogTreeWidget::class
         );
 
@@ -63,7 +62,7 @@ class PropertyTypeTree extends PropertyType
     {
         return array_merge(parent::attributeLabels(),
             [
-                'is_multiple' => \Yii::t('skeeks/cms', 'Multiple choice'),
+                'is_multiple'  => \Yii::t('skeeks/cms', 'Multiple choice'),
                 'fieldElement' => \Yii::t('skeeks/cms', 'Form element type'),
                 'root_tree_id' => \Yii::t('skeeks/cms', 'Root partition'),
             ]);
@@ -118,13 +117,13 @@ class PropertyTypeTree extends PropertyType
                 $rootTreeModels = CmsTree::findAll($this->root_tree_id);
             }
             $field->widget(
-                \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::className(),
+                \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::className(),
                 [
-                    "multiple" => $this->isMultiple ? true : false,
+                    "multiple"          => $this->isMultiple ? true : false,
                     'treeWidgetOptions' =>
                         [
-                            'models' => $rootTreeModels
-                        ]
+                            'models' => $rootTreeModels,
+                        ],
                 ]
             );
         }
@@ -132,7 +131,7 @@ class PropertyTypeTree extends PropertyType
 
         return $field;
     }
-    
+
     /**
      * @return string
      */
