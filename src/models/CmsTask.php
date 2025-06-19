@@ -312,7 +312,7 @@ class CmsTask extends ActiveRecord
                 'skipOnEmpty' => false,
                 //'extensions'    => [''],
                 'maxFiles'    => 50,
-                'maxSize'     => 1024 * 1024 * 50,
+                'maxSize'     => 1024 * 1024 * 100,
                 'minSize'     => 256,
             ],
         ]);

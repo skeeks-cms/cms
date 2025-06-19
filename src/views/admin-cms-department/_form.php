@@ -159,7 +159,7 @@ CSS
                     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
                 ) */ ?>
                 <?= $form->field($model, 'redirect_tree_id')->widget(
-                    \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::class,
+                    \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                     [
                         'multiple' => false,
                     ]
@@ -220,10 +220,10 @@ CSS
 <?php
 $prodcutsContent = \skeeks\cms\models\CmsContent::find()->isProducts()->andWhere(['cms_tree_type_id' => $model->tree_type_id])->one();
 if ($prodcutsContent) :
-?>
+    ?>
     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Настройки магазина'), ['isOpen' => true]); ?>
-        <?php
-        $this->registerJs(<<<JS
+    <?php
+    $this->registerJs(<<<JS
         if ($(".field-tree-shop_has_collections input").is(":checked")) {
             $(".field-tree-shop_show_collections").slideDown();
         } else {
@@ -238,11 +238,11 @@ if ($prodcutsContent) :
             }
         });
 JS
-        );
+    );
 
-        ?>
-        <?php echo $form->field($model, 'shop_has_collections')->checkbox(); ?>
-        <?php echo $form->field($model, 'shop_show_collections')->checkbox(); ?>
+    ?>
+    <?php echo $form->field($model, 'shop_has_collections')->checkbox(); ?>
+    <?php echo $form->field($model, 'shop_show_collections')->checkbox(); ?>
     <? $fieldSet::end(); ?>
 <?php endif; ?>
 
@@ -341,7 +341,7 @@ JS
                     \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
                 ) */ ?>
                     <?= $form->field($model, 'canonical_tree_id')->widget(
-                        \skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget::class,
+                        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
                         [
                             'multiple' => false,
                         ]
