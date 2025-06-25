@@ -898,7 +898,7 @@ class RelatedPropertiesModel extends DynamicModel
                     $result = [];
 
                     foreach ($property->enums as $enum) {
-                        if (in_array($enum->id, $value)) {
+                        if (in_array($enum->id, (array) $value)) {
                             $result[$enum->code] = $enum;
                         }
 
