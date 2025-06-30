@@ -312,7 +312,7 @@ class CmsSite extends ActiveRecord
      */
     public function getCmsSmsProvider()
     {
-        return $this->getCmsSmsProviders()->default()->one();
+        return $this->getCmsSmsProviders()->andWhere(['is_main' => 1])->one();
     }
 
     /**
