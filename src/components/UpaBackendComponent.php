@@ -59,6 +59,29 @@ class UpaBackendComponent extends BackendComponent
                         \Yii::$app->response->redirect(Url::to(['/cms/upa-personal/password']));
                     }
                 }
+
+
+
+                if (\Yii::$app->cms->is_need_user_data) {
+                    if (!in_array(\Yii::$app->controller->uniqueId, [
+                        'admin/error',
+                    ]) && !in_array(\Yii::$app->controller->action->uniqueId, [
+                        'cms/upa-personal/password',
+                        'cms/upa-personal/update',
+                    ]) ) {
+                        $user = \Yii::$app->user->identity;
+                        
+                        foreach (\Yii::$app->cms->is_need_user_data as $code)
+                        {
+                            if (!$user->{$code}) {
+                                \Yii::$app->response->redirect(Url::to(['/cms/upa-personal/update']));
+                                return true;
+                            }
+                        }
+                       
+                    }
+                }
+
             }
 
         });

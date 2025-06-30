@@ -149,6 +149,8 @@ class Cms extends \skeeks\cms\base\Component
     public $pass_required_need_lowercase = 1;
     public $pass_required_need_specialChars = 0;
     public $pass_is_need_change = 1;
+    
+    public $is_need_user_data = [];
 
     public $is_allow_auth_by_email = 1;
 
@@ -366,6 +368,7 @@ class Cms extends \skeeks\cms\base\Component
             [['approved_key_is_letter'], 'integer'],
 
 
+            [['is_need_user_data'], 'safe'],
             [['pass_is_need_change'], 'integer'],
             [['is_allow_auth_by_email'], 'integer'],
             [['auth_submit_code_always'], 'integer'],
@@ -390,6 +393,7 @@ class Cms extends \skeeks\cms\base\Component
             'auth_submit_code_always'      => 'Всегда отправлять проверочный код на email или телефон',
             'is_allow_auth_by_email'      => 'Разрешить авторизацию по Email',
             'pass_is_need_change'      => 'Требовать установки постоянного пароля?',
+            'is_need_user_data'      => 'Требовать от пользователя заполнения этих данных.',
             'pass_required_length'      => 'Минимальная длина пароля',
             'pass_required_need_number'      => 'Пароль должен содержать хотя бы одну цифру',
             'pass_required_need_uppercase'      => 'Пароль должен содержать хотя бы одну заглавную букву',
@@ -405,6 +409,7 @@ class Cms extends \skeeks\cms\base\Component
             'registerRoles'               => 'Так же после созданию пользователя, ему будут назначены, выбранные группы.',
             'auth_only_email_is_approved' => 'Если эта опция включена то пользователь, который не подтвердил свой email не сможет авторизоваться на сайте.',
             'pass_is_need_change' => 'Если авторизация произошла через код подтверждения (телефон, email), то после авторизации будет предолжено установить постоянный пароль.',
+            'is_need_user_data' => 'После авторизации будет предолжено указать эти данные.',
             'auth_submit_code_always'      => 'Постоянный пароль не спрашивается, всегда отправляется сообщение на email или телефон.',
         ]);
     }
@@ -472,6 +477,19 @@ class Cms extends \skeeks\cms\base\Component
                     'pass_is_need_change'      => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
+                    ],
+                    
+                    'is_need_user_data'      => [
+                        'class'     => SelectField::class,
+                        'multiple' => true,
+                        'items' => [
+                            'first_name' => "Имя",
+                            'last_name' => "Фамилия",
+                            'patronymic' => "Отчество",
+                            'email' => "Email",
+                            'phone' => "Телефон", 
+                            
+                        ],
                     ],
 
                     'pass_required_length'      => [

@@ -173,7 +173,8 @@ class WidgetRenderable extends Widget
         $cacheKey = $this->getCacheKey($this->is_cache_unique_for_user).'WidgetRenderableRun';
 
         $result = \Yii::$app->cache->get($cacheKey);
-        if ($result === false || $this->is_cache === false) {
+
+        if ($result === false || ($this->is_cache === false || $this->is_cache == "0")) {
 
             if ($this->viewFile) {
                 try {
