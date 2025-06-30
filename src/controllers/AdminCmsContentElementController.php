@@ -211,23 +211,24 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                             $query = null;
                                             if ($userIds) {
                                                 $userIds = array_keys($userIds);
-                                                $query = CmsUser::find()->cmsSite()->where(['id' => $userIds]);
+                                                $query = CmsUser::find()->cmsSite()->where([CmsUser::tableName() .'.id' => $userIds]);
                                                 /*return ArrayHelper::map($q->all(), 'id', function(CmsUser $model) {
                                                     return $model->shortDisplayName . ($model->email ? " ($model->email)" : "");
                                                 });*/
                                             } else {
-                                                $query = CmsUser::find()->cmsSite()->where(['id' => null]);
+                                                $query = CmsUser::find()->cmsSite()->where([CmsUser::tableName() .'.id' => null]);
                                             }
 
 
                                             if ($word) {
-                                                $query->andWhere([
+                                                $query->search($word);
+                                                /*$query->andWhere([
                                                     'or',
                                                     ['like', 'first_name', $word],
                                                     ['like', 'last_name', $word],
                                                     ['like', 'email', $word],
                                                     ['like', 'phone', $word],
-                                                ]);
+                                                ]);*/
                                             }
                                             
                                             return $query;
