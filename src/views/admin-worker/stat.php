@@ -36,14 +36,24 @@ $qTree = \skeeks\cms\models\CmsTree::find()->from([
         'count'        => new \yii\db\Expression("count(1)"),
     ]);
     
+$qCollection = \skeeks\cms\shop\models\ShopCollection::find()->from([
+        'sc' => \skeeks\cms\shop\models\ShopCollection::tableName(),
+    ])
+    ->andWhere(['sc.created_by' => $model->id])
+    ->select([
+        'count'        => new \yii\db\Expression("count(1)"),
+    ]);
+    
 if ($dm->from) {
     $start = strtotime($dm->from . " 00:00:00");
     $q->andWhere(['>=', 'c.created_at', $start]);
+    $qCollection->andWhere(['>=', 'sc.created_at', $start]);
     $qTree->andWhere(['>=', 't.created_at', $start]);
 }
 if ($dm->to) {
     $to = strtotime($dm->to . " 23:59:59");
     $q->andWhere(['<=', 'c.created_at', $to]);
+    $qCollection->andWhere(['<=', 'sc.created_at', $to]);
     $qTree->andWhere(['<=', 't.created_at', $to]);
 }
 
@@ -52,6 +62,10 @@ $all = $q
     ->all();
 
 $allTree = $qTree
+    ->asArray()
+    ->all();
+
+$allCollection = $qCollection
     ->asArray()
     ->all();
 
@@ -84,6 +98,14 @@ $allTree = $qTree
             <?php foreach ($allTree as $data) : ?>
                 <div>
                     Разделов добавлено: <b><?php echo $data['count']; ?></b>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <?php if ($allCollection) : ?>
+            <?php foreach ($allCollection as $data) : ?>
+                <div>
+                    Коллекций добавлено: <b><?php echo $data['count']; ?></b>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
