@@ -182,7 +182,7 @@ class WidgetRenderable extends Widget
                         'widget' => $this,
                     ]));
                 } catch (\Exception $e) {
-                    $result = $e->getMessage();
+                    $result = $e->getTraceAsString();
                 }
                 
             } else {
