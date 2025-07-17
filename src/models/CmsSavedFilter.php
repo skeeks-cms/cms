@@ -10,6 +10,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\components\urlRules\UrlRuleContentElement;
+use skeeks\cms\eavqueryfilter\CmsEavQueryFilterHandler;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasMultiLangAndSiteFields;
 use skeeks\cms\models\behaviors\HasStatus;
@@ -17,8 +18,10 @@ use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\traits\HasUrlTrait;
 use skeeks\cms\models\queries\CmsSavedFilterQuery;
 use skeeks\cms\shop\models\ShopBrand;
+use skeeks\cms\shop\queryFilter\ShopDataFiltersHandler;
 use skeeks\yii2\yaslug\YaSlugBehavior;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -56,6 +59,8 @@ use yii\web\Application;
  * @property string                 $url
  * @property bool                 $isAllowIndex
  *
+ * @property string                $propertyIdForFilter
+ * @property string                $propertyValueForFilter
  * @property CmsTree                $cmsTree
  * @property CmsSite                $cmsSite
  * @property CmsStorageFile         $cmsImage
@@ -627,6 +632,45 @@ class CmsSavedFilter extends ActiveRecord
         return true;
     }
 
+    public function getPropertyIdForFilter()
+    {
+        $baseQuery = CmsCompareElement::find();
+        
+        if ($this->shop_brand_id) {
+            $f = new ShopDataFiltersHandler([
+                'baseQuery' => $baseQuery,
+            ]);
+            return "field-{$f->formName()}-brand_id";
+        }
+        
+        if ($this->cms_content_property_id) {
+            $f = new CmsEavQueryFilterHandler([
+                'baseQuery' => $baseQuery,
+            ]);
+            return "field-{$f->formName()}-" . $this->cms_content_property_id;
+        }
+        
+        
+        
+        return "";
+    }
+    public function getPropertyValueForFilter()
+    {
+        
+        if ($this->value_content_element_id) {
+            return $this->value_content_element_id;
+        }
+        
+        if ($this->value_content_property_enum_id) {
+            return $this->value_content_property_enum_id;
+        }
+        
+        if ($this->shop_brand_id) {
+            return $this->shop_brand_id;
+        }
+
+        return "";
+    }
 
 }
 
