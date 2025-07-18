@@ -168,6 +168,7 @@ HTML
     public function updateFields($action)
     {
         $handlerFields = [];
+
         /**
          * @var $handler DeliveryHandlerComponent
          */
@@ -199,7 +200,7 @@ CSS
 
                     'is_main' => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
+                        'allowNull' => true,
                     ],
                     'name',
                     'priority',

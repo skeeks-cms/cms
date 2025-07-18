@@ -114,6 +114,8 @@ class CmsSmsProvider extends \skeeks\cms\base\ActiveRecord
 
             //[['cms_site_id', 'is_main'], 'unique', 'targetAttribute' => ['cms_site_id', 'is_main']],
 
+            [['is_main'], 'default', 'value' => 0],
+
             [['component_config'], 'safe'],
             [['component'], 'string', 'max' => 255],
 
