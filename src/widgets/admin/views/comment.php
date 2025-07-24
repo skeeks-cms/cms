@@ -21,7 +21,7 @@ $log->model_id = $widget->model->id;
 $isPjax = (int) $widget->isPjax;
 
 $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-    'action'                 => \yii\helpers\Url::to(['/cms/admin-cms-log/add-comment']),
+    'action'                 => \yii\helpers\Url::to($widget->backend_url),
     'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
     'clientCallback'         => new \yii\web\JsExpression(<<<JS

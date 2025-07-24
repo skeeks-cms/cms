@@ -94,7 +94,7 @@ $dataProvider = new \yii\data\ActiveDataProvider([
 
 ?>
 
-<? echo \yii\widgets\ListView::widget([
+<? echo \yii\widgets\ListView::widget(\yii\helpers\ArrayHelper::merge([
     'dataProvider' => $dataProvider,
     'itemView'     => '_log-list-item',
     'emptyText'    => '<div class="sx-block">Записей нет</div>',
@@ -117,5 +117,5 @@ $dataProvider = new \yii\data\ActiveDataProvider([
     'layout'       => '<div class="row"><div class="col-md-12 sx-list-summary">{summary}</div></div>
     <div class="no-gutters row sx-list sx-log-list">{items}</div>
     <div class="row"><div class="col-md-12">{pager}</div></div>',
-])
+], (array) $widget->list_view_config))
 ?>
