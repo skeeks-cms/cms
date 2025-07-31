@@ -12,7 +12,6 @@ use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\query\CmsActiveQuery;
-use skeeks\cms\widgets\formInputs\selectTree\DaterangeInputWidget;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;

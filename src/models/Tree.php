@@ -509,7 +509,7 @@ class Tree extends ActiveRecord
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 1,
-                'maxSize'     => 1024 * 1024 * 10,
+                'maxSize'     => 1024 * 1024 * 15,
                 'minSize'     => 1024,
             ],
             [['imageIds', 'fileIds'], 'safe'],
@@ -519,7 +519,7 @@ class Tree extends ActiveRecord
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 40,
-                'maxSize'     => 1024 * 1024 * 10,
+                'maxSize'     => 1024 * 1024 * 15,
                 'minSize'     => 1024,
             ],
             [

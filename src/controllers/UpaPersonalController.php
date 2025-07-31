@@ -165,7 +165,7 @@ class UpaPersonalController extends BackendController
                 $rr->success = false;
                 $rr->data = [
                     'validation' => ArrayHelper::merge(
-                        ActiveForm::validate($user),
+                        ActiveForm::validate($user), []
                     ),
                 ];
             }

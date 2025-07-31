@@ -430,7 +430,7 @@ class CmsContentElement extends RelatedElementModel
                 'skipOnEmpty' => true,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 1,
-                'maxSize'     => 1024 * 1024 * 10,
+                'maxSize'     => 1024 * 1024 * 15,
                 'minSize'     => 256,
             ],
             [['imageIds', 'fileIds'], 'safe'],
@@ -441,7 +441,7 @@ class CmsContentElement extends RelatedElementModel
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 100,
-                'maxSize'     => 1024 * 1024 * 10,
+                'maxSize'     => 1024 * 1024 * 15,
                 'minSize'     => 256,
             ],
             [
