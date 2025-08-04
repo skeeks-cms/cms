@@ -28,7 +28,7 @@ $(function() {
   jInput.daterangepicker({
       autoUpdateInput: false,
       "locale": {
-        "format": "MM.DD.YYYY",
+        "format": "DD.MM.YYYY",
         "separator": " - ",
         "applyLabel": "Применить",
         "cancelLabel": "Сбросить фильтр",
@@ -75,11 +75,11 @@ $(function() {
   });
 
   jInput.on('apply.daterangepicker', function(ev, picker) {
-      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY')).trigger("change");
   });
 
   jInput.on('cancel.daterangepicker', function(ev, picker) {
-      $(this).val('');
+      $(this).val('').trigger("change");
   });
 
 });
