@@ -119,6 +119,17 @@ class SavedFilterController extends Controller
 
         $cmsTree->name = $this->model->seoName;
         $cmsTree->seoName = $this->model->seoName;
+        
+        if ($this->model->meta_title) {
+            $cmsTree->meta_title = $this->model->meta_title;
+        }
+
+        if ($this->model->meta_description) {
+            $cmsTree->meta_description = $this->model->meta_description;
+        }
+        if ($this->model->meta_keywords) {
+            $cmsTree->meta_keywords = $this->model->meta_keywords;
+        }
 
         $result = $this->render($viewFile, [
             'model' => $cmsTree,

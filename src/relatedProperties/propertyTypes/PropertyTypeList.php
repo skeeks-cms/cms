@@ -116,32 +116,38 @@ class PropertyTypeList extends PropertyType
         $result = $activeForm->fieldSelect($this, 'fieldElement',
             \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList::fieldElements());
 
-        if ($controllerProperty = \Yii::$app->createController($this->enumRoute)[0]) {
-            /**
-             * @var \skeeks\cms\backend\BackendAction $actionIndex
-             * @var \skeeks\cms\backend\BackendAction $actionCreate
-             */
-            $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
-            $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
+        $controllers = \Yii::$app->createController($this->enumRoute);
 
-            if ($this->property->isNewRecord) {
-                $result .= Alert::widget([
-                    'options' => [
-                        'class' => 'alert-info text-center',
-                    ],
-                    'body'    => \Yii::t('skeeks/cms', 'To start setting up options, save this property.'),
-                ]);
-            } else {
-                
-                $result .= Alert::widget([
-                    'options' => [
-                        'class' => 'alert-default text-center',
-                    ],
-                    'body'    => \Yii::t('skeeks/cms', 'Опции для этого списка задаются в отдельной вкладке, которая доступна после сохранения этого свойства.'),
-                ]);
+        if ($controllers) {
+            if ($controllerProperty = $controllers[0]) {
+
+                /**
+                 * @var \skeeks\cms\backend\BackendAction $actionIndex
+                 * @var \skeeks\cms\backend\BackendAction $actionCreate
+                 */
+                $actionCreate = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+                $actionIndex = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'index');
+
+                if ($this->property->isNewRecord) {
+                    $result .= Alert::widget([
+                        'options' => [
+                            'class' => 'alert-info text-center',
+                        ],
+                        'body'    => \Yii::t('skeeks/cms', 'To start setting up options, save this property.'),
+                    ]);
+                } else {
+
+                    $result .= Alert::widget([
+                        'options' => [
+                            'class' => 'alert-default text-center',
+                        ],
+                        'body'    => \Yii::t('skeeks/cms', 'Опции для этого списка задаются в отдельной вкладке, которая доступна после сохранения этого свойства.'),
+                    ]);
+                }
+
             }
-
         }
+
 
         return $result;
     }

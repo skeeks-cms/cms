@@ -41,6 +41,7 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_OTHER = 'other';
     const SOCIAL_PINTEREST = 'pinterest';
     const SOCIAL_YANDEX = 'yandex';
+    const SOCIAL_RUTUBE = 'rutube';
 
     /**
      * @inheritdoc
@@ -65,6 +66,8 @@ class CmsSiteSocial extends ActiveRecord
             self::SOCIAL_YOUTUBE   => 'Youtube',
             self::SOCIAL_VK        => 'Вконтакте',
             self::SOCIAL_OK        => 'Одноклассники',
+
+            self::SOCIAL_RUTUBE        => 'Rutube',
 
             self::SOCIAL_PINTEREST => 'Pinterest',
             self::SOCIAL_OTHER     => 'Другое',
@@ -138,6 +141,6 @@ class CmsSiteSocial extends ActiveRecord
 
     public function getIconCode()
     {
-        return $this->social_type == self::SOCIAL_OTHER ? 'fas fa-external-link-alt' : "fab fa-".$this->social_type;
+        return in_array($this->social_type, [self::SOCIAL_OTHER, self::SOCIAL_RUTUBE]) ? 'fas fa-external-link-alt' : "fab fa-".$this->social_type;
     }
 }
