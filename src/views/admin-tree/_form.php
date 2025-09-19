@@ -576,6 +576,7 @@ JS
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/cms', 'Дополнительно'), ['isOpen' => false]); ?>
 
 <?= $form->field($model, 'name_hidden')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms', 'Не отображается на сайте! Показывается только как пометка возле названия раздела в админ части сайта.')) ?>
+<?= $form->field($model, 'external_id')->textInput(['maxlength' => 255]); ?>
 
 <?= $form->field($model, 'is_adult')->checkbox(); ?>
 
