@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\components\Imaging;
 use skeeks\cms\components\imaging\Filter;
 use skeeks\cms\Exception;
+use skeeks\cms\Skeeks;
 use skeeks\imagine\Image;
 use skeeks\sx\File;
 use yii\helpers\ArrayHelper;
@@ -33,7 +34,7 @@ class ImagePreviewController extends Controller
      */
     public function actionProcess()
     {
-        ini_set("memory_limit", "512M");
+        Skeeks::unlimited();
 
         $imaging = \Yii::$app->imaging;
         if (!$imaging) {
