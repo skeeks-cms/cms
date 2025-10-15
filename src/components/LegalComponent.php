@@ -88,7 +88,7 @@ class LegalComponent extends Component
                 [
                     'email',
                 ],
-                'email',
+                'email', 'enableIDN' => true
             ],
         ]);
     }
