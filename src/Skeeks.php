@@ -8,6 +8,7 @@
 
 namespace skeeks\cms;
 
+use skeeks\cms\backend\BackendComponent;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsCompanyAddress;
 use skeeks\cms\models\CmsCompanyEmail;
@@ -37,6 +38,7 @@ use yii\caching\TagDependency;
 use yii\console\Application;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\web\View;
 
 /**
  * @property array   $logTypes
@@ -74,6 +76,58 @@ class Skeeks extends Component implements BootstrapInterface
 
     public function bootstrap($application)
     {
+        Event::on(View::class, View::EVENT_AFTER_RENDER, function (Event $event) {
+
+            /*<!--форма обратная связь-->
+            [sx]w=skeeks-modules-cms-form2-cmsWidgets-form2-FormWidget&form_id=2[/sx]*/
+
+            if (BackendComponent::getCurrent()) {
+                return false;
+            }
+
+            $content = $event->output;
+
+            if (strpos($content, "[sx]") !== false) {
+
+                $search = array(
+                        '/\[sx\](.*?)\[\/sx\]/is',
+                        );
+
+                $replace = array(
+                        '<strong>$1</strong>',
+                        );
+
+                /*$content = preg_replace ($search, $replace, $content);*/
+
+                $content = preg_replace_callback ($search, function ($matches) {
+                    $string = $matches[0];
+                    $string = str_replace("[sx]", "", $string);
+                    $string = str_replace("[/sx]", "", $string);
+                    $string = html_entity_decode($string);
+                    $data = [];
+                    parse_str($string, $data);
+                    $wClass = ArrayHelper::getValue($data, "w");
+                    if ($wClass) {
+                        $wClass = "\\" . $wClass;
+                        unset($data['w']);
+                        $wClass = str_replace("-", '\\', $wClass);
+                        if (class_exists($wClass)) {
+                            return $wClass::widget($data);
+                        } else {
+                            return $wClass;
+                        }
+
+                    }
+                    return "";
+
+                }, $content);
+
+                $event->output = $content;
+
+            }
+
+
+        });
         //Уведомления для пользователей
         Event::on(CmsLog::class, BaseActiveRecord::EVENT_AFTER_INSERT, function (Event $event) {
             /**
