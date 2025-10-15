@@ -31,6 +31,7 @@ use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopBonusTransaction;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopPayment;
+use skeeks\modules\cms\form2\cmsWidgets\form2\FormWidget;
 use yii\base\BootstrapInterface;
 use yii\base\Component;
 use yii\base\Event;
@@ -106,7 +107,16 @@ class Skeeks extends Component implements BootstrapInterface
                     $string = html_entity_decode($string);
                     $data = [];
                     parse_str($string, $data);
+                    
                     $wClass = ArrayHelper::getValue($data, "w");
+                    if ($wClass == 'form') {
+                        $wClass = FormWidget::class;
+                    }
+                    
+                    if (!isset($data['namespace'])) {
+                        $data['namespace'] = md5($string);
+                    }
+                    
                     if ($wClass) {
                         $wClass = "\\" . $wClass;
                         unset($data['w']);
