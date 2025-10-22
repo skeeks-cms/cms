@@ -378,6 +378,20 @@ class AdminTreeController extends BackendModelStandartController
                 "generateAccess" => true,
             ],
 
+            "faq" => [
+                "priority" => 150,
+                'name'     => "FAQ",
+                'icon'     => "fa fa-list",
+                'class'    => BackendModelAction::class,
+
+                'accessCallback' => function ($action) {
+                    if (!$action->model) {
+                        return false;
+                    }
+                    return true;
+                },
+            ],
+
             "log" => [
                 'class'          => BackendModelLogAction::class,
                 "generateAccess" => true,

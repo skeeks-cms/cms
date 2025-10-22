@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
@@ -25,6 +26,7 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\helpers\rules\HasModelBehaviors;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\GridView;
 use Yii;
 use yii\base\Event;
@@ -119,6 +121,23 @@ JS
                                     ),
                                 ],
                             ])."<br />";
+                        
+                        /*$dm = new DynamicModel();
+                        $dm->defineAttribute("files", 'safe');
+                        
+                        $event->content = $event->content . AjaxFileUploadWidget::widget([
+                                'model' => $dm,
+                                'attribite' => "files",
+                                'clientOptions' => [
+                                    'completeUploadFile' => new \yii\web\JsExpression(<<<JS
+        function(data)
+        {
+            window.location.reload();
+        }
+JS
+                                    ),
+                                ],
+                            ])."<br />";*/
                     },
                     'on init'         => function ($e) {
                         $action = $e->sender;

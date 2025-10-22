@@ -12,6 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
@@ -841,6 +842,26 @@ HTML;
                 "accessCallback"     => function () {
                     return \Yii::$app->user->can($this->permissionName."/update");
                 },
+            ],
+
+            "faq" => [
+                'priority' => 900,
+                'name'     => "FAQ",
+                'icon'     => "fa fa-list",
+                'class'    => BackendModelAction::class,
+
+                'accessCallback' => function ($action) {
+                    if (!$action->model) {
+                        return false;
+                    }
+                    return true;
+                },
+            ],
+
+            "log" => [
+                'priority' => 1000,
+                'class'          => BackendModelLogAction::class,
+                "generateAccess" => true,
             ],
 
             /*"rp" => [

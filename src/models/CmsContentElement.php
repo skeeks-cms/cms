@@ -94,6 +94,7 @@ use yii\web\Application;
  * @property CmsContentElementProperty[] $cmsContentElementProperties
  * @property CmsContentElementProperty[] $cmsContentElementPropertyValues
  * @property CmsContentProperty[]        $cmsContentProperties
+ * @property CmsFaq[]      $cmsFaqs
  *
  * @property CmsStorageFile              $image
  * @property CmsStorageFile              $fullImage
@@ -1086,6 +1087,14 @@ class CmsContentElement extends RelatedElementModel
         return true;
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsFaqs()
+    {
+        return $this->hasMany(CmsFaq::class,
+            ['id' => 'cms_faq_id'])->viaTable("cms_faq2content_element", ['cms_content_element_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
     /**
      * @return \skeeks\cms\query\CmsActiveQuery|CmsContentElementActiveQuery
      */

@@ -123,6 +123,8 @@ use yii\helpers\Url;
  * @property CmsContentProperty2tree[] $cmsContentProperty2trees
  * @property CmsContentProperty[]      $cmsContentProperties
  *
+ * @property CmsFaq[]      $cmsFaqs
+ *
  * @property string                    $seoName
  * @property bool                      $isAllowIndex
  *
@@ -1281,6 +1283,15 @@ class Tree extends ActiveRecord
         }
 
         return true;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsFaqs()
+    {
+        return $this->hasMany(CmsFaq::class,
+            ['id' => 'cms_faq_id'])->viaTable("cms_faq2tree", ['cms_tree_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
     /**

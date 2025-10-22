@@ -287,6 +287,11 @@ return array_merge(dashboardsMenu(), [
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
                 ],
 
+                [
+                    "label" => \Yii::t('skeeks/cms', "Вопрос/Ответ"),
+                    "url"   => ["cms/admin-cms-faq"],
+                ],
+
 
             ], contentMenu()),
         ],

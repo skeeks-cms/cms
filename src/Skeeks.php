@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsCompanyLink;
 use skeeks\cms\models\CmsCompanyPhone;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsDeal;
+use skeeks\cms\models\CmsFaq;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsSite;
@@ -285,6 +286,13 @@ class Skeeks extends Component implements BootstrapInterface
 
 
     public $modelsConfig = [
+
+        CmsFaq::class           => [
+            'name'       => 'Вопросы/Ответы',
+            'name_one'   => 'Вопрос/Ответ',
+            'controller' => 'cms/admin-cms-faq',
+        ],
+
         CmsTree::class           => [
             'name'       => 'Разделы',
             'name_one'   => 'Раздел',
