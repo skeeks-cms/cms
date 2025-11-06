@@ -12,18 +12,11 @@
 namespace skeeks\cms\widgets\formInputs\daterange;
 
 use skeeks\cms\Exception;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsTree;
-use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\Module;
-use skeeks\cms\modules\admin\widgets\ActiveForm;
-use skeeks\cms\widgets\formInputs\selectTree\assets\SelectTreeInputWidgetAsset;
-use skeeks\cms\widgets\Pjax;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\Json;
+use yii\web\JsExpression;
 use yii\widgets\InputWidget;
-use Yii;
 
 /**
  *
@@ -52,12 +45,17 @@ class DaterangeInputWidget extends InputWidget
      * @var array
      */
     public $clientOptions = [];
+
+    public $jsConfigPrepend = [];
+    public $jsConfigAppend = [];
+
+    protected $_daterangepickerDefaultConfig = [];
     /**
      * @var array
      */
     public $wrapperOptions = [];
     public $defaultOptions = [
-        'autocomplete' => 'off'
+        'autocomplete' => 'off',
     ];
 
     /**
@@ -67,7 +65,54 @@ class DaterangeInputWidget extends InputWidget
 
     public function init()
     {
-        $this->wrapperOptions['id'] = $this->id . "-wrapper";
+        $this->_daterangepickerDefaultConfig = [
+            "autoUpdateInput" => false,
+            "locale"          => [
+                "format"           => "DD.MM.YYYY",
+                "separator"        => " - ",
+                "applyLabel"       => "Применить",
+                "cancelLabel"      => "Сбросить фильтр",
+                "fromLabel"        => "от",
+                "toLabel"          => "до",
+                "customRangeLabel" => "Диапазон",
+                "weekLabel"        => "W",
+                "daysOfWeek"       => [
+                    "Вс",
+                    "Пн",
+                    "Вт",
+                    "Ср",
+                    "Чт",
+                    "Пт",
+                    "Сб",
+                ],
+                "monthNames"       => [
+                    "Январь",
+                    "Февраль",
+                    "Март",
+                    "Апрель",
+                    "Май",
+                    "Июнь",
+                    "Июль",
+                    "Август",
+                    "Сентябрь",
+                    "Октябрь",
+                    "Ноябрь",
+                    "Декабрь",
+                ],
+                "firstDay"         => 1,
+            ],
+            "ranges" => [
+                "Сегодня" => new JsExpression("[moment(), moment()]"),
+                "Вчера" => new JsExpression("[moment().subtract(1, 'days'), moment().subtract(1, 'days')]"),
+                "Последние 7 дней" => new JsExpression("[moment().subtract(6, 'days'), moment()]"),
+                "Последние 30 дней" => new JsExpression("[moment().subtract(29, 'days'), moment()]"),
+                "Этот месяц" => new JsExpression("[moment().startOf('month'), moment().endOf('month')]"),
+                "Прошлый месяц" => new JsExpression("[moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]"),
+                "Этот год" => new JsExpression("[moment().startOf('year'), moment().endOf('year')]"),
+                "Прошлый год" => new JsExpression("[moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]"),
+            ]
+        ];
+        $this->wrapperOptions['id'] = $this->id."-wrapper";
 
         $this->clientOptions['id'] = $this->id;
         $this->clientOptions['wrapperid'] = $this->wrapperOptions['id'];
@@ -99,10 +144,20 @@ class DaterangeInputWidget extends InputWidget
         }
 
         $this->registerAssets();
+        
+        $jsConfig = $this->_daterangepickerDefaultConfig;
+        if ($this->jsConfigPrepend) {
+            $jsConfig = ArrayHelper::merge($this->jsConfigPrepend, $jsConfig);
+        }
 
+        if ($this->jsConfigAppend) {
+            $jsConfig = ArrayHelper::merge($jsConfig, $this->jsConfigAppend);
+        }
+        
         echo $this->render('daterange', [
-            'widget' => $this,
-            'element' => $element
+            'widget'  => $this,
+            'element' => $element,
+            'jsConfig' => $jsConfig,
         ]);
     }
 
