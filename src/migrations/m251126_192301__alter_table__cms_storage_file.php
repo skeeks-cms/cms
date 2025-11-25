@@ -8,7 +8,7 @@
 
 use yii\db\Migration;
 
-class m250603_192301__alter_table__cms_storage_file extends Migration
+class m251126_192301__alter_table__cms_storage_file extends Migration
 {
     public function safeUp()
     {
