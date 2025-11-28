@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                      $is_vendor
  * @property integer                      $is_vendor_code
  * @property integer                      $is_country
+ * @property integer                      $is_sticker
  * @property integer|null                 $sx_id
  *
  * @property CmsContent[]                 $cmsContents
@@ -87,6 +88,7 @@ class CmsContentProperty extends RelatedPropertyModel
             'is_vendor'             => \Yii::t('skeeks/cms', 'Производитель?'),
             'is_vendor_code'        => \Yii::t('skeeks/cms', 'Код производителя?'),
             'is_country'            => \Yii::t('skeeks/cms', 'Страна'),
+            'is_sticker'            => \Yii::t('skeeks/cms', 'Стикер'),
 
             'sx_id'               => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
@@ -100,6 +102,7 @@ class CmsContentProperty extends RelatedPropertyModel
             'is_img_offer_property' => \Yii::t('skeeks/cms', 'В карточке будет отображатсья картинка при выборе этого варианта.'),
             'is_offer_property'     => \Yii::t('skeeks/cms', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
             'cms_site_id'           => Yii::t('skeeks/cms', 'Если сайт не будет выбран, то свойство будет показываться на всех сайтах.'),
+            'is_sticker'           => Yii::t('skeeks/cms', 'Эта характеристика является стикером на товар.'),
             'cmsContents'           => Yii::t('skeeks/cms', 'Необходимо выбрать в каком контенте будет показываться это свойство.'),
             'cmsTrees'              => Yii::t('skeeks/cms',
                 'Так же есть возможность ограничить отображение поля только для определенных разделов. Если будут выбраны разделы, то добавляя элемент в соответствующий раздел будет показываться это поле.'),
@@ -114,7 +117,7 @@ class CmsContentProperty extends RelatedPropertyModel
     {
         $rules = ArrayHelper::merge(parent::rules(), [
             [
-                ['is_vendor', 'is_vendor_code', 'is_country', 'is_offer_property', 'is_img_offer_property', 'sx_id'],
+                ['is_vendor', 'is_vendor_code', 'is_sticker', 'is_country', 'is_offer_property', 'is_img_offer_property', 'sx_id'],
                 'integer',
             ],
 
@@ -133,7 +136,7 @@ class CmsContentProperty extends RelatedPropertyModel
 
             ],*/
             [
-                ['is_img_offer_property', 'is_offer_property'],
+                ['is_img_offer_property', 'is_offer_property', 'is_sticker'],
                 'default',
                 'value' => 0,
             ],

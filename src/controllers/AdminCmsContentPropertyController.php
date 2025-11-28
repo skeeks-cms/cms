@@ -533,6 +533,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
 
         if ($model->isNewRecord) {
             $model->cms_site_id = \Yii::$app->skeeks->site->id;
+            $model->is_sticker = 0;
         }
         
         $isChange = true;
@@ -657,6 +658,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         'class'     => BoolField::class,
                         //'allowNull' => false,
                     ],*/
+
                     'is_offer_property' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
@@ -665,7 +667,10 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-
+                    'is_sticker' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
                 ],
             ],
 
