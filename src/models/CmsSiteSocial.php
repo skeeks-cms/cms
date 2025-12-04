@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsSite     $cmsSite
  * @property string      $iconCode
+ * @property string      $iconHtml
  */
 class CmsSiteSocial extends ActiveRecord
 {
@@ -42,6 +43,7 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_PINTEREST = 'pinterest';
     const SOCIAL_YANDEX = 'yandex';
     const SOCIAL_RUTUBE = 'rutube';
+    const SOCIAL_DZEN = 'dzen';
 
     /**
      * @inheritdoc
@@ -61,6 +63,7 @@ class CmsSiteSocial extends ActiveRecord
             self::SOCIAL_WHATSAPP  => 'WatsApp',
 
             self::SOCIAL_YANDEX     => 'Yandex',
+            self::SOCIAL_DZEN     => 'Dzen',
             self::SOCIAL_FACEBOOK  => 'Facebook',
             self::SOCIAL_INSTAGRAM => 'Instagram',
             self::SOCIAL_YOUTUBE   => 'Youtube',
@@ -141,6 +144,11 @@ class CmsSiteSocial extends ActiveRecord
 
     public function getIconCode()
     {
-        return in_array($this->social_type, [self::SOCIAL_OTHER, self::SOCIAL_RUTUBE]) ? 'fas fa-external-link-alt' : "fab fa-".$this->social_type;
+        return in_array($this->social_type, [self::SOCIAL_OTHER]) ? 'fas fa-external-link-alt' : "fab fa-".$this->social_type;
+    }
+    
+    public function getIconHtml()
+    {
+        return "<i class='{$this->iconCode}'></i>";
     }
 }
