@@ -136,12 +136,17 @@ class CmsContentProperty extends RelatedPropertyModel
 
             ],*/
             [
-                ['is_img_offer_property', 'is_offer_property', 'is_sticker'],
+                ['is_img_offer_property', 'is_offer_property'],
                 'default',
                 'value' => 0,
             ],
             [
                 ['sx_id'],
+                'default',
+                'value' => null,
+            ],
+            [
+                ['is_sticker'],
                 'default',
                 'value' => null,
             ],
