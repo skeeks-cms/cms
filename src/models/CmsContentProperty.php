@@ -150,6 +150,14 @@ class CmsContentProperty extends RelatedPropertyModel
                 'default',
                 'value' => null,
             ],
+            [
+                ['is_sticker'],
+                function($attribute) {
+                    if ($this->{$attribute} == 0) {
+                        $this->{$attribute} = null;
+                    }
+                }
+            ],
 
             [['cmsContents'], 'safe'],
             [['cmsTrees'], 'safe'],

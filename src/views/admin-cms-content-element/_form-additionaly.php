@@ -68,6 +68,11 @@
         )->label($contentModel->parentContent->name_one) ?>
     <?php endif; ?>
 
+    <?= $form->field($model, 'created_by')->widget(
+            \skeeks\cms\widgets\AjaxSelectModel::class,[
+                'modelClass' => \skeeks\cms\models\CmsUser::class
+            ]
+    ); ?>
 
     <? $fieldSet::end(); ?>
 <?php endif; ?>
