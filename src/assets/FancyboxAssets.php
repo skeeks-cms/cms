@@ -17,7 +17,7 @@ use yii\web\YiiAsset;
  */
 class FancyboxAssets extends AssetBundle
 {
-    public $sourcePath = '@bower/fancybox/dist';
+    public $sourcePath = '@skeeks/cms/assets/src/fancybox';
 
     public $js = [
         'jquery.fancybox.min.js',

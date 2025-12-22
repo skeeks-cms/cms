@@ -40,14 +40,19 @@ class DateTimeColumnData extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
+        $timestamp = $model->{$this->attribute};
+        
+        if (!$timestamp) {
+            return '';
+        }
+        
         if ($this->view_type == self::VIEW_RELITIVE_TYME) {
-            $timestamp = $model->{$this->attribute};
+            
             return Html::tag("span", \Yii::$app->formatter->asRelativeTime($timestamp), [
                 'title' => \Yii::$app->formatter->asDatetime($timestamp),
                 'data-toggle' => "tooltip"
             ]);
         } elseif ($this->view_type == self::VIEW_DATE) {
-            $timestamp = $model->{$this->attribute};
             return Html::tag("span", \Yii::$app->formatter->asDate($timestamp), [
                 'title' => \Yii::$app->formatter->asDatetime($timestamp),
                 'data-toggle' => "tooltip"
