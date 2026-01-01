@@ -252,6 +252,7 @@ class CmsContentElement extends RelatedElementModel
                 'no_log_fields' => [
                     'description_short_type',
                     'description_full_type',
+                    'show_counter',
                 ],
                 'relation_map' => [
                     'content_id' => 'cmsContent',
