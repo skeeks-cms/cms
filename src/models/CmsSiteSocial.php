@@ -44,6 +44,7 @@ class CmsSiteSocial extends ActiveRecord
     const SOCIAL_YANDEX = 'yandex';
     const SOCIAL_RUTUBE = 'rutube';
     const SOCIAL_DZEN = 'dzen';
+    const SOCIAL_MAX = 'max';
 
     /**
      * @inheritdoc
@@ -59,6 +60,7 @@ class CmsSiteSocial extends ActiveRecord
     static public function getSocialTypes()
     {
         return [
+            self::SOCIAL_MAX  => 'Max',
             self::SOCIAL_TELEGRAM  => 'Telegram',
             self::SOCIAL_WHATSAPP  => 'WatsApp',
 
@@ -126,7 +128,7 @@ class CmsSiteSocial extends ActiveRecord
             [['cms_site_id', 'url'], 'unique', 'targetAttribute' => ['cms_site_id', 'url']],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
 
-            [['url'], 'string', 'max' => 64],
+            [['url'], 'string', 'max' => 256],
             [['url'], 'url'],
         ]);
     }
