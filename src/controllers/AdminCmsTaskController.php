@@ -381,6 +381,41 @@ class AdminCmsTaskController extends BackendModelStandartController
                             },
                         ],
 
+                        'end_task_at' => [
+                            'format'    => 'raw',
+                            'label'     => 'Дата завершения',
+                            'attribute' => 'end_task_at',
+                            'value'     => function (CmsTask $CmsTask) {
+                                if ($CmsTask->raw_row['end_task_at']) {
+                                    return \Yii::$app->formatter->asDate($CmsTask->raw_row['end_task_at']);
+                                } else {
+                                    return " - ";
+                                }
+                            },
+                            'beforeCreateCallback' => function (GridView $gridView) {
+                                $query = $gridView->dataProvider->query;
+
+                                $gridView->dataProvider->query->andWhere(['status' => CmsTask::STATUS_READY]);
+
+                                $scheduleTotalTime = CmsTaskSchedule::find()->select([
+                                    'MAX(end_at) as total_timestamp',
+                                ])->where([
+                                    'cms_task_id' => new Expression(CmsTask::tableName().".id"),
+                                ]);
+
+                                $query->addSelect([
+                                    'end_task_at' => $scheduleTotalTime,
+                                ]);
+
+                                $gridView->sortAttributes['end_task_at'] = [
+                                    'asc'     => ['end_task_at' => SORT_ASC],
+                                    'desc'    => ['end_task_at' => SORT_DESC],
+                                    'label'   => '',
+                                    'default' => SORT_ASC,
+                                ];
+                            },
+                        ],
+
                         'status'     => [
                             'value' => function (CmsTask $CmsTask, $key, $index) {
 
