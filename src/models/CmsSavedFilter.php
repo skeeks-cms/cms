@@ -647,7 +647,7 @@ class CmsSavedFilter extends ActiveRecord
             $f = new CmsEavQueryFilterHandler([
                 'baseQuery' => $baseQuery,
             ]);
-            return "field-{$f->formName()}-" . $this->cms_content_property_id;
+            return "field-{$f->formName()}-f" . $this->cms_content_property_id;
         }
         
         
