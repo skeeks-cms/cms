@@ -246,6 +246,19 @@ class CmsContentProperty extends RelatedPropertyModel
         return $result." ($this->code)";
     }
 
+
+    public function getNameWithTrees()
+    {
+        $treeName = '';
+
+        if ($this->cmsTrees) {
+            $treeName = implode(", ", ArrayHelper::map($this->cmsTrees, "id", "name"));
+        }
+
+        return parent::asText() . " [{$treeName}]";
+    }
+
+
     /**
      * @return CmsContentPropertyActiveQuery
      */
