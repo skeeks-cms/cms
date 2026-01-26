@@ -982,6 +982,9 @@ TEXT;
     .sx-legal-cookie {
         bottom: 5rem;
     }
+    .mm-opening .sx-legal-cookie {
+        display: none;
+    }
 }
 
 
