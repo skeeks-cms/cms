@@ -669,7 +669,7 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                     ],
                     'is_sticker' => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
+                        'allowNull' => true,
                     ],
                 ],
             ],
