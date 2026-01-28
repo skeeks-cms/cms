@@ -1057,6 +1057,17 @@ class CmsContentElement extends RelatedElementModel
         return (bool)($this->active == "Y");
     }
 
+    public function setIs_active(bool $active)
+    {
+        if ($active === true) {
+            $this->active = "Y";
+        } else {
+            $this->active = "N";
+        }
+        
+        return $this;
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
