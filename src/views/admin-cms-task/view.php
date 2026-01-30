@@ -105,6 +105,11 @@ JS
                             <div class="sx-title">Приложенные изображения:</div>
                             <div class="sx-files-block">
                                 <? foreach ($images as $key => $file) : ?>
+                                    <?
+                                    /**
+                                     * @var $file \skeeks\cms\models\CmsStorageFile
+                                     */
+                                    ?>
                                     <a href="<?php echo $file->src; ?>" target="_blank" data-pjax="0">
                                         <img src="<?php echo $file->src; ?>"/>
                                     </a>
@@ -118,7 +123,7 @@ JS
                             <div class="sx-files-block">
                                 <? foreach ($files as $key => $file) : ?>
                                 <div class="sx-file-item">
-                                    <a href="<?php echo $file->src; ?>" target="_blank" data-pjax="0"><?php echo $file->original_name; ?></a>
+                                    <a href="<?php echo $file->src; ?>" download="<?php echo $file->original_name; ?>" target="_blank" data-pjax="0"><?php echo $file->original_name; ?></a>
                                     <a href="<?php echo \yii\helpers\Url::to(['/cms/admin-storage-files/download', 'pk' => $file->id]); ?>" target="_blank" data-pjax="0" class="btn btn-xs btn-default">скачать (<?php echo \Yii::$app->formatter->asShortSize($file->size); ?>)</a>
                                 </div>
                                 <? endforeach; ?>
