@@ -258,4 +258,48 @@ class AdminCmsFaqController extends BackendModelStandartController
 
         return $rr;
     }
+    
+    /**
+     * @return RequestResponse
+     */
+    public function actionJoinElement()
+    {
+        $rr = new RequestResponse();
+
+        $treeId = \Yii::$app->request->post("element_id");
+        $pk = \Yii::$app->request->get("pk");
+
+        if ($treeId && $pk) {
+
+            /**
+             * @var $faq CmsFaq
+             */
+            $faq = CmsFaq::find()->andWhere(['id' => $pk])->one();
+
+            if ($faq) {
+
+                $newTreeIds = [];
+                foreach ($faq->contentElements as $tree)
+                {
+                    $newTreeIds[] = $tree->id;
+                }
+                $newTreeIds[] = $treeId;
+                $faq->contentElements = $newTreeIds;
+
+                if (!$faq->save()) {
+                    print_r($property->errors);die;
+                    $rr->success = false;
+                    $rr->message = print_r($property->errors, true);
+                    return $rr;
+                }
+
+                $rr->success = true;
+                $rr->message = "Связаны";
+
+            }
+
+        }
+
+        return $rr;
+    }
 }
