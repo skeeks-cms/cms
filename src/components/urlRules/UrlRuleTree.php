@@ -74,6 +74,13 @@ class UrlRuleTree
                     return $url;
                 }
             }
+            //Указан редиррект на другой раздел
+            /*if ($tree->redirect_saved_filter_id) {
+                return $tree->redirectSavedFilter->getUrl(false, $defaultParams);
+                $paramsNew = ArrayHelper::merge($defaultParams, ['model' => $tree->redirectSavedFilter]);
+                $url = $this->createUrl($manager, "cms/saved-filter/view", $paramsNew);
+                return $url;
+            }*/
 
             //Стандартно берем dir раздела
             if ($tree->dir) {

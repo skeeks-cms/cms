@@ -16,8 +16,6 @@ $tree = $action->model;
 $model = $tree;
 
 
-
-
 ?>
 
 <?php
@@ -80,14 +78,14 @@ JS
         <div style="display: none;" class="sx-search-property-element-wrapper">
             <?
 
-            $url = \yii\helpers\Url::to(['/cms/admin-cms-faq/join-tree']);
+            $url = \yii\helpers\Url::to(['/cms/admin-cms-faq/join-element']);
 
             $this->registerJs(<<<JS
 var propertyUrl = "{$url}";
 $("#search-exist-faq").on("change", function() {
 var ajaxQuery = sx.ajax.preparePostQuery(propertyUrl + "&pk=" + $(this).val());
 ajaxQuery.setData({
-'tree_id': {$tree->id},
+'element_id': {$tree->id},
 });
 
 console.log(ajaxQuery.toArray());

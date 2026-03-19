@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\console\controllers;
 
+use skeeks\cms\Skeeks;
 use skeeks\imagine\Image;
 use skeeks\cms\models\CmsStorageFile;
 use yii\base\Exception;
@@ -123,6 +124,8 @@ class ImageController extends \yii\console\Controller
      */
     public function actionResizeOriginalImages($maxWidth = 1920, $maxHeight = 1200, $quantity = 100)
     {
+        Skeeks::unlimited();
+        
         $query = CmsStorageFile::find()
             ->andWhere(['>', 'image_height', $maxHeight])
             ->andWhere(['>', 'image_width', $maxWidth])

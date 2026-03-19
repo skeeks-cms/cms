@@ -671,6 +671,31 @@ HTML;
                 },
             ],
 
+            "element-joins" => [
+                'class'    => BackendModelAction::class,
+                'name'     => "Связи",
+                'icon'     => 'fa fa-list',
+                'priority' => 190,
+                'defaultView' => "@skeeks/cms/views/admin-cms-content-element/element-joins",
+
+                /*'accessCallback' => function (BackendModelAction $action) {
+
+
+                    $model = $action->model;
+
+                    if (!$model) {
+                        return false;
+                    }
+
+
+
+                    $site = $model->cmsSite;
+
+                    return \Yii::$app->user->can($this->permissionName."/join", ['model' => $model]);
+
+                },*/
+            ],
+
             'stat' => [
                 //'generateAccess' => true,
                 'class'          => ViewBackendAction::class,
@@ -888,6 +913,57 @@ HTML;
 
         //Дополнительные свойства
         return $result;
+    }
+
+
+    /**
+     * @return RequestResponse
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionElementJoinsDettach()
+    {
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost()) {
+            $product_id = (int)\Yii::$app->request->post('product_id');
+
+            if ($product_id) {
+                $sp = CmsContentElement::findOne($product_id);
+                $spModel = $sp->cmsContentModel;
+                if (!$spModel) {
+                    return $rr;
+                }
+
+                $t = \Yii::$app->db->beginTransaction();
+
+                try {
+
+                    $sp->cms_content_model_id = null;
+                    if (!$sp->save(false, ['cms_content_model_id'])) {
+                        throw new \yii\base\Exception(print_r($sp->errors, true));
+                    }
+
+                    if ($spModel->getCmsContentElements()->count() <= 1) {
+                        $spModel->delete();
+                    }
+
+
+
+                    $t->commit();
+
+                    $rr->success = true;
+
+                } catch (\Exception $exception) {
+                    $t->rollBack();
+                    throw $exception;
+                }
+
+
+            }
+
+        }
+
+        return $rr;
     }
 
 

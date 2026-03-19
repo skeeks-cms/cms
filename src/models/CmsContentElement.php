@@ -59,7 +59,8 @@ use yii\web\Application;
  * @property string                      $meta_keywords
  * @property string                      $seo_h1
  * @property integer|null                $cms_site_id
- * 
+ * @property integer|null                $cms_content_model_id
+ *
  * @property string|null                 $external_id
  * @property integer|null                $main_cce_id
  * @property integer|null                $main_cce_at
@@ -115,6 +116,7 @@ use yii\web\Application;
  * @property string                      $seoName
  *
  * @property CmsContentElement           $mainCmsContentElement
+ * @property CmsContentModel           $cmsContentModel
  *
  */
 class CmsContentElement extends RelatedElementModel
@@ -342,6 +344,7 @@ class CmsContentElement extends RelatedElementModel
                     'main_cce_by',
                     'is_adult',
                     'sx_id',
+                    'cms_content_model_id',
                 ],
                 'integer',
             ],
@@ -355,6 +358,7 @@ class CmsContentElement extends RelatedElementModel
             [['external_id'], 'trim'],
             [['external_id'], 'string', 'max' => 255],
             [['external_id'], 'default', 'value' => null],
+            [['cms_content_model_id'], 'default', 'value' => null],
             /*[
                 ['content_id', 'code'],
                 'unique',
@@ -521,6 +525,16 @@ class CmsContentElement extends RelatedElementModel
 
         ]);
     }
+
+    /**
+     * @return CmsContentModel
+     */
+    public function getCmsContentModel()
+    {
+        return $this->hasOne(CmsContentModel::class, ['id' => 'cms_content_model_id'])->from(['cmsContentModel' => CmsContentModel::tableName()]);
+
+    }
+
     /**
      * Валидация родительского элемента
      *
@@ -1119,6 +1133,48 @@ class CmsContentElement extends RelatedElementModel
         return new CmsContentElementActiveQuery(get_called_class(), ['is_active' => false]);
     }
 
+
+
+    public function joinToModel(array $element_ids = [])
+    {
+        if ($element_ids) {
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+                if (!$this->cms_content_model_id) {
+                    $spModel = new CmsContentModel();
+                    if (!$spModel->save()) {
+                        throw new Exception(print_r($spModel->errors, true));
+                    }
+
+                    $this->cms_content_model_id = $spModel->id;
+                    $this->update(false, ['cms_content_model_id']);
+                } else {
+                    $spModel = $this->cmsContentModel;
+                }
+
+
+                foreach ($element_ids as $product_id) {
+                    if ($product_id) {
+
+                        if ($sp = CmsContentElement::findOne($product_id)) {
+                            $sp->cms_content_model_id = $spModel->id;
+                            $sp->update(false, ['cms_content_model_id']);
+                        }
+
+                    }
+
+                }
+
+                $t->commit();
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                throw $exception;
+            }
+
+        }
+    }
 }
 
 

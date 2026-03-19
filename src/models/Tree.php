@@ -107,6 +107,7 @@ use yii\helpers\Url;
  * @property CmsTreeFile[]             $cmsTreeFiles
  * @property CmsTreeImage[]            $cmsTreeImages
  * @property CmsTree                   $redirectTree
+ * @property CmsSavedFilter            $redirectSavedFilter
  * @property CmsTree                   $canonicalTree
  * @property CmsTree                   $mainCmsTree
  *
@@ -123,7 +124,7 @@ use yii\helpers\Url;
  * @property CmsContentProperty2tree[] $cmsContentProperty2trees
  * @property CmsContentProperty[]      $cmsContentProperties
  *
- * @property CmsFaq[]      $cmsFaqs
+ * @property CmsFaq[]                  $cmsFaqs
  *
  * @property string                    $seoName
  * @property bool                      $isAllowIndex
@@ -219,13 +220,13 @@ class Tree extends ActiveRecord
                 ],
             ],
 
-            CmsLogBehavior::class     => [
-                'class' => CmsLogBehavior::class,
+            CmsLogBehavior::class => [
+                'class'         => CmsLogBehavior::class,
                 'no_log_fields' => [
                     'description_short_type',
                     'description_full_type',
                 ],
-                'relation_map' => [
+                'relation_map'  => [
                     'tree_type_id' => 'treeType',
                 ],
             ],
@@ -378,15 +379,15 @@ class Tree extends ActiveRecord
             'view_file'              => Yii::t('skeeks/cms', 'Template'),
             'seo_h1'                 => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'            => Yii::t('skeeks/cms', 'ID из внешней системы'),
-            'sx_id'               => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'                  => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
 
             'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
             'is_index' => Yii::t('skeeks/cms', 'Страница индексируется?'),
 
-            'dir' => Yii::t('skeeks/cms', 'Дирректория'),
+            'dir'   => Yii::t('skeeks/cms', 'Дирректория'),
             'level' => Yii::t('skeeks/cms', 'Уровень вложенности'),
-            'pids' => Yii::t('skeeks/cms', 'Родительские разделы'),
-            'pid' => Yii::t('skeeks/cms', 'Родительский раздел'),
+            'pids'  => Yii::t('skeeks/cms', 'Родительские разделы'),
+            'pid'   => Yii::t('skeeks/cms', 'Родительский раздел'),
 
         ]);
     }
@@ -576,6 +577,13 @@ class Tree extends ActiveRecord
     public function getRedirectTree()
     {
         return $this->hasOne(CmsTree::className(), ['id' => 'redirect_tree_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRedirectSavedFilter()
+    {
+        return $this->hasOne(CmsSavedFilter::className(), ['id' => 'redirect_saved_filter_id']);
     }
 
     /**

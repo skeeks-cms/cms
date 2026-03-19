@@ -76,6 +76,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsContent[]         $childrenContents
  * @property CmsTreeType          $savedFilterTreeType
  * @property CmsTreeType          $cmsTreeType
+ * @property bool          $isProducts
  */
 class CmsContent extends Core
 {
@@ -490,6 +491,11 @@ class CmsContent extends Core
         }
 
         return (bool)in_array((string)$code, (array)$this->editable_fields);
+    }
+
+    public function getIsProducts()
+    {
+        return (bool) ($this->base_role == 'products');
     }
 
     /**
