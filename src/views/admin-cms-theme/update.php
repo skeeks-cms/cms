@@ -99,7 +99,7 @@ JS
                             }
                         });
                         ActiveFormAjaxSubmit.on('error', function(e, response) {
-                            alert("111");
+                            alert("Ошибка сохранения данных!");
                         });
                     }
 JS

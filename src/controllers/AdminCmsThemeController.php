@@ -123,7 +123,7 @@ class AdminCmsThemeController extends BackendController
                 if ($configModel->load(\Yii::$app->request->post()) && $configModel->validate()) {
                     $cmsTheme->config = $configModel->toArray();
                     if (!$cmsTheme->update(true, ['config'])) {
-                        print_r($cmsTheme->errors, true);
+                        throw new Exception(print_r($cmsTheme->errors, true));
                     }
 
                     $rr->message = "Настройки сохранены";
