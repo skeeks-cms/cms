@@ -109,29 +109,48 @@ class AdminCmsThemeController extends BackendController
 
         $code = trim(\Yii::$app->request->get("code"));
 
-        $themes = \Yii::$app->view->availableThemes;
-
         /**
          * @var $cmsTheme CmsTheme
          */
         $cmsTheme = CmsTheme::find()->cmsSite()->andWhere(['code' => $code])->one();
+        if (!$cmsTheme) {
+            throw new Exception("Тема «{$code}» не найдена");
+        }
 
-        $configModel = $cmsTheme->objectTheme->configFormModel;
+        $objectTheme = $cmsTheme->objectTheme;
+        if (!$objectTheme) {
+            throw new Exception("Тема «{$code}» недоступна");
+        }
+
+        $configModel = $objectTheme->configFormModel;
 
         if ($rr->isRequestAjaxPost()) {
             try {
-                if ($configModel->load(\Yii::$app->request->post()) && $configModel->validate()) {
-                    $cmsTheme->config = $configModel->toArray();
-                    if (!$cmsTheme->update(true, ['config'])) {
-                        throw new Exception(print_r($cmsTheme->errors, true));
-                    }
-
-                    $rr->message = "Настройки сохранены";
-                    $rr->success = true;
+                if (!$configModel->load(\Yii::$app->request->post())) {
+                    throw new Exception("Не удалось загрузить настройки из запроса");
                 }
-            } catch (\Exception $exception) {
+
+                if (!$configModel->validate()) {
+                    $rr->success = false;
+                    $rr->message = "Проверьте заполнение полей";
+                    $rr->addModelErrors($configModel);
+
+                    return $rr;
+                }
+
+                $cmsTheme->config = $configModel->toArray();
+
+                // save() returns true even when the resulting config has not changed.
+                if (!$cmsTheme->save(true, ['config'])) {
+                    throw new Exception(print_r($cmsTheme->errors, true));
+                }
+
+                $rr->message = "Настройки сохранены";
+                $rr->success = true;
+            } catch (\Throwable $exception) {
                 $rr->success = false;
                 $rr->message = $exception->getMessage();
+                \Yii::error($exception, __METHOD__);
             }
 
             return $rr;
