@@ -87,6 +87,9 @@ class ContentElementBackendGridView extends GridViewWidget
     {
         $result = parent::getAvailableColumns($callableData);
 
+        if (ArrayHelper::getValue($callableData, 'availableColumnsCacheKey')) {
+            return $result;
+        }
 
         $content_id = ArrayHelper::getValue($callableData, 'callAttributes.contextData.content_id');
         $cmsContent = CmsContent::findOne($content_id);
@@ -109,6 +112,5 @@ class ContentElementBackendGridView extends GridViewWidget
         return $result;
     }
 }
-
 
 

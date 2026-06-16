@@ -165,8 +165,23 @@ class GridView extends \yii\grid\GridView
                                          */
                                         $widgetField = $e->sender;
 
-                                        $fields = $this->getAvailableColumns(\Yii::$app->controller->getCallableData());
-                                        $widgetField->widgetConfig['items'] = $this->getFilteredAvailableColumns($fields, \Yii::$app->controller->getCallableData());
+                                        $callableData = \Yii::$app->controller->getCallableData();
+                                        $fields = $this->getAvailableColumns($callableData);
+                                        $ajaxUrl = ArrayHelper::getValue($callableData, 'availableColumnsUrl');
+                                        if ($ajaxUrl) {
+                                            $widgetField->widgetConfig['ajaxUrl'] = $ajaxUrl;
+                                        }
+
+                                        if ($cacheKey = ArrayHelper::getValue($callableData, 'availableColumnsCacheKey')) {
+                                            $cachedFields = (array)\Yii::$app->cache->get($cacheKey);
+                                            foreach ((array)$this->visibleColumns as $columnCode) {
+                                                if (!array_key_exists($columnCode, $fields) && array_key_exists($columnCode, $cachedFields)) {
+                                                    $fields[$columnCode] = $cachedFields[$columnCode];
+                                                }
+                                            }
+                                        }
+
+                                        $widgetField->widgetConfig['items'] = $this->getFilteredAvailableColumns($fields, $callableData);
 
                                         //skeeks\cms\backend\controllers\AdminBackendShowingController
                                         /*$widgetField->widgetConfig['items'] = ArrayHelper::getValue(

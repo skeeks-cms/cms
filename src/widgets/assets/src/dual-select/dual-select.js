@@ -43,6 +43,47 @@
 
             this.jVisible.disableSelection();
             this.jHidden.disableSelection();
+
+            if (this.get('ajaxUrl')) {
+                this._loadItems();
+            }
+        },
+
+        _loadItems: function() {
+            var self = this;
+
+            self.jWrapper.addClass('sx-dual-select-loading');
+
+            $.getJSON(this.get('ajaxUrl'))
+                .done(function(response) {
+                    var items = response.items || response.columns || {};
+
+                    _.each(items, function(label, value) {
+                        var jVisibleItem = $('li', self.jVisible).filter(function() {
+                            return String($(this).data('value')) === String(value);
+                        });
+
+                        if (jVisibleItem.length) {
+                            jVisibleItem.text(label);
+                            return;
+                        }
+
+                        if ($('li', self.jHidden).filter(function() {
+                            return String($(this).data('value')) === String(value);
+                        }).length) {
+                            return;
+                        }
+
+                        $('<li>', {
+                            'data-value': value
+                        }).text(label).appendTo(self.jHidden);
+                    });
+
+                    self._update();
+                })
+                .always(function() {
+                    self.jWrapper.removeClass('sx-dual-select-loading');
+                });
         },
 
         _update: function () {

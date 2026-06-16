@@ -56,6 +56,9 @@ class AdminComponentSettingsController extends BackendController
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
+            if ($action->id == 'callable-data') {
+                return true;
+            }
 
             $componentClassName = \Yii::$app->request->get('componentClassName');
             $namespace = \Yii::$app->request->get('componentNamespace');
@@ -132,6 +135,28 @@ class AdminComponentSettingsController extends BackendController
         }
 
         return $rr;
+    }
+
+    /**
+     * Lazy loading heavy callable data chunks, for example large grid columns list.
+     * @return array
+     */
+    public function actionCallableData()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $key = (string)\Yii::$app->request->get('key');
+        if (!$key) {
+            return [
+                'success' => false,
+                'items' => [],
+            ];
+        }
+
+        return [
+            'success' => true,
+            'items' => (array)\Yii::$app->cache->get($key),
+        ];
     }
 
     /**

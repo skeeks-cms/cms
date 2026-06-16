@@ -34,6 +34,11 @@ class DualSelect extends InputWidget
      */
     public $jsOptions = [];
 
+    /**
+     * @var string|null Ajax url for lazy loading items.
+     */
+    public $ajaxUrl = null;
+
 
     /**
      * @var array|string
@@ -74,6 +79,9 @@ class DualSelect extends InputWidget
 
         $this->wrapperOptions['id'] = $this->id;
         $this->jsOptions['id'] = $this->id;
+        if ($this->ajaxUrl) {
+            $this->jsOptions['ajaxUrl'] = $this->ajaxUrl;
+        }
 
         $this->options['multiple'] = true;
 

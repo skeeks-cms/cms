@@ -286,6 +286,9 @@ class ContentElementBackendFiltersWidget extends FiltersWidget
     {
         $result = parent::getAvailableFields($callableData);
 
+        if (ArrayHelper::getValue($callableData, 'availableColumnsCacheKey')) {
+            return $result;
+        }
 
         $content_id = ArrayHelper::getValue($callableData, 'callAttributes.contextData.content_id');
         $cmsContent = CmsContent::findOne($content_id);
