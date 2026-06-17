@@ -133,25 +133,29 @@ JS
                 <? $worked = \skeeks\cms\helpers\CmsScheduleHelper::durationBySchedules($task->schedules); ?>
                 <div class="sx-employee" style="font-size: 12px; <?= $worked > $task->plan_duration ? "color: var(--color-red-pale);" : "color: var(--color-gray);"; ?>">
                     <!--<span title="Создана: <? /*= \Yii::$app->formatter->asDatetime($task->created_at); */ ?>" data-toggle="tooltip"><? /*= \Yii::$app->formatter->asRelativeTime($task->created_at); */ ?></span>-->
-                    <? if ($worked) : ?>
-                        <span title="Отработано" data-toggle="tooltip">
-                        <?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($worked); ?>
-                    </span> /
-                    <? else : ?>
-
-                    <? endif; ?>
-
-                    <span title="Запланированное время" data-toggle="tooltip">
-                    <?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($task->plan_duration); ?>
-                </span>
-
-                    <?= $worked > $task->plan_duration ? "переработка!" : ""; ?>
+                    
 
                     <? if ($task->plan_start_at) : ?>
-                        / <span title="Запланирована на это время" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at); ?></span>
+                        <span title="Запланирована на это время" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at, "d MMMM y 'г'., HH:mm"); ?></span>
                         <? if ($task->plan_start_at < time()) : ?>
                             / <span style="color: var(--color-red-pale);">Просрочена!</span>
                         <? endif; ?>
+                    <? else: ?>
+                    
+                        <? if ($worked) : ?>
+                            <span title="Отработано" data-toggle="tooltip">
+                            <?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($worked); ?>
+                        </span> /
+                        <? else : ?>
+    
+                        <? endif; ?>
+    
+                        <span title="Запланированное время" data-toggle="tooltip">
+                            <?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($task->plan_duration); ?>
+                        </span>
+    
+                        <?= $worked > $task->plan_duration ? "Переработка!" : ""; ?>
+                        
                     <? endif; ?>
 
 
