@@ -63,7 +63,7 @@ class LegalComponent extends Component
             'description' => 'Все что нужно для соблюдения закона 152-ФЗ',
             'image'       => [
                 CmsAsset::class,
-                'img/legal.jpg',
+                'images/icons/admin-menu/legal.svg',
             ],
         ]);
     }
