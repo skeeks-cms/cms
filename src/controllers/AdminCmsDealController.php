@@ -460,6 +460,80 @@ CSS
         return $this->render($this->action->id);
     }
 
+    protected function registerClientSwitcher($model, $modelId)
+    {
+        $this->view->registerCSS(<<<CSS
+.field-{$modelId}-cms_company_id {
+    display: none;
+}
+.field-{$modelId}-cms_user_id {
+    display: none;
+}
+.btn.sx-active {
+    background: #6c757d !important;
+    color: white;
+}
+CSS
+        );
+
+        $cms_company_id = (int) $model->cms_company_id;
+        $cms_user_id = (int) $model->cms_user_id;
+
+        $this->view->registerJs(<<<JS
+var {$modelId}_cms_company_id = {$cms_company_id};
+var {$modelId}_cms_user_id = {$cms_user_id};
+
+$("body").on("click", ".sx-choose-paymenter .btn", function(e, data) {
+    $(".field-{$modelId}-cms_company_id").slideUp();
+    $(".field-{$modelId}-cms_user_id").slideUp();
+
+    var is_first = false;
+
+    if (data) {
+        if (data.is_first) {
+            is_first = true;
+        }
+    }
+
+    if (is_first === false) {
+        $("#{$modelId}-cms_company_id").val("");
+        $("#{$modelId}-cms_user_id").val("");
+    }
+
+    $(".sx-choose-paymenter .btn").removeClass("sx-active");
+    $(this).addClass("sx-active");
+    $($(this).data("view")).slideDown();
+    return false;
+});
+
+function reload{$modelId}ClientView() {
+    var cms_company_id = $("#{$modelId}-cms_company_id").val();
+    var cms_user_id = $("#{$modelId}-cms_user_id").val();
+
+    if (cms_company_id) {
+        $(".cms_company_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    } else if(cms_user_id) {
+        $(".cms_user_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    }
+
+    return false;
+}
+
+reload{$modelId}ClientView();
+
+$(document).on('pjax:complete', function (e) {
+    setTimeout(function() {
+        reload{$modelId}ClientView();
+    }, 200);
+});
+JS
+        );
+    }
+
     public function updateFields($action)
     {
 
@@ -468,6 +542,7 @@ CSS
          */
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
+        $this->registerClientSwitcher($model, 'cmsdeal');
 
         if (!$model->name && $model->dealType && \Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
             $model->name = $model->dealType->name;
@@ -514,7 +589,13 @@ CSS
                 'class'  => FieldSet::class,
                 'name'   => 'Компания или клиент (заполнить хотя бы одно)',
                 'fields' => [
-
+                    'div' => [
+                        'class' => HtmlBlock::class,
+                        'content' => '<div class="col-12 sx-choose-paymenter form-group"><div class="btn-group btn-block" role="group" aria-label="Basic example">
+                              <button type="button" class="btn btn-default cms_company_id-btn" data-view=".field-cmsdeal-cms_company_id">&#1050;&#1086;&#1084;&#1087;&#1072;&#1085;&#1080;&#1103;</button>
+                              <button type="button" class="btn btn-default cms_user_id-btn" data-view=".field-cmsdeal-cms_user_id">&#1050;&#1083;&#1080;&#1077;&#1085;&#1090;</button>
+                            </div></div>',
+                    ],
 
                     'cms_company_id' => [
                         'class'        => WidgetField::class,
