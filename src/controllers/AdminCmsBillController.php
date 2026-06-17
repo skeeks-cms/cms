@@ -17,6 +17,7 @@ use skeeks\cms\backend\actions\BackendModelMultiAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\base\InputWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\StringHelper;
@@ -41,6 +42,7 @@ use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\base\WidgetEvent;
@@ -643,6 +645,16 @@ HTML
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
+        /**
+         * Если не указана платежная система надо взять первую по сортировки
+         */
+        if (!$model->shop_pay_system_id) {
+            $first = ShopPaySystem::find()->sort()->limit(1)->one();
+            if ($first) {
+                $model->shop_pay_system_id = $first->id;
+            }
+        }
+
         /*$findPacts = crmDeal::find()->active();
 
         if ($model->isNewRecord) {
@@ -668,6 +680,83 @@ HTML
                 ]);
         }*/
 
+        $this->view->registerCSS(<<<CSS
+.field-shopbill-cms_company_id {
+    display: none;
+}
+.field-shopbill-cms_user_id {
+    display: none;
+}
+.btn.sx-active {
+    background: #6c757d !important;
+    color: white;   
+}
+CSS
+        );
+
+
+
+
+        $cms_company_id = (int) $model->cms_company_id;
+        $cms_user_id = (int) $model->cms_user_id;
+
+        $this->view->registerJs(<<<JS
+var cms_company_id = {$cms_company_id};
+var cms_user_id = {$cms_user_id};
+
+$("body").on("click", ".sx-choose-paymenter .btn", function(e, data) {
+    $(".field-shopbill-cms_company_id").slideUp();
+    $(".field-shopbill-cms_user_id").slideUp();
+    
+    var is_first = false;
+    
+    if (data) {
+        if (data.is_first) {
+            is_first = true;
+        }
+    }
+    
+    if (is_first === false) {
+        $("#shopbill-cms_company_id").val("");
+        $("#shopbill-cms_user_id").val("");
+    }
+    
+    
+    $(".sx-choose-paymenter .btn").removeClass("sx-active");
+    $(this).addClass("sx-active");
+    $($(this).data("view")).slideDown();
+    return false;
+});
+
+function reloadView() {
+    var cms_company_id = $("#shopbill-cms_company_id").val();
+    var cms_user_id = $("#shopbill-cms_user_id").val();
+    
+    if (cms_company_id) {
+        $(".cms_company_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    } else if(cms_user_id) {
+        $(".cms_user_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    }
+    
+    return false;
+}
+
+reloadView();
+
+
+
+$(document).on('pjax:complete', function (e) {
+    setTimeout(function() {
+        reloadView();
+    }, 200);
+});
+JS
+        );
+
 
         $result = [];
 
@@ -690,14 +779,74 @@ HTML
                 ],
             ],
         ];
-        
 
 
-        $result['client'] = [
+
+
+
+        $result['div'] = [
+            'class' => HtmlBlock::class,
+            'content' => '<div class="col-12 sx-choose-paymenter form-group"><div class="btn-group btn-block" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-default cms_company_id-btn" data-view=".field-shopbill-cms_company_id">Компания</button>
+                  <button type="button" class="btn btn-default cms_user_id-btn" data-view=".field-shopbill-cms_user_id">Контакт</button>
+                </div></div>'
+        ];
+
+        $result['cms_company_id'] = [
+            'class'        => WidgetField::class,
+            'widgetClass'  => AjaxSelectModel::class,
+            'widgetConfig' => [
+                'options'       => [
+                    'data' => [
+                        'form-reload' => 'true',
+                    ],
+                ],
+                'modelClass' => CmsCompany::class,
+                'searchQuery' => function($word = '') {
+                    $query = CmsCompany::find()->forManager();
+                    if ($word) {
+                        $query->search($word);
+                    }
+                    return $query;
+                },
+            ],
+        ];
+
+
+        $result['cms_user_id'] = [
+            'class'        => WidgetField::class,
+            'widgetClass'  => AjaxSelectModel::class,
+
+            'widgetConfig' => [
+                'options'       => [
+                    'data' => [
+                        'form-reload' => 'true',
+                    ],
+                ],
+                'modelClass' => CmsUser::class,
+                'searchQuery' => function($word = '') {
+                    $query = CmsUser::find()->forManager();
+                    if ($word) {
+                        $query->search($word);
+                    }
+                    return $query;
+                },
+            ],
+        ];
+
+
+        /*$result['client'] = [
             'class'  => FieldSet::class,
-            'name'   => 'Компания или клиент (заполнить хотя бы одно)',
+            'name'   => 'Компания / Клиент',
             'fields' => [
-                
+                'div' => [
+                    'class' => HtmlBlock::class,
+                    'content' => '<div class="col-12 sx-choose-paymenter"><div class="btn-group btn-block" role="group" aria-label="Basic example">
+                          <button type="button" class="btn btn-default cms_company_id-btn" data-view=".field-shopbill-cms_company_id">Компания</button>
+                          <button type="button" class="btn btn-default cms_user_id-btn" data-view=".field-shopbill-cms_user_id">Контакт</button>
+                        </div></div>'
+                ],
+
                 'cms_company_id' => [
                     'class'        => WidgetField::class,
                     'widgetClass'  => AjaxSelectModel::class,
@@ -721,7 +870,7 @@ HTML
                 'cms_user_id' => [
                     'class'        => WidgetField::class,
                     'widgetClass'  => AjaxSelectModel::class,
-                    
+
                     'widgetConfig' => [
                         'options'       => [
                             'data' => [
@@ -739,43 +888,14 @@ HTML
                     ],
                 ],
             ],
-        ];
-        
-        
-        $result['description'] = [
-            'class' => TextareaField::class,
-        ];
-        
-        $dealData = [];
-        
-        if ($model->cms_company_id || $model->cms_user_id) {
-            $query = CmsDeal::find()
-                ->forManager()
-            ;
+        ];*/
 
-            if ($model->cms_company_id) {
-                $query->andWhere(['cms_company_id' => $model->cms_company_id]);
-            }
-            
-            if ($model->cms_user_id) {
-                $query->andWhere(['cms_user_id' => $model->cms_user_id]);
-            }
-            
-            $dealData = ArrayHelper::map($query->all(), 'id', 'asText');
-        }
-        
-        $result['deals'] = [
-            'class'        => SelectField::class,
-            'multiple' => true,
-            'items'  => $dealData,
-        ];
-        
-        
-        
+
+
         $senderData = [];
-        
+
         if ($model->cms_company_id || $model->cms_user_id) {
-            
+
             $query = CmsContractor::find()
                 ->forManager()
             ;
@@ -784,13 +904,19 @@ HTML
                 $query->joinWith('companies as companies');
                 $query->andWhere(['companies.id' => $model->cms_company_id]);
             }
-            
+
             if ($model->cms_user_id) {
                 $query->joinWith('users as users');
                 $query->andWhere(['users.id' => $model->cms_user_id]);
             }
-            
+
             $senderData = ArrayHelper::map($query->all(), 'id', 'asText');
+            if (count($senderData) == 1 && $model->isNewRecord) {
+                foreach ($senderData as $id => $idData)
+                {
+                    $model->sender_contractor_id = $id;
+                }
+            }
         }
 
         $bankData = [];
@@ -810,91 +936,201 @@ HTML
         if ($model->receiver_contractor_id) {
             $bankData = ArrayHelper::map($model->receiverContractor->banks, 'id', 'asText');
         }
-        
-        $result['legal'] = [
-            'class'  => FieldSet::class,
-            'name'   => 'Реквизиты',
-            'fields' => [
-                
-                'sender_contractor_id' => [
-                    'class'        => SelectField::class,
-                    'items'  => $senderData,
-                ],
 
-                'receiver_contractor_id' => [
-                    'class'        => WidgetField::class,
-                    'widgetClass'  => AjaxSelectModel::class,
-                    
-                    'widgetConfig' => [
-                        'options'       => [
-                            'data' => [
-                                'form-reload' => 'true',
+        if ($model->shopPaySystem) {
+            if ($model->shopPaySystem->handler instanceof BankTransferPaysystemHandler) {
+                $result['legal'] = [
+                    'class'  => FieldSet::class,
+                    'name'   => 'Реквизиты',
+                    'fields' => [
+
+                        'sender_contractor_id' => [
+                            'class'        => SelectField::class,
+                            'items'  => $senderData,
+                        ],
+
+                        'receiver_contractor_id' => [
+                            'class'        => WidgetField::class,
+                            'widgetClass'  => AjaxSelectModel::class,
+
+                            'widgetConfig' => [
+                                'options'       => [
+                                    'data' => [
+                                        'form-reload' => 'true',
+                                    ],
+                                ],
+                                'modelClass' => CmsContractor::class,
+                                'searchQuery' => function($word = '') {
+                                    $query = CmsContractor::find()->our();
+                                    if ($word) {
+                                        $query->search($word);
+                                    }
+                                    return $query;
+                                },
                             ],
                         ],
-                        'modelClass' => CmsContractor::class,
-                        'searchQuery' => function($word = '') {
-                            $query = CmsContractor::find()->our();
-                            if ($word) {
-                                $query->search($word);
-                            }
-                            return $query;
-                        },
-                    ],
-                ],
 
-                'receiver_contractor_bank_id' => [
-                    'class'          => SelectField::class,
-                    'items'          => $bankData,
-                ],
-            ],
-        ];
-        
-        
-        $result['amount'] = [
+                        'receiver_contractor_bank_id' => [
+                            'class'          => SelectField::class,
+                            'items'          => $bankData,
+                        ],
+                    ],
+                ];
+            }
+        }
+
+
+
+
+        $result['description'] = [
             'class'  => FieldSet::class,
-            'name'   => 'Сумма',
+            'name'   => 'Комментарий',
             'fields' => [
-                
-                'amount' => [
-                    'class' => NumberField::class,
-                    'step'  => 0.01,
-                ],
-        
-                'currency_code' => [
-                    'class' => SelectField::class,
-                    'items' => ArrayHelper::map(
-                        MoneyCurrency::find()->where(['is_active' => 1])->all(),
-                        'code',
-                        'asText'
-                    ),
-                ],
+                "description" => [
+                    'class' => TextareaField::class,
+                ]
+
             ]
         ];
-        
-        $result['dates'] = [
+
+
+        $dealData = [];
+
+        if ($model->cms_company_id || $model->cms_user_id) {
+            $query = CmsDeal::find()
+                ->forManager()
+            ;
+
+            if ($model->cms_company_id) {
+                $query->andWhere(['cms_company_id' => $model->cms_company_id]);
+            }
+
+            if ($model->cms_user_id) {
+                $query->andWhere(['cms_user_id' => $model->cms_user_id]);
+            }
+
+
+            if ($model->isNewRecord) {
+                $query->active();
+            }
+
+
+            $dealData = ArrayHelper::map($query->all(), 'id', 'asText');
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $currencies = MoneyCurrency::find()->where(['is_active' => 1])->all();
+        if (count($currencies) > 1) {
+            $result['amount'] = [
+                'class'  => FieldSet::class,
+                'name'   => 'Сумма',
+                'fields' => [
+
+                    'amount' => [
+                        'class' => NumberField::class,
+                        'step'  => 0.01,
+                    ],
+
+                    'currency_code' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            MoneyCurrency::find()->where(['is_active' => 1])->all(),
+                            'code',
+                            'asText'
+                        ),
+                    ],
+                ]
+            ];
+        } else {
+
+            /**
+             * @var $currency MoneyCurrency
+             */
+            $currency = MoneyCurrency::find()->where(['is_active' => 1])->one();
+
+            if ($currency) {
+                $model->currency_code = $currency->code;
+
+            }
+
+            $this->view->registerCss(<<<CSS
+.field-shopbill-currency_code {
+    display: none;
+}
+CSS
+            );
+
+            $result['amount'] = [
+                'class'  => FieldSet::class,
+                'name'   => 'Сумма',
+                'fields' => [
+
+                    'amount' => [
+                        'class' => NumberField::class,
+                        'step'  => 0.01,
+                        'append'  => $currency ? $currency->code : "",
+                    ],
+
+                    'currency_code' => [
+                        'class' => TextField::class,
+
+                    ],
+                ],
+            ];
+        }
+
+
+        $result['relations'] = [
             'class'  => FieldSet::class,
-            'name'   => 'Статусы',
+            'name'   => 'Связи',
             'fields' => [
-                
-                'paid_at' => [
-                    'class'        => WidgetField::class,
-                    'widgetClass'  => DateControl::class,
-                    'widgetConfig' => [
-                        'type' => DateControl::FORMAT_DATETIME,
-                    ],
-                ],
-    
-                'closed_at' => [
-                    'class'        => WidgetField::class,
-                    'widgetClass'  => DateControl::class,
-                    'widgetConfig' => [
-                        'type' => DateControl::FORMAT_DATETIME,
-                    ],
-                ],
+                "deals" => [
+                    'class'        => SelectField::class,
+                    'multiple' => true,
+                    'items'  => $dealData,
+                ]
+
             ]
         ];
-        
-        
+
+        if (!$model->isNewRecord) {
+            $result['dates'] = [
+                'class'  => FieldSet::class,
+                'name'   => 'Статусы',
+                'fields' => [
+
+                    'paid_at' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => DateControl::class,
+                        'widgetConfig' => [
+                            'type' => DateControl::FORMAT_DATETIME,
+                        ],
+                    ],
+
+                    'closed_at' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => DateControl::class,
+                        'widgetConfig' => [
+                            'type' => DateControl::FORMAT_DATETIME,
+                        ],
+                    ],
+                ]
+            ];
+        }
+
+
+
 
         /*if ($model->isNewRecord) {
             $result['isCreateNotify'] = [
