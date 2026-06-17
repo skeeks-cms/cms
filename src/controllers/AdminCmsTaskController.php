@@ -48,6 +48,7 @@ use yii\helpers\ArrayHelper;
  */
 class AdminCmsTaskController extends BackendModelStandartController
 {
+    public $defaultAction = "calendar";
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Задачи");
@@ -86,8 +87,19 @@ class AdminCmsTaskController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+            
+            'calendar' => [
+                'class'    => ViewBackendAction::class,
+                'name' => 'Мой календарь',
+                'icon' => 'fa fa-calendar',
+                'priority' => 10,
+                /*'isOpenNewWindow' => false,*/
+            ],
+            
             'index' => [
 
+                'priority' => 20,
+                
                 'name' => 'Список задач',
 
                 'filters' => [
@@ -482,13 +494,7 @@ JS
                 ],
             ],
 
-            'calendar' => [
-                'class'    => ViewBackendAction::class,
-                'name' => 'Мой календарь',
-                'icon' => 'fa fa-calendar',
-                'priority' => 100,
-                /*'isOpenNewWindow' => false,*/
-            ],
+            
 
 
             'view' => [

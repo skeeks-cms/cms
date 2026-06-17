@@ -78,7 +78,7 @@ JS
 ?>
 
 <div class="row">
-    <div class="col-8">
+    <div class="col-12 col-sm-8">
         <div class="sx-block sx-block-task" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
             <div class="sx-task-description" style="">
                 <? if ($model->description) : ?>
@@ -140,7 +140,7 @@ JS
             
         </div>
     </div>
-    <div class="col-4">
+    <div class="col-12 col-sm-4">
         <div class="sx-properties-wrapper sx-columns-1 sx-block" style="height: 100%;">
             <ul class="sx-properties" style="padding: 10px;">
                 <li>
