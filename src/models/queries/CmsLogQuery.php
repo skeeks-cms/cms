@@ -37,5 +37,13 @@ class CmsLogQuery extends CmsActiveQuery
         return $this->logType(CmsLog::LOG_TYPE_COMMENT);
     }
 
+    /**
+     * @return $this
+     */
+    public function phoneCalls()
+    {
+        return $this->logType(CmsLog::LOG_TYPE_PHONE_CALL);
+    }
+
 
 }

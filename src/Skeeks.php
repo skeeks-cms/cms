@@ -69,6 +69,7 @@ class Skeeks extends Component implements BootstrapInterface
      * @var string[]
      */
     public $defaultLogTypes = [
+        CmsLog::LOG_TYPE_PHONE_CALL => 'Звонок',
         CmsLog::LOG_TYPE_COMMENT => 'Комментарий',
 
         CmsLog::LOG_TYPE_DELETE => 'Удаление',

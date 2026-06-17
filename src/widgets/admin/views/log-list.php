@@ -71,6 +71,53 @@ $this->registerCss(<<<CSS
     opacity: 1;
 }
 
+
+.sx-tel-item.failed .sx-icon {
+    background: #ffe8e8;
+}
+.sx-tel-item.failed .sx-icon svg {
+    fill: #ff5752;
+}
+
+.sx-tel-item.answered .sx-icon {
+    background: #ccffe7;
+}
+.sx-tel-item.answered .sx-icon svg {
+    fill: #1bce7b;
+}
+
+.sx-tel-item .sx-phone-status-icon svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+.sx-tel-item .sx-gray {
+    color: gray;
+}
+
+.sx-tel-item .sx-phone-status-icon {
+    position: absolute;
+    /*background: white;*/
+    right: 1rem;
+    /*bottom: 50%;
+    transform: translateY(50%);*/
+    top: 1rem;
+}
+
+.sx-tel-item audio {
+    width: 100%;
+}
+.sx-tel-item .sx-icon {
+    position: relative;
+    background: silver;
+    padding: 1rem;
+    border-radius: 1rem;
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 CSS
 );
 

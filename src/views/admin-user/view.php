@@ -356,7 +356,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                     </div>
 
 
-                                    <div class="btn btn-default" data-html="true" title="Начать звонок">
+                                    <div class="btn btn-default sx-telephony-btn" data-value="<?php echo $cmsUserPhone->value; ?>" data-html="true" title="Начать звонок">
                                         <i class="fas fa-phone"></i>
                                     </div>
                                 </div>
@@ -723,7 +723,10 @@ JS
                 <div class="row">
                     <div class="col-12">
                         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                            'query'         => $model->getUserLogs()->comments(),
+                            'query'         => $model->getUserLogs()->logType([
+                                \skeeks\cms\models\CmsLog::LOG_TYPE_PHONE_CALL,
+                                \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT
+                            ]),
                             'is_show_model' => false,
                         ]); ?>
                     </div>

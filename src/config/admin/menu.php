@@ -567,6 +567,36 @@ return array_merge(dashboardsMenu(), [
                 ],
 
                 [
+                    "label" => \Yii::t('skeeks/cms', "Телефония"),
+                    //"url"   => ["cms/admin-cms-content-type"],
+                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/telephone-call.png'],
+
+                    'items' => [
+                        [
+                            'url'   => ["/cms/admin-cms-telephony-provider"],
+                            'label' => \Yii::t('skeeks/cms', "Провайдеры"),
+                        ],
+
+                        [
+                            'url'   => ["/cms/admin-cms-telephony-user"],
+                            'label' => \Yii::t('skeeks/cms', "Пользователи"),
+                        ],
+
+
+                        [
+                            'url'   => ["/cms/admin-cms-telephony-call"],
+                            'label' => \Yii::t('skeeks/cms', "Звонки"),
+                        ],
+
+                        /*[
+                            'url'   => ["/cms/admin-cms-sms-message"],
+                            'label' => \Yii::t('skeeks/cms', "SMS сообщения"),
+                        ],*/
+                    ],
+                    //contentEditMenu()
+                ],
+
+                [
                     "label" => \Yii::t('skeeks/cms', "Авторизация по звонку"),
                     //"url"   => ["cms/admin-cms-content-type"],
                     "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/telephone-call.png'],

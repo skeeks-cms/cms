@@ -722,6 +722,7 @@ class Cms extends \skeeks\cms\base\Component
     }
 
 
+    public $telephonyHandlers = [];
     public $smsHandlers = [];
 
     /**
@@ -733,6 +734,27 @@ class Cms extends \skeeks\cms\base\Component
 
         if ($this->smsHandlers) {
             foreach ($this->smsHandlers as $id => $handlerClass) {
+                if (is_array($handlerClass)) {
+                    $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
+                }
+
+                $result[$id] = (new $handlerClass())->descriptor->name;
+
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTelephonyHandlersForSelect()
+    {
+        $result = [];
+
+        if ($this->telephonyHandlers) {
+            foreach ($this->telephonyHandlers as $id => $handlerClass) {
                 if (is_array($handlerClass)) {
                     $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
                 }

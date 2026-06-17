@@ -481,6 +481,37 @@ class AdminWorkerController extends BackendModelStandartController
                 },
             ],
 
+            'telephony' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'priority' => 600,
+                'name'     => 'Звонки',
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-worker", ['model' => $this->model]);
+                },
+                //'priority' => 90,
+                /*'callback' => [$this, 'shift'],*/
+                'icon'     => 'fas fa-list',
+
+                'controllerRoute' => "/cms/admin-cms-telephony-call",
+                'relation'        => ['cms_worker_user_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    /*$action->relatedIndexAction->filters = false;*/
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    /*ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');*/
+
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+
+
+                },
+            ],
+
             'stat' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Статистика',

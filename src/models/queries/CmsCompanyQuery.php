@@ -76,6 +76,18 @@ class CmsCompanyQuery extends CmsActiveQuery
     }
 
     /**
+     * @param string $phone
+     * @return $this
+     */
+    public function phone(string $phone)
+    {
+        $this->joinWith("phones as phones");
+        $this->groupBy($this->getPrimaryTableName().'.id');
+
+        return $this->andWhere(['phones.value' => $phone]);
+    }
+
+    /**
      * @param string $username
      * @return $this
      */
