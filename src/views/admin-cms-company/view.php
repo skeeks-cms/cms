@@ -898,7 +898,19 @@ JS
 CSS
             );
             
-            $tasks = $model->getTasks()->expired()->orderPlanStartAt()->limit(2)->all();
+            $tasks = $model->getTasks()
+                ->expired()
+                ->andWhere([
+                    'not in',
+                    'status',
+                    [
+                        \skeeks\cms\models\CmsTask::STATUS_READY,
+                        \skeeks\cms\models\CmsTask::STATUS_CANCELED,
+                    ],
+                ])
+                ->orderPlanStartAt()
+                ->limit(2)
+                ->all();
             if ($tasks) :
             ?>
                 <div class="sx-expired-tasks">

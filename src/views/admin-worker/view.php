@@ -618,6 +618,20 @@ JS
         </div>
 
         <div class="col-lg-8 col-sm-6 col-12" style="padding-left: 10px;">
+            <?
+            $currentTask = $model->getExecutorTasks()->statusInWork()->one();
+            if ($currentTask) :
+            ?>
+                <div class="sx-current-worker-task">
+                    <div class="sx-block">
+                        <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
+                            <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $currentTask]); ?>
+                            <? echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $currentTask]); ?>
+                        </div>
+                    </div>
+                </div>
+            <? endif; ?>
+
             <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
                 'id' => 'sx-comments',
             ]); ?>

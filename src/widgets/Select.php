@@ -37,6 +37,10 @@ class Select extends Select2
     
     public function init()
     {
+        if (is_bool($this->placeholder)) {
+            $this->placeholder = '';
+        }
+
         if ($this->placeholder) {
             $this->options['placeholder'] = $this->placeholder;
         }
@@ -57,6 +61,14 @@ class Select extends Select2
                 }
                 
             }
+        }
+
+        if (isset($this->options['placeholder']) && is_bool($this->options['placeholder'])) {
+            $this->options['placeholder'] = '';
+        }
+
+        if (isset($this->pluginOptions['placeholder']) && is_bool($this->pluginOptions['placeholder'])) {
+            $this->pluginOptions['placeholder'] = '';
         }
         
         parent::init();
