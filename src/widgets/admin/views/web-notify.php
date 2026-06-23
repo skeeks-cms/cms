@@ -40,6 +40,7 @@ $jsData = [
     'backend_notifies_clear' => \yii\helpers\Url::to(['/cms/ajax/web-notifies-clear']),
     'id' => "sx-notifies-wrapper",
     'sound_src' => \skeeks\cms\assets\CmsAsset::getAssetUrl("sound/sound_telegram.mp3"),
+    'browser_icon_src' => \skeeks\cms\assets\CmsAsset::getAssetUrl("favicon.ico"),
     'last_notify_id' => $lastNotify ? $lastNotify->id : ''
 ];
 $js = \yii\helpers\Json::encode($jsData);
@@ -60,10 +61,21 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         self.jItemsContainer = $(".sx-notifies-has-items", self.getJWrapper());
         self.jList = $(".sx-notifies-list", self.getJWrapper());
         self.jBtnClear = $(".sx-btn-clear", self.getJWrapper());
+        self.jBrowserPermission = $(".sx-browser-permission", self.getJWrapper());
+        self.jBrowserPermissionEnable = $(".sx-browser-permission-enable", self.getJWrapper());
+        self.jBrowserPermissionDenied = $(".sx-browser-permission-denied", self.getJWrapper());
+        self.jBtnBrowserPermission = $(".sx-btn-browser-permission", self.getJWrapper());
         
-        self.jTrigger.on("click", function() {
+        self.jTrigger.on("click", function(e) {
+            e.preventDefault();
+            self.updateBrowserPermissionPanel();
             self.jContainer.fadeIn();
             self.loadMessages();
+        });
+
+        self.jBtnBrowserPermission.on("click", function(e) {
+            e.preventDefault();
+            self.requestBrowserPermission();
         });
         
         self.jBtnClear.on("click", function() {
@@ -90,6 +102,8 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         {
             self.checkNewNotifies();
         }, 10000);
+
+        self.updateBrowserPermissionPanel();
     },
     
     checkNewNotifies: function() {
@@ -116,6 +130,7 @@ sx.classes.WebNotify = sx.classes.Component.extend({
                 response.data.items.forEach(function(item) {
                     /*sx.notify.info(item.render, { life: 1000000 });*/
                     sx.notify.info(item.render);
+                    self.showBrowserNotification(item);
                     self.set("last_notify_id", item.id);
                     var audio = new Audio();
                     audio.src = self.get("sound_src");
@@ -206,6 +221,125 @@ sx.classes.WebNotify = sx.classes.Component.extend({
 
         ajaxQuery.execute();
     },
+
+    isBrowserNotificationsSupported: function() {
+        return "Notification" in window;
+    },
+
+    requestBrowserPermission: function() {
+        var self = this;
+
+        if (!self.isBrowserNotificationsSupported() || Notification.permission !== "default") {
+            self.updateBrowserPermissionPanel();
+            return;
+        }
+
+        var permission = Notification.requestPermission();
+        if (permission && permission.then) {
+            permission.then(function() {
+                self.updateBrowserPermissionPanel();
+            });
+        } else {
+            self.updateBrowserPermissionPanel();
+        }
+    },
+
+    updateBrowserPermissionPanel: function() {
+        var self = this;
+
+        if (!self.jBrowserPermission || !self.jBrowserPermission.length) {
+            return;
+        }
+
+        if (!self.isBrowserNotificationsSupported() || Notification.permission === "granted") {
+            self.jBrowserPermission.hide();
+            return;
+        }
+
+        self.jBrowserPermission.show();
+
+        if (Notification.permission === "denied") {
+            self.jBrowserPermissionEnable.hide();
+            self.jBrowserPermissionDenied.show();
+        } else {
+            self.jBrowserPermissionDenied.hide();
+            self.jBrowserPermissionEnable.show();
+        }
+    },
+
+    getBrowserStorageKey: function(item) {
+        return "sx-web-notify-browser-" + item.id;
+    },
+
+    isBrowserNotificationShown: function(item) {
+        if (!item || !item.id) {
+            return false;
+        }
+
+        try {
+            return window.localStorage && window.localStorage.getItem(this.getBrowserStorageKey(item));
+        } catch (e) {
+            return false;
+        }
+    },
+
+    markBrowserNotificationShown: function(item) {
+        if (!item || !item.id) {
+            return;
+        }
+
+        try {
+            if (window.localStorage) {
+                window.localStorage.setItem(this.getBrowserStorageKey(item), "1");
+            }
+        } catch (e) {}
+    },
+
+    getBrowserNotificationData: function(item) {
+        var jRender = $("<div>").html(item.render || "");
+        var title = $.trim(item.name || jRender.find(".sx-name").first().text() || document.title);
+        var body = $.trim(jRender.find(".sx-model").first().text());
+
+        if (!body) {
+            body = $.trim(jRender.text().replace(title, ""));
+        }
+
+        body = body.replace(/\s+/g, " ");
+
+        return {
+            title: title,
+            body: body.substr(0, 240)
+        };
+    },
+
+    showBrowserNotification: function(item) {
+        var self = this;
+
+        if (!self.isBrowserNotificationsSupported() || Notification.permission !== "granted" || self.isBrowserNotificationShown(item)) {
+            return;
+        }
+
+        var notificationData = self.getBrowserNotificationData(item);
+        self.markBrowserNotificationShown(item);
+
+        try {
+            var notification = new Notification(notificationData.title, {
+                body: notificationData.body,
+                icon: self.get("browser_icon_src"),
+                tag: "sx-web-notify-" + item.id,
+                renotify: true
+            });
+
+            notification.onclick = function() {
+                window.focus();
+                notification.close();
+            };
+
+            setTimeout(function() {
+                notification.close();
+            }, 10000);
+        } catch (e) {}
+    },
     
     getJWrapper: function() {
         return $("#" + this.get("id"));
@@ -276,6 +410,37 @@ $this->registerCss(<<<CSS
     text-align: center;
 }
 
+.sx-notifies-wrapper .sx-browser-permission {
+    display: none;
+    margin: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    background: rgba(43, 123, 220, 0.16);
+    color: #fff;
+}
+
+.sx-notifies-wrapper .sx-browser-permission-enable,
+.sx-notifies-wrapper .sx-browser-permission-denied {
+    display: none;
+}
+
+.sx-notifies-wrapper .sx-browser-permission-denied {
+    border-left: 3px solid var(--color-red-pale);
+    padding-left: 0.75rem;
+}
+
+.sx-notifies-wrapper .sx-browser-permission-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.sx-notifies-wrapper .sx-browser-permission-text {
+    color: #b8c7e6;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    margin-bottom: 0.65rem;
+}
+
 
 .sx-notifies-wrapper .dropdown-toggle::after {
     content: none;
@@ -322,6 +487,17 @@ CSS
         <i class="hs-admin-bell g-absolute-centered"></i>
     </a>
     <div class="sx-notifies">
+        <div class="sx-browser-permission">
+            <div class="sx-browser-permission-enable">
+                <div class="sx-browser-permission-title">&#1041;&#1088;&#1072;&#1091;&#1079;&#1077;&#1088;&#1085;&#1099;&#1077; &#1091;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103;</div>
+                <div class="sx-browser-permission-text">&#1056;&#1072;&#1079;&#1088;&#1077;&#1096;&#1080;&#1090;&#1077; &#1091;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103;, &#1095;&#1090;&#1086;&#1073;&#1099; &#1074;&#1080;&#1076;&#1077;&#1090;&#1100; &#1085;&#1086;&#1074;&#1099;&#1077; &#1089;&#1086;&#1073;&#1099;&#1090;&#1080;&#1103; &#1076;&#1072;&#1078;&#1077; &#1074; &#1076;&#1088;&#1091;&#1075;&#1086;&#1081; &#1074;&#1082;&#1083;&#1072;&#1076;&#1082;&#1077;.</div>
+                <button class="btn btn-primary btn-xs sx-btn-browser-permission">&#1042;&#1082;&#1083;&#1102;&#1095;&#1080;&#1090;&#1100;</button>
+            </div>
+            <div class="sx-browser-permission-denied">
+                <div class="sx-browser-permission-title">&#1059;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103; &#1079;&#1072;&#1073;&#1083;&#1086;&#1082;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1099;</div>
+                <div class="sx-browser-permission-text">&#1056;&#1072;&#1079;&#1088;&#1077;&#1096;&#1080;&#1090;&#1077; &#1091;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103; &#1076;&#1083;&#1103; &#1101;&#1090;&#1086;&#1075;&#1086; &#1089;&#1072;&#1081;&#1090;&#1072; &#1074; &#1085;&#1072;&#1089;&#1090;&#1088;&#1086;&#1081;&#1082;&#1072;&#1093; &#1073;&#1088;&#1072;&#1091;&#1079;&#1077;&#1088;&#1072;.</div>
+            </div>
+        </div>
         <div class="sx-notifies-has-items">
             <div class="sx-notifies-list">
 
