@@ -38,7 +38,13 @@ $jsData = [
     'backend_notifies' => \yii\helpers\Url::to(['/cms/ajax/web-notifies']),
     'backend_notifies_new' => \yii\helpers\Url::to(['/cms/ajax/web-notifies-new']),
     'backend_notifies_clear' => \yii\helpers\Url::to(['/cms/ajax/web-notifies-clear']),
+    'backend_idle_work_check' => \yii\helpers\Url::to(['/cms/ajax/idle-work-check']),
+    'backend_idle_work_stop' => \yii\helpers\Url::to(['/cms/ajax/idle-work-stop']),
+    'backend_stale_work_check' => \yii\helpers\Url::to(['/cms/ajax/stale-work-check']),
+    'backend_stale_work_stop' => \yii\helpers\Url::to(['/cms/ajax/stale-work-stop']),
     'id' => "sx-notifies-wrapper",
+    'idle_modal_id' => "sx-idle-work-modal",
+    'stale_modal_id' => "sx-stale-work-modal",
     'sound_src' => \skeeks\cms\assets\CmsAsset::getAssetUrl("sound/sound_telegram.mp3"),
     'browser_icon_src' => \skeeks\cms\assets\CmsAsset::getAssetUrl("favicon.ico"),
     'last_notify_id' => $lastNotify ? $lastNotify->id : ''
@@ -65,6 +71,26 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         self.jBrowserPermissionEnable = $(".sx-browser-permission-enable", self.getJWrapper());
         self.jBrowserPermissionDenied = $(".sx-browser-permission-denied", self.getJWrapper());
         self.jBtnBrowserPermission = $(".sx-btn-browser-permission", self.getJWrapper());
+        self.jIdleModal = $("#" + self.get("idle_modal_id"));
+        if (self.jIdleModal.parent()[0] !== document.body) {
+            self.jIdleModal.appendTo("body");
+        }
+        self.jIdleModalBody = $(".sx-idle-work-body", self.jIdleModal);
+        self.jIdleModalBtnYes = $(".sx-idle-work-yes", self.jIdleModal);
+        self.jIdleModalBtnNo = $(".sx-idle-work-no", self.jIdleModal);
+        self.idleWorkData = null;
+        self.isIdleWorkStopped = false;
+        self.jStaleModal = $("#" + self.get("stale_modal_id"));
+        if (self.jStaleModal.parent()[0] !== document.body) {
+            self.jStaleModal.appendTo("body");
+        }
+        self.jStaleModalBody = $(".sx-stale-work-body", self.jStaleModal);
+        self.jStaleModalInput = $(".sx-stale-work-end-time", self.jStaleModal);
+        self.jStaleModalError = $(".sx-stale-work-error", self.jStaleModal);
+        self.jStaleModalBtnSave = $(".sx-stale-work-save", self.jStaleModal);
+        self.jStaleModalBtnLater = $(".sx-stale-work-later", self.jStaleModal);
+        self.staleWorkData = null;
+        self.isStaleWorkStopped = false;
         
         self.jTrigger.on("click", function(e) {
             e.preventDefault();
@@ -76,6 +102,40 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         self.jBtnBrowserPermission.on("click", function(e) {
             e.preventDefault();
             self.requestBrowserPermission();
+        });
+
+        self.jIdleModalBtnYes.on("click", function(e) {
+            e.preventDefault();
+            self.stopIdleWork();
+        });
+
+        self.jIdleModalBtnNo.on("click", function(e) {
+            e.preventDefault();
+            self.snoozeIdleWorkReminder();
+            self.jIdleModal.modal("hide");
+        });
+
+        self.jIdleModal.on("hidden.bs.modal", function() {
+            if (self.idleWorkData && !self.isIdleWorkStopped) {
+                self.snoozeIdleWorkReminder();
+            }
+        });
+
+        self.jStaleModalBtnSave.on("click", function(e) {
+            e.preventDefault();
+            self.stopStaleWork();
+        });
+
+        self.jStaleModalBtnLater.on("click", function(e) {
+            e.preventDefault();
+            self.snoozeStaleWorkReminder();
+            self.jStaleModal.modal("hide");
+        });
+
+        self.jStaleModal.on("hidden.bs.modal", function() {
+            if (self.staleWorkData && !self.isStaleWorkStopped) {
+                self.snoozeStaleWorkReminder();
+            }
         });
         
         self.jBtnClear.on("click", function() {
@@ -103,7 +163,319 @@ sx.classes.WebNotify = sx.classes.Component.extend({
             self.checkNewNotifies();
         }, 10000);
 
+        setInterval(function()
+        {
+            self.checkWorkReminders();
+        }, 60000);
+
         self.updateBrowserPermissionPanel();
+        self.checkWorkReminders();
+    },
+
+    getCsrfData: function() {
+        var data = {};
+        if (window.yii && yii.getCsrfParam && yii.getCsrfToken) {
+            data[yii.getCsrfParam()] = yii.getCsrfToken();
+        }
+
+        return data;
+    },
+
+    getIdleWorkStorageKey: function(data) {
+        if (!data) {
+            return "sx-idle-work-reminder";
+        }
+
+        return "sx-idle-work-reminder-" + data.schedule_id + "-" + data.last_task_end_at;
+    },
+
+    getIdleWorkSnoozedUntil: function(data) {
+        try {
+            return parseInt(window.localStorage.getItem(this.getIdleWorkStorageKey(data)), 10) || 0;
+        } catch (e) {
+            return 0;
+        }
+    },
+
+    setIdleWorkSnoozedUntil: function(data, timestamp) {
+        try {
+            window.localStorage.setItem(this.getIdleWorkStorageKey(data), timestamp);
+        } catch (e) {}
+    },
+
+    snoozeIdleWorkReminder: function() {
+        if (!this.idleWorkData) {
+            return;
+        }
+
+        this.setIdleWorkSnoozedUntil(this.idleWorkData, Date.now() + 10 * 60 * 1000);
+    },
+
+    getStaleWorkStorageKey: function(data) {
+        if (!data) {
+            return "sx-stale-work-reminder";
+        }
+
+        return "sx-stale-work-reminder-" + data.schedule_id + "-" + data.date_key;
+    },
+
+    getStaleWorkSnoozedUntil: function(data) {
+        try {
+            return parseInt(window.localStorage.getItem(this.getStaleWorkStorageKey(data)), 10) || 0;
+        } catch (e) {
+            return 0;
+        }
+    },
+
+    setStaleWorkSnoozedUntil: function(data, timestamp) {
+        try {
+            window.localStorage.setItem(this.getStaleWorkStorageKey(data), timestamp);
+        } catch (e) {}
+    },
+
+    snoozeStaleWorkReminder: function() {
+        if (!this.staleWorkData) {
+            return;
+        }
+
+        this.setStaleWorkSnoozedUntil(this.staleWorkData, Date.now() + 10 * 60 * 1000);
+    },
+
+    checkWorkReminders: function() {
+        var self = this;
+
+        self.checkStaleWork(function(hasStaleWork) {
+            if (!hasStaleWork) {
+                self.checkIdleWork();
+            }
+        });
+    },
+
+    checkStaleWork: function(callback) {
+        var self = this;
+        var data = self.getCsrfData();
+
+        $.ajax({
+            url: self.get("backend_stale_work_check"),
+            type: "post",
+            dataType: "json",
+            data: data,
+            success: function(response) {
+                if (!response || !response.success || !response.data) {
+                    if (callback) {
+                        callback(false);
+                    }
+                    return;
+                }
+
+                if (self.getStaleWorkSnoozedUntil(response.data) > Date.now()) {
+                    if (callback) {
+                        callback(true);
+                    }
+                    return;
+                }
+
+                self.showStaleWorkModal(response.data);
+                if (callback) {
+                    callback(true);
+                }
+            },
+            error: function() {
+                if (callback) {
+                    callback(false);
+                }
+            }
+        });
+    },
+
+    renderStaleIntervals: function(title, intervals, emptyText) {
+        var jWrap = $("<div>").addClass("sx-stale-work-section");
+        jWrap.append($("<div>").addClass("sx-stale-work-section-title").text(title));
+
+        if (!intervals || !intervals.length) {
+            jWrap.append($("<div>").addClass("sx-stale-work-empty").text(emptyText));
+            return jWrap;
+        }
+
+        intervals.forEach(function(interval) {
+            var endTime = interval.end_time || "\u043d\u0435 \u0437\u0430\u043a\u0440\u044b\u0442";
+            var duration = interval.duration ? " (" + interval.duration + ")" : "";
+            var jItem = $("<div>").addClass("sx-stale-work-interval");
+            if (interval.is_current || interval.is_open) {
+                jItem.addClass("sx-is-open");
+            }
+
+            jItem.append(
+                $("<div>").addClass("sx-stale-work-interval-time").text(interval.start_time + " \u2014 " + endTime + duration)
+            );
+
+            if (interval.task_name) {
+                jItem.append($("<div>").addClass("sx-stale-work-task-name").text(interval.task_name));
+            }
+
+            jWrap.append(jItem);
+        });
+
+        return jWrap;
+    },
+
+    showStaleWorkModal: function(data) {
+        var self = this;
+        var title = data.is_yesterday
+            ? "\u0412\u044b \u043d\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u043b\u0438 \u0440\u0430\u0431\u043e\u0447\u0435\u0435 \u0432\u0440\u0435\u043c\u044f \u0432\u0447\u0435\u0440\u0430"
+            : "\u0412\u044b \u043d\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u043b\u0438 \u0440\u0430\u0431\u043e\u0447\u0435\u0435 \u0432\u0440\u0435\u043c\u044f";
+
+        self.staleWorkData = data;
+        self.isStaleWorkStopped = false;
+        self.jStaleModalError.hide().empty();
+        self.jStaleModalInput
+            .attr("min", data.min_end_time)
+            .attr("max", data.max_end_time)
+            .val(data.min_end_time);
+
+        $(".sx-stale-work-title", self.jStaleModal).text(title);
+        self.jStaleModalBody.html(
+            $("<div>").append(
+                $("<p>").text("\u0414\u0435\u043d\u044c: " + data.work_date + ". \u0420\u0430\u0431\u043e\u0447\u0438\u0439 \u043f\u0440\u043e\u043c\u0435\u0436\u0443\u0442\u043e\u043a \u043d\u0430\u0447\u0430\u043b\u0441\u044f \u0432 " + data.start_datetime + "."),
+                self.renderStaleIntervals(
+                    "\u0420\u0430\u0431\u043e\u0447\u0438\u0435 \u043f\u0440\u043e\u043c\u0435\u0436\u0443\u0442\u043a\u0438",
+                    data.work_intervals,
+                    "\u041d\u0435\u0442 \u043f\u0440\u043e\u043c\u0435\u0436\u0443\u0442\u043a\u043e\u0432."
+                ),
+                self.renderStaleIntervals(
+                    "\u0420\u0430\u0431\u043e\u0442\u0430 \u043f\u043e \u0437\u0430\u0434\u0430\u0447\u0430\u043c",
+                    data.task_intervals,
+                    "\u0417\u0430\u0434\u0430\u0447\u0438 \u0432 \u044d\u0442\u043e\u0442 \u0434\u0435\u043d\u044c \u043d\u0435 \u0437\u0430\u043f\u0443\u0441\u043a\u0430\u043b\u0438\u0441\u044c."
+                ),
+                $("<p>").addClass("sx-stale-work-hint").text("\u0423\u043a\u0430\u0436\u0438\u0442\u0435, \u0432\u043e \u0441\u043a\u043e\u043b\u044c\u043a\u043e \u043d\u0443\u0436\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c \u0440\u0430\u0431\u043e\u0447\u0438\u0439 \u0434\u0435\u043d\u044c. \u041c\u0438\u043d\u0438\u043c\u0443\u043c: " + data.min_end_time + ".")
+            ).html()
+        );
+
+        self.jStaleModal.modal({
+            backdrop: "static",
+            keyboard: false,
+            show: true
+        });
+    },
+
+    stopStaleWork: function() {
+        var self = this;
+        var data = self.getCsrfData();
+        data.end_time = self.jStaleModalInput.val();
+
+        self.jStaleModalError.hide().empty();
+        self.jStaleModalBtnSave.prop("disabled", true);
+        self.jStaleModalBtnLater.prop("disabled", true);
+
+        $.ajax({
+            url: self.get("backend_stale_work_stop"),
+            type: "post",
+            dataType: "json",
+            data: data,
+            complete: function() {
+                self.jStaleModalBtnSave.prop("disabled", false);
+                self.jStaleModalBtnLater.prop("disabled", false);
+            },
+            success: function(response) {
+                if (!response || !response.success) {
+                    self.jStaleModalError.text(response && response.error ? response.error : "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0438\u0441\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0430\u0431\u043e\u0447\u0435\u0435 \u0432\u0440\u0435\u043c\u044f.").show();
+                    return;
+                }
+
+                self.isStaleWorkStopped = true;
+                self.jStaleModal.modal("hide");
+                self.setStaleWorkSnoozedUntil(self.staleWorkData, Date.now() + 24 * 60 * 60 * 1000);
+                sx.notify.success("\u0420\u0430\u0431\u043e\u0447\u0435\u0435 \u0432\u0440\u0435\u043c\u044f \u0438\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e.");
+                if ($.pjax && $("#sx-schedule-pjax").length) {
+                    $.pjax.reload("#sx-schedule-pjax", {async: false});
+                }
+            }
+        });
+    },
+
+    checkIdleWork: function() {
+        var self = this;
+        var data = self.getCsrfData();
+
+        $.ajax({
+            url: self.get("backend_idle_work_check"),
+            type: "post",
+            dataType: "json",
+            data: data,
+            success: function(response) {
+                if (!response || !response.success || !response.data) {
+                    return;
+                }
+
+                if (self.getIdleWorkSnoozedUntil(response.data) > Date.now()) {
+                    return;
+                }
+
+                self.showIdleWorkModal(response.data);
+            }
+        });
+    },
+
+    showIdleWorkModal: function(data) {
+        var self = this;
+        var message;
+        var closeTime = data.last_task_date || data.last_task_time;
+        self.idleWorkData = data;
+        self.isIdleWorkStopped = false;
+        if (data.reason === "no_tasks") {
+            message = "Вы включили рабочее время, но не запускали задачи уже " + data.idle_duration + ".";
+        } else {
+            message = "Вы последний раз работали по задаче в " + data.last_task_date + ".";
+        }
+
+        self.jIdleModalBody.html(
+            $("<div>").append(
+                $("<p>").addClass("sx-idle-work-message").text(message),
+                $("<p>").append(
+                    document.createTextNode("Завершить текущий рабочий период временем "),
+                    $("<span>").addClass("sx-idle-work-time").text(closeTime),
+                    document.createTextNode("?")
+                )
+            ).html()
+        );
+        self.jIdleModal.modal({
+            backdrop: "static",
+            keyboard: false,
+            show: true
+        });
+    },
+
+    stopIdleWork: function() {
+        var self = this;
+        var data = self.getCsrfData();
+
+        self.jIdleModalBtnYes.prop("disabled", true);
+        self.jIdleModalBtnNo.prop("disabled", true);
+
+        $.ajax({
+            url: self.get("backend_idle_work_stop"),
+            type: "post",
+            dataType: "json",
+            data: data,
+            complete: function() {
+                self.jIdleModalBtnYes.prop("disabled", false);
+                self.jIdleModalBtnNo.prop("disabled", false);
+            },
+            success: function(response) {
+                if (!response || !response.success) {
+                    sx.notify.error(response && response.error ? response.error : "Не удалось завершить рабочее время.");
+                    return;
+                }
+
+                self.isIdleWorkStopped = true;
+                self.jIdleModal.modal("hide");
+                self.setIdleWorkSnoozedUntil(self.idleWorkData, Date.now() + 24 * 60 * 60 * 1000);
+                sx.notify.success("Рабочее время завершено.");
+                if ($.pjax && $("#sx-schedule-pjax").length) {
+                    $.pjax.reload("#sx-schedule-pjax", {async: false});
+                }
+            }
+        });
     },
     
     checkNewNotifies: function() {
@@ -466,6 +838,152 @@ $this->registerCss(<<<CSS
     display: block;
 }
 
+.sx-idle-work-modal .modal-body {
+    color: #333;
+    font-size: 16px;
+    line-height: 1.45;
+    min-height: auto;
+    padding: 20px;
+}
+
+.sx-idle-work-modal .modal-title {
+    color: #333;
+    flex: 1 1 auto;
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.sx-idle-work-modal .modal-footer,
+.sx-idle-work-modal .modal-header {
+    padding: 15px 20px;
+}
+
+.sx-idle-work-modal .modal-header {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+}
+
+.sx-idle-work-modal .modal-header .close {
+    flex: 0 0 auto;
+    float: none;
+    font-size: 24px;
+    line-height: 1;
+    margin: 0 0 0 auto;
+    opacity: .55;
+    order: 2;
+}
+
+.sx-idle-work-modal p {
+    margin: 0 0 12px;
+}
+
+.sx-idle-work-modal p:last-child {
+    margin-bottom: 0;
+}
+
+.sx-idle-work-modal .sx-idle-work-time {
+    font-weight: 600;
+}
+
+.sx-stale-work-modal .modal-dialog {
+    max-width: 720px;
+    width: 720px;
+}
+
+.sx-stale-work-modal .modal-body {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.45;
+    padding: 20px;
+}
+
+.sx-stale-work-modal .modal-title {
+    color: #333;
+    flex: 1 1 auto;
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.sx-stale-work-modal .modal-header {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    padding: 15px 20px;
+}
+
+.sx-stale-work-modal .modal-header .close {
+    flex: 0 0 auto;
+    float: none;
+    font-size: 24px;
+    line-height: 1;
+    margin: 0 0 0 auto;
+    opacity: .55;
+    order: 2;
+}
+
+.sx-stale-work-modal .modal-footer {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+}
+
+.sx-stale-work-modal .sx-stale-work-form {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin-right: auto;
+}
+
+.sx-stale-work-modal .sx-stale-work-form label {
+    color: #555;
+    font-weight: 400;
+    margin: 0;
+}
+
+.sx-stale-work-modal .sx-stale-work-end-time {
+    max-width: 120px;
+}
+
+.sx-stale-work-modal .sx-stale-work-section {
+    margin-top: 16px;
+}
+
+.sx-stale-work-modal .sx-stale-work-section-title {
+    color: #222;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sx-stale-work-modal .sx-stale-work-interval {
+    border-left: 3px solid #d9e1ea;
+    margin-bottom: 8px;
+    padding: 6px 0 6px 10px;
+}
+
+.sx-stale-work-modal .sx-stale-work-interval.sx-is-open {
+    border-left-color: var(--color-red-pale);
+}
+
+.sx-stale-work-modal .sx-stale-work-interval-time {
+    color: #333;
+    font-weight: 600;
+}
+
+.sx-stale-work-modal .sx-stale-work-task-name,
+.sx-stale-work-modal .sx-stale-work-empty,
+.sx-stale-work-modal .sx-stale-work-hint {
+    color: #777;
+}
+
+.sx-stale-work-modal .sx-stale-work-error {
+    display: none;
+    margin: 0 20px 15px;
+}
+
 @keyframes sx-pulse-bage {
   0% {
     box-shadow: 0 0 5px 0px var(--color-red), 0 0 5px 0px var(--color-red); 
@@ -511,6 +1029,43 @@ CSS
     </div>
 </div>
 
+<div id="sx-stale-work-modal" class="modal fade sx-stale-work-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title sx-stale-work-title">&#1042;&#1099; &#1085;&#1077; &#1079;&#1072;&#1074;&#1077;&#1088;&#1096;&#1080;&#1083;&#1080; &#1088;&#1072;&#1073;&#1086;&#1095;&#1077;&#1077; &#1074;&#1088;&#1077;&#1084;&#1103;</h4>
+                <button type="button" class="close sx-stale-work-later" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body sx-stale-work-body">
+            </div>
+            <div class="alert alert-danger sx-stale-work-error"></div>
+            <div class="modal-footer">
+                <div class="sx-stale-work-form">
+                    <label for="sx-stale-work-end-time">&#1047;&#1072;&#1074;&#1077;&#1088;&#1096;&#1080;&#1090;&#1100; &#1074;</label>
+                    <input id="sx-stale-work-end-time" class="form-control sx-stale-work-end-time" type="time" step="60" />
+                </div>
+                <button type="button" class="btn btn-default sx-stale-work-later" data-dismiss="modal">&#1055;&#1086;&#1079;&#1078;&#1077;</button>
+                <button type="button" class="btn btn-primary sx-stale-work-save">&#1047;&#1072;&#1074;&#1077;&#1088;&#1096;&#1080;&#1090;&#1100;</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-
+<div id="sx-idle-work-modal" class="modal fade sx-idle-work-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Завершить рабочее время?</h4>
+                <button type="button" class="close sx-idle-work-no" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body sx-idle-work-body">
+                <p>Похоже, рабочее время включено, но сейчас нет активной задачи.</p>
+                <p>Завершить текущий рабочий период?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default sx-idle-work-no" data-dismiss="modal">Нет</button>
+                <button type="button" class="btn btn-primary sx-idle-work-yes">Да, завершить</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,6 +17,16 @@ use yii\base\Widget;
 
 class CmsUserScheduleBtnWidget extends Widget
 {
+    /**
+     * @var string
+     */
+    public $pjaxId = 'sx-schedule-pjax';
+
+    /**
+     * @var string
+     */
+    public $layout = 'default';
+
     public function getUser()
     {
         return \Yii::$app->user->identity;

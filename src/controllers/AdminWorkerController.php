@@ -512,6 +512,18 @@ class AdminWorkerController extends BackendModelStandartController
                 },
             ],
 
+            'log' => [
+                'class'          => BackendModelAction::class,
+                'name'           => 'Активность',
+                'generateAccess' => false,
+                'icon'           => 'fa fa-list',
+                'priority'       => 1000,
+                "callback"       => [$this, 'view'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-worker", ['model' => $this->model]);
+                },
+            ],
+
             'stat' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Статистика',

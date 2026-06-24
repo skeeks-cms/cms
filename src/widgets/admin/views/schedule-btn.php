@@ -12,6 +12,9 @@
 
 $widget = $this->context;
 $user = $widget->user;
+$pjaxId = $widget->pjaxId;
+$layout = $widget->layout;
+$pjaxIdJson = \yii\helpers\Json::htmlEncode($pjaxId);
 ?>
 
 <? $this->registerJs(<<<JS
@@ -36,31 +39,31 @@ sx.classes.InfoSchedule = sx.classes.Component.extend({
 });
 
 new sx.classes.InfoSchedule({
-    'id': 'sx-schedule-pjax'
+    'id': {$pjaxIdJson}
 });
 })(sx, sx.$, sx._);
 JS
 );
 $this->registerCss(<<<CSS
 
-#sx-schedule-pjax {
+.sx-schedule-pjax {
     display: flex;
 }
 
-#sx-schedule-pjax>div {
+.sx-schedule-pjax>div {
     margin-left: 1rem;
 }
 
-#sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
+.sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
     width: 2rem;
     height: 2rem;
 }
 
-#sx-schedule-pjax .sx-current-task .sx-main-info {
+.sx-schedule-pjax .sx-current-task .sx-main-info {
     overflow: hidden;
     max-height: 40px;
 }
-#sx-schedule-pjax .sx-current-task {
+.sx-schedule-pjax .sx-current-task {
     line-height: 1;
     max-width: 30rem;
     max-height: 40px;
@@ -68,9 +71,45 @@ $this->registerCss(<<<CSS
     margin-left: 2rem;
 }
 
-#sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
+.sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
     width: 2rem;
     height: 2rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 1rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar>div {
+    margin-left: .75rem;
+    margin-top: 0;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar form {
+    flex: 1 1 auto;
+    margin: 0;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar form .btn {
+    width: 100%;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar .sx-current-task {
+    flex: 0 0 100%;
+    max-width: none;
+    max-height: none;
+    margin-left: 0;
+    margin-top: 1.75rem;
+    padding-top: .5rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar .col-md-12 {
+    flex: 0 0 100%;
+    margin-left: 0;
+    margin-top: .75rem;
 }
 
 .sx-schedule-last {
@@ -104,12 +143,12 @@ CSS
 ?>
 
 <? $pjax = \skeeks\cms\widgets\Pjax::begin([
-    'id'              => 'sx-schedule-pjax',
+    'id'              => $pjaxId,
     'enablePushState' => false,
     'isBlock'         => false,
     'timeout'         => 100000,
     'options'         => [
-        'class' => '',
+        'class' => 'sx-schedule-pjax sx-schedule-layout-'.$layout,
     ],
 ]); ?>
 <? $form = \yii\widgets\ActiveForm::begin([

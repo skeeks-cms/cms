@@ -13,6 +13,42 @@ $widget = $this->context;
 $cmsUser = $widget->user;
 
 $class = 'g-brd-gray-light-v4';
+$currentTask = null;
+$isWorkingNow = (bool)$cmsUser->isWorkingNow;
+$isCurrentTaskAvailable = true;
+
+if ($isWorkingNow) {
+    $currentTask = $cmsUser->getExecutorTasks()->statusInWork()->one();
+
+    if ($currentTask && \Yii::$app->user->id != $cmsUser->id) {
+        $isCurrentTaskAvailable = \Yii::$app->user->can("cms/admin-task/manage", ['model' => $currentTask]);
+    }
+}
+
+$css = <<<CSS
+.sx-worker-work-state {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+    border-radius: 50%;
+    vertical-align: middle;
+    color: #fff;
+    font-size: 7px;
+    line-height: 1;
+}
+.sx-worker-work-state.is-task {
+    background: #14b8a6;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(20, 184, 166, 0.18);
+}
+.sx-worker-work-state.is-without-task {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(245, 158, 11, 0.18);
+}
+CSS;
+$this->registerCss($css, [], 'sx-worker-work-state');
 
 ?>
 <div class="d-flex flex-row sx-preview-card">
@@ -82,6 +118,17 @@ $class = 'g-brd-gray-light-v4';
             ],
 
         ]); ?>
+        <?php if ($isWorkingNow) : ?>
+            <?php if ($currentTask) : ?>
+                <span class="sx-worker-work-state is-task" data-toggle="tooltip" title="<?php echo $isCurrentTaskAvailable ? "В работе: ".\yii\helpers\Html::encode($currentTask->name) : "В работе"; ?>">
+                    <i class="fas fa-play"></i>
+                </span>
+            <?php else : ?>
+                <span class="sx-worker-work-state is-without-task" data-toggle="tooltip" title="В работе, но задача не запущена">
+                    <i class="fas fa-exclamation"></i>
+                </span>
+            <?php endif; ?>
+        <?php endif; ?>
         <?php $ajaxWidget::end(); ?>
 
 
@@ -99,5 +146,3 @@ $class = 'g-brd-gray-light-v4';
 
 
 </div>
-
-

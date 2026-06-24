@@ -39,6 +39,13 @@ $isCanEdit = \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model])
             <div>
 
                 <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
+                    <?php echo \skeeks\cms\widgets\user\UserOnlineWidget::widget([
+                        'user'    => $model,
+                        'options' => [
+                            'class'  => 'sx-user-online-indicator--header',
+                            'height' => '11px',
+                        ],
+                    ]); ?>
                     <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
 
 

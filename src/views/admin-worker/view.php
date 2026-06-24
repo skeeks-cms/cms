@@ -619,15 +619,77 @@ JS
 
         <div class="col-lg-8 col-sm-6 col-12" style="padding-left: 10px;">
             <?
+            $isWorkingNow = (bool)$model->isWorkingNow;
             $currentTask = $model->getExecutorTasks()->statusInWork()->one();
-            if ($currentTask) :
+            $isCurrentTaskAvailable = true;
+
+            if ($currentTask && \Yii::$app->user->id != $model->id) {
+                $isCurrentTaskAvailable = \Yii::$app->user->can("cms/admin-task/manage", ['model' => $currentTask]);
+            }
+
+            $currentWorkerStateCss = <<<CSS
+.sx-current-worker-state .sx-state-title {
+    color: #8a8f99;
+    font-size: 12px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+.sx-current-worker-state .sx-state-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #7a4b00;
+}
+.sx-current-worker-state .sx-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 50%;
+    background: #fff7e6;
+    color: #f59e0b;
+}
+.sx-current-worker-state .sx-state-message.is-unavailable {
+    color: #8a8f99;
+}
+.sx-current-worker-state .sx-state-message.is-unavailable .sx-state-icon {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+CSS;
+            $this->registerCss($currentWorkerStateCss, [], 'sx-current-worker-state');
+            if ($isWorkingNow) :
             ?>
                 <div class="sx-current-worker-task">
                     <div class="sx-block">
-                        <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
-                            <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $currentTask]); ?>
-                            <? echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $currentTask]); ?>
-                        </div>
+                        <?php if ($currentTask) : ?>
+                            <div class="sx-current-worker-state">
+                                <div class="sx-state-title">Сейчас выполняет задачу</div>
+                            </div>
+                            <?php if ($isCurrentTaskAvailable) : ?>
+                                <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
+                                    <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $currentTask]); ?>
+                                    <? echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $currentTask]); ?>
+                                </div>
+                            <?php else : ?>
+                                <div class="sx-current-worker-state">
+                                    <div class="sx-state-message is-unavailable">
+                                        <span class="sx-state-icon"><i class="fas fa-lock"></i></span>
+                                        <span>Задача недоступна для просмотра.</span>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        <?php else : ?>
+                            <div class="sx-current-worker-state">
+                                <div class="sx-state-title">Сейчас в работе</div>
+                                <div class="sx-state-message">
+                                    <span class="sx-state-icon"><i class="fas fa-exclamation"></i></span>
+                                    <span>Рабочее время запущено, но задача не выбрана.</span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             <? endif; ?>
