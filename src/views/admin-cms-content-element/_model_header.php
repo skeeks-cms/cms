@@ -34,8 +34,22 @@ $controller = $this->context;
                         </span>
                     <? endif; ?>
                     <? if ($model->sx_id) : ?>
+                        <?
+                        $sxInfoUpdateColor = (isset($model->is_sx_info_update) && !$model->is_sx_info_update) ? "red" : "green";
+                        $sxInfoUpdateTitle = (isset($model->is_sx_info_update) && !$model->is_sx_info_update)
+                            ? "SkeekS ID: {$model->sx_id}. Обновление информации из сервиса SkeekS Товары запрещено"
+                            : "SkeekS ID: {$model->sx_id}. Информация обновляется из сервиса SkeekS Товары";
+                        $sxMarketUrl = isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getProductUrl($model->sx_id) : "#";
+                        $sxIcon = "<i class='fas fa-link' style='color: {$sxInfoUpdateColor} !important;'></i>";
+                        ?>
                         <span style="font-size: 17px; font-weight: bold;">
-                            <span data-toggle='tooltip' title='SkeekS Suppliers ID: <?php echo $model->sx_id; ?>'><i class='fas fa-link'></i></span>
+                            <?php echo \yii\helpers\Html::a($sxIcon, $sxMarketUrl, [
+                                'target' => '_blank',
+                                'data-pjax' => '0',
+                                'data-toggle' => 'tooltip',
+                                'title' => $sxInfoUpdateTitle,
+                                'style' => "color: {$sxInfoUpdateColor} !important;",
+                            ]); ?>
                         </span>
                     <? endif; ?>
 

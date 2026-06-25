@@ -77,7 +77,7 @@ if ($model->isCanonical) {
     <?php endif; ?>
 
     <?php if ($model->sx_id) : ?>
-        <small data-toggle="tooltip" title="SkeekS Suppliers ID: <?= $model->sx_id; ?>"><i class="fas fa-link"></i></small>
+        <small data-toggle="tooltip" title="SkeekS ID: <?= $model->sx_id; ?>"><i class="fas fa-link"></i></small>
     <?php endif; ?>
 
 </div>

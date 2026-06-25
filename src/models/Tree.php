@@ -379,7 +379,7 @@ class Tree extends ActiveRecord
             'view_file'              => Yii::t('skeeks/cms', 'Template'),
             'seo_h1'                 => Yii::t('skeeks/cms', 'SEO заголовок h1'),
             'external_id'            => Yii::t('skeeks/cms', 'ID из внешней системы'),
-            'sx_id'                  => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'                  => Yii::t('skeeks/cms', 'SkeekS ID'),
 
             'is_adult' => Yii::t('skeeks/cms', 'Контент для взрослых?'),
             'is_index' => Yii::t('skeeks/cms', 'Страница индексируется?'),

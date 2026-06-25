@@ -90,7 +90,7 @@ class CmsContentProperty extends RelatedPropertyModel
             'is_country'            => \Yii::t('skeeks/cms', 'Страна'),
             'is_sticker'            => \Yii::t('skeeks/cms', 'Стикер'),
 
-            'sx_id'               => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'               => Yii::t('skeeks/cms', 'SkeekS ID'),
         ]);
     }
     /**

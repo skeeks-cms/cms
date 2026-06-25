@@ -165,7 +165,7 @@ class StorageFile extends Core
             'description_full'  => Yii::t('skeeks/cms', 'Description Full'),
             'image_height'      => Yii::t('skeeks/cms', 'Image Height'),
             'image_width'       => Yii::t('skeeks/cms', 'Image Width'),
-            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS ID'),
         ]);
     }
 

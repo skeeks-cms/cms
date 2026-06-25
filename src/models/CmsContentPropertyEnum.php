@@ -57,7 +57,7 @@ class CmsContentPropertyEnum extends RelatedPropertyEnumModel
             'description'            => 'Описание',
             'cms_image_id'           => 'Фото/Изображение',
             'color'           => 'Цвет',
-            'sx_id'           => \Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'           => \Yii::t('skeeks/cms', 'SkeekS ID'),
         ]);
     }
 
