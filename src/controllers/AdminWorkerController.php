@@ -23,7 +23,6 @@ use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
-use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContractor;
@@ -259,13 +258,13 @@ class AdminWorkerController extends BackendModelStandartController
                         'actions',
                         //'id',
                         'custom',
+                        'role',
                         'phone',
                         'email',
                         //'image_id',
                         //'displayName',
                         //'created_at',
                         //'logged_at',
-                        //'role',
                         'is_active',
                     ],
                     'columns'            => [
@@ -275,69 +274,9 @@ class AdminWorkerController extends BackendModelStandartController
                             'attribute' => 'id',
                             'label'     => 'Аккаунт',
                             'value'     => function (CmsUser $cmsUser) {
-                                //$data[] = $cmsUser->asText;
-                                $data[] = Html::a($cmsUser->shortDisplayNameWithAlias, "#", [
-                                    'style' => 'font-size: 15px;
-                                                display: block;',
+                                return \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
+                                    'user' => $cmsUser,
                                 ]);
-                                /*if ($cmsUser->phone) {
-                                    $data[] = "<div style='color: gray;'>" . $cmsUser->phone . "</div>";
-                                }
-                                if ($cmsUser->email) {
-                                    $data[] = "<div style='color: gray;'>" . $cmsUser->email . "</div>";
-                                }*/
-
-                                $rolesData = [];
-                                if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
-                                    foreach ($roles as $role) {
-                                        $rolesData[] = Html::tag('label', $role->description, [
-                                            'title' => $role->name,
-                                            'class' => "".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 10px;
-    padding: 2px;
-    padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    background: silver;
-    color: white;
-        margin-bottom: 0;
-        margin-right: 5px;
-        border-radius: 20px;
-            line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    margin-top: 5px;
-    margin-bottom: 0;
-    color: #fff;",
-                                        ]);
-                                    }
-                                }
-
-                                if ($rolesData) {
-                                    $data[] = implode("", $rolesData);
-                                }
-
-
-                                $info = implode("", $data);
-
-                                return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none;
-    border-bottom: 0;
-    width: 54px;
-    border-radius: 50%;
-    border: 2px solid #ededed;
-    height: 54px;
-    
-    display: flex;
-    overflow: hidden;'>
-                                                    <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='    max-width: 50px;
-    max-height: 50px;
-    border-radius: 50%;
-    margin: auto;' />
-                                                </a>
-                                                </div>
-                                                <div style='margin-left: 10px; line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
                             },
                         ],
                         'created_at'             => [
@@ -364,14 +303,36 @@ class AdminWorkerController extends BackendModelStandartController
 
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
                                     foreach ($roles as $role) {
-                                        $result[] = $role->description." ({$role->name})";
+                                        $result[] = Html::tag('label', $role->description, [
+                                            'title' => $role->name,
+                                            'class' => "".($role->name == 'root' ? 'u-label-danger' : ''),
+                                            'style' => "font-size: 10px;
+    padding: 2px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background: silver;
+    color: white;
+        margin-bottom: 0;
+        margin-right: 5px;
+        border-radius: 20px;
+            line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    margin-top: 5px;
+    margin-bottom: 0;
+    color: #fff;",
+                                        ]);
                                     }
                                 }
 
-                                return implode(', ', $result);
+                                return implode("", $result);
                             },
-                            'format' => 'html',
+                            'format' => 'raw',
                             'label'  => \Yii::t('skeeks/cms', 'Roles'),
+                            'headerOptions' => [
+                                'style' => 'width: 260px;',
+                            ],
                         ],
                         'phone'                  => [
                             'label'         => "Телефон",
