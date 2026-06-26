@@ -63,6 +63,60 @@ class DaterangeInputWidget extends InputWidget
      */
     public $multiple = false;
 
+    /**
+     * @param string $value
+     * @return array|null [start timestamp, end timestamp]
+     */
+    public static function parseRange($value)
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        $parts = preg_split('/\s+-\s+/', $value, 2);
+        if (count($parts) !== 2) {
+            $parts = explode('-', $value, 2);
+        }
+
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+        $start = static::parseDatePart($parts[0], '00:00:00');
+        $end = static::parseDatePart($parts[1], '23:59:59');
+
+        if ($start === false || $end === false) {
+            return null;
+        }
+
+        return [$start, $end];
+    }
+
+    /**
+     * @param string $date
+     * @param string $time
+     * @return int|false
+     */
+    protected static function parseDatePart($date, $time)
+    {
+        $date = trim((string) $date);
+        if ($date === '') {
+            return false;
+        }
+
+        foreach (['d.m.Y', 'd/m/Y', 'Y-m-d'] as $format) {
+            $dateTime = \DateTimeImmutable::createFromFormat('!'.$format.' H:i:s', $date.' '.$time);
+            $errors = \DateTimeImmutable::getLastErrors();
+
+            if ($dateTime && (!$errors || (!$errors['warning_count'] && !$errors['error_count']))) {
+                return $dateTime->getTimestamp();
+            }
+        }
+
+        return false;
+    }
+
     public function init()
     {
         $this->_daterangepickerDefaultConfig = [

@@ -31,7 +31,7 @@ $(function() {
   jInput.daterangepicker({$jsDaterangeConfig});
 
   jInput.on('apply.daterangepicker', function(ev, picker) {
-      $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY')).trigger("change");
+      $(this).val(picker.startDate.format('DD.MM.YYYY') + ' - ' + picker.endDate.format('DD.MM.YYYY')).trigger("change");
   });
 
   jInput.on('cancel.daterangepicker', function(ev, picker) {
