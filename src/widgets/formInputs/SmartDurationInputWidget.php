@@ -21,8 +21,38 @@ class SmartDurationInputWidget extends InputWidget
     /**
      * @var array
      */
+    public $availableUnits = [
+        'sec'  => 'сек',
+        'min'  => 'мин',
+        'hour' => 'час',
+    ];
+    /**
+     * @var string
+     */
+    public $defaultUnit = 'sec';
+    /**
+     * @var array
+     */
     public $defaultOptions = [
         'type'  => 'text',
         'class' => 'form-control',
     ];
+
+    public function init()
+    {
+        if (!$this->availableUnits) {
+            $this->availableUnits = [
+                'sec' => 'сек',
+            ];
+        }
+
+        if (!isset($this->availableUnits[$this->defaultUnit])) {
+            foreach ($this->availableUnits as $unit => $label) {
+                $this->defaultUnit = $unit;
+                break;
+            }
+        }
+
+        parent::init();
+    }
 }

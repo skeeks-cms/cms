@@ -2,11 +2,11 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
+ * @copyright 2010 SkeekS
  * @date 02.03.2016
  */
 /* @var $this yii\web\View */
-/* @var $widget \skeeks\cms\widgets\formInputs\SmartTimeInputWidget */
+/* @var $widget \skeeks\cms\widgets\formInputs\SmartDurationInputWidget */
 
 $widget = $this->context;
 $model = $widget->model;
@@ -29,12 +29,7 @@ CSS
     <div class="sx-not-real">
         <div class="input-group">
             <input class="form-control" type="number" step="1" style="max-width: 200px;">
-            <?= \yii\helpers\Html::listBox("sx-not-real-select", "sec", [
-                'sec'  => 'сек',
-                'min' => 'мин',
-                'hour'  => 'час',
-                //'dday'  => 'дней',
-            ], ['size' => 1, 'class' => 'form-control', 'style' => 'max-width: 70px;']) ?>
+            <?= \yii\helpers\Html::listBox("sx-not-real-select", $widget->defaultUnit, $widget->availableUnits, ['size' => 1, 'class' => 'form-control', 'style' => 'max-width: 70px;']) ?>
         </div>
     </div>
 
@@ -42,6 +37,8 @@ CSS
 <?
 
 $jsOptions = \yii\helpers\Json::encode($widget->clientOptions);
+$availableUnits = \yii\helpers\Json::encode($widget->availableUnits);
+$defaultUnit = \yii\helpers\Json::encode($widget->defaultUnit);
 
 
 $this->registerJs(<<<JS
@@ -52,63 +49,94 @@ $this->registerJs(<<<JS
         _onDomReady: function()
         {
            var self = this;
+           var availableUnits = {$availableUnits};
+           var defaultUnit = {$defaultUnit};
+
+           var normalizeUnit = function(unit) {
+               if (availableUnits[unit]) {
+                   return unit;
+               }
+
+               if (availableUnits[defaultUnit]) {
+                   return defaultUnit;
+               }
+
+               for (var key in availableUnits) {
+                   if (availableUnits.hasOwnProperty(key)) {
+                       return key;
+                   }
+               }
+
+               return 'sec';
+           };
+
+           var durationToSeconds = function(value, measure) {
+               if (measure == 'min') {
+                   return value * 60;
+               } else if (measure == 'hour') {
+                   return value * 3600;
+               }
+
+               return value;
+           };
+
+           var valueFromSeconds = function(value, measure) {
+               if (measure == 'min') {
+                   return value / 60;
+               } else if (measure == 'hour') {
+                   return value / 3600;
+               }
+
+               return value;
+           };
+
+           var updateStep = function(measure) {
+               if (measure == 'min') {
+                   self.getNotRealInput().attr("step", "0.01");
+               } else if (measure == 'hour') {
+                   self.getNotRealInput().attr("step", "0.0001");
+               } else {
+                   self.getNotRealInput().attr("step", "1");
+               }
+           };
+
+           var applyNotRealValue = function() {
+                var notRealVal = self.getNotRealInput().val();
+                var measure = normalizeUnit(self.getNotRealSelect().val());
+
+                self.getNotRealSelect().val(measure);
+                self.getRealInput().val(durationToSeconds(notRealVal, measure));
+           };
            
             this.getNotRealInput().on("keyup change", function() {
-                var notRalVal = self.getNotRealInput().val();
-                var measure = self.getNotRealSelect().val();
-                var realValue = 0;
-                
-                if (measure == 'min') {
-                    realValue = notRalVal * 60;
-                } else if (measure == 'hour') {
-                    realValue = notRalVal * 3600;
-                } else {
-                    realValue = notRalVal
-                }
-                
-                self.getRealInput().val(realValue);
+                applyNotRealValue();
             });
             
             this.getNotRealSelect().on("change", function() {
-                var notRalVal = self.getNotRealInput().val();
-                var measure = self.getNotRealSelect().val();
-                var realValue = 0;
-                
-                if (measure == 'min') {
-                    realValue = notRalVal * 60;
-                    self.getNotRealInput().attr("step", "0.01");
-                } else if (measure == 'hour') {
-                    realValue = notRalVal * 3600 ;
-                    self.getNotRealInput().attr("step", "0.0001");
-                } else {
-                    self.getNotRealInput().attr("step", "1");
-                    realValue = notRalVal
-                }
-                
-                self.getRealInput().val(realValue);
+                var measure = normalizeUnit(self.getNotRealSelect().val());
+                updateStep(measure);
+                applyNotRealValue();
             });
             
             var startVal = this.getRealInput().val();
             if (startVal == 0) {
-                self.getNotRealSelect().val("min");
-                self.getNotRealInput().attr("step", "0.01");
+                var measure = normalizeUnit(defaultUnit);
+                self.getNotRealSelect().val(measure);
+                updateStep(measure);
             } else {
-                if (startVal >= 3600) {
-                    var val = startVal/3600;
-                    self.getNotRealInput().val(val);
-                    self.getNotRealSelect().val("hour");
-                    self.getNotRealInput().attr("step", "0.0001");
-                } else if (startVal >= 60) {
-                    var val = startVal/60;
-                    self.getNotRealInput().val(val);
-                    self.getNotRealSelect().val("min");
-                    self.getNotRealInput().attr("step", "0.01");
-                } else {
-                    var val = startVal;
-                    self.getNotRealInput().val(val);
-                    self.getNotRealSelect().val("sec");
-                    self.getNotRealInput().attr("step", "1");
+                var measure = normalizeUnit(defaultUnit);
+
+                if (startVal >= 3600 && availableUnits['hour']) {
+                    measure = 'hour';
+                } else if (startVal >= 60 && availableUnits['min']) {
+                    measure = 'min';
+                } else if (availableUnits['sec']) {
+                    measure = 'sec';
                 }
+
+                self.getNotRealInput().val(valueFromSeconds(startVal, measure));
+                self.getNotRealSelect().val(measure);
+                updateStep(measure);
             }
             
             

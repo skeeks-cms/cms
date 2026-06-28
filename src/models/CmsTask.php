@@ -59,6 +59,8 @@ class CmsTask extends ActiveRecord
 {
     use HasLogTrait;
 
+    protected static $_isRecalculatingTasksPriority = false;
+
     const STATUS_NEW = 'new';
     const STATUS_ACCEPTED = 'accepted';
 
@@ -131,6 +133,78 @@ class CmsTask extends ActiveRecord
         ]);
     }
 
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        if ($this->plan_start_at && $this->plan_duration) {
+            $this->plan_end_at = (int)$this->plan_start_at + (int)$this->plan_duration;
+        } else {
+            $this->plan_end_at = null;
+        }
+
+        return true;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (static::$_isRecalculatingTasksPriority) {
+            return;
+        }
+
+        $recalculateAttributes = [
+            'executor_id',
+            'plan_duration',
+            'status',
+        ];
+        $needRecalculate = $insert;
+        foreach ($recalculateAttributes as $attribute) {
+            if (array_key_exists($attribute, $changedAttributes)) {
+                $needRecalculate = true;
+                break;
+            }
+        }
+
+        if (!$needRecalculate) {
+            return;
+        }
+
+        $userIds = [];
+        if ($this->executor_id) {
+            $userIds[(int)$this->executor_id] = (int)$this->executor_id;
+        }
+        if (!empty($changedAttributes['executor_id'])) {
+            $userIds[(int)$changedAttributes['executor_id']] = (int)$changedAttributes['executor_id'];
+        }
+
+        $activeStatuses = [
+            self::STATUS_NEW,
+            self::STATUS_IN_WORK,
+            self::STATUS_ON_PAUSE,
+            self::STATUS_ACCEPTED,
+        ];
+
+        if (($insert || array_key_exists('executor_id', $changedAttributes)) && $this->executor_id && in_array($this->status, $activeStatuses)) {
+            $maxSort = (int)static::find()
+                ->andWhere(['executor_id' => $this->executor_id])
+                ->andWhere(['status' => $activeStatuses])
+                ->andWhere(['!=', static::tableName().'.id', $this->id])
+                ->max('executor_sort');
+            static::updateAll(['executor_sort' => $maxSort + 100], ['id' => $this->id]);
+        }
+
+        foreach ($userIds as $userId) {
+            $user = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $userId])->one();
+            if ($user) {
+                static::recalculateTasksPriority($user, []);
+            }
+        }
+    }
+
 
     /**
      * {@inheritdoc}
@@ -154,7 +228,28 @@ class CmsTask extends ActiveRecord
 
             [['name'], 'string', 'max' => 255],
 
-            ['plan_duration', 'default', 'value' => 60 * 5], //5 минут
+            ['plan_duration', 'default', 'value' => 60 * 15], //15 минут
+            [
+                'plan_start_at',
+                function ($attribute) {
+                    if (!$this->{$attribute}) {
+                        return true;
+                    }
+
+                    if (!$this->isNewRecord && !$this->isAttributeChanged($attribute)) {
+                        return true;
+                    }
+
+                    $minStartAt = time() + 30 * 60;
+                    $minStartAt = $minStartAt - ($minStartAt % 60);
+                    if ((int)$this->{$attribute} < $minStartAt) {
+                        $this->addError($attribute, "Нельзя указать время начала задачи раньше чем через 30 минут.");
+                        return false;
+                    }
+
+                    return true;
+                },
+            ],
 
             [
                 'status',
@@ -345,6 +440,8 @@ class CmsTask extends ActiveRecord
             'executor_end_at' => 'Ориентировочная дата исполнения задачи исполнителем',
 
             'fileIds' => "Файлы",
+        ], [
+            'fact_duration' => 'Длительность для отчета',
         ]);
     }
 
@@ -633,7 +730,7 @@ class CmsTask extends ActiveRecord
      */
     public function getPlanDurationSeconds()
     {
-        return $this->plan_duration * 60 * 60;
+        return $this->plan_duration;
     }
 
     static public function recalculateTasksPriority(CmsUser $user, $sortTaskIds)
@@ -688,7 +785,10 @@ class CmsTask extends ActiveRecord
 
 
         $priority = 0;
-        $elseDayTime = 0;
+        $tasks = array_values((array)$tasks);
+        $taskIndex = 0;
+        $taskRemaining = null;
+
         for ($i = 0; $i <= 1000; $i++) {
 
             $workShedule = $user->work_shedule;
@@ -702,67 +802,78 @@ class CmsTask extends ActiveRecord
             $todayDate = \Yii::$app->formatter->asDate(time(), "php:Y-m-d");
             //Тут отфильтровать время согласно текущему времени
             if ($todayDate == $date) {
-                //$times = CrmScheduleHelper::getFilteredSchedulesByStartTime($times, \Yii::$app->formatter->asTime(time(), "php:H:i:s"));
-                $times = \skeeks\cms\helpers\CmsScheduleHelper::getFilteredSchedulesByStartTime($times);
+                $now = time();
+                foreach ($times as $key => $period) {
+                    if ($period->end_at <= $now) {
+                        ArrayHelper::remove($times, $key);
+                        continue;
+                    }
+
+                    if ($period->start_at < $now) {
+                        $period->start_at = $now;
+                    }
+                }
             }
 
             if (!$times) {
                 continue;
             }
 
-
-            if (!$tasks) {
+            if (!isset($tasks[$taskIndex])) {
                 break;
             }
 
             foreach ($times as $period)
             {
-                $periodDuration = CmsScheduleHelper::durationBySchedules([$period]);
-                $peroidTime = $periodDuration + $elseDayTime;
+                $periodCursor = (int)$period->start_at;
+                $periodEndAt = (int)$period->end_at;
 
-                if ($tasks) {
-                    $elseTime = 0;
-                    foreach ($tasks as $key => $task) {
-                        $priority++;
+                while (isset($tasks[$taskIndex]) && $periodCursor < $periodEndAt) {
+                    $task = $tasks[$taskIndex];
 
+                    if ($taskRemaining === null) {
                         //время по плану на задачу минус то что уже отработано по задаче
-                        $time = $task->raw_row['planTotalTime'] - $task->raw_row['scheduleTotalTime'];
-                        if ($time < 0) {
-                            $time = 0;
-                        }
-
-                        $elseTime = $time + $elseTime;
-
-                        $peroidTime = $peroidTime - $time;
-
-
-                        $task->executor_sort = $priority;
-                        $task->executor_end_at = $period->start_at + $elseTime;
-                        $task->save();
-
-                        /*echo "$key\n";*/
-
-                        unset($tasks[$key]);
-
-                        if ($peroidTime <= 0) {
-                            $elseDayTime = $peroidTime;
-                            break;
+                        $taskRemaining = (int)$task->raw_row['planTotalTime'] - (int)$task->raw_row['scheduleTotalTime'];
+                        if ($taskRemaining < 0) {
+                            $taskRemaining = 0;
                         }
                     }
-                } else {
-                    break;
+
+                    if ($taskRemaining <= 0) {
+                        $priority++;
+                        $taskEndAt = $periodCursor;
+                        static::updateAll([
+                            'executor_sort'   => $priority,
+                            'executor_end_at' => $taskEndAt,
+                            'plan_end_at'     => $taskEndAt,
+                        ], ['id' => $task->id]);
+                        $taskIndex++;
+                        $taskRemaining = null;
+                        continue;
+                    }
+
+                    $available = $periodEndAt - $periodCursor;
+                    $duration = min($available, $taskRemaining);
+
+                    $periodCursor += $duration;
+                    $taskRemaining -= $duration;
+
+                    if ($taskRemaining <= 0) {
+                        $priority++;
+                        static::updateAll([
+                            'executor_sort'   => $priority,
+                            'executor_end_at' => $periodCursor,
+                            'plan_end_at'     => $periodCursor,
+                        ], ['id' => $task->id]);
+                        $taskIndex++;
+                        $taskRemaining = null;
+                    }
                 }
             }
-
-
-
-
-
-
         }
 
         //Если приоритет задач обновил другой пользователь, то уведомим исполнителя
-        if ($currentUser != $user) {
+        if ($currentUser && $currentUser->id != $user->id) {
             $notify = new CmsWebNotify();
             $notify->cms_user_id = $user->id;
             $notify->name = $currentUser->asText . " поменял(а) порядок ваших задач.";

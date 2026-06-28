@@ -34,6 +34,7 @@ use skeeks\cms\widgets\formInputs\SmartTimeInputWidget;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
@@ -41,6 +42,7 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -583,12 +585,359 @@ JS
 
         if ($model->isNewRecord) {
             $model->executor_id = \Yii::$app->user->id;
+            if (!$model->plan_duration) {
+                $model->plan_duration = 60 * 15;
+            }
         }
 
         $model->load(\Yii::$app->request->get());
 
+        $projectAjaxUrl = \yii\helpers\Json::encode(\yii\helpers\Url::current([
+            'ajaxid' => 'cmstask-project-relation-select',
+        ]));
+        $estimateEndAtUrl = \yii\helpers\Json::encode(\yii\helpers\Url::current([
+            'ajaxid' => 'cmstask-estimate-end-at',
+        ]));
 
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->get('ajaxid') == 'cmstask-estimate-end-at') {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+            $executorId = (int)\Yii::$app->request->get('executor_id');
+            $duration = (int)\Yii::$app->request->get('duration');
+            $executor = $executorId ? CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $executorId])->one() : null;
+            $estimatedEndAt = ($executor && $duration > 0) ? $this->calculateEstimatedTaskEndAt($executor, $duration, $model->isNewRecord ? null : (int)$model->id) : null;
+
+            \Yii::$app->response->data = [
+                'success' => (bool)$estimatedEndAt,
+                'end_at' => $estimatedEndAt,
+                'text'    => $estimatedEndAt ? $this->formatEstimatedTaskEndAt($estimatedEndAt) : '',
+            ];
+            \Yii::$app->end();
+        }
+
+        $this->view->registerCSS(<<<CSS
+.field-cmstask-cms_company_id {
+    display: none;
+}
+.field-cmstask-cms_user_id {
+    display: none;
+}
+.field-cmstask-cms_project_id {
+    display: none;
+}
+.sx-task-company-project-field [data-sx-quick-access-picker="projects"] {
+    display: none !important;
+}
+.sx-choose-task-relation .btn.sx-active {
+    background: #6c757d !important;
+    color: white;
+}
+.sx-task-estimate-end {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    color: #657786;
+    font-size: 14px;
+}
+.sx-task-estimate-hint {
+    margin-left: 5px;
+    color: silver;
+    cursor: help;
+}
+.sx-task-estimate-end__value {
+    color: #2f3b45;
+    font-weight: 600;
+}
+.sx-task-estimate-end.is-empty .sx-task-estimate-end__value {
+    color: #9aa8b2;
+    font-weight: 400;
+}
+.sx-task-fixed-start-actions {
+    margin-bottom: 14px;
+}
+.field-cmstask-plan_start_at {
+    display: none;
+    max-width: 380px;
+}
+.field-cmstask-plan_start_at .input-group,
+.field-cmstask-plan_start_at input {
+    width: 100%;
+}
+.sx-task-auto-start-actions {
+    display: none;
+    margin-top: 10px;
+    margin-bottom: 14px;
+}
+CSS
+        );
+
+        $this->view->registerJs(<<<JS
+var taskRelationProjectAjaxUrl = {$projectAjaxUrl};
+var taskEstimateEndAtUrl = {$estimateEndAtUrl};
+var taskRelationProjectsRequest = null;
+var taskEstimateEndAtRequest = null;
+var taskRelationSilentProjectChange = false;
+
+function clearTaskProjectRelationValue() {
+    taskRelationSilentProjectChange = true;
+    $("#cmstask-cms_project_id").val("").trigger("change");
+    taskRelationSilentProjectChange = false;
+}
+
+function normalizeTaskPlanStartDisplay() {
+    $(".field-cmstask-plan_start_at input[type='text']").each(function() {
+        var value = $(this).val();
+        if (value) {
+            $(this).val(value.replace(/(:\\d{2})\\d{2}$/, "$1").replace(/(:\\d{2}):\\d{2}$/, "$1"));
+        }
+    });
+}
+
+function hasTaskPlanStartValue() {
+    return !!($("#cmstask-plan_start_at").val() || $(".field-cmstask-plan_start_at input[type='text']").val());
+}
+
+function updateTaskPlanStartMode() {
+    if (hasTaskPlanStartValue()) {
+        $(".sx-task-estimate-end").slideUp();
+        $(".field-cmstask-plan_start_at").show();
+        $(".sx-task-fixed-start-actions").hide();
+        $(".sx-task-auto-start-actions").show();
+    } else {
+        $(".sx-task-estimate-end").slideDown();
+        $(".field-cmstask-plan_start_at").hide();
+        $(".sx-task-fixed-start-actions").show();
+        $(".sx-task-auto-start-actions").hide();
+    }
+}
+
+function clearTaskPlanStart() {
+    $("#cmstask-plan_start_at").val("").trigger("change");
+    $(".field-cmstask-plan_start_at input[type='text']").val("").trigger("change");
+    updateTaskPlanStartMode();
+}
+
+function updateTaskRelationCompanyProjects() {
+    var cms_company_id = $("#cmstask-cms_company_id").val();
+    var isCompanyActive = $(".cms_company_id-btn").hasClass("sx-active");
+    var field = $(".field-cmstask-cms_project_id");
+
+    if (taskRelationProjectsRequest) {
+        taskRelationProjectsRequest.abort();
+        taskRelationProjectsRequest = null;
+    }
+
+    if (!cms_company_id || !isCompanyActive) {
+        field.removeClass("sx-task-company-project-field");
+        field.slideUp();
+        return false;
+    }
+
+    taskRelationProjectsRequest = $.getJSON(taskRelationProjectAjaxUrl, {
+        cms_company_id: cms_company_id,
+        q: ''
+    }, function(data) {
+        var hasProjects = data && data.results && data.results.length;
+
+        if (hasProjects) {
+            field.addClass("sx-task-company-project-field");
+            field.children("label").first().text("Проект компании");
+            field.insertAfter(".field-cmstask-cms_company_id").slideDown();
+        } else {
+            clearTaskProjectRelationValue();
+            field.removeClass("sx-task-company-project-field");
+            field.slideUp();
+        }
+    });
+
+    return false;
+}
+
+$("body").on("click", ".sx-choose-task-relation .btn", function(e, data) {
+    var projectField = $(".field-cmstask-cms_project_id");
+    var wasCompanyProjectMode = projectField.hasClass("sx-task-company-project-field");
+
+    $(".field-cmstask-cms_company_id").slideUp();
+    $(".field-cmstask-cms_user_id").slideUp();
+    projectField.slideUp();
+
+    $(".sx-choose-task-relation .btn").removeClass("sx-active");
+    $(this).addClass("sx-active");
+    $($(this).data("view")).slideDown();
+
+    if ($(this).hasClass("cms_company_id-btn")) {
+        updateTaskRelationCompanyProjects();
+    } else if ($(this).hasClass("cms_project_id-btn")) {
+        if (wasCompanyProjectMode) {
+            clearTaskProjectRelationValue();
+        }
+        projectField.removeClass("sx-task-company-project-field").children("label").first().text("Проект");
+    }
+
+    return false;
+});
+
+$("body").on("select2:select select2:unselect", "#cmstask-cms_company_id", function() {
+    $("#cmstask-cms_user_id").val("").trigger("change");
+    clearTaskProjectRelationValue();
+    updateTaskRelationCompanyProjects();
+});
+
+$("body").on("select2:select select2:unselect", "#cmstask-cms_user_id", function() {
+    $("#cmstask-cms_company_id").val("").trigger("change");
+    clearTaskProjectRelationValue();
+});
+
+$("body").on("select2:select select2:unselect", "#cmstask-cms_project_id", function() {
+    if (taskRelationSilentProjectChange) {
+        return;
+    }
+    $("#cmstask-cms_user_id").val("").trigger("change");
+    if (!$(".cms_company_id-btn").hasClass("sx-active")) {
+        $("#cmstask-cms_company_id").val("").trigger("change");
+    }
+});
+
+function normalizeTaskRelationValues() {
+    if ($(".cms_company_id-btn").hasClass("sx-active")) {
+        $("#cmstask-cms_user_id").val("");
+        if (!$("#cmstask-cms_company_id").val()) {
+            $("#cmstask-cms_project_id").val("");
+        }
+    } else if ($(".cms_user_id-btn").hasClass("sx-active")) {
+        $("#cmstask-cms_company_id").val("");
+        $("#cmstask-cms_project_id").val("");
+    } else if ($(".cms_project_id-btn").hasClass("sx-active")) {
+        $("#cmstask-cms_company_id").val("");
+        $("#cmstask-cms_user_id").val("");
+    }
+}
+
+function updateTaskEstimateEndAt() {
+    var executorId = $("#cmstask-executor_id").val();
+    var duration = $("#cmstask-plan_duration").val();
+    var estimate = $(".sx-task-estimate-end");
+
+    if (taskEstimateEndAtRequest) {
+        taskEstimateEndAtRequest.abort();
+        taskEstimateEndAtRequest = null;
+    }
+
+    if (!executorId || !duration || !estimate.length) {
+        estimate.addClass("is-empty");
+        $(".sx-task-estimate-end__value", estimate).text("—");
+        return false;
+    }
+
+    $(".sx-task-estimate-end__value", estimate).text("считаем...");
+
+    taskEstimateEndAtRequest = $.getJSON(taskEstimateEndAtUrl, {
+        executor_id: executorId,
+        duration: duration
+    }, function(data) {
+        if (data && data.success && data.text) {
+            estimate.removeClass("is-empty");
+            $(".sx-task-estimate-end__value", estimate).text(data.text);
+        } else {
+            estimate.addClass("is-empty");
+            $(".sx-task-estimate-end__value", estimate).text("нет данных по графику");
+        }
+    }).fail(function(xhr, status) {
+        if (status !== "abort") {
+            estimate.addClass("is-empty");
+            $(".sx-task-estimate-end__value", estimate).text("не удалось рассчитать");
+        }
+    });
+
+    return false;
+}
+
+$("body").on("change select2:select select2:unselect", "#cmstask-executor_id", function() {
+    updateTaskEstimateEndAt();
+});
+
+$("body").on("keyup change input", "#cmstask-plan_duration, .field-cmstask-plan_duration .sx-not-real input, .field-cmstask-plan_duration .sx-not-real select", function() {
+    setTimeout(updateTaskEstimateEndAt, 50);
+});
+
+$("body").on("click", ".sx-task-fixed-start-btn", function() {
+    $(".field-cmstask-plan_start_at").slideDown();
+    $(".field-cmstask-plan_start_at input").attr({
+        autocomplete: "off",
+        "data-lpignore": "true"
+    });
+    normalizeTaskPlanStartDisplay();
+    $(".sx-task-fixed-start-actions").slideUp();
+    $(".sx-task-estimate-end").slideUp();
+    $(".sx-task-auto-start-actions").slideDown();
+    return false;
+});
+
+$("body").on("change keyup", ".field-cmstask-plan_start_at input[type='text']", function() {
+    normalizeTaskPlanStartDisplay();
+    updateTaskPlanStartMode();
+});
+
+$("body").on("click", ".sx-task-auto-start-btn", function() {
+    clearTaskPlanStart();
+    updateTaskEstimateEndAt();
+    return false;
+});
+
+$("body").on("beforeSubmit submit", "form", function() {
+    if ($(this).find("#cmstask-name").length) {
+        normalizeTaskRelationValues();
+    }
+});
+
+function reloadTaskRelationView() {
+    var cms_company_id = $("#cmstask-cms_company_id").val();
+    var cms_user_id = $("#cmstask-cms_user_id").val();
+    var cms_project_id = $("#cmstask-cms_project_id").val();
+
+    if (cms_company_id) {
+        $(".cms_company_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    } else if (cms_user_id) {
+        $(".cms_user_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    } else if (cms_project_id) {
+        $(".cms_project_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    } else {
+        $(".cms_company_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    }
+
+    return false;
+}
+
+reloadTaskRelationView();
+updateTaskEstimateEndAt();
+$(".field-cmstask-plan_start_at input").attr({
+    autocomplete: "off",
+    "data-lpignore": "true"
+});
+normalizeTaskPlanStartDisplay();
+updateTaskPlanStartMode();
+
+$(document).on('pjax:complete', function (e) {
+    setTimeout(function() {
+        reloadTaskRelationView();
+        updateTaskEstimateEndAt();
+        $(".field-cmstask-plan_start_at input").attr({
+            autocomplete: "off",
+            "data-lpignore": "true"
+        });
+        normalizeTaskPlanStartDisplay();
+        updateTaskPlanStartMode();
+    }, 200);
+});
+JS
+        );
 
         $result = [
             'name',
@@ -605,6 +954,130 @@ JS
                             if ($word) {
                                 $query->search($word);
                             }
+                        }
+                        return $query;
+                    },
+                ],
+            ],
+
+
+            'plan_duration' => [
+                'class'  => WidgetField::class,
+                'widgetClass' => SmartDurationInputWidget::class,
+                'label' => 'Время на выполнение задачи',
+                'widgetConfig' => [
+                    'availableUnits' => [
+                        'min' => 'мин',
+                        'hour' => 'час',
+                    ],
+                    'defaultUnit' => 'min',
+                ],
+            ],
+
+            'estimate_end_at' => [
+                'class' => HtmlBlock::class,
+                'content' => '<div class="col-12 sx-task-estimate-end is-empty">Задача будет сделана примерно <span class="sx-task-estimate-end__value">—</span> <i class="far fa-question-circle sx-task-estimate-hint" data-toggle="tooltip" data-html="true" title="Дата считается по рабочему графику исполнителя, его текущей очереди задач и указанному времени на выполнение."></i></div>',
+            ],
+
+            'fixed_start_at_trigger' => [
+                'class' => HtmlBlock::class,
+                'content' => '<div class="col-12 sx-task-fixed-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-fixed-start-btn"><i class="far fa-clock"></i> Начать делать задачу в фиксированное время</button></div>',
+            ],
+
+            'plan_start_at' => [
+                'class'        => WidgetField::class,
+                'label'        => 'Когда начать делать задачу',
+                'widgetClass'  => DateControl::class,
+                'widgetConfig' => [
+                    'type' => DateControl::FORMAT_DATETIME,
+                    'displayFormat' => 'php:d-m-Y H:i',
+                    'saveFormat' => 'php:U',
+                    'options' => [
+                        'autocomplete' => 'off',
+                        'data-lpignore' => 'true',
+                    ],
+                    'saveOptions' => [
+                        'autocomplete' => 'off',
+                        'data-lpignore' => 'true',
+                    ],
+                    'widgetOptions' => [
+                        'pluginOptions' => [
+                            'minuteStep' => 5,
+                        ],
+                    ],
+                ],
+            ],
+
+            'auto_start_at_trigger' => [
+                'class' => HtmlBlock::class,
+                'content' => '<div class="col-12 sx-task-auto-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-auto-start-btn"><i class="fas fa-magic"></i> Рассчитать время выполнения автоматически</button></div>',
+            ],
+
+            'task_relation' => [
+                'class' => HtmlBlock::class,
+                'content' => '<div class="col-12 sx-choose-task-relation form-group"><div class="btn-group btn-block" role="group" aria-label="Task relation">
+                  <button type="button" class="btn btn-default cms_company_id-btn" data-view=".field-cmstask-cms_company_id">&#1050;&#1086;&#1084;&#1087;&#1072;&#1085;&#1080;&#1103;</button>
+                  <button type="button" class="btn btn-default cms_user_id-btn" data-view=".field-cmstask-cms_user_id">&#1050;&#1083;&#1080;&#1077;&#1085;&#1090;</button>
+                  <button type="button" class="btn btn-default cms_project_id-btn" data-view=".field-cmstask-cms_project_id">&#1055;&#1088;&#1086;&#1077;&#1082;&#1090;</button>
+                </div></div>',
+            ],
+
+            'cms_project_id' => [
+                'class'        => WidgetField::class,
+                'label'        => 'Проект',
+                'widgetClass'  => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'id' => 'cmstask-project-relation-select',
+                    'modelClass'  => CmsProject::class,
+                    'searchQuery' => function ($word = '') use ($model) {
+                        $query = CmsProject::find()->forManager();
+                        $cmsCompanyId = \Yii::$app->request->get('cms_company_id', $model->cms_company_id);
+                        if ($cmsCompanyId) {
+                            $query->andWhere(['cms_company_id' => $cmsCompanyId]);
+                        } else {
+                            $query->andWhere([
+                                'or',
+                                ['cms_company_id' => null],
+                                ['cms_company_id' => 0],
+                            ]);
+                        }
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+                    'pluginOptions' => [
+                        'ajax' => [
+                            'data' => new JsExpression('function(params) { return {q: params.term, cms_company_id: $(".cms_company_id-btn").hasClass("sx-active") ? $("#cmstask-cms_company_id").val() : ""}; }'),
+                        ],
+                    ],
+                ],
+            ],
+
+            'cms_user_id'    => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'modelClass'  => CmsUser::class,
+                    'searchQuery' => function ($word = '') {
+                        $query = CmsUser::find()->forManager();
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+                ],
+            ],
+
+            'cms_company_id' => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'modelClass'  => CmsCompany::class,
+                    'searchQuery' => function ($word = '') {
+                        $query = CmsCompany::find()->forManager();
+                        if ($word) {
+                            $query->search($word);
                         }
                         return $query;
                     },
@@ -634,39 +1107,23 @@ JS
                 ],
             ],
 
-
-            'plan_duration' => [
-                'class'  => WidgetField::class,
-                'widgetClass' => SmartDurationInputWidget::class
-            ],
             /*'plan_duration' => [
                 'class'  => NumberField::class,
                 'step'   => 0.01,
                 'append' => 'ч',
             ],*/
-
-
-
-
-            'plan_start_at' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => DateControl::class,
-                'widgetConfig' => [
-                    'type' => DateControl::FORMAT_DATETIME,
-                ],
-            ],
-
-            'plan_end_at' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => DateControl::class,
-                'widgetConfig' => [
-                    'type' => DateControl::FORMAT_DATETIME,
-                ],
-            ],
-
             'fact_duration' => [
                 'class'  => WidgetField::class,
-                'widgetClass' => SmartDurationInputWidget::class
+                'widgetClass' => SmartDurationInputWidget::class,
+                'label' => 'Длительность для отчета',
+                'hint' => 'Если вас не устраивает реальное время, посчитанное по задаче, можете указать в этом поле другое время. Это поле увидит клиент в отчете.',
+                'widgetConfig' => [
+                    'availableUnits' => [
+                        'min' => 'мин',
+                        'hour' => 'час',
+                    ],
+                    'defaultUnit' => 'min',
+                ],
             ],
 
 
@@ -736,6 +1193,13 @@ JS
 
         ];
 
+        unset($result['client']);
+        $result['plan_duration']['label'] = 'Время на выполнение задачи';
+
+        if ($model->isNewRecord) {
+            unset($result['fact_duration']);
+        }
+
         /*if ($model->crmProject) {
             if ($model->crmProject->crmContractors) {
                 $contrator_ids = ArrayHelper::map($model->crmProject->crmContractors, "id", "id");
@@ -760,5 +1224,122 @@ JS
         return $result;
     }
 
+    /**
+     * Прогноз завершения новой задачи с учетом текущей очереди и рабочего графика исполнителя.
+     */
+    protected function calculateEstimatedTaskEndAt(CmsUser $user, int $duration, ?int $excludeTaskId = null): ?int
+    {
+        $remaining = max(0, $duration);
+        if (!$remaining) {
+            return null;
+        }
+
+        $scheduleTotalTime = CmsTaskSchedule::find()->select([
+            'SUM(end_at - start_at) as total_timestamp',
+        ])->where([
+            'cms_task_id' => new Expression(CmsTask::tableName().".id"),
+        ]);
+
+        $tasksQuery = CmsTask::find()->select([
+            CmsTask::tableName().'.id',
+            CmsTask::tableName().'.plan_duration',
+            'scheduleTotalTime' => $scheduleTotalTime,
+        ])->where([
+            'executor_id' => $user->id,
+            'status' => [
+                CmsTask::STATUS_NEW,
+                CmsTask::STATUS_IN_WORK,
+                CmsTask::STATUS_ON_PAUSE,
+                CmsTask::STATUS_ACCEPTED,
+            ],
+        ])->orderBy([
+            'executor_sort' => SORT_ASC,
+            'id'            => SORT_DESC,
+        ])->asArray();
+
+        if ($excludeTaskId) {
+            $tasksQuery->andWhere(['!=', CmsTask::tableName().'.id', $excludeTaskId]);
+        }
+
+        foreach ($tasksQuery->all() as $task) {
+            $taskDuration = (int)ArrayHelper::getValue($task, 'plan_duration', 0);
+            $taskWorked = (int)ArrayHelper::getValue($task, 'scheduleTotalTime', 0);
+            $remaining += max(0, $taskDuration - $taskWorked);
+        }
+
+        $now = time();
+        $workSchedule = (array)$user->work_shedule;
+
+        for ($i = 0; $i <= 1000; $i++) {
+            $date = date("Y-m-d", strtotime("+{$i} day"));
+            $periods = CmsScheduleHelper::getSchedulesByWorktimeForDate($workSchedule, $date);
+
+            foreach ($periods as $period) {
+                $startAt = (int)$period->start_at;
+                $endAt = (int)$period->end_at;
+
+                if ($endAt <= $now) {
+                    continue;
+                }
+
+                if ($startAt < $now) {
+                    $startAt = $now;
+                }
+
+                $available = max(0, $endAt - $startAt);
+                if (!$available) {
+                    continue;
+                }
+
+                if ($remaining <= $available) {
+                    return $startAt + $remaining;
+                }
+
+                $remaining -= $available;
+            }
+        }
+
+        return null;
+    }
+
+    protected function formatEstimatedTaskEndAt(int $timestamp): string
+    {
+        $date = \Yii::$app->formatter->asDate($timestamp, "php:j F");
+        $time = \Yii::$app->formatter->asTime($timestamp, "php:H:i");
+
+        $today = strtotime(date("Y-m-d"));
+        $targetDay = strtotime(date("Y-m-d", $timestamp));
+        $daysDiff = (int)floor(($targetDay - $today) / 86400);
+
+        if ($daysDiff === 0) {
+            return "сегодня в {$time}";
+        }
+
+        if ($daysDiff === 1) {
+            return "завтра в {$time}";
+        }
+
+        if ($daysDiff > 1) {
+            return "{$date} в {$time} (через ".$this->formatDaysPlural($daysDiff).")";
+        }
+
+        return "{$date} в {$time}";
+    }
+
+    protected function formatDaysPlural(int $days): string
+    {
+        $mod10 = $days % 10;
+        $mod100 = $days % 100;
+
+        if ($mod10 === 1 && $mod100 !== 11) {
+            return "{$days} день";
+        }
+
+        if ($mod10 >= 2 && $mod10 <= 4 && ($mod100 < 12 || $mod100 > 14)) {
+            return "{$days} дня";
+        }
+
+        return "{$days} дней";
+    }
 
 }
