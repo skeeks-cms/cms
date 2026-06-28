@@ -17,9 +17,55 @@ $this->registerCss(<<<CSS
 .sx-user-header-h1:hover .sx-controlls {
     opacity: 1;
 }
+button.sx-quick-access-favorite-btn {
+    all: unset;
+    display: inline-flex;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #a8b0ba;
+    font-size: 17px;
+    line-height: 1;
+    vertical-align: 4px;
+    background: transparent none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: color .15s ease;
+}
+button.sx-quick-access-favorite-btn:hover,
+button.sx-quick-access-favorite-btn:focus {
+    color: #d99a00;
+    background: transparent none !important;
+    box-shadow: none !important;
+    outline: 0;
+}
+button.sx-quick-access-favorite-btn.is-active {
+    color: #f0ad00;
+}
 CSS
 );
 $controller = $this->context;
+$quickAccessFavoriteItem = null;
+if (!$model->is_worker) {
+    $quickAccessFavoriteItem = [
+        'type'   => 'clients',
+        'id'     => (int) $model->id,
+        'name'   => (string) $model->shortDisplayName,
+        'url'    => \yii\helpers\Url::to(['/cms/admin-user/view', 'pk' => $model->id]),
+        'action' => (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+            '/cms/admin-user/view',
+            'pk' => $model->id,
+        ])->enableEmptyLayout()->enableNoActions()->url,
+        'image'  => (string) $model->avatarSrc,
+    ];
+}
 ?>
 <div class="row" style="margin-bottom: 5px;">
     <? if ($model->image) : ?>
@@ -37,6 +83,15 @@ $controller = $this->context;
 
                 <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
                     <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
+                    <?php if ($quickAccessFavoriteItem) : ?>
+                        <button type="button"
+                                class="sx-quick-access-favorite-btn"
+                                data-sx-quick-access-favorite
+                                data-sx-quick-access-item="<?= \yii\helpers\Html::encode(\yii\helpers\Json::encode($quickAccessFavoriteItem)); ?>"
+                                title="Добавить в избранное">
+                            <i class="far fa-star"></i>
+                        </button>
+                    <?php endif; ?>
 
 
                 </h1>

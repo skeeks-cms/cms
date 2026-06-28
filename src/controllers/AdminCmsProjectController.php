@@ -66,6 +66,13 @@ class AdminCmsProjectController extends BackendModelStandartController
         $this->permissionName = 'cms/admin-company';
         $this->generateAccessActions = false;
 
+        $this->modelHeader = function () {
+            $model = $this->model;
+            return $this->renderPartial("@skeeks/cms/views/admin-cms-project/_model_header", [
+                'model' => $model,
+            ]);
+        };
+
         /*$this->accessCallback = function () {
             return \Yii::$app->user->can($this->uniqueId);
         };*/

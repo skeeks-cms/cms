@@ -144,14 +144,12 @@ class AdminCmsBillController extends BackendModelStandartController
                                     $query = $e->dataProvider->query;
 
                                     if ($e->field->value) {
-                                        $data = explode("-", $e->field->value);
-                                        $start = strtotime(trim(ArrayHelper::getValue($data, 0) . " 00:00:00"));
-                                        $end = strtotime(trim(ArrayHelper::getValue($data, 1) .  " 23:59:59"));
+                                        if ($range = DaterangeInputWidget::parseRange($e->field->value)) {
+                                            list($start, $end) = $range;
 
-                                        $query->andWhere(['>=', "created_at", $start]);
-                                        $query->andWhere(['<=', "created_at", $end]);
-
-
+                                            $query->andWhere(['>=', "created_at", $start]);
+                                            $query->andWhere(['<=', "created_at", $end]);
+                                        }
                                     }
                                 },
                             ],
@@ -175,14 +173,12 @@ class AdminCmsBillController extends BackendModelStandartController
                                     $query = $e->dataProvider->query;
 
                                     if ($e->field->value) {
-                                        $data = explode("-", $e->field->value);
-                                        $start = strtotime(trim(ArrayHelper::getValue($data, 0) . " 00:00:00"));
-                                        $end = strtotime(trim(ArrayHelper::getValue($data, 1) .  " 23:59:59"));
+                                        if ($range = DaterangeInputWidget::parseRange($e->field->value)) {
+                                            list($start, $end) = $range;
 
-                                        $query->andWhere(['>=', "paid_at", $start]);
-                                        $query->andWhere(['<=', "paid_at", $end]);
-
-
+                                            $query->andWhere(['>=', "paid_at", $start]);
+                                            $query->andWhere(['<=', "paid_at", $end]);
+                                        }
                                     }
                                 },
                             ],

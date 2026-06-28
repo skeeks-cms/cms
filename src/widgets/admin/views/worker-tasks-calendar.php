@@ -239,8 +239,48 @@ JS
         .sx-task-planned {
             background: #f8fbff;
         }
+        .sx-unfinished-tasks {
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            background: white;
+        }
+        .sx-unfinished-tasks thead th {
+            background: #e57d20 !important;
+            color: white;
+            border: none;
+        }
+        .sx-unfinished-task {
+            background: #fff8f1;
+        }
 CSS
                 );
+
+                $todayDate = \Yii::$app->formatter->asDate(time(), "php:Y-m-d");
+                $todayStartAt = strtotime($todayDate . ' 00:00:00');
+                $todayEndAt = strtotime($todayDate . ' 23:59:59');
+
+                $unfinishedSchedules = \skeeks\cms\models\CmsTaskSchedule::find()
+                    ->select([
+                        'cms_task_id',
+                        'last_start_at' => new \yii\db\Expression('MAX(' . \skeeks\cms\models\CmsTaskSchedule::tableName() . '.start_at)'),
+                        'last_end_at' => new \yii\db\Expression('MAX(' . \skeeks\cms\models\CmsTaskSchedule::tableName() . '.end_at)'),
+                    ])
+                    ->andWhere([\skeeks\cms\models\CmsTaskSchedule::tableName() . '.cms_user_id' => $model->id])
+                    ->andWhere(['between', \skeeks\cms\models\CmsTaskSchedule::tableName() . '.start_at', $todayStartAt, $todayEndAt])
+                    ->andWhere(['>', \skeeks\cms\models\CmsTaskSchedule::tableName() . '.end_at', 0])
+                    ->groupBy(\skeeks\cms\models\CmsTaskSchedule::tableName() . '.cms_task_id');
+
+                $unfinishedTasks = \skeeks\cms\models\CmsTask::find()
+                    ->select([
+                        \skeeks\cms\models\CmsTask::tableName() . '.*',
+                        'last_start_at' => 'unfinished_schedules.last_start_at',
+                        'last_end_at' => 'unfinished_schedules.last_end_at',
+                    ])
+                    ->where([\skeeks\cms\models\CmsTask::tableName() . '.executor_id' => $model->id])
+                    ->andWhere([\skeeks\cms\models\CmsTask::tableName() . '.status' => \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE])
+                    ->innerJoin(['unfinished_schedules' => $unfinishedSchedules], ['unfinished_schedules.cms_task_id' => new \yii\db\Expression(\skeeks\cms\models\CmsTask::tableName() . '.id')])
+                    ->orderBy(['last_start_at' => SORT_DESC])
+                    ->all();
 
                 $scheduleTotalTime = \skeeks\cms\models\CmsTaskSchedule::find()->select([
                     'SUM((end_at - start_at)) as total_timestamp',
@@ -304,6 +344,47 @@ CSS
 
 
                 ?>
+
+                <? if ($unfinishedTasks) : ?>
+                    <table class="table sx-table sx-unfinished-tasks">
+                        <thead>
+                        <tr>
+                            <th class="text-center" colspan="4">
+                                Незавершенные задачи
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <? foreach ($unfinishedTasks as $task) : ?>
+                            <?
+                            $isCan = true;
+
+                            if (\Yii::$app->user->id != $user->id) {
+                                $isCan = \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
+                            }
+                            ?>
+                            <?= \yii\helpers\Html::beginTag('tr', [
+                                'class' => ($isCan ? "" : "sx-task-hidden") . ' sx-unfinished-task',
+                            ]); ?>
+                            <td style="width: 45px;">
+                            </td>
+                            <td style="width: 45px;">
+                                <span title="Последний запуск" data-toggle="tooltip" style="line-height: 35px;">
+                                    <?= \Yii::$app->formatter->asTime($task->raw_row['last_start_at'], 'php:H:i'); ?>
+                                </span>
+                            </td>
+                            <td class="sx-task-td">
+                                <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
+                            </td>
+
+                            <td style="width: 50px;">
+                                <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task, 'isShort' => true]); ?>
+                            </td>
+                            <?= \yii\helpers\Html::endTag('tr'); ?>
+                        <? endforeach; ?>
+                        </tbody>
+                    </table>
+                <? endif; ?>
 
                 <? if ($expiredTasks) : ?>
                     <table class="table sx-table sx-calendar-day sx-expired-tasks">
@@ -645,5 +726,4 @@ CSS
 
     </div>
 </div>
-
 

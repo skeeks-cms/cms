@@ -271,12 +271,12 @@ if ($cmsSchedulesByDate) : ?>
             ]);
             ?>
         <?php else : ?>
-            <a href="<?php echo \yii\helpers\Url::to(['/cms/admin-cms-task/index']); ?>" data-pjax="0" data-toggle="tooltip" title="У вас не запущена никакая задача, возьмите задачу в работу в этом разделе.">Выбрать задачу!</a>
+            <a href="<?php echo \yii\helpers\Url::to(['/cms/admin-cms-task/calendar']); ?>" data-pjax="0" data-toggle="tooltip" title="У вас не запущена никакая задача, возьмите задачу в работу в этом разделе.">Выбрать задачу!</a>
         <?php endif; ?>
     </div>
 <?php else : ?>
 <div class="my-auto sx-current-task">
-    <a href="<?php echo \yii\helpers\Url::to(['/cms/admin-cms-task/index']); ?>" data-pjax="0" data-toggle="tooltip" title="У вас не запущена работа. Нажмите на кнопку и начните работу. Система будет вести учет вашего рабочего времени.">Включите таймер!</a>
+    <a href="<?php echo \yii\helpers\Url::to(['/cms/admin-cms-task/calendar']); ?>" data-pjax="0" data-toggle="tooltip" title="У вас не запущена работа. Нажмите на кнопку и начните работу. Система будет вести учет вашего рабочего времени.">Включите таймер!</a>
 </div>
 <?php endif; ?>
 

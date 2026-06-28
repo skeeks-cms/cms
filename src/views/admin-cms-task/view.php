@@ -15,6 +15,87 @@ $status = \skeeks\cms\widgets\admin\CmsTaskBtnsWidget::widget([
 
 $model->refresh();
 
+$quickAccessItems = [];
+$makeQuickAccessActionUrl = function ($route, $id) {
+    return (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+        $route,
+        'pk' => $id,
+    ])->enableEmptyLayout()->enableNoActions()->url;
+};
+$makeQuickAccessImageUrl = function ($model) {
+    if ($model && $model->cmsImage) {
+        return (string) \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+            'w' => 80,
+            'h' => 80,
+            'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
+        ]), '', true);
+    }
+
+    return null;
+};
+
+$quickAccessCompany = $model->cmsCompany ?: ($model->cmsProject ? $model->cmsProject->cmsCompany : null);
+
+if ($quickAccessCompany) {
+    $quickAccessItems[] = [
+        'type'   => 'companies',
+        'id'     => (int) $quickAccessCompany->id,
+        'name'   => (string) $quickAccessCompany->name,
+        'url'    => \yii\helpers\Url::to(['/cms/admin-cms-company/view', 'pk' => $quickAccessCompany->id]),
+        'action' => $makeQuickAccessActionUrl('/cms/admin-cms-company/view', $quickAccessCompany->id),
+        'image'  => $makeQuickAccessImageUrl($quickAccessCompany),
+    ];
+}
+
+if ($model->cmsProject) {
+    $quickAccessItems[] = [
+        'type'   => 'projects',
+        'id'     => (int) $model->cmsProject->id,
+        'name'   => (string) $model->cmsProject->name,
+        'url'    => \yii\helpers\Url::to(['/cms/admin-cms-project/view', 'pk' => $model->cmsProject->id]),
+        'action' => $makeQuickAccessActionUrl('/cms/admin-cms-project/view', $model->cmsProject->id),
+        'image'  => $makeQuickAccessImageUrl($model->cmsProject),
+    ];
+}
+
+if ($quickAccessItems) {
+    $quickAccessItemsJson = \yii\helpers\Json::encode($quickAccessItems);
+    $this->registerJs(<<<JS
+(function(items) {
+    var attempts = 0;
+    var addItems = function() {
+        attempts++;
+        var windows = [window, window.parent, window.top, window.opener];
+
+        for (var w = 0; w < windows.length; w++) {
+            try {
+                var target = windows[w];
+                if (!target || !target.sx || !target.sx.Project || !target.sx.Project.quickAccessAdd) {
+                    continue;
+                }
+
+                for (var i = 0; i < items.length; i++) {
+                    target.sx.Project.quickAccessAdd(items[i]);
+                }
+
+                return true;
+            } catch (e) {
+            }
+        }
+
+        if (attempts < 10) {
+            setTimeout(addItems, 300);
+        }
+
+        return false;
+    };
+
+    addItems();
+})({$quickAccessItemsJson});
+JS
+);
+}
+
 $this->registerCss(<<<CSS
 .sx-task-description {
     height: 100%;

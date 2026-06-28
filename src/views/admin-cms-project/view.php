@@ -7,6 +7,121 @@
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
+
+$quickAccessItems = [];
+$makeQuickAccessActionUrl = function ($route, $id) {
+    return (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+        $route,
+        'pk' => $id,
+    ])->enableEmptyLayout()->enableNoActions()->url;
+};
+$makeQuickAccessImageUrl = function ($model) {
+    if ($model && $model->cmsImage) {
+        return (string) \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+            'w' => 80,
+            'h' => 80,
+            'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
+        ]), '', true);
+    }
+
+    return null;
+};
+
+if ($model->cmsCompany) {
+    $quickAccessItems[] = [
+        'type'   => 'companies',
+        'id'     => (int) $model->cmsCompany->id,
+        'name'   => (string) $model->cmsCompany->name,
+        'url'    => \yii\helpers\Url::to(['/cms/admin-cms-company/view', 'pk' => $model->cmsCompany->id]),
+        'action' => $makeQuickAccessActionUrl('/cms/admin-cms-company/view', $model->cmsCompany->id),
+        'image'  => $makeQuickAccessImageUrl($model->cmsCompany),
+    ];
+}
+
+$quickAccessItems[] = [
+    'type'   => 'projects',
+    'id'     => (int) $model->id,
+    'name'   => (string) $model->name,
+    'url'    => \yii\helpers\Url::to(['/cms/admin-cms-project/view', 'pk' => $model->id]),
+    'action' => $makeQuickAccessActionUrl('/cms/admin-cms-project/view', $model->id),
+    'image'  => $makeQuickAccessImageUrl($model),
+];
+
+$quickAccessItemsJson = \yii\helpers\Json::encode($quickAccessItems);
+$this->registerJs(<<<JS
+(function(items) {
+    var attempts = 0;
+    var item = items[items.length - 1];
+    var mountFavorite = function() {
+        attempts++;
+        var windows = [window, window.parent, window.top, window.opener];
+        var target = null;
+
+        for (var w = 0; w < windows.length; w++) {
+            try {
+                var candidate = windows[w];
+                if (!candidate || !candidate.sx || !candidate.sx.Project || !candidate.sx.Project.quickAccessToggleFavorite) {
+                    continue;
+                }
+
+                if (candidate.document && candidate.document.querySelector('[data-sx-quick-access-edge-favorites]')) {
+                    target = candidate;
+                    break;
+                }
+
+                if (!target) {
+                    target = candidate;
+                }
+            } catch (e) {
+            }
+        }
+
+        var \$title = $('h1').first();
+        if (!item || !target || !\$title.length) {
+            if (attempts < 10) {
+                setTimeout(mountFavorite, 300);
+            }
+            return false;
+        }
+
+        var \$button = \$title.find('[data-sx-quick-access-favorite]').first();
+        var isNewButton = !\$button.length;
+        if (isNewButton) {
+            \$button = $('<button type="button" class="sx-quick-access-favorite-btn" data-sx-quick-access-favorite title="Добавить в избранное"><i class="far fa-star"></i></button>');
+        }
+        \$button.attr('data-sx-quick-access-item', JSON.stringify(item));
+        \$button.attr('data-sx-quick-access-external', '1');
+        var update = function(active) {
+            if (typeof active === 'undefined') {
+                active = false;
+                try {
+                    active = target.sx.Project.quickAccessIsFavorite(item);
+                } catch (e) {
+                }
+            }
+
+            \$button.toggleClass('is-active', active);
+            \$button.attr('title', active ? 'Убрать из избранного' : 'Добавить в избранное');
+            \$button.find('i').toggleClass('fas', active).toggleClass('far', !active);
+        };
+
+        \$button.off('click.sxQuickAccessFavorite').on('click.sxQuickAccessFavorite', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            update(target.sx.Project.quickAccessToggleFavorite(item));
+        });
+
+        if (isNewButton) {
+            \$title.append(\$button);
+        }
+        update();
+        return true;
+    };
+
+    mountFavorite();
+})({$quickAccessItemsJson});
+JS
+);
 ?>
 
 

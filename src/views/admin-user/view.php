@@ -8,6 +8,97 @@ $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
 
+$makeQuickAccessActionUrl = function ($route, $id) {
+    return (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+        $route,
+        'pk' => $id,
+    ])->enableEmptyLayout()->enableNoActions()->url;
+};
+
+if (!$model->is_worker) {
+    $quickAccessItemsJson = \yii\helpers\Json::encode([[
+        'type'   => 'clients',
+        'id'     => (int) $model->id,
+        'name'   => (string) $model->shortDisplayName,
+        'url'    => \yii\helpers\Url::to(['/cms/admin-user/view', 'pk' => $model->id]),
+        'action' => $makeQuickAccessActionUrl('/cms/admin-user/view', $model->id),
+        'image'  => (string) $model->avatarSrc,
+    ]]);
+
+    $this->registerJs(<<<JS
+(function(item) {
+    var attempts = 0;
+    var mountFavorite = function() {
+        attempts++;
+        var windows = [window, window.parent, window.top, window.opener];
+        var target = null;
+
+        for (var w = 0; w < windows.length; w++) {
+            try {
+                var candidate = windows[w];
+                if (!candidate || !candidate.sx || !candidate.sx.Project || !candidate.sx.Project.quickAccessToggleFavorite) {
+                    continue;
+                }
+
+                if (candidate.document && candidate.document.querySelector('[data-sx-quick-access-edge-favorites]')) {
+                    target = candidate;
+                    break;
+                }
+
+                if (!target) {
+                    target = candidate;
+                }
+            } catch (e) {
+            }
+        }
+
+        var \$title = $('h1').first();
+        if (!target || !\$title.length) {
+            if (attempts < 10) {
+                setTimeout(mountFavorite, 300);
+            }
+            return false;
+        }
+
+        var \$button = \$title.find('[data-sx-quick-access-favorite]').first();
+        var isNewButton = !\$button.length;
+        if (isNewButton) {
+            \$button = $('<button type="button" class="sx-quick-access-favorite-btn" data-sx-quick-access-favorite title="Добавить в избранное"><i class="far fa-star"></i></button>');
+        }
+        \$button.attr('data-sx-quick-access-item', JSON.stringify(item));
+        \$button.attr('data-sx-quick-access-external', '1');
+        var update = function(active) {
+            if (typeof active === 'undefined') {
+                active = false;
+                try {
+                    active = target.sx.Project.quickAccessIsFavorite(item);
+                } catch (e) {
+                }
+            }
+
+            \$button.toggleClass('is-active', active);
+            \$button.attr('title', active ? 'Убрать из избранного' : 'Добавить в избранное');
+            \$button.find('i').toggleClass('fas', active).toggleClass('far', !active);
+        };
+
+        \$button.off('click.sxQuickAccessFavorite').on('click.sxQuickAccessFavorite', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            update(target.sx.Project.quickAccessToggleFavorite(item));
+        });
+
+        if (isNewButton) {
+            \$title.append(\$button);
+        }
+        update();
+        return true;
+    };
+
+    mountFavorite();
+})({$quickAccessItemsJson}[0]);
+JS
+);
+}
 
 $jsData = \yii\helpers\Json::encode([
     'backend' => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id]),

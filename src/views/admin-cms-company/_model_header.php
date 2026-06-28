@@ -17,15 +17,79 @@ $this->registerCss(<<<CSS
 .sx-user-header-h1:hover .sx-controlls {
     opacity: 1;
 }
+button.sx-quick-access-favorite-btn {
+    all: unset;
+    display: inline-flex;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #a8b0ba;
+    font-size: 17px;
+    line-height: 1;
+    vertical-align: 4px;
+    background: transparent none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: color .15s ease;
+}
+button.sx-quick-access-favorite-btn:hover,
+button.sx-quick-access-favorite-btn:focus {
+    color: #d99a00;
+    background: transparent none !important;
+    box-shadow: none !important;
+    outline: 0;
+}
+button.sx-quick-access-favorite-btn.is-active {
+    color: #f0ad00;
+}
 CSS
 );
 $controller = $this->context;
+$makeQuickAccessActionUrl = function ($route, $id) {
+    return (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+        $route,
+        'pk' => $id,
+    ])->enableEmptyLayout()->enableNoActions()->url;
+};
+$makeQuickAccessImageUrl = function ($model) {
+    if ($model && $model->image) {
+        return (string) \Yii::$app->imaging->thumbnailUrlOnRequest($model->image->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+            'w' => 80,
+            'h' => 80,
+            'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
+        ]), '', true);
+    }
+
+    if ($model && $model->cmsImage) {
+        return (string) \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
+            'w' => 80,
+            'h' => 80,
+            'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
+        ]), '', true);
+    }
+
+    return null;
+};
+$quickAccessFavoriteItem = [
+    'type'   => 'companies',
+    'id'     => (int) $model->id,
+    'name'   => (string) ($model->name ?: $model->shortDisplayNameWithAlias),
+    'url'    => \yii\helpers\Url::to(['/cms/admin-cms-company/view', 'pk' => $model->id]),
+    'action' => $makeQuickAccessActionUrl('/cms/admin-cms-company/view', $model->id),
+    'image'  => $makeQuickAccessImageUrl($model),
+];
 ?>
 <div class="row" style="margin-bottom: 5px;">
     <? if ($model->image) : ?>
         <div class="col my-auto" style="max-width: 60px">
-            <img style="border: 2px solid #ededed; border-radius: 50%;" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
-                new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
+            <img style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #ededed; border-radius: 50%;" src="<?php echo \yii\helpers\Html::encode($makeQuickAccessImageUrl($model)); ?>"/>
         </div>
     <? endif; ?>
     <div class="col my-auto">
@@ -35,6 +99,13 @@ $controller = $this->context;
 
                 <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
                     <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
+                    <button type="button"
+                            class="sx-quick-access-favorite-btn"
+                            data-sx-quick-access-favorite
+                            data-sx-quick-access-item="<?= \yii\helpers\Html::encode(\yii\helpers\Json::encode($quickAccessFavoriteItem)); ?>"
+                            title="Добавить в избранное">
+                        <i class="far fa-star"></i>
+                    </button>
 
 
                 </h1>
