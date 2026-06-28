@@ -422,9 +422,20 @@ class AdminWorkerController extends BackendModelStandartController
 
             'calendar' => [
                 'class'          => BackendModelAction::class,
-                'name'           => 'Календарь задач',
+                'name'           => 'Задачи',
                 'generateAccess' => false,
                 'icon'           => 'fa fa-list',
+                "callback"       => [$this, 'view'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-worker", ['model' => $this->model]);
+                },
+            ],
+
+            'tasks-calendar' => [
+                'class'          => BackendModelAction::class,
+                'name'           => 'Календарь',
+                'generateAccess' => false,
+                'icon'           => 'fa fa-calendar',
                 "callback"       => [$this, 'view'],
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-worker", ['model' => $this->model]);

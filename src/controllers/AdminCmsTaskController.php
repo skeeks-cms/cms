@@ -90,9 +90,17 @@ class AdminCmsTaskController extends BackendModelStandartController
             
             'calendar' => [
                 'class'    => ViewBackendAction::class,
-                'name' => 'Мой календарь',
+                'name' => 'Мои задачи',
                 'icon' => 'fa fa-calendar',
                 'priority' => 10,
+                /*'isOpenNewWindow' => false,*/
+            ],
+
+            'tasks-calendar' => [
+                'class'    => ViewBackendAction::class,
+                'name' => 'Мой календарь',
+                'icon' => 'fa fa-calendar',
+                'priority' => 15,
                 /*'isOpenNewWindow' => false,*/
             ],
             
@@ -100,7 +108,7 @@ class AdminCmsTaskController extends BackendModelStandartController
 
                 'priority' => 20,
                 
-                'name' => 'Список задач',
+                'name' => 'Все задачи',
 
                 'filters' => [
                     'visibleFilters' => [

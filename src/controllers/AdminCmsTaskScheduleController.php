@@ -70,7 +70,7 @@ class AdminCmsTaskScheduleController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
 
-                'name' => 'Список задач',
+                'name' => 'Все задачи',
 
                 'filters' => false,
 
