@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null            $cms_project_id Проект
  * @property int|null            $cms_company_id Компания
  * @property int|null            $cms_user_id Клиент
+ * @property int|null            $parent_cms_task_id Связанная задача
  *
  * @property int|null            $plan_start_at Планируемое начало
  * @property int|null            $plan_end_at Планируемое завершение
@@ -41,6 +42,8 @@ use yii\helpers\ArrayHelper;
  * @property CmsCompany          $cmsCompany
  * @property CmsUser             $cmsUser
  * @property CmsUser             $executor
+ * @property CmsTask             $parentCmsTask
+ * @property CmsTask[]           $childCmsTasks
  *
  * @property CrmTaskSchedule[]   $schedules
  *
@@ -212,7 +215,7 @@ class CmsTask extends ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'created_at', 'cms_project_id', 'executor_id', 'plan_start_at', 'plan_end_at'], 'integer'],
+            [['created_by', 'created_at', 'cms_project_id', 'executor_id', 'plan_start_at', 'plan_end_at', 'parent_cms_task_id'], 'integer'],
             [['executor_sort'], 'integer'],
             [['cms_company_id'], 'integer'],
             [['cms_user_id'], 'integer'],
@@ -229,6 +232,17 @@ class CmsTask extends ActiveRecord
             [['name'], 'string', 'max' => 255],
 
             ['plan_duration', 'default', 'value' => 60 * 15], //15 минут
+            [
+                'parent_cms_task_id',
+                function ($attribute) {
+                    if ($this->{$attribute} && (int)$this->{$attribute} === (int)$this->id) {
+                        $this->addError($attribute, "Задача не может быть связана сама с собой.");
+                        return false;
+                    }
+
+                    return true;
+                },
+            ],
             [
                 'plan_start_at',
                 function ($attribute) {
@@ -427,6 +441,7 @@ class CmsTask extends ActiveRecord
 
             'cms_company_id' => 'Компания',
             'cms_user_id'    => 'Клиент',
+            'parent_cms_task_id' => 'Связанная задача',
 
             'plan_start_at' => 'Планируемое начало',
             'plan_end_at'   => 'Планируемое завершение',
@@ -464,6 +479,22 @@ class CmsTask extends ActiveRecord
     public function getCmsTaskFiles()
     {
         return $this->hasMany(CmsTaskFile::className(), ['cms_task_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParentCmsTask()
+    {
+        return $this->hasOne(static::class, ['id' => 'parent_cms_task_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildCmsTasks()
+    {
+        return $this->hasMany(static::class, ['parent_cms_task_id' => 'id'])->orderBy(['plan_end_at' => SORT_ASC, 'id' => SORT_DESC]);
     }
 
     /**

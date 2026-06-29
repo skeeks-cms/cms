@@ -14,6 +14,11 @@ $status = \skeeks\cms\widgets\admin\CmsTaskBtnsWidget::widget([
 ]);
 
 $model->refresh();
+$planStartAt = $model->plan_start_at;
+$planStartEndAt = $model->executor_end_at ?: $model->plan_end_at;
+if (!$planStartAt && $planStartEndAt && $model->plan_duration) {
+    $planStartAt = max(0, (int)$planStartEndAt - (int)$model->plan_duration);
+}
 
 $quickAccessItems = [];
 $makeQuickAccessActionUrl = function ($route, $id) {
@@ -33,6 +38,35 @@ $makeQuickAccessImageUrl = function ($model) {
 
     return null;
 };
+$createRelatedTaskUrl = (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+    '/cms/admin-cms-task/create',
+    'parent_cms_task_id' => $model->id,
+])->enableEmptyLayout()->enableNoActions()->url;
+$createRelatedTaskActionData = \yii\helpers\Json::encode([
+    "isOpenNewWindow" => true,
+    "url"             => $createRelatedTaskUrl,
+]);
+$linkRelatedTaskUrl = \yii\helpers\Url::to([
+    '/cms/admin-cms-task/link-related-task',
+    'pk' => $model->id,
+]);
+$relatedTasks = [];
+if ($model->parentCmsTask) {
+    $relatedTasks[] = $model->parentCmsTask;
+}
+foreach ($model->childCmsTasks as $childTask) {
+    $relatedTasks[] = $childTask;
+}
+usort($relatedTasks, function ($a, $b) {
+    $aPlanEndAt = $a->plan_end_at ? (int) $a->plan_end_at : PHP_INT_MAX;
+    $bPlanEndAt = $b->plan_end_at ? (int) $b->plan_end_at : PHP_INT_MAX;
+
+    if ($aPlanEndAt == $bPlanEndAt) {
+        return (int) $b->id <=> (int) $a->id;
+    }
+
+    return $aPlanEndAt <=> $bPlanEndAt;
+});
 
 $quickAccessCompany = $model->cmsCompany ?: ($model->cmsProject ? $model->cmsProject->cmsCompany : null);
 
@@ -148,12 +182,116 @@ $this->registerCss(<<<CSS
     padding: 1rem;
     border-radius: var(--border-radius);
 }
+.sx-task-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.sx-task-related-create {
+    white-space: nowrap;
+}
+.sx-task-related-title {
+    color: var(--color-gray);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+.sx-task-related-table {
+    margin-bottom: 0;
+}
+.sx-task-related-table th {
+    font-weight: normal;
+    color: var(--color-gray);
+    border-top: 0;
+}
+.sx-task-related-table td {
+    vertical-align: middle;
+}
+.sx-task-related-actions {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+}
+.sx-task-related-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.sx-task-related-link .select2-container {
+    flex: 1 1 auto;
+}
+.sx-task-related-link .btn {
+    white-space: nowrap;
+}
 
 CSS
 );
 \skeeks\cms\assets\LinkActvationAsset::register($this);
 $this->registerJs(<<<JS
 new sx.classes.LinkActivation('.sx-task-description');
+$("body").on("click", ".sx-task-related-unlink", function(e) {
+    e.preventDefault();
+
+    if (!confirm("Отвязать задачу?")) {
+        return false;
+    }
+
+    var data = {};
+    if (window.yii) {
+        data[yii.getCsrfParam()] = yii.getCsrfToken();
+    }
+
+    $.ajax({
+        "url": $(this).data("url"),
+        "type": "post",
+        "data": data,
+        "success": function() {
+            window.location.reload();
+        },
+        "error": function() {
+            alert("Не удалось отвязать задачу.");
+        }
+    });
+
+    return false;
+});
+$("body").on("click", ".sx-task-related-link-btn", function(e) {
+    e.preventDefault();
+
+    var taskId = $("#sx-task-related-link-select").val();
+    if (!taskId) {
+        alert("Выберите задачу.");
+        return false;
+    }
+
+    var data = {
+        "related_task_id": taskId
+    };
+    if (window.yii) {
+        data[yii.getCsrfParam()] = yii.getCsrfToken();
+    }
+
+    $.ajax({
+        "url": $(this).data("url"),
+        "type": "post",
+        "data": data,
+        "success": function(response) {
+            if (response && response.success === false) {
+                alert(response.message || "Не удалось привязать задачу.");
+                return;
+            }
+
+            window.location.reload();
+        },
+        "error": function() {
+            alert("Не удалось привязать задачу.");
+        }
+    });
+
+    return false;
+});
 JS
 );
 ?>
@@ -217,8 +355,14 @@ JS
 
             </div>
             
-            <?php echo $status; ?>
-            
+            <div class="sx-task-actions">
+                <?php echo $status; ?>
+
+                <a href="<?php echo $createRelatedTaskUrl; ?>" class="btn btn-default sx-task-related-create" data-pjax="0" onclick='new sx.classes.backend.widgets.Action(<?php echo $createRelatedTaskActionData; ?>).go(); return false;'>
+                    <i class="fas fa-plus"></i> Связанная задача
+                </a>
+            </div>
+
         </div>
     </div>
     <div class="col-12 col-sm-4">
@@ -283,13 +427,23 @@ JS
             </span>
                 </li>
                 <li>
-            <span class="sx-properties--name">
-                Отработано
-            </span>
+                    <span class="sx-properties--name">
+                        Отработано
+                    </span>
                     <span class="sx-properties--value">
                 <?php echo $model->schedules ? \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($model->schedules) : "—"; ?>
             </span>
                 </li>
+
+                <li>
+                    <span class="sx-properties--name">
+                        Начало по плану
+                    </span>
+                    <span class="sx-properties--value">
+                        <?php echo $planStartAt ? \Yii::$app->formatter->asDatetime($planStartAt) : "—"; ?>
+                    </span>
+                </li>
+
                 <?php if($model->executor_end_at) : ?>
                     <li>
                     <span class="sx-properties--name">
@@ -300,15 +454,6 @@ JS
                     </span>
                         </li>
                 <?php endif; ?>
-
-                <li>
-                    <span class="sx-properties--name">
-                        Начало по плану
-                    </span>
-                    <span class="sx-properties--value">
-                        <?php echo $model->plan_start_at ? \Yii::$app->formatter->asDatetime($model->plan_start_at) : "—"; ?>
-                    </span>
-                </li>
 
                 <li>
                     <span class="sx-properties--name">
@@ -355,6 +500,89 @@ JS
                     </span>
                 </li>
             </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-top: 1rem;">
+    <div class="col-12">
+        <div class="sx-block sx-task-related">
+            <div class="sx-task-related-title">Связанные задачи</div>
+            <div class="sx-task-related-link">
+                <?php echo \skeeks\cms\widgets\AjaxSelectModel::widget([
+                    'name' => 'related_task_id',
+                    'modelClass' => \skeeks\cms\models\CmsTask::class,
+                    'modelShowAttribute' => 'name',
+                    'options' => [
+                        'id' => 'sx-task-related-link-select',
+                    ],
+                    'placeholder' => 'Выбрать существующую задачу',
+                    'searchQuery' => function ($word = '') use ($model) {
+                        $query = \skeeks\cms\models\CmsTask::find()
+                            ->forManager()
+                            ->andWhere(['!=', \skeeks\cms\models\CmsTask::tableName().'.id', $model->id]);
+
+                        if ($word) {
+                            $query->search($word);
+                        }
+
+                        return $query->orderBy([\skeeks\cms\models\CmsTask::tableName().'.created_at' => SORT_DESC]);
+                    },
+                ]); ?>
+                <button type="button" class="btn btn-default sx-task-related-link-btn" data-url="<?php echo $linkRelatedTaskUrl; ?>">
+                    <i class="fas fa-link"></i> Привязать
+                </button>
+            </div>
+
+            <?php if ($relatedTasks) : ?>
+                <div class="table-responsive">
+                    <table class="table table-hover sx-task-related-table">
+                        <thead>
+                        <tr>
+                            <th>Задача</th>
+                            <th>Планируемое завершение</th>
+                            <th>Отработанное время</th>
+                            <th>Статус</th>
+                            <th>Исполнитель</th>
+                            <th class="sx-task-related-actions"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($relatedTasks as $relatedTask) : ?>
+                            <?php
+                                $unlinkTaskId = ((int)$model->parent_cms_task_id === (int)$relatedTask->id) ? $model->id : $relatedTask->id;
+                                $unlinkRelatedTaskUrl = \yii\helpers\Url::to([
+                                    '/cms/admin-cms-task/unlink-related-task',
+                                    'pk' => $unlinkTaskId,
+                                ]);
+                            ?>
+                            <tr>
+                                <td>
+                                    <?php echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $relatedTask]); ?>
+                                </td>
+                                <td>
+                                    <?php echo $relatedTask->plan_end_at ? \Yii::$app->formatter->asDatetime((int) $relatedTask->plan_end_at, "php:d.m.Y H:i") : " - "; ?>
+                                </td>
+                                <td>
+                                    <?php echo $relatedTask->schedules ? \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($relatedTask->schedules) : " - "; ?>
+                                </td>
+                                <td>
+                                    <?php echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $relatedTask, 'isShort' => true]); ?>
+                                </td>
+                                <td>
+                                    <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $relatedTask->executor, 'isSmall' => true]); ?>
+                                </td>
+                                <td class="sx-task-related-actions">
+                                    <a href="#" class="btn btn-xs btn-default sx-task-related-unlink" data-url="<?php echo $unlinkRelatedTaskUrl; ?>" title="Отвязать задачу" data-toggle="tooltip">
+                                        <i class="fas fa-unlink"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

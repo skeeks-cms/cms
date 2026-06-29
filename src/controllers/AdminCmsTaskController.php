@@ -336,6 +336,18 @@ class AdminCmsTaskController extends BackendModelStandartController
                             },
                         ],
 
+                        'plan_end_at' => [
+                            'format' => 'raw',
+                            'label'  => 'Планируемое завершение',
+                            'value'  => function (CmsTask $CmsTask) {
+                                if ($CmsTask->plan_end_at) {
+                                    return \Yii::$app->formatter->asDatetime((int) $CmsTask->plan_end_at, "php:d.m.Y H:i");
+                                }
+
+                                return " - ";
+                            },
+                        ],
+
                         'scheduleTotalTime' => [
                             'format'    => 'raw',
                             'label'     => 'Отработанное время',
@@ -588,6 +600,8 @@ JS
             if (!$model->plan_duration) {
                 $model->plan_duration = 60 * 15;
             }
+
+            $this->applyParentTaskFromRequest($model);
         }
 
         $model->load(\Yii::$app->request->get());
@@ -942,6 +956,11 @@ JS
         $result = [
             'name',
 
+            'parent_cms_task_id' => [
+                'class' => HtmlBlock::class,
+                'content' => \yii\helpers\Html::activeHiddenInput($model, 'parent_cms_task_id'),
+            ],
+
             'executor_id'   => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => AjaxSelectModel::class,
@@ -1222,6 +1241,81 @@ JS
 
 
         return $result;
+    }
+
+    public function actionUnlinkRelatedTask($pk)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $task = CmsTask::findOne((int)$pk);
+        if (!$task) {
+            throw new \yii\web\NotFoundHttpException('Задача не найдена.');
+        }
+
+        $task->updateAttributes([
+            'parent_cms_task_id' => null,
+        ]);
+
+        return [
+            'success' => true,
+        ];
+    }
+
+    public function actionLinkRelatedTask($pk, $related_task_id = null)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $task = CmsTask::find()->forManager()->andWhere([CmsTask::tableName().'.id' => (int)$pk])->one();
+        $relatedTaskId = (int)($related_task_id ?: \Yii::$app->request->post('related_task_id'));
+        $relatedTask = $relatedTaskId ? CmsTask::find()->forManager()->andWhere([CmsTask::tableName().'.id' => $relatedTaskId])->one() : null;
+
+        if (!$task || !$relatedTask) {
+            throw new \yii\web\NotFoundHttpException('Задача не найдена.');
+        }
+
+        if ((int)$task->id === (int)$relatedTask->id) {
+            return [
+                'success' => false,
+                'message' => 'Нельзя связать задачу саму с собой.',
+            ];
+        }
+
+        $parentTask = $task->parentCmsTask;
+        while ($parentTask) {
+            if ((int)$parentTask->id === (int)$relatedTask->id) {
+                return [
+                    'success' => false,
+                    'message' => 'Нельзя создать циклическую связь задач.',
+                ];
+            }
+
+            $parentTask = $parentTask->parentCmsTask;
+        }
+
+        $relatedTask->updateAttributes([
+            'parent_cms_task_id' => $task->id,
+        ]);
+
+        return [
+            'success' => true,
+        ];
+    }
+
+    protected function applyParentTaskFromRequest(CmsTask $model): void
+    {
+        $parentTaskId = (int)\Yii::$app->request->get('parent_cms_task_id');
+        $parentTask = $parentTaskId ? CmsTask::findOne($parentTaskId) : null;
+
+        if (!$parentTask) {
+            return;
+        }
+
+        $model->parent_cms_task_id = $parentTask->id;
+        $model->executor_id = $parentTask->executor_id ?: $model->executor_id;
+        $model->cms_project_id = $parentTask->cms_project_id;
+        $model->cms_company_id = $parentTask->cms_company_id;
+        $model->cms_user_id = $parentTask->cms_user_id;
+        $model->plan_duration = $parentTask->plan_duration ?: $model->plan_duration;
     }
 
     /**
