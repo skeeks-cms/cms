@@ -16,6 +16,7 @@ use yii\base\Exception;
 use yii\db\AfterSaveEvent;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Inflector;
 
 /**
  * @property array $noLogFields
@@ -46,6 +47,57 @@ class CmsLogBehavior extends Behavior
      * @var array
      */
     public $relation_map = [];
+
+    protected function guessRelationNameByAttribute($attribute)
+    {
+        if (!preg_match('/_id$/', $attribute)) {
+            return null;
+        }
+
+        return lcfirst(Inflector::id2camel(substr($attribute, 0, -3), '_'));
+    }
+
+    protected function getRelationNameByAttribute($attribute)
+    {
+        $relationName = ArrayHelper::getValue((array)$this->relation_map, $attribute);
+        if ($relationName) {
+            return $relationName;
+        }
+
+        $relationName = $this->guessRelationNameByAttribute($attribute);
+        if ($relationName && $this->owner->getRelation($relationName, false)) {
+            return $relationName;
+        }
+
+        return null;
+    }
+
+    protected function formatAttributeValueForLog($attribute, $value)
+    {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
+        $relationName = $this->getRelationNameByAttribute($attribute);
+        if (!$relationName) {
+            return $value;
+        }
+
+        $relation = $this->owner->getRelation($relationName, false);
+        if (!$relation || count($relation->link) !== 1) {
+            if (ArrayHelper::getValue((array)$this->relation_map, $attribute) && $this->owner->canGetProperty($relationName)) {
+                return (string)$this->owner->{$relationName};
+            }
+
+            return $value;
+        }
+
+        $targetAttribute = array_key_first($relation->link);
+        $modelClass = $relation->modelClass;
+        $model = $modelClass::find()->andWhere([$targetAttribute => $value])->one();
+
+        return $model ? (string)$model : $value;
+    }
 
     /**
      * @return array
@@ -187,12 +239,7 @@ class CmsLogBehavior extends Behavior
 
         foreach ($data as $key => $value)
         {
-            $newValueText = $value;
-            $relationCode = ArrayHelper::getValue((array) $this->relation_map, $key);
-
-            if ($relationCode) {
-                $newValueText = (string) $this->owner->{$relationCode};
-            }
+            $newValueText = $this->formatAttributeValueForLog($key, $value);
 
             $result[$key] = [
                 'name' => $this->owner->getAttributeLabel($key),
@@ -302,11 +349,8 @@ class CmsLogBehavior extends Behavior
                     } else {
                         $newValue = $this->owner->getAttribute($key);
 
-                        $newValueText = $newValue;
-                        $relationCode = ArrayHelper::getValue((array) $this->relation_map, $key);
-                        if ($relationCode) {
-                            $newValueText = (string) $this->owner->{$relationCode};
-                        }
+                        $newValueText = $this->formatAttributeValueForLog($key, $newValue);
+                        $oldValueText = $this->formatAttributeValueForLog($key, $value);
 
                         if ($newValue != $value) {
 
@@ -316,7 +360,7 @@ class CmsLogBehavior extends Behavior
                                 'as_text' => $newValueText,
 
                                 'old_value' => $value,
-                                'old_as_text' => $value,
+                                'old_as_text' => $oldValueText,
 
                                 'name' => $this->owner->getAttributeLabel($key),
                             ];

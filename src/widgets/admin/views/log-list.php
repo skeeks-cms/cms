@@ -33,6 +33,89 @@ $this->registerCss(<<<CSS
 .sx-list .sx-controlls a {
     color: #a1a1a1;
 }
+.sx-log-list .sx-log-meta {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+.sx-log-list .sx-log-meta-item {
+    color: #9aa0a6;
+    font-size: 0.78rem;
+    line-height: 1.2;
+    margin-right: 0.45rem;
+}
+.sx-log-list .sx-log-pin-toggle {
+    align-items: center;
+    background: #f5f7fa;
+    border: 1px solid #dfe5ec;
+    border-radius: 999px;
+    color: #667085;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: 600;
+    gap: 0.3rem;
+    line-height: 1;
+    padding: 0.28rem 0.55rem;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+}
+.sx-log-list .sx-log-pin-toggle:hover {
+    background: #edf6ff;
+    border-color: #b8d8f4;
+    color: #1e6ba8;
+}
+.sx-log-list .sx-log-pin-toggle.is-pinned {
+    background: #e8f7f4;
+    border-color: #9edbd0;
+    color: #11806f;
+}
+.sx-log-list .sx-log-pin-toggle.is-loading {
+    opacity: 0.55;
+    pointer-events: none;
+}
+.sx-log-list .sx-log-value-collapsed {
+    display: inline;
+}
+.sx-log-list .sx-log-value-preview {
+    color: inherit;
+}
+.sx-log-list .sx-log-value-toggle {
+    background: #f5f7fa;
+    border: 1px solid #dfe5ec;
+    border-radius: 999px;
+    color: #667085;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-left: 0.35rem;
+    padding: 0.25rem 0.55rem;
+}
+.sx-log-list .sx-log-value-toggle:hover {
+    background: #edf6ff;
+    border-color: #b8d8f4;
+    color: #1e6ba8;
+}
+.sx-log-list .sx-log-value-full {
+    background: #f8fafc;
+    border: 1px solid #e6ebf1;
+    border-radius: 0.5rem;
+    display: none;
+    margin-top: 0.6rem;
+    max-height: 28rem;
+    overflow: auto;
+    padding: 0.75rem 0.9rem;
+}
+.sx-log-list .sx-log-value-collapsed.is-open .sx-log-value-full {
+    display: block;
+}
+.sx-log-list .sx-log-value-collapsed.is-open .sx-log-value-preview {
+    display: none;
+}
+.sx-log-list .sx-log-value-pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
 .sx-log-list .sx-hidden-content .sx-hidden {
     display: none;
 }
@@ -124,8 +207,66 @@ CSS
 \skeeks\cms\assets\LinkActvationAsset::register($this);
 $this->registerJs(<<<JS
 new sx.classes.LinkActivation('.sx-comment-wrapper');
+$("body").off("click.sxLogValueToggle").on("click.sxLogValueToggle", ".sx-log-value-toggle", function(e) {
+    e.preventDefault();
+
+    var jWrapper = $(this).closest(".sx-log-value-collapsed");
+    var isOpen = !jWrapper.hasClass("is-open");
+
+    jWrapper.toggleClass("is-open", isOpen);
+    $(this).text(isOpen ? "Свернуть" : "Показать полностью");
+
+    return false;
+});
 JS
 );
+
+if ($widget->is_show_pin_controls) {
+    $this->registerJs(<<<JS
+$("body").off("click.sxLogPinToggle").on("click.sxLogPinToggle", ".sx-log-pin-toggle", function(e) {
+    e.preventDefault();
+
+    var jBtn = $(this);
+    var data = {
+        id: jBtn.data("id"),
+        is_pinned: jBtn.data("value")
+    };
+
+    if (window.yii) {
+        data[yii.getCsrfParam()] = yii.getCsrfToken();
+    }
+
+    jBtn.addClass("is-loading");
+
+    $.ajax({
+        url: jBtn.data("url"),
+        type: "post",
+        data: data,
+        success: function(response) {
+            if (response && response.success === false) {
+                alert(response.message || "Не удалось обновить комментарий.");
+                jBtn.removeClass("is-loading");
+                return;
+            }
+
+            var jPjax = jBtn.closest("[data-pjax-container]");
+            if (jPjax.length && $.pjax) {
+                $.pjax.reload({container: "#" + jPjax.attr("id"), async: false});
+            } else {
+                window.location.reload();
+            }
+        },
+        error: function() {
+            alert("Не удалось обновить комментарий.");
+            jBtn.removeClass("is-loading");
+        }
+    });
+
+    return false;
+});
+JS
+    );
+}
 
 $dataProvider = new \yii\data\ActiveDataProvider([
     'query' => $widget->query,
@@ -144,6 +285,9 @@ $dataProvider = new \yii\data\ActiveDataProvider([
 <? echo \yii\widgets\ListView::widget(\yii\helpers\ArrayHelper::merge([
     'dataProvider' => $dataProvider,
     'itemView'     => '_log-list-item',
+    'viewParams'   => [
+        'is_show_pin_controls' => (bool)$widget->is_show_pin_controls,
+    ],
     'emptyText'    => '<div class="sx-block">Записей нет</div>',
     'options'      => [
         'class' => '',

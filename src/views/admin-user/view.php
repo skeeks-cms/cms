@@ -819,6 +819,7 @@ JS
                                 \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT
                             ]),
                             'is_show_model' => false,
+                            'is_show_pin_controls' => true,
                         ]); ?>
                     </div>
                 </div>

@@ -19,6 +19,8 @@ $log = new \skeeks\cms\models\CmsLog();
 $log->model_code = $widget->model->skeeksModelCode;
 $log->model_id = $widget->model->id;
 $isPjax = (int) $widget->isPjax;
+$pinInputId = \yii\helpers\Html::getInputId($log, 'is_pinned');
+$pinLabel = $widget->pinnedLabel ?: $log->getAttributeLabel('is_pinned');
 
 $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'action'                 => \yii\helpers\Url::to($widget->backend_url),
@@ -93,7 +95,51 @@ border-radius: 0.5rem !important;
 background: none !important;
 border: none !important;
 }
+.sx-comment-pin-field {
+    margin: 0 0 1rem 0;
+}
+.sx-comment-pin-toggle {
+    align-items: center;
+    background: #f5f7fa;
+    border: 1px solid #dfe5ec;
+    border-radius: 999px;
+    color: #667085;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.88rem;
+    font-weight: 600;
+    gap: 0.45rem;
+    line-height: 1;
+    margin: 0;
+    padding: 0.55rem 0.85rem;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.sx-comment-pin-toggle:hover {
+    background: #edf6ff;
+    border-color: #b8d8f4;
+    color: #1e6ba8;
+}
+.sx-comment-pin-toggle.is-active {
+    background: #e8f7f4;
+    border-color: #9edbd0;
+    color: #11806f;
+}
 CSS
+        );
+        $this->registerJs(<<<JS
+$("body").off("click.sxCommentPinToggle").on("click.sxCommentPinToggle", ".sx-comment-pin-toggle", function(e) {
+    e.preventDefault();
+
+    var jBtn = $(this);
+    var jInput = $("#" + jBtn.data("input"));
+    var isActive = !jBtn.hasClass("is-active");
+
+    jBtn.toggleClass("is-active", isActive);
+    jInput.val(isActive ? 1 : 0);
+
+    return false;
+});
+JS
         );
         echo $form->field($log, "comment")->widget(
             \skeeks\yii2\ckeditor\CKEditorWidget::class,
@@ -169,6 +215,16 @@ CSS
                 'remote' => new \yii\helpers\UnsetArrayValue(),
             ],*/
         ])->label(false); ?>
+    </div>
+    <div class="col-12 sx-comment-pin-field">
+        <?php echo \yii\helpers\Html::activeHiddenInput($log, 'is_pinned', [
+            'id' => $pinInputId,
+            'value' => 0,
+        ]); ?>
+        <button type="button" class="sx-comment-pin-toggle" data-input="<?php echo $pinInputId; ?>">
+            <i class="fas fa-thumbtack"></i>
+            <span><?php echo \yii\helpers\Html::encode($pinLabel); ?></span>
+        </button>
     </div>
     <div class="col-12">
         <div class="d-flex">

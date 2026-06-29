@@ -2,19 +2,31 @@
 /**
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsLog
+ * @var $is_show_pin_controls bool
  */
 $log = $model;
+$is_show_pin_controls = isset($is_show_pin_controls) ? (bool)$is_show_pin_controls : false;
+$isTaskLog = $log->model_code == \skeeks\cms\models\CmsTask::class;
+$pinLabel = $isTaskLog ? 'Результат задачи' : 'Закрепить';
+$unpinLabel = $isTaskLog ? 'Убрать из результата' : 'Открепить';
+$togglePinUrl = \yii\helpers\Url::to(['/cms/admin-cms-log/toggle-pin']);
 ?>
 <div class="sx-block sx-item">
     <div class="sx-controlls d-flex" style="margin-bottom: 0.25rem;">
-
-
-        <div class="d-flex" style="flex-grow: 1;">
-            <div style="margin-right: 1rem; color: #a1a1a1; font-size: 0.8rem;" class="my-auto"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
-            <div style="margin-right: 1rem; font-size: 0.8rem; color: #a1a1a1;" class="my-auto">
-                <?php echo $log->logTypeAsText; ?>
-
-            </div>
+        <div class="d-flex sx-log-meta" style="flex-grow: 1;">
+            <div class="sx-log-meta-item"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
+            <div class="sx-log-meta-item"><?php echo $log->logTypeAsText; ?></div>
+            <?php if ($is_show_pin_controls) : ?>
+            <button type="button"
+                    class="sx-log-pin-toggle <?php echo $log->is_pinned ? 'is-pinned' : ''; ?>"
+                    data-id="<?php echo (int)$log->id; ?>"
+                    data-url="<?php echo $togglePinUrl; ?>"
+                    data-value="<?php echo $log->is_pinned ? 0 : 1; ?>"
+                    title="<?php echo \yii\helpers\Html::encode($log->is_pinned ? $unpinLabel : $pinLabel); ?>">
+                <i class="fas fa-thumbtack"></i>
+                <span><?php echo $log->is_pinned ? 'Закреплено' : $pinLabel; ?></span>
+            </button>
+            <?php endif; ?>
         </div>
         <div style="margin-right: 1rem; font-size: 0.8rem; color: #a1a1a1;" class="my-auto">
             <?php
@@ -64,12 +76,9 @@ $log = $model;
             </div>
         <?php endif; ?>
 
-        <?php /*echo $log->comment; */ ?>
-        <?php /*echo $model->renderLog($log); */ ?>
         <div class="sx-comment-wrapper">
             <?php echo $model->render(); ?>
         </div>
-
 
         <?php if ($model->files) : ?>
 
@@ -96,7 +105,6 @@ $log = $model;
                     </div>
                 <?php endif; ?>
 
-
                 <?php if ($files) : ?>
                     <div class="sx-title">Приложенные файлы:</div>
                     <div class="sx-files-block">
@@ -108,12 +116,8 @@ $log = $model;
                         <? endforeach; ?>
                     </div>
                 <?php endif; ?>
-
-
             </div>
         <?php endif; ?>
-
-
     </div>
 
     <div class="sx-right-btn">
@@ -128,7 +132,6 @@ $log = $model;
             ],
         ]);
         ?>
-        <!--<i class="hs-admin-angle-down"></i>-->
         <i class="fas fa-ellipsis-v"></i>
         <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
     </div>

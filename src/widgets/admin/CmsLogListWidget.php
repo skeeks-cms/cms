@@ -18,6 +18,8 @@ class CmsLogListWidget extends Widget
     public $query = null;
 
     public $is_show_model = true;
+
+    public $is_show_pin_controls = false;
     
     public $list_view_config = [];
 

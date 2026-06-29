@@ -8,6 +8,8 @@ use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\queries\CmsLogQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
+use yii\helpers\Inflector;
 /**
  * @property int              $id
  *
@@ -30,6 +32,7 @@ use yii\helpers\Html;
  * @property array            $data
  *
  * @property string           $log_type
+ * @property int|null         $is_pinned
  *
  * @property string|null      $comment
  *
@@ -120,6 +123,7 @@ class CmsLog extends ActiveRecord
                     'cms_company_id'
                     ,
                     'cms_user_id',
+                    'is_pinned',
                 ],
                 'integer',
             ],
@@ -140,6 +144,7 @@ class CmsLog extends ActiveRecord
             [['sub_model_as_text'], 'default', 'value' => null],
             [['data'], 'default', 'value' => null],
             [['log_type'], 'default', 'value' => self::LOG_TYPE_COMMENT],
+            [['is_pinned'], 'default', 'value' => 0],
 
             [['comment', 'cms_company_id', 'cms_user_id'], 'default', 'value' => null],
             [['sub_model_code', 'sub_model_id', 'sub_model_log_type'], 'default', 'value' => null],
@@ -178,6 +183,7 @@ class CmsLog extends ActiveRecord
             'cms_company_id' => "Компания",
             'cms_user_id'    => "Клиент",
             'comment'        => "Текст комментария",
+            'is_pinned'      => "Закрепить комментарий",
             'fileIds'        => "Файлы",
         ]);
     }
@@ -270,6 +276,125 @@ class CmsLog extends ActiveRecord
         return;
     }
 
+    protected function formatLogValue($key, $name, $value)
+    {
+        if (is_array($value)) {
+            return $this->renderCollapsedValue(print_r($value, true), true);
+        }
+
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        $value = (string)$value;
+        $lowerKey = mb_strtolower((string)$key, 'UTF-8');
+        $lowerName = mb_strtolower((string)$name, 'UTF-8');
+
+        $relationValue = $this->formatRelationLogValue($key, $value);
+        if ($relationValue !== null) {
+            return $relationValue;
+        }
+
+        if ($this->isDurationLogValue($lowerKey, $lowerName, $value)) {
+            return \skeeks\cms\helpers\CmsScheduleHelper::durationAsText((int)$value);
+        }
+
+        if ($this->isTimestampLogValue($lowerKey, $lowerName, $value)) {
+            return \Yii::$app->formatter->asDatetime((int)$value);
+        }
+
+        if ($this->isLongLogValue($value)) {
+            return $this->renderCollapsedValue($value);
+        }
+
+        return $value;
+    }
+
+    protected function formatRelationLogValue($key, $value)
+    {
+        if (!is_numeric($value) || !preg_match('/_id$/', (string)$key)) {
+            return null;
+        }
+
+        $model = $this->subModel ?: $this->model;
+        if (!$model) {
+            return null;
+        }
+
+        $relationName = lcfirst(Inflector::id2camel(substr((string)$key, 0, -3), '_'));
+        $relation = $model->getRelation($relationName, false);
+        if (!$relation || count($relation->link) !== 1) {
+            return null;
+        }
+
+        $targetAttribute = array_key_first($relation->link);
+        $modelClass = $relation->modelClass;
+        $relatedModel = $modelClass::find()->andWhere([$targetAttribute => $value])->one();
+
+        return $relatedModel ? (string)$relatedModel : null;
+    }
+
+    protected function isDurationLogValue($lowerKey, $lowerName, $value)
+    {
+        if (!is_numeric($value)) {
+            return false;
+        }
+
+        return (bool)preg_match('/duration|seconds|длительность|продолжительность/u', $lowerKey.' '.$lowerName);
+    }
+
+    protected function isTimestampLogValue($lowerKey, $lowerName, $value)
+    {
+        if (!is_numeric($value)) {
+            return false;
+        }
+
+        $timestamp = (int)$value;
+        if ($timestamp < 946684800 || $timestamp > 4102444800) {
+            return false;
+        }
+
+        if ($this->isDurationLogValue($lowerKey, $lowerName, $value)) {
+            return false;
+        }
+
+        return (bool)(
+            preg_match('/(^|_)at$|(^|_)time$|date|timestamp/u', $lowerKey)
+            || preg_match('/дата|время|начало|завершение/u', $lowerName)
+        );
+    }
+
+    protected function isLongLogValue($value)
+    {
+        $plain = trim(strip_tags($value));
+
+        return strlen($value) > 900 || mb_strlen($plain, 'UTF-8') > 360 || (strip_tags($value) !== $value && mb_strlen($plain, 'UTF-8') > 180);
+    }
+
+    protected function renderCollapsedValue($value, $isPre = false)
+    {
+        $plain = trim(preg_replace('/\s+/u', ' ', strip_tags((string)$value)));
+        $preview = mb_substr($plain, 0, 220, 'UTF-8');
+        if (mb_strlen($plain, 'UTF-8') > 220) {
+            $preview .= '...';
+        }
+
+        $full = $isPre
+            ? Html::tag('pre', Html::encode((string)$value), ['class' => 'sx-log-value-pre'])
+            : HtmlPurifier::process((string)$value);
+
+        return Html::tag('span',
+            Html::tag('span', Html::encode($preview), ['class' => 'sx-log-value-preview']).
+            ' '.
+            Html::button('Показать полностью', [
+                'type'  => 'button',
+                'class' => 'sx-log-value-toggle',
+            ]).
+            Html::tag('div', $full, ['class' => 'sx-log-value-full']),
+            ['class' => 'sx-log-value-collapsed']
+        );
+    }
+
     public function render()
     {
         $name = ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$this->model_code, 'name_one'], $this->model_code);
@@ -331,6 +456,8 @@ class CmsLog extends ActiveRecord
                         }
                     }
 
+                    $as_text = $this->formatLogValue($key, $name, $as_text);
+
                     if ($as_text) {
                         $res[] = "<span>".$name.": </span>".Html::tag('span', $as_text, [
                                 'data-toggle' => 'tooltip',
@@ -385,6 +512,10 @@ class CmsLog extends ActiveRecord
                             }
                         }
 
+                        $as_text = $this->formatLogValue($key, $name, $as_text);
+                        $old_as_text = $this->formatLogValue($key, $name, ArrayHelper::getValue($data, "old_as_text"));
+                        $data["old_as_text"] = $old_as_text;
+
                         $res[] = "<span>".$name.": </span>".Html::tag('span', $as_text, [
                                 'data-toggle' => 'tooltip',
                                 'data-html'   => 'true',
@@ -404,7 +535,11 @@ class CmsLog extends ActiveRecord
 
                 if ($dataValues) {
                     foreach ($dataValues as $key => $data) {
-                        $res[] = "<span>".(string)ArrayHelper::getValue($data, "name").": </span>".Html::tag('span', (string)ArrayHelper::getValue($data, "as_text", ''), [
+                        $name = (string)ArrayHelper::getValue($data, "name");
+                        $as_text = $this->formatLogValue($key, $name, ArrayHelper::getValue($data, "as_text", ''));
+                        $old_as_text = $this->formatLogValue($key, $name, ArrayHelper::getValue($data, "old_as_text"));
+                        $data["old_as_text"] = $old_as_text;
+                        $res[] = "<span>".$name.": </span>".Html::tag('span', $as_text, [
                                 'data-toggle' => 'tooltip',
                                 'data-html'   => 'true',
                                 'title'       => "<b>Старое значение: </b>".(string)ArrayHelper::getValue($data, "old_as_text"),

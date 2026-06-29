@@ -504,6 +504,26 @@ JS
     </div>
 </div>
 
+<?php $pjax = \skeeks\cms\widgets\Pjax::begin([
+    'id' => 'sx-comments',
+]); ?>
+
+<?php $taskResultQuery = $model->getLogs()->comments()->results(); ?>
+<?php if ($taskResultQuery->count()) : ?>
+    <div class="row" style="margin-top: 1rem;">
+        <div class="col-12">
+            <div class="sx-block">
+                <div class="sx-task-related-title">Результат по задаче</div>
+                <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                    'query'         => $taskResultQuery,
+                    'is_show_model' => false,
+                    'is_show_pin_controls' => true,
+                ]); ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <div class="row" style="margin-top: 1rem;">
     <div class="col-12">
         <div class="sx-block sx-task-related">
@@ -587,15 +607,12 @@ JS
     </div>
 </div>
 
-<?php $pjax = \skeeks\cms\widgets\Pjax::begin([
-    'id' => 'sx-comments',
-]); ?>
-
     <div class="row" style="margin-top: 1rem;">
         <div class="col-12">
             <div class="sx-block">
                 <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
                     'model' => $model,
+                    'pinnedLabel' => 'Результат по задаче',
                 ]); ?>
             </div>
         </div>
@@ -606,6 +623,7 @@ JS
             <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
                 'query'         => $model->getLogs()->comments(),
                 'is_show_model' => false,
+                'is_show_pin_controls' => true,
             ]); ?>
         </div>
     </div>

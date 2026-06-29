@@ -20,6 +20,7 @@ use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\ckeditor\CKEditorWidget;
+use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -91,6 +92,15 @@ class AdminCmsLogController extends BackendModelStandartController
                 'accessCallback' => function() {
                     return \Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS);
                 }
+            ],
+
+            'toggle-pin' => [
+                'class' => BackendAction::class,
+                'isVisible' => false,
+                'callback' => [$this, 'togglePin'],
+                'accessCallback' => function() {
+                    return \Yii::$app->user->can(CmsManager::PERMISSION_ADMIN_ACCESS);
+                }
             ]
         ]);
 
@@ -135,6 +145,36 @@ class AdminCmsLogController extends BackendModelStandartController
 
         return $rr;
     }
+
+    public function togglePin()
+    {
+        $rr = new RequestResponse();
+
+        try {
+            if ($rr->isRequestAjaxPost()) {
+                $id = (int)\Yii::$app->request->post('id');
+                $isPinned = (int)\Yii::$app->request->post('is_pinned');
+                $log = CmsLog::findOne($id);
+
+                if (!$log) {
+                    throw new Exception("Комментарий не найден");
+                }
+
+                $log->is_pinned = $isPinned ? 1 : 0;
+                if (!$log->save(false, ['is_pinned', 'updated_at', 'updated_by'])) {
+                    throw new Exception("Не удалось сохранить комментарий");
+                }
+
+                $rr->message = $log->is_pinned ? "Комментарий закреплен" : "Комментарий откреплен";
+                $rr->success = true;
+            }
+        } catch (\Exception $e) {
+            $rr->success = false;
+            $rr->message = $e->getMessage();
+        }
+
+        return $rr;
+    }
     
     
     public function updateFields($action)
@@ -146,6 +186,9 @@ class AdminCmsLogController extends BackendModelStandartController
             'comment' => [
                 'class' => WidgetField::class,
                 'widgetClass' => CKEditorWidget::class
+            ],
+            'is_pinned' => [
+                'class' => BoolField::class,
             ],
             'fileIds' => [
                 'class' => WidgetField::class,

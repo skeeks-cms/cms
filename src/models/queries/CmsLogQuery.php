@@ -40,6 +40,22 @@ class CmsLogQuery extends CmsActiveQuery
     /**
      * @return $this
      */
+    public function pinned()
+    {
+        return $this->andWhere(['is_pinned' => 1]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function results()
+    {
+        return $this->pinned();
+    }
+
+    /**
+     * @return $this
+     */
     public function phoneCalls()
     {
         return $this->logType(CmsLog::LOG_TYPE_PHONE_CALL);

@@ -24,6 +24,11 @@ class CmsCommentWidget extends Widget
      * @var bool Перезагружать контейнер pjax если это возможно, если его нет, то перезагрузить страницу после написания комментария
      */
     public $isPjax = true;
+
+    /**
+     * @var string|null
+     */
+    public $pinnedLabel = null;
     
     public $backend_url = ['/cms/admin-cms-log/add-comment'];
 

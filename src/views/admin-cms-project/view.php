@@ -248,6 +248,7 @@ JS
             <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
                 'query'         => $model->getLogs()->comments(),
                 'is_show_model' => false,
+                'is_show_pin_controls' => true,
             ]); ?>
         </div>
     </div>

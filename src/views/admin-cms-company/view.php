@@ -1038,6 +1038,22 @@ CSS
                 'id' => 'sx-comments',
             ]); ?>
 
+                <?php $pinnedCompanyCommentsQuery = $model->getCompanyLogs()->comments()->pinned(); ?>
+                <?php if ($pinnedCompanyCommentsQuery->count()) : ?>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="sx-block">
+                                <div class="sx-block-title">Закрепленные комментарии</div>
+                                <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                                    'query'         => $pinnedCompanyCommentsQuery,
+                                    'is_show_model' => false,
+                                    'is_show_pin_controls' => true,
+                                ]); ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <div class="row">
                     <div class="col-12">
                         <div class="sx-block">
@@ -1056,6 +1072,7 @@ CSS
                                 \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT
                             ]),
                             'is_show_model' => false,
+                            'is_show_pin_controls' => true,
                         ]); ?>
                     </div>
                 </div>
