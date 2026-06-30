@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\models\queries;
 
+use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsProject2user;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
@@ -59,6 +61,41 @@ class CmsProjectQuery extends CmsActiveQuery
                 ],
             ]);
         }
+
+        return $this;
+    }
+
+    /**
+     * Поиск проектов доступных клиенту
+     *
+     * @param User|null $user
+     * @return $this
+     */
+    public function forClient(User $user = null)
+    {
+        if ($user === null) {
+            $user = \Yii::$app->user->identity;
+        }
+
+        if (!$user) {
+            return $this;
+        }
+
+        $projectIdsQuery = CmsProject2user::find()
+            ->select('cms_project_id')
+            ->andWhere(['cms_user_id' => $user->id]);
+
+        $companyIdsQuery = CmsCompany::find()
+            ->forClient($user)
+            ->select(CmsCompany::tableName().'.id');
+
+        $this->andWhere([
+            'or',
+            [self::getPrimaryTableName().'.id' => $projectIdsQuery],
+            [self::getPrimaryTableName().'.cms_company_id' => $companyIdsQuery],
+            [self::getPrimaryTableName().'.cms_user_id' => $user->id],
+            [self::getPrimaryTableName().'.created_by' => $user->id],
+        ]);
 
         return $this;
     }

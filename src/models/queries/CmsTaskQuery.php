@@ -69,6 +69,33 @@ class CmsTaskQuery extends CmsActiveQuery
     }
 
     /**
+     * Поиск задач доступных клиенту
+     *
+     * @param User|null $user
+     * @return $this
+     */
+    public function forClient(User $user = null)
+    {
+        if ($user === null) {
+            $user = \Yii::$app->user->identity;
+        }
+
+        if (!$user) {
+            return $this;
+        }
+
+        $this->andWhere([
+            "or",
+            [self::getPrimaryTableName().".cms_project_id" => CmsProject::find()->forClient($user)->select(CmsProject::tableName().'.id')],
+            [self::getPrimaryTableName().".cms_company_id" => CmsCompany::find()->forClient($user)->select(CmsCompany::tableName().'.id')],
+            [self::getPrimaryTableName().".cms_user_id" => $user->id],
+            [self::getPrimaryTableName().".created_by" => $user->id],
+        ]);
+
+        return $this;
+    }
+
+    /**
      * @param string|array $types
      * @return $this
      */
