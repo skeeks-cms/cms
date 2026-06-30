@@ -87,6 +87,15 @@ $config = [
                         'url'  => ['/cms/upa-personal/view'],
                         'icon' => 'icon-user',
                     ],
+                    'work' => [
+                        'name'     => 'Кабинет сотрудника',
+                        'url'      => ['/admin/admin-index'],
+                        'icon'     => 'fas fa-tachometer-alt',
+                        'priority' => 10,
+                        'visible'  => function ($item) {
+                            return \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS);
+                        },
+                    ],
                     'profile' =>
                     [
                         'priority' => 9999,
