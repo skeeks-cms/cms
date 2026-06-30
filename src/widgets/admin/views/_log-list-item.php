@@ -11,6 +11,7 @@ $pinLabel = $isTaskLog ? 'Результат задачи' : 'Закрепить
 $unpinLabel = $isTaskLog ? 'Убрать из результата' : 'Открепить';
 $togglePinUrl = \yii\helpers\Url::to(['/cms/admin-cms-log/toggle-pin']);
 $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx-log-'.(int)$log->id;
+$canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['model' => $log]);
 ?>
 <div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-block sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
     <div class="sx-controlls d-flex" style="margin-bottom: 0.25rem;">
@@ -127,6 +128,7 @@ $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx
         <?php endif; ?>
     </div>
 
+    <?php if ($canUpdateDelete) : ?>
     <div class="sx-right-btn">
         <?
         \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
@@ -142,4 +144,5 @@ $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx
         <i class="fas fa-ellipsis-v"></i>
         <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
     </div>
+    <?php endif; ?>
 </div>

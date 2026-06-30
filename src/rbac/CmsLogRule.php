@@ -21,6 +21,7 @@ use yii\rbac\Rule;
 class CmsLogRule extends Rule
 {
     const NAME = 'cmsLogRule';
+    const COMMENT_UPDATE_DELETE_SECONDS = 86400;
 
     public $name = self::NAME;
 
@@ -41,8 +42,12 @@ class CmsLogRule extends Rule
             if ($model->created_by == $user) {
                 //Только комментарий
                 if ($model->log_type == CmsLog::LOG_TYPE_COMMENT) {
+                    if ($model->is_pinned) {
+                        return false;
+                    }
+
                     //Если с момента написания комментария прошло менее 24 часов
-                    if (time() - $params['model']->created_at < 60*60*24) {
+                    if (time() - $params['model']->created_at < self::COMMENT_UPDATE_DELETE_SECONDS) {
                         return true;
                     }
                 }
