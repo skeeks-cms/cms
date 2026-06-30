@@ -233,6 +233,21 @@ class CmsTask extends ActiveRecord
 
             ['plan_duration', 'default', 'value' => 60 * 15], //15 минут
             [
+                'executor_id',
+                function ($attribute) {
+                    if ($this->isNewRecord || !$this->isAttributeChanged($attribute)) {
+                        return true;
+                    }
+
+                    if (CmsTaskSchedule::find()->task($this)->exists()) {
+                        $this->addError($attribute, "Нельзя менять исполнителя по задаче, если по ней уже начата работа.");
+                        return false;
+                    }
+
+                    return true;
+                },
+            ],
+            [
                 'parent_cms_task_id',
                 function ($attribute) {
                     if ($this->{$attribute} && (int)$this->{$attribute} === (int)$this->id) {

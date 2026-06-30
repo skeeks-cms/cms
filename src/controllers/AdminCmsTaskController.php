@@ -605,6 +605,7 @@ JS
         }
 
         $model->load(\Yii::$app->request->get());
+        $isExecutorLocked = !$model->isNewRecord && CmsTaskSchedule::find()->task($model)->exists();
 
         $projectAjaxUrl = \yii\helpers\Json::encode(\yii\helpers\Url::current([
             'ajaxid' => 'cmstask-project-relation-select',
@@ -964,9 +965,13 @@ JS
             'executor_id'   => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => AjaxSelectModel::class,
+                'hint'         => $isExecutorLocked ? 'Исполнителя нельзя изменить, потому что по задаче уже начата работа.' : null,
                 'widgetConfig' => [
                     'modelClass'  => CmsUser::class,
                     'multiple'    => false,
+                    'options'     => [
+                        'disabled' => $isExecutorLocked,
+                    ],
                     'searchQuery' => function ($word = '') {
                         $query = CmsUser::find()->isWorker();
                         if ($word) {
