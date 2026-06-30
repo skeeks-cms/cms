@@ -10,12 +10,19 @@ $isTaskLog = $log->model_code == \skeeks\cms\models\CmsTask::class;
 $pinLabel = $isTaskLog ? 'Результат задачи' : 'Закрепить';
 $unpinLabel = $isTaskLog ? 'Убрать из результата' : 'Открепить';
 $togglePinUrl = \yii\helpers\Url::to(['/cms/admin-cms-log/toggle-pin']);
+$shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx-log-'.(int)$log->id;
 ?>
-<div class="sx-block sx-item">
+<div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-block sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
     <div class="sx-controlls d-flex" style="margin-bottom: 0.25rem;">
         <div class="d-flex sx-log-meta" style="flex-grow: 1;">
             <div class="sx-log-meta-item"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
             <div class="sx-log-meta-item"><?php echo $log->logTypeAsText; ?></div>
+            <button type="button"
+                    class="sx-log-share"
+                    data-url="<?php echo \yii\helpers\Html::encode($shareUrl); ?>"
+                    title="Скопировать ссылку на комментарий">
+                <i class="fas fa-link"></i>
+            </button>
             <?php if ($is_show_pin_controls) : ?>
             <button type="button"
                     class="sx-log-pin-toggle <?php echo $log->is_pinned ? 'is-pinned' : ''; ?>"

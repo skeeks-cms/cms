@@ -73,6 +73,43 @@ $this->registerCss(<<<CSS
     opacity: 0.55;
     pointer-events: none;
 }
+.sx-log-list .sx-log-pin-toggle:focus,
+.sx-log-list .sx-log-share:focus {
+    outline: none;
+}
+.sx-log-list .sx-log-share {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: #9aa0a6;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.72rem;
+    height: 1.6rem;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    width: 1.6rem;
+}
+.sx-log-list .sx-log-share:hover,
+.sx-log-list .sx-log-share.is-copied {
+    background: #edf6ff;
+    border-color: #b8d8f4;
+    color: #1e6ba8;
+}
+.sx-log-list .sx-log-share.is-copied {
+    transform: scale(1.08);
+}
+.sx-log-list .sx-log-item {
+    transition: background 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+}
+.sx-log-list .sx-log-item.sx-log-highlight {
+    background: #fffdf3;
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.28), 0 0.75rem 2rem rgba(32, 39, 48, 0.12);
+    transform: scale(1.012);
+}
 .sx-log-list .sx-log-value-collapsed {
     display: inline;
 }
@@ -207,6 +244,74 @@ CSS
 \skeeks\cms\assets\LinkActvationAsset::register($this);
 $this->registerJs(<<<JS
 new sx.classes.LinkActivation('.sx-comment-wrapper');
+$("body").off("click.sxLogShare").on("click.sxLogShare", ".sx-log-share", function(e) {
+    e.preventDefault();
+
+    var jBtn = $(this);
+    var url = jBtn.data("url");
+
+    var markCopied = function() {
+        jBtn.addClass("is-copied");
+        if (sx.notify && sx.notify.info) {
+            sx.notify.info("Ссылка на комментарий скопирована");
+        }
+        setTimeout(function() {
+            jBtn.removeClass("is-copied");
+        }, 1300);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(markCopied);
+        return false;
+    }
+
+    var textarea = document.createElement("textarea");
+    textarea.value = url;
+    textarea.setAttribute("readonly", "readonly");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand("copy");
+        markCopied();
+    } catch (ignore) {}
+    document.body.removeChild(textarea);
+
+    return false;
+});
+
+window.sxScrollToLogComment = function() {
+    if (!window.location.hash || window.location.hash.indexOf("#sx-log-") !== 0) {
+        return;
+    }
+
+    var id = window.location.hash.replace("#", "");
+    var target = document.getElementById(id);
+    if (!target) {
+        return;
+    }
+
+    target.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+    var jTarget = $(target);
+    jTarget.removeClass("sx-log-highlight");
+    setTimeout(function() {
+        jTarget.addClass("sx-log-highlight");
+    }, 450);
+    setTimeout(function() {
+        jTarget.removeClass("sx-log-highlight");
+    }, 3200);
+};
+
+$(window).off("hashchange.sxLogShare").on("hashchange.sxLogShare", window.sxScrollToLogComment);
+$(document).off("pjax:end.sxLogShare").on("pjax:end.sxLogShare", function() {
+    setTimeout(window.sxScrollToLogComment, 150);
+});
+setTimeout(window.sxScrollToLogComment, 350);
 $("body").off("click.sxLogValueToggle").on("click.sxLogValueToggle", ".sx-log-value-toggle", function(e) {
     e.preventDefault();
 
@@ -268,16 +373,47 @@ JS
     );
 }
 
+$pageSize = 50;
+$targetPage = null;
+$targetLogId = (int)\Yii::$app->request->get('sx-log-id');
+
+if ($targetLogId && $widget->query) {
+    $targetLog = (clone $widget->query)
+        ->andWhere(['id' => $targetLogId])
+        ->one();
+
+    if ($targetLog) {
+        $beforeCount = (clone $widget->query)
+            ->andWhere([
+                'or',
+                ['>', 'created_at', $targetLog->created_at],
+                [
+                    'and',
+                    ['created_at' => $targetLog->created_at],
+                    ['>', 'id', $targetLog->id],
+                ],
+            ])
+            ->count();
+        $targetPage = (int)floor($beforeCount / $pageSize);
+    }
+}
+
+$pagination = [
+    'defaultPageSize' => $pageSize,
+];
+if ($targetPage !== null) {
+    $pagination['page'] = $targetPage;
+}
+
 $dataProvider = new \yii\data\ActiveDataProvider([
     'query' => $widget->query,
     'sort'       => [
         'defaultOrder' => [
             'created_at' => SORT_DESC,
+            'id'         => SORT_DESC,
         ],
     ],
-    'pagination' => [
-        'defaultPageSize' => 50,
-    ],
+    'pagination' => $pagination,
 ]);
 
 ?>

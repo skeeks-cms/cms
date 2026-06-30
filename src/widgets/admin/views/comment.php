@@ -119,6 +119,10 @@ border: none !important;
     border-color: #b8d8f4;
     color: #1e6ba8;
 }
+.sx-comment-pin-toggle:focus,
+.sx-comment-pin-toggle:active {
+    outline: none;
+}
 .sx-comment-pin-toggle.is-active {
     background: #e8f7f4;
     border-color: #9edbd0;
