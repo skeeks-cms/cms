@@ -74,6 +74,8 @@ class CmsTask extends ActiveRecord
     const STATUS_CANCELED = 'canceled';
     const STATUS_READY = 'ready';
 
+    const READY_RESUME_SECONDS = 86400;
+
     /**
      * {@inheritdoc}
      */
@@ -373,6 +375,11 @@ class CmsTask extends ActiveRecord
 
                             if (!in_array($this->getOldAttribute('status'), [self::STATUS_IN_WORK, self::STATUS_ON_CHECK, self::STATUS_READY, self::STATUS_CANCELED])) {
                                 $this->addError('status', "Для того чтобы включить задачу, она должна быть в статусе (в работе)");
+                                return false;
+                            }
+
+                            if ($this->getOldAttribute('status') == self::STATUS_READY && !$this->canResumeReady()) {
+                                $this->addError('status', "Нельзя возобновить готовую задачу, если с момента проверки прошло больше 24 часов.");
                                 return false;
                             }
 
@@ -779,6 +786,41 @@ class CmsTask extends ActiveRecord
         return $this->plan_duration;
     }
 
+    public function getReadyAt()
+    {
+        $logs = CmsLog::find()
+            ->andWhere([
+                'model_code' => self::class,
+                'model_id'   => $this->id,
+                'log_type'   => CmsLog::LOG_TYPE_UPDATE,
+            ])
+            ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC])
+            ->all();
+
+        foreach ($logs as $log) {
+            $statusData = (array)ArrayHelper::getValue((array)$log->data, 'status', []);
+            if (ArrayHelper::getValue($statusData, 'value') == self::STATUS_READY) {
+                return (int)$log->created_at;
+            }
+        }
+
+        return (int)$this->updated_at;
+    }
+
+    public function canResumeReady()
+    {
+        if ($this->status != self::STATUS_READY && $this->getOldAttribute('status') != self::STATUS_READY) {
+            return true;
+        }
+
+        $readyAt = $this->readyAt;
+        if (!$readyAt) {
+            return true;
+        }
+
+        return time() - $readyAt <= self::READY_RESUME_SECONDS;
+    }
+
     static public function recalculateTasksPriority(CmsUser $user, $sortTaskIds)
     {
         $currentUser = \Yii::$app->user->identity;
@@ -919,7 +961,7 @@ class CmsTask extends ActiveRecord
         }
 
         //Если приоритет задач обновил другой пользователь, то уведомим исполнителя
-        if ($currentUser && $currentUser->id != $user->id) {
+        if ($sortTaskIds && $currentUser && $currentUser->id != $user->id) {
             $notify = new CmsWebNotify();
             $notify->cms_user_id = $user->id;
             $notify->name = $currentUser->asText . " поменял(а) порядок ваших задач.";

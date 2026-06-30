@@ -319,7 +319,7 @@ $title = '';
 
     <? endif; ?>
 
-    <? if ($widget->task->status == \skeeks\cms\models\CmsTask::STATUS_READY) : ?>
+    <? if ($widget->task->status == \skeeks\cms\models\CmsTask::STATUS_READY && $widget->task->canResumeReady()) : ?>
         <? $status = \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE; ?>
         <?= \yii\helpers\Html::button('<i class="fas fa-redo"></i> Возобновить',
             [
