@@ -80,6 +80,45 @@ JS
     );
 }
 
+if (!empty($isUserScheduleStarted)) {
+    $modalId = 'sx-auto-user-schedule-started-' . $widget->id;
+    $modalIdJson = \yii\helpers\Json::htmlEncode($modalId);
+    $titleJson = \yii\helpers\Json::htmlEncode('Рабочее время запущено');
+    $messageJson = \yii\helpers\Json::htmlEncode('Рабочее время было выключено, поэтому система включила его автоматически и запустила задачу.');
+
+    $this->registerJs(<<<JS
+(function($) {
+    var modalId = {$modalIdJson};
+    var title = {$titleJson};
+    var message = {$messageJson};
+    var modalHtml = '' +
+        '<div class="modal fade" id="' + modalId + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+            '<div class="modal-dialog" role="document">' +
+                '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                        '<h5 class="modal-title">' + title + '</h5>' +
+                        '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+                            '<span aria-hidden="true">&times;</span>' +
+                        '</button>' +
+                    '</div>' +
+                    '<div class="modal-body">' + message + '</div>' +
+                    '<div class="modal-footer">' +
+                        '<button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+    $('#' + modalId).remove();
+    $('body').append(modalHtml);
+    $('#' + modalId).modal('show').on('hidden.bs.modal', function() {
+        $(this).remove();
+    });
+})(sx.$ || jQuery);
+JS
+    );
+}
+
 $form = \yii\widgets\ActiveForm::begin([
     'id'      => "form-".$widget->id,
     'options' => [

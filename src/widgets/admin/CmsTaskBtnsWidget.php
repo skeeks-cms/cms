@@ -11,6 +11,7 @@ namespace skeeks\cms\widgets\admin;
 use common\models\User;
 use skeeks\cms\models\CmsTask;
 use skeeks\cms\models\CmsTaskSchedule;
+use skeeks\cms\models\CmsUserSchedule;
 use skeeks\crm\models\CrmSchedule;
 use yii\base\Exception;
 use yii\base\Widget;
@@ -55,6 +56,7 @@ class CmsTaskBtnsWidget extends Widget
         }
 
         $isSaved = false;
+        $isUserScheduleStarted = false;
 
 
         if (\Yii::$app->request->post() && \Yii::$app->request->post($this->id)) {
@@ -68,7 +70,26 @@ class CmsTaskBtnsWidget extends Widget
 
                 //var_dump($task);die;
 
-                if ($task->load(\Yii::$app->request->post()) && $task->validate()) {
+                if ($task->load(\Yii::$app->request->post())) {
+                    if ($task->status == CmsTask::STATUS_IN_WORK && !\Yii::$app->user->identity->isWorkingNow) {
+                        $CmsUserSchedule = new CmsUserSchedule();
+                        $CmsUserSchedule->cms_user_id = \Yii::$app->user->id;
+                        $CmsUserSchedule->start_at = time();
+                        $CmsUserSchedule->end_at = null;
+
+                        if (!$CmsUserSchedule->save()) {
+                            $task->addError('status', 'Не удалось автоматически включить рабочее время: ' . print_r($CmsUserSchedule->errors, true));
+                            throw new Exception("Не удалось автоматически включить рабочее время");
+                        }
+
+                        \Yii::$app->user->identity->refresh();
+                        $isUserScheduleStarted = true;
+                    }
+
+                    if (!$task->validate()) {
+                        throw new Exception('Не сохранился статус задачи');
+                    }
+
                     $oldAttributeStatus = $task->getOldAttribute('status');
 
                     if ($task->save()) {
@@ -132,6 +153,7 @@ class CmsTaskBtnsWidget extends Widget
             'error' => $error,
             'task' => $task,
             'isSaved' => $isSaved,
+            'isUserScheduleStarted' => $isUserScheduleStarted,
             'CmsTaskSchedule' => $CmsTaskSchedule,
         ]);
     }
