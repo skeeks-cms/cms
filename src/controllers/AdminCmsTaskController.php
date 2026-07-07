@@ -44,6 +44,7 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
+use yii\web\Response;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -104,6 +105,13 @@ class AdminCmsTaskController extends BackendModelStandartController
                 'icon' => 'fa fa-calendar',
                 'priority' => 15,
                 /*'isOpenNewWindow' => false,*/
+            ],
+
+            'report' => [
+                'class'    => ViewBackendAction::class,
+                'name'     => 'Отчет',
+                'icon'     => 'fa fa-chart-bar',
+                'priority' => 25,
             ],
             
             'index' => [
@@ -586,6 +594,444 @@ JS
     public function view()
     {
         return $this->render($this->action->id);
+    }
+
+    public function actionReportExport($format = 'csv')
+    {
+        $report = $this->buildTaskReport($this->getTaskReportParams());
+        $format = strtolower((string)$format);
+
+        if ($format == 'xlsx') {
+            return $this->downloadTaskReportXlsx($report);
+        }
+
+        if ($format == 'pdf') {
+            return $this->downloadTaskReportPdf($report);
+        }
+
+        return $this->downloadTaskReportCsv($report);
+    }
+
+    public function getTaskReportParams()
+    {
+        $request = \Yii::$app->request;
+        $period = (string)$request->get('period');
+
+        if (!$period) {
+            $period = date('01.m.Y').' - '.date('t.m.Y');
+        }
+
+        $columns = (array)$request->get('columns', []);
+        if (!$columns) {
+            $columns = ['name', 'result', 'project', 'completed_at'];
+        }
+
+        $columns = array_values(array_intersect(array_keys($this->taskReportColumns()), $columns));
+        if (!$columns) {
+            $columns = ['name', 'result', 'project', 'completed_at'];
+        }
+
+        $display = (string)$request->get('display', 'charts_data');
+        if (!in_array($display, ['charts_data', 'charts', 'data'])) {
+            $display = 'charts_data';
+        }
+
+        $taskView = (string)$request->get('task_view', 'list');
+        if (!in_array($taskView, ['table', 'list'])) {
+            $taskView = 'list';
+        }
+
+        return [
+            'period'         => $period,
+            'periodStart'    => $this->parseTaskReportPeriod($period, false),
+            'periodEnd'      => $this->parseTaskReportPeriod($period, true),
+            'cms_company_id' => (int)$request->get('cms_company_id'),
+            'cms_user_id'    => (int)$request->get('cms_user_id'),
+            'cms_project_id' => (int)$request->get('cms_project_id'),
+            'executor_id'    => (int)$request->get('executor_id'),
+            'status'         => (array)$request->get('status', []),
+            'columns'        => $columns,
+            'display'        => $display,
+            'task_view'      => $taskView,
+        ];
+    }
+
+    public function taskReportColumns()
+    {
+        return [
+            'name'         => 'Задача',
+            'result'       => 'Результат',
+            'project'      => 'Проект',
+            'company'      => 'Компания',
+            'client'       => 'Клиент',
+            'executor'     => 'Исполнитель',
+            'status'       => 'Статус',
+            'fact_time'    => 'Отработанное время',
+            'fact_hours'   => 'Отработанное время (ч.)',
+            'completed_at' => 'Дата завершения',
+        ];
+    }
+
+    public function buildTaskReport(array $params)
+    {
+        $periodStart = (int)ArrayHelper::getValue($params, 'periodStart');
+        $periodEnd = (int)ArrayHelper::getValue($params, 'periodEnd');
+
+        if (!$periodStart || !$periodEnd) {
+            $periodStart = strtotime(date('Y-m-01 00:00:00'));
+            $periodEnd = strtotime(date('Y-m-t 23:59:59'));
+        }
+
+        if ($periodStart > $periodEnd) {
+            $tmp = $periodStart;
+            $periodStart = $periodEnd;
+            $periodEnd = $tmp;
+        }
+
+        $tasksQuery = CmsTask::find()->select([CmsTask::tableName().'.id']);
+        self::initQuery($tasksQuery);
+
+        if (!empty($params['cms_company_id'])) {
+            $tasksQuery->andWhere([CmsTask::tableName().'.cms_company_id' => (int)$params['cms_company_id']]);
+        }
+        if (!empty($params['cms_user_id'])) {
+            $tasksQuery->andWhere([CmsTask::tableName().'.cms_user_id' => (int)$params['cms_user_id']]);
+        }
+        if (!empty($params['cms_project_id'])) {
+            $tasksQuery->andWhere([CmsTask::tableName().'.cms_project_id' => (int)$params['cms_project_id']]);
+        }
+        if (!empty($params['executor_id'])) {
+            $tasksQuery->andWhere([CmsTask::tableName().'.executor_id' => (int)$params['executor_id']]);
+        }
+        if (!empty($params['status'])) {
+            $tasksQuery->andWhere([CmsTask::tableName().'.status' => (array)$params['status']]);
+        }
+
+        $query = CmsTaskSchedule::find()
+            ->alias('s')
+            ->andWhere(['s.cms_task_id' => $tasksQuery])
+            ->andWhere(['<=', 's.start_at', $periodEnd])
+            ->andWhere([
+                'or',
+                ['s.end_at' => null],
+                ['>=', 's.end_at', $periodStart],
+            ])
+            ->orderBy(['s.start_at' => SORT_ASC]);
+
+        $tasks = [];
+        foreach ($query->with(['cmsTask.cmsProject', 'cmsTask.cmsCompany', 'cmsTask.cmsUser', 'cmsTask.executor'])->all() as $schedule) {
+            /**
+             * @var CmsTaskSchedule $schedule
+             */
+            $task = $schedule->cmsTask;
+            if (!$task) {
+                continue;
+            }
+
+            $taskEndAt = $schedule->end_at ? (int)$schedule->end_at : time();
+            $startAt = max((int)$schedule->start_at, $periodStart);
+            $endAt = min($taskEndAt, $periodEnd);
+            if ($endAt < $startAt) {
+                continue;
+            }
+
+            if (!isset($tasks[$task->id])) {
+                $tasks[$task->id] = [
+                    'task'        => $task,
+                    'duration'    => 0,
+                    'completedAt' => null,
+                ];
+            }
+
+            $tasks[$task->id]['duration'] += $endAt - $startAt;
+            $tasks[$task->id]['completedAt'] = max((int)$tasks[$task->id]['completedAt'], $taskEndAt);
+        }
+
+        $results = $this->getTaskReportResults(array_keys($tasks));
+        $rows = [];
+        $totalDuration = 0;
+        $byExecutor = [];
+        $byStatus = [];
+
+        foreach ($tasks as $taskId => $taskData) {
+            /**
+             * @var CmsTask $task
+             */
+            $task = $taskData['task'];
+            $duration = (int)$taskData['duration'];
+            $totalDuration += $duration;
+
+            $executorName = $task->executor ? (string)$task->executor->asText : '';
+            $statusName = $task->statusAsText;
+
+            if (!isset($byExecutor[$executorName])) {
+                $byExecutor[$executorName] = ['name' => $executorName ?: 'Не указан', 'tasks' => 0, 'duration' => 0];
+            }
+            $byExecutor[$executorName]['tasks']++;
+            $byExecutor[$executorName]['duration'] += $duration;
+
+            if (!isset($byStatus[$statusName])) {
+                $byStatus[$statusName] = ['name' => $statusName, 'tasks' => 0, 'duration' => 0];
+            }
+            $byStatus[$statusName]['tasks']++;
+            $byStatus[$statusName]['duration'] += $duration;
+
+            $completedAt = $task->status == CmsTask::STATUS_READY ? (int)$taskData['completedAt'] : null;
+            $rows[] = [
+                'name'         => (string)$task->name,
+                'result'       => (string)ArrayHelper::getValue($results, $taskId, ''),
+                'project'      => $task->cmsProject ? (string)$task->cmsProject->asText : '',
+                'company'      => $task->cmsCompany ? (string)$task->cmsCompany->asText : '',
+                'client'       => $task->cmsUser ? (string)$task->cmsUser->asText : '',
+                'executor'     => $executorName,
+                'status'       => $statusName,
+                'fact_time'    => CmsScheduleHelper::durationAsText($duration),
+                'fact_hours'   => \Yii::$app->formatter->asDecimal($duration / 3600, 1),
+                'completed_at' => $completedAt ? \Yii::$app->formatter->asDate($completedAt) : '',
+            ];
+        }
+
+        usort($rows, function ($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
+
+        return [
+            'params'     => $params,
+            'title'      => $this->buildTaskReportTitle($params),
+            'columns'    => $this->taskReportColumns(),
+            'rows'       => $rows,
+            'summary'    => [
+                'tasks'    => count($rows),
+                'duration' => $totalDuration,
+                'hours'    => $totalDuration / 3600,
+            ],
+            'byExecutor' => array_values($byExecutor),
+            'byStatus'   => array_values($byStatus),
+        ];
+    }
+
+    protected function buildTaskReportTitle(array $params)
+    {
+        $parts = ['Отчет'];
+
+        if (!empty($params['cms_company_id'])) {
+            $model = CmsCompany::findOne((int)$params['cms_company_id']);
+            if ($model) {
+                $parts[] = (string)$model->asText;
+            }
+        }
+        if (!empty($params['cms_project_id'])) {
+            $model = CmsProject::findOne((int)$params['cms_project_id']);
+            if ($model) {
+                $parts[] = (string)$model->asText;
+            }
+        }
+        if (!empty($params['cms_user_id'])) {
+            $model = CmsUser::findOne((int)$params['cms_user_id']);
+            if ($model) {
+                $parts[] = (string)$model->asText;
+            }
+        }
+        if (!empty($params['executor_id'])) {
+            $model = CmsUser::findOne((int)$params['executor_id']);
+            if ($model) {
+                $parts[] = (string)$model->asText;
+            }
+        }
+        if (!empty($params['status'])) {
+            $statuses = CmsTask::statuses();
+            $statusNames = [];
+            foreach ((array)$params['status'] as $status) {
+                $statusName = (string)ArrayHelper::getValue($statuses, $status, $status);
+                if ($statusName !== '') {
+                    $statusNames[] = $statusName;
+                }
+            }
+            if ($statusNames) {
+                $parts[] = implode(', ', $statusNames);
+            }
+        }
+        if (!empty($params['period'])) {
+            $parts[] = trim((string)$params['period']);
+        }
+
+        return preg_replace('/\s+/u', ' ', trim(implode(' ', array_filter($parts))));
+    }
+
+    protected function taskReportDownloadName(array $report, $extension)
+    {
+        $title = (string)ArrayHelper::getValue($report, 'title', 'Отчет по задачам');
+        $name = preg_replace('/[<>:"\/\\\\|?*\x00-\x1F]+/u', ' ', $title);
+        $name = preg_replace('/\s+/u', ' ', trim($name));
+        $name = trim($name, " .\t\n\r\0\x0B");
+
+        if ($name === '') {
+            $name = 'Отчет по задачам';
+        }
+        if (function_exists('mb_strlen') && mb_strlen($name, 'UTF-8') > 160) {
+            $name = mb_substr($name, 0, 160, 'UTF-8');
+        }
+
+        return $name.'.'.ltrim((string)$extension, '.');
+    }
+
+    protected function taskReportSheetTitle(array $report)
+    {
+        $title = (string)ArrayHelper::getValue($report, 'title', 'Отчет');
+        $title = preg_replace('/[\[\]\:\*\?\/\\\\]+/u', ' ', $title);
+        $title = preg_replace('/\s+/u', ' ', trim($title));
+        if ($title === '') {
+            $title = 'Отчет';
+        }
+
+        return function_exists('mb_substr') ? mb_substr($title, 0, 31, 'UTF-8') : substr($title, 0, 31);
+    }
+
+    protected function getTaskReportResults(array $taskIds)
+    {
+        if (!$taskIds) {
+            return [];
+        }
+
+        $result = [];
+        $logs = CmsLog::find()
+            ->comments()
+            ->pinned()
+            ->andWhere([
+                'model_code' => CmsTask::class,
+                'model_id'   => $taskIds,
+            ])
+            ->orderBy(['created_at' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        foreach ($logs as $log) {
+            $comment = trim(strip_tags((string)$log->comment));
+            if (!$comment) {
+                continue;
+            }
+            if (!isset($result[$log->model_id])) {
+                $result[$log->model_id] = [];
+            }
+            $result[$log->model_id][] = $comment;
+        }
+
+        foreach ($result as $taskId => $comments) {
+            $result[$taskId] = implode("\n", $comments);
+        }
+
+        return $result;
+    }
+
+    protected function parseTaskReportPeriod($period, $isEnd = false)
+    {
+        $data = preg_split('/\s+-\s+/', (string)$period);
+        $date = trim((string)ArrayHelper::getValue($data, $isEnd ? 1 : 0));
+        if (!$date) {
+            $date = trim((string)ArrayHelper::getValue($data, 0));
+        }
+
+        $timeZone = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+        foreach (['d/m/Y', 'd.m.Y', 'Y-m-d'] as $format) {
+            $dateTime = \DateTime::createFromFormat($format.' H:i:s', $date.' '.($isEnd ? '23:59:59' : '00:00:00'), $timeZone);
+            if ($dateTime instanceof \DateTime && $dateTime->format($format) == $date) {
+                return $dateTime->getTimestamp();
+            }
+        }
+
+        return strtotime($date.' '.($isEnd ? '23:59:59' : '00:00:00'));
+    }
+
+    protected function downloadTaskReportCsv(array $report)
+    {
+        $content = "\xEF\xBB\xBF";
+        $out = fopen('php://temp', 'r+');
+        $columns = (array)ArrayHelper::getValue($report, 'params.columns', []);
+        fputcsv($out, array_values(array_intersect_key($report['columns'], array_flip($columns))), ';');
+
+        foreach ($report['rows'] as $row) {
+            $cells = [];
+            foreach ($columns as $column) {
+                $cells[] = ArrayHelper::getValue($row, $column, '');
+            }
+            fputcsv($out, $cells, ';');
+        }
+
+        rewind($out);
+        $content .= stream_get_contents($out);
+        fclose($out);
+
+        return \Yii::$app->response->sendContentAsFile($content, $this->taskReportDownloadName($report, 'csv'), [
+            'mimeType' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    protected function downloadTaskReportXlsx(array $report)
+    {
+        if (!class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+            return $this->downloadTaskReportCsv($report);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle($this->taskReportSheetTitle($report));
+        $columns = (array)ArrayHelper::getValue($report, 'params.columns', []);
+
+        $columnIndex = 1;
+        foreach ($columns as $column) {
+            $sheet->setCellValueByColumnAndRow($columnIndex, 1, ArrayHelper::getValue($report['columns'], $column, $column));
+            $columnIndex++;
+        }
+
+        $rowIndex = 2;
+        foreach ($report['rows'] as $row) {
+            $columnIndex = 1;
+            foreach ($columns as $column) {
+                $sheet->setCellValueByColumnAndRow($columnIndex, $rowIndex, ArrayHelper::getValue($row, $column, ''));
+                $columnIndex++;
+            }
+            $rowIndex++;
+        }
+
+        foreach (range(1, max(1, count($columns))) as $i) {
+            $sheet->getColumnDimensionByColumn($i)->setAutoSize(true);
+        }
+
+        $file = \Yii::getAlias('@runtime').DIRECTORY_SEPARATOR.'task-report-'.time().'.xlsx';
+        (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet))->save($file);
+
+        $response = \Yii::$app->response->sendFile($file, $this->taskReportDownloadName($report, 'xlsx'));
+        $response->on(Response::EVENT_AFTER_SEND, function () use ($file) {
+            @unlink($file);
+        });
+
+        return $response;
+    }
+
+    protected function downloadTaskReportPdf(array $report)
+    {
+        if (!class_exists('\Mpdf\Mpdf')) {
+            return $this->downloadTaskReportCsv($report);
+        }
+
+        $html = $this->renderPartial('report-pdf', [
+            'report' => $report,
+        ]);
+
+        $tempDir = \Yii::getAlias('@runtime/mpdf');
+        if (!is_dir($tempDir)) {
+            @mkdir($tempDir, 0777, true);
+        }
+
+        $mpdf = new \Mpdf\Mpdf([
+            'tempDir' => $tempDir,
+            'format'  => 'A4-L',
+        ]);
+        $mpdf->SetTitle((string)ArrayHelper::getValue($report, 'title', 'Отчет по задачам'));
+        $mpdf->WriteHTML($html);
+
+        return \Yii::$app->response->sendContentAsFile($mpdf->Output('', 'S'), $this->taskReportDownloadName($report, 'pdf'), [
+            'mimeType' => 'application/pdf',
+        ]);
     }
 
     public function updateFields($action)

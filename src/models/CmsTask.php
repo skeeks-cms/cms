@@ -716,7 +716,7 @@ class CmsTask extends ActiveRecord
      */
     public function getCmsUser()
     {
-        return $this->hasOne(CmsCompany::class, ['id' => 'cms_user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']);
     }
 
     /**
