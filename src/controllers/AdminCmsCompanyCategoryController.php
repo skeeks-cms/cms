@@ -10,16 +10,19 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\models\CmsCompany2category;
 use skeeks\cms\models\CmsCompanyCategory;
 use skeeks\cms\models\CmsCompanyStatus;
 use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsDealType;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -60,10 +63,45 @@ class AdminCmsCompanyCategoryController extends BackendModelStandartController
                         'actions',
                         'name',
                         'sort',
+                        'countCompanies',
                     ],
                     'columns'        => [
                         'name' => [
                             'class' => DefaultActionColumn::class,
+                        ],
+                        'countCompanies' => [
+                            'attribute'            => 'countCompanies',
+                            'format'               => 'raw',
+                            'label'                => \Yii::t('skeeks/cms', 'Где используется'),
+                            'contentOptions'       => [
+                                'style' => 'max-width: 120px;',
+                            ],
+                            'headerOptions'        => [
+                                'style' => 'max-width: 120px;',
+                            ],
+                            'beforeCreateCallback' => function (GridView $gridView) {
+                                $query = $gridView->dataProvider->query;
+
+                                $countCompaniesQuery = CmsCompany2category::find()
+                                    ->select([new Expression("count(1)")])
+                                    ->andWhere([
+                                        'cms_company_category_id' => new Expression(CmsCompanyCategory::tableName().".id"),
+                                    ]);
+
+                                $query->addSelect([
+                                    'countCompanies' => $countCompaniesQuery,
+                                ]);
+
+                                $gridView->sortAttributes['countCompanies'] = [
+                                    'asc'     => ['countCompanies' => SORT_ASC],
+                                    'desc'    => ['countCompanies' => SORT_DESC],
+                                    'label'   => \Yii::t('skeeks/cms', 'Где используется'),
+                                    'default' => SORT_ASC,
+                                ];
+                            },
+                            'value'                => function (CmsCompanyCategory $model) {
+                                return $model->raw_row['countCompanies'];
+                            },
                         ],
                     ],
                 ],
