@@ -12,8 +12,11 @@ use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsTelephonyCall;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\data\ActiveDataProvider;
@@ -46,6 +49,15 @@ class AdminCmsTelephonyCallController extends BackendModelStandartController
 
             'index' => [
                 'on beforeRender' => function (Event $e) {
+                    \Yii::$app->view->registerCss(<<<CSS
+audio.sx-call-audio::-webkit-media-controls-mute-button,
+audio.sx-call-audio::-webkit-media-controls-volume-slider,
+audio.sx-call-audio::-webkit-media-controls-volume-control-container {
+    display: none !important;
+}
+CSS
+                    );
+
                     /*$e->content = Alert::widget([
                         'closeButton' => false,
                         'options'     => [
@@ -65,17 +77,41 @@ HTML
                 "filters"         => [
                     'visibleFilters' => [
                         'q',
-                        //'date',
+                        'date',
                         'cms_telephony_provider_id',
                         'cms_worker_user_id',
 
                         'cms_company_id',
-                        'cms_user_id',
 
                         'status',
                     ],
                     'filtersModel' => [
+                        'rules' => [
+                            ['date', 'safe'],
+                        ],
+                        'attributeDefines' => [
+                            'date',
+                        ],
                         'fields' => [
+
+                            'date' => [
+                                'class'       => WidgetField::class,
+                                'widgetClass' => DaterangeInputWidget::class,
+                                'widgetConfig' => [
+                                    'options' => [
+                                        'placeholder' => 'Диапазон дат',
+                                    ],
+                                ],
+                                'label' => 'Дата',
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    if ($e->field->value && ($range = DaterangeInputWidget::parseRange($e->field->value))) {
+                                        [$start, $end] = $range;
+                                        $createdAt = CmsTelephonyCall::tableName().'.created_at';
+                                        $e->dataProvider->query->andWhere(['>=', $createdAt, $start]);
+                                        $e->dataProvider->query->andWhere(['<=', $createdAt, $end]);
+                                    }
+                                },
+                            ],
 
                             'status' => [
                                 'defaultMode'       => FilterModeEq::ID,
@@ -162,13 +198,8 @@ HTML
                         'actions',
 
                         'created_at',
-                        'direction',
-                        'from',
-                        'to',
-                        /*'custom',
-                        'phones',*/
+                        'custom',
 
-                        'status',
                         'duration',
                     ],
 
@@ -334,91 +365,74 @@ HTML
                             'label'  => 'Звонок',
                             'format' => 'raw',
                             'value'  => function (CmsTelephonyCall $call) {
-
-                                $result = [];
-
-                                if ($call->isIncoming()) {
-
-                                    //сначала клиент
-                                    $data = [];
-                                    if ($call->company) {
-
-                                        $data[] = AjaxControllerActionsWidget::widget([
-                                            'controllerId' => '/cms/admin-cms-company',
-                                            'modelId'      => $call->company->id,
-                                            'content'      => '<i class="fas fa-users"></i> '.$call->company->asText,
-                                            'options'      => [
-                                                'style' => 'text-align: left;',
-                                            ],
-                                        ]);
-
-                                    } elseif ($call->user) {
-                                        $data[] = AjaxControllerActionsWidget::widget([
-                                            'controllerId' => '/cms/admin-user',
-                                            'modelId'      => $call->user->id,
-                                            'content'      => '<i class="fas fa-users"></i> '.$call->user->asText,
-                                            'options'      => [
-                                                'style' => 'text-align: left;',
-                                            ],
-                                        ]);
-                                    } else {
-                                        $data[] = $call->client_phone;
-                                    }
-
-                                    if ($call->workerUser) {
-                                        $data[] = \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
-                                            'user'    => $call->workerUser,
-                                            'isSmall' => true,
-                                        ]);
-                                    } else {
-                                        $data[] = $call->provider_phone_to;
-                                    }
-
-
+                                if ($call->workerUser) {
+                                    $worker = \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
+                                        'user'    => $call->workerUser,
+                                        'isSmall' => true,
+                                    ]);
                                 } else {
-
-                                    $data = [];
-
-
-                                    if ($call->workerUser) {
-                                        $data[] = \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
-                                            'user'    => $call->workerUser,
-                                            'isSmall' => true,
-                                        ]);
-                                    } else {
-                                        $data[] = $call->provider_phone_from;
-                                    }
-
-                                    if ($call->company) {
-
-                                        $data[] = AjaxControllerActionsWidget::widget([
-                                            'controllerId' => '/cms/admin-cms-company',
-                                            'modelId'      => $call->company->id,
-                                            'content'      => '<i class="fas fa-users"></i> '.$call->company->asText,
-                                            'options'      => [
-                                                'style' => 'text-align: left;',
-                                            ],
-                                        ]);
-
-                                    } elseif ($call->user) {
-                                        $data[] = AjaxControllerActionsWidget::widget([
-                                            'controllerId' => '/cms/admin-user',
-                                            'modelId'      => $call->user->id,
-                                            'content'      => '<i class="fas fa-users"></i> '.$call->user->asText,
-                                            'options'      => [
-                                                'style' => 'text-align: left;',
-                                            ],
-                                        ]);
-                                    } else {
-                                        $data[] = $call->client_phone;
-                                    }
-
-
+                                    $workerPhone = $call->isIncoming()
+                                        ? $call->provider_phone_to
+                                        : $call->provider_phone_from;
+                                    $worker = Html::encode($workerPhone);
                                 }
 
-                                return "<div style='display: flex;'>".implode(" → ", $data)."</div>";
+                                if ($call->company) {
+                                    $client = AjaxControllerActionsWidget::widget([
+                                        'controllerId' => '/cms/admin-cms-company',
+                                        'modelId'      => $call->company->id,
+                                        'isRunFirstActionOnClick' => true,
+                                        'content'      => '<i class="fas fa-users"></i> '.$call->company->asText,
+                                        'options'      => [
+                                            'style' => 'text-align: left;',
+                                        ],
+                                    ]);
+                                } elseif ($call->user) {
+                                    $client = AjaxControllerActionsWidget::widget([
+                                        'controllerId' => '/cms/admin-user',
+                                        'modelId'      => $call->user->id,
+                                        'isRunFirstActionOnClick' => true,
+                                        'content'      => '<i class="fas fa-users"></i> '.$call->user->asText,
+                                        'options'      => [
+                                            'style' => 'text-align: left;',
+                                        ],
+                                    ]);
+                                } else {
+                                    $client = Html::encode($call->client_phone);
+                                }
 
+                                $workerPhone = $call->provider_user_num ?: ($call->isIncoming()
+                                    ? $call->provider_phone_to
+                                    : $call->provider_phone_from);
 
+                                $workerMeta = array_filter([
+                                    $workerPhone,
+                                    $call->provider ? $call->provider->name : null,
+                                ]);
+
+                                $worker = Html::tag('div', $worker.Html::tag('div', Html::encode(implode(' · ', $workerMeta)), [
+                                    'style' => 'color: gray; font-size: 11px;',
+                                ]), [
+                                    'style' => 'width: 240px; min-width: 240px;',
+                                ]);
+
+                                $client = Html::tag('div', $client.Html::tag('div', Html::encode($call->client_phone), [
+                                    'style' => 'color: gray; font-size: 11px;',
+                                ]), [
+                                    'style' => 'min-width: 0;',
+                                ]);
+
+                                $arrow = $call->isIncoming() ? '←' : '→';
+                                $direction = $call->isIncoming() ? 'Входящий' : 'Исходящий';
+                                $arrow = Html::tag('span', $arrow, [
+                                    'title'      => $direction,
+                                    'aria-label' => $direction,
+                                    'style'      => 'font-size: 22px; color: #6c757d; margin: 0 20px;',
+                                ]);
+
+                                return Html::tag('div', $worker.$arrow.$client, [
+                                    'style' => 'display: flex; align-items: center; min-width: 0;',
+                                ]);
                             },
                         ],
 
@@ -426,52 +440,38 @@ HTML
                             'class' => DateTimeColumnData::class,
                         ],
 
-                        'status' => [
+                        'duration' => [
                             'headerOptions' => [
-                                'style' => ['width' => '160px;'],
+                                'style' => ['width' => '320px;'],
                             ],
                             'format'        => 'raw',
                             'value'         => function (CmsTelephonyCall $call) {
-                                $data = [];
-
-                                $color = match ($call->status) {
-                                    CmsTelephonyCall::STATUS_ANSWERED => 'green',
-                                    CmsTelephonyCall::STATUS_FAILED => 'red',
-                                    CmsTelephonyCall::STATUS_CONVERSATION => 'orange',
-                                    CmsTelephonyCall::STATUS_RINGING => 'orange',
-                                    default => 'gray',
-                                };
-
-                                $data[] = Html::tag('div', $call->statusAsText, [
-                                    'style' => "color: {$color}; font-weight: bold;",
-                                ]);
-
-                                if ($call->provider) {
-                                    $data[] = Html::tag('div', $call->provider->name, [
-                                        'style' => 'font-size: 10px; color: gray;',
+                                if ($call->status !== CmsTelephonyCall::STATUS_ANSWERED) {
+                                    $color = $call->status === CmsTelephonyCall::STATUS_FAILED ? 'red' : 'orange';
+                                    return Html::tag('span', $call->statusAsText, [
+                                        'style' => "color: {$color}; font-weight: bold;",
                                     ]);
+                                }
+
+                                $duration = $call->getDurationFormatted();
+                                if ($duration === '00:00:00') {
+                                    return '';
                                 }
 
                                 if ($call->cms_record_file_id) {
-                                    $data[] = Html::a('▶ запись', $call->cmsRecordFile->src, [
-                                        'target' => '_blank',
-                                        'data' => [
-                                            'pjax' => 0
-                                        ],
-                                        'style'  => 'font-size: 11px; display: block;',
+                                    return Html::tag('audio', '', [
+                                        'class'      => 'sx-call-audio',
+                                        'controls'   => true,
+                                        'preload'    => 'metadata',
+                                        'src'        => $call->cmsRecordFile->src,
+                                        'style'      => 'display: block; width: 300px; max-width: 100%; height: 32px;',
+                                        'aria-label' => 'Запись звонка',
+                                        'onloadedmetadata' => 'this.volume = 1;',
+                                        'onvolumechange'   => 'if (this.volume !== 1) { this.volume = 1; }',
                                     ]);
                                 }
 
-                                return implode('', $data);
-                            },
-                        ],
-
-                        'duration' => [
-                            'headerOptions' => [
-                                'style' => ['width' => '90px;'],
-                            ],
-                            'value'         => function (CmsTelephonyCall $call) {
-                                return $call->getDurationFormatted();
+                                return $duration;
                             },
                         ],
 
