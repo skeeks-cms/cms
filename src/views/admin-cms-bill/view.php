@@ -58,6 +58,38 @@ $entityLink = function ($controllerId, $entity, $title, $subtitle = '', $icon = 
     ]);
 };
 
+$relatedPill = static function ($controllerId, $entity, $title, $subtitle, $icon, $class = '', array $colors = []) {
+    $style = '';
+    if ($colors) {
+        $style = 'color: '.Html::encode($colors['text'])
+            .'; background: '.Html::encode($colors['background'])
+            .'; border-color: '.Html::encode($colors['border']).';';
+    }
+
+    $content = '<span class="sx-bill-related-pill '.$class.'" style="'.$style.'">'
+        .'<i class="'.$icon.'"></i>'
+        .'<span><strong>'.Html::encode($title).'</strong>';
+
+    if ($subtitle) {
+        $content .= '<small>'.Html::encode($subtitle).'</small>';
+    }
+
+    $content .= '</span></span>';
+
+    return AjaxControllerActionsWidget::widget([
+        'controllerId'            => $controllerId,
+        'modelId'                 => $entity->id,
+        'isRunFirstActionOnClick' => true,
+        'content'                 => $content,
+        'options'                 => [
+            'class' => 'sx-bill-related-link',
+        ],
+    ]);
+};
+
+$payments = $model->payments;
+$documents = $model->documents;
+
 $billItems = $model->printableBillItems;
 $hasItemDiscounts = false;
 foreach ($billItems as $billItem) {
@@ -78,21 +110,96 @@ $billDiscountMoney = new \skeeks\cms\money\Money($model->discount_amount, (strin
 $this->registerCss(<<<CSS
 .sx-bill-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 0;
+    padding: 12px 28px;
+    border-bottom: 1px solid #edf0f2;
 }
-.sx-bill-actions-main,
-.sx-bill-actions-extra {
+.sx-bill-actions-main {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
+    margin-left: auto;
 }
-.sx-bill-actions .btn i,
-.sx-bill-actions .btn .glyphicon {
+.sx-bill-actions .btn i {
     margin-right: 5px;
+}
+.sx-bill-related {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+.sx-bill-related-link {
+    display: inline-flex;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+.sx-bill-related-link:hover,
+.sx-bill-related-link:focus {
+    color: inherit;
+    text-decoration: none;
+    outline: none;
+}
+.sx-bill-related-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 7px 11px;
+    border: 1px solid #dbe2e8;
+    border-radius: 7px;
+    background: #f8fafb;
+    color: #34424e;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.sx-bill-related-pill.is-payment {
+    color: #18703a;
+    border-color: #cce8d6;
+    background: #eaf7ef;
+}
+.sx-bill-related-pill.is-closed {
+    color: #18703a;
+    border-color: #cce8d6;
+    background: #eaf7ef;
+}
+.sx-bill-related-pill.is-open {
+    color: #806000;
+    border-color: #f0dfa7;
+    background: #fff7df;
+}
+.sx-bill-related-link:hover .sx-bill-related-pill,
+.sx-bill-related-link:focus .sx-bill-related-pill {
+    box-shadow: 0 5px 16px rgba(31, 82, 130, .1);
+    transform: translateY(-1px);
+}
+.sx-bill-related-pill > i {
+    flex: 0 0 auto;
+}
+.sx-bill-related-pill span {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+.sx-bill-related-pill strong {
+    font-size: 13px;
+    font-weight: 600;
+}
+.sx-bill-related-pill small {
+    margin-top: 3px;
+    color: inherit;
+    font-size: 11px;
+    opacity: .78;
+}
+.sx-bill-card-footer-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 .sx-bill-action-form {
     margin: 0;
@@ -102,60 +209,6 @@ $this->registerCss(<<<CSS
     border: 1px solid #e3e7eb;
     border-radius: 10px;
     overflow: hidden;
-}
-.sx-bill-card-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 24px 28px;
-    border-bottom: 1px solid #edf0f2;
-}
-.sx-bill-title {
-    margin: 0 0 8px;
-    font-size: 28px;
-    font-weight: 600;
-}
-.sx-bill-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    color: #8a929a;
-}
-.sx-bill-status {
-    align-self: flex-end;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-.sx-bill-status-box {
-    display: flex;
-    align-items: flex-end;
-    flex-direction: column;
-    gap: 8px;
-}
-.sx-bill-due {
-    color: #6f5100;
-    font-weight: 600;
-    white-space: nowrap;
-}
-.sx-bill-due i {
-    margin-right: 4px;
-}
-.sx-bill-due.is-paid {
-    color: #087a2f;
-}
-.sx-bill-status.is-paid {
-    color: #087a2f;
-    background: #e8f7ee;
-}
-.sx-bill-status.is-closed {
-    color: #a51d1d;
-    background: #fdecec;
-}
-.sx-bill-status.is-waiting {
-    color: #6f5100;
-    background: #fff4cc;
 }
 .sx-bill-section {
     padding: 22px 28px;
@@ -329,13 +382,16 @@ $this->registerCss(<<<CSS
     overflow-wrap: anywhere;
 }
 @media (max-width: 900px) {
-    .sx-bill-actions,
-    .sx-bill-card-header {
-        align-items: flex-start;
+    .sx-bill-actions {
+        align-items: stretch;
         flex-direction: column;
     }
-    .sx-bill-status-box {
-        align-items: flex-start;
+    .sx-bill-actions-main {
+        justify-content: flex-start;
+        margin-left: 0;
+    }
+    .sx-bill-related {
+        width: 100%;
     }
     .sx-bill-entities,
     .sx-bill-requisites {
@@ -389,70 +445,61 @@ $this->registerJs(<<<JS
 JS
 );
 
-$statusClass = 'is-waiting';
-$statusText = 'Ожидает оплаты';
-if ($model->closed_at) {
-    $statusClass = 'is-closed';
-    $statusText = 'Отменен';
-} elseif ($model->paid_at) {
-    $statusClass = 'is-paid';
-    $statusText = 'Оплачен';
-}
 ?>
 
 <div class="sx-bill-view">
-    <div class="sx-bill-actions">
-        <div class="sx-bill-actions-main">
-            <button type="button" class="btn btn-primary" data-sx-bill-share>
-                <i class="fa fa-link"></i> Поделиться
-            </button>
-            <a href="<?= Html::encode($publicUrl); ?>" class="btn btn-default" target="_blank">
-                <span class="glyphicon glyphicon-new-window"></span> Открыть
-            </a>
-            <a href="<?= Html::encode($pdfUrl); ?>" class="btn btn-default" target="_blank">
-                <span class="glyphicon glyphicon-download-alt"></span> Скачать PDF
-            </a>
-            <?php if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) : ?>
-                <a href="<?= Html::encode($pdfNoSignatureUrl); ?>" class="btn btn-default" target="_blank">
-                    <span class="glyphicon glyphicon-download-alt"></span> PDF без подписей
-                </a>
-            <?php endif; ?>
-            <button type="button" class="btn btn-default" onclick="window.print();">
-                <i class="fa fa-print"></i> Печать
-            </button>
-        </div>
-        <div class="sx-bill-actions-extra">
-            <?php if (!$model->paid_at && !$model->closed_at) : ?>
-                <?= Html::beginForm($closeUrl, 'post', ['class' => 'sx-bill-action-form']); ?>
-                    <?= Html::submitButton('<i class="fa fa-ban"></i> Отменить счет', [
-                        'class' => 'btn btn-default',
-                        'data' => [
-                            'confirm' => 'Отменить этот счет?',
-                        ],
-                    ]); ?>
-                <?= Html::endForm(); ?>
-            <?php endif; ?>
-        </div>
-    </div>
-
     <div class="sx-bill-card">
-        <div class="sx-bill-card-header">
-            <div>
-                <h2 class="sx-bill-title"><?= Html::encode($model->asText); ?></h2>
-                <div class="sx-bill-meta">
-                    <span><i class="fa fa-key"></i> <?= (int)$model->id; ?></span>
-                    <span><i class="fa fa-calendar"></i> <?= \Yii::$app->formatter->asDate($model->created_at); ?></span>
-                    <?php if ($model->billPaySystemName) : ?>
-                        <span><i class="fa fa-credit-card"></i> <?= Html::encode($model->billPaySystemName); ?></span>
+        <div class="sx-bill-actions">
+            <?php if ($payments || $documents) : ?>
+                <div class="sx-bill-related">
+                    <?php if ($documents) : ?>
+                        <span class="sx-bill-related-pill <?= $model->isClosedByDocuments ? 'is-closed' : 'is-open'; ?>">
+                            <i class="fa <?= $model->isClosedByDocuments ? 'fa-check' : 'fa-clock'; ?>"></i>
+                            <span>
+                                <strong><?= $model->isClosedByDocuments ? 'Закрыт документами' : 'Не закрыт документами'; ?></strong>
+                                <?php if (!$model->isClosedByDocuments) : ?>
+                                    <small>Осталось закрыть: <?= Html::encode((string)$model->documentBalanceMoney); ?></small>
+                                <?php endif; ?>
+                            </span>
+                        </span>
                     <?php endif; ?>
+                    <?php foreach ($payments as $payment) : ?>
+                        <?= $relatedPill(
+                            '/shop/admin-payment',
+                            $payment,
+                            'Платеж №'.$payment->id,
+                            (string)$payment->money.' · '.Yii::$app->formatter->asDate($payment->created_at),
+                            'fa fa-check',
+                            'is-payment'
+                        ); ?>
+                    <?php endforeach; ?>
+                    <?php foreach ($documents as $document) : ?>
+                        <?= $relatedPill(
+                            '/cms/admin-cms-document',
+                            $document,
+                            $document->typeAsText.' №'.$document->number,
+                            $document->statusAsText.' · '.Yii::$app->formatter->asDate($document->issued_at ?: $document->created_at),
+                            $document->statusIcon,
+                            '',
+                            $document->statusColors
+                        ); ?>
+                    <?php endforeach; ?>
                 </div>
-            </div>
-            <div class="sx-bill-status-box">
-                <div class="sx-bill-status <?= $statusClass; ?>"><?= Html::encode($statusText); ?></div>
-                <?php if ($model->paid_at) : ?>
-                    <div class="sx-bill-due is-paid"><i class="fa fa-check"></i> Оплачен <?= \Yii::$app->formatter->asDate($model->paid_at); ?></div>
-                <?php elseif (!$model->closed_at && $model->due_at) : ?>
-                    <div class="sx-bill-due"><i class="fa fa-calendar"></i> Оплатить до <?= \Yii::$app->formatter->asDate($model->due_at); ?></div>
+            <?php endif; ?>
+            <div class="sx-bill-actions-main">
+                <button type="button" class="btn btn-default" data-sx-bill-share>
+                    <i class="fa fa-link"></i> Поделиться
+                </button>
+                <a href="<?= Html::encode($publicUrl); ?>" class="btn btn-default" target="_blank">
+                    <i class="fa fa-external-link-alt"></i> Открыть
+                </a>
+                <a href="<?= Html::encode($pdfUrl); ?>" class="btn btn-default" target="_blank">
+                    <i class="fa fa-file-pdf"></i> Скачать PDF
+                </a>
+                <?php if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) : ?>
+                    <a href="<?= Html::encode($pdfNoSignatureUrl); ?>" class="btn btn-default" target="_blank">
+                        <i class="fa fa-file-download"></i> PDF без подписей
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
@@ -562,6 +609,19 @@ if ($model->closed_at) {
                         <?= $entityLink('/cms/admin-cms-deal', $deal, 'Сделка', '', 'fa fa-file'); ?>
                     <?php endforeach; ?>
                 </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!$model->paid_at && !$model->closed_at) : ?>
+            <div class="sx-bill-section sx-bill-card-footer-actions">
+                <?= Html::beginForm($closeUrl, 'post', ['class' => 'sx-bill-action-form']); ?>
+                    <?= Html::submitButton('<i class="fa fa-ban"></i> Отменить счет', [
+                        'class' => 'btn btn-default',
+                        'data' => [
+                            'confirm' => 'Отменить этот счет?',
+                        ],
+                    ]); ?>
+                <?= Html::endForm(); ?>
             </div>
         <?php endif; ?>
     </div>

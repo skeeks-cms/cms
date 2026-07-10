@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelCreateAction;
+use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
@@ -48,12 +49,18 @@ class AdminCmsContractorController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = \Yii::t('skeeks/cms', "Юр. Лица");
+        $this->name = \Yii::t('skeeks/cms', "Реквизиты");
         $this->modelShowAttribute = "asText";
         $this->modelClassName = CmsContractor::class;
 
         $this->generateAccessActions = false;
         $this->permissionName = 'cms/admin-company';
+
+        $this->modelHeader = function () {
+            return $this->renderPartial("@skeeks/cms/views/admin-cms-contractor/_model_header", [
+                'model' => $this->model,
+            ]);
+        };
 
         parent::init();
     }
@@ -64,6 +71,13 @@ class AdminCmsContractorController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+            'view' => [
+                'class'       => BackendModelAction::class,
+                'name'        => 'Реквизиты',
+                'icon'        => 'fa fa-id-card',
+                'priority'    => 1,
+                'defaultView' => '@skeeks/cms/views/admin-cms-contractor/view',
+            ],
             'index'  => [
 
                 'on beforeRender' => function (Event $e) {
@@ -174,7 +188,7 @@ HTML
             'bankData' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Банковские реквизиты',
-                'priority' => 500,
+                'priority' => 20,
                 'callback' => [$this, 'bankData'],
                 'icon'     => 'far fa-file-alt',
 
@@ -191,7 +205,13 @@ HTML
                 'fields' => [$this, 'updateFields'],
             ],
             "update" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'   => [$this, 'updateFields'],
+                'priority' => 10,
+            ],
+            'log' => [
+                'class'    => BackendModelLogAction::class,
+                'name'     => 'Активность',
+                'priority' => 100,
             ],
         ]);
     }

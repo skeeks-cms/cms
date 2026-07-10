@@ -13,6 +13,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
@@ -27,6 +28,7 @@ use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsDealType;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
+use skeeks\cms\shop\models\ShopDocument;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -93,6 +95,16 @@ class AdminCmsDealController extends BackendModelStandartController
                 'priority' => 450,
                 'callback' => [$this, 'bills'],
                 'icon'     => 'fas fa-credit-card',
+            ],
+            'documents' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Документы',
+                'priority' => 500,
+                'callback' => [$this, 'documents'],
+                'icon'     => 'fas fa-file-signature',
+            ],
+            'log' => [
+                'class' => BackendModelLogAction::class,
             ],
             /*'acts'     => [
                 'class'    => BackendModelAction::class,
@@ -343,7 +355,11 @@ CSS
                                     );
                                 }
                                 $reuslt .= "<small style='color: gray;'>{$cmsDeal->dealType->name}</small><br />";
-                                $reuslt .= Html::a($cmsDeal->asShortText, ['/crm/crm-deal/view', 'pk' => $cmsDeal->id], ['data-pjax' => 0, 'class' => 'sx-trigger-action',]);
+                                $reuslt .= Html::a($cmsDeal->asShortText, ['/crm/crm-deal/view', 'pk' => $cmsDeal->id], [
+                                    'data-pjax' => 0,
+                                    'class'     => 'sx-trigger-action',
+                                    'style'     => 'font-size: 15px;',
+                                ]);
                                 $reuslt .= "<br />";
 
                                 if ($cmsDeal->end_at) {
@@ -814,6 +830,65 @@ JS
 
                 });
 
+
+                return $indexAction->run();
+            }
+        }
+
+        throw new ForbiddenHttpException("Нет доступа к разделу");
+    }
+
+
+    public function documents()
+    {
+        if ($controller = \Yii::$app->createController('/cms/admin-cms-document')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey'         => $this->action->uniqueId,
+                    'backendShowingKey' => $this->action->uniqueId,
+                    'url'               => $this->action->urlData,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->backendShowings = false;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    $dataProvider = $e->sender->dataProvider;
+                    $dataProvider->query->forManager();
+                    $dataProvider->query->joinWith('deals as deals');
+                    $dataProvider->query->andWhere(['deals.id' => $this->model->id]);
+                    $dataProvider->query->groupBy(ShopDocument::tableName().'.id');
+                };
+
+                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
+                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        /** @var CmsDeal $model */
+                        $model = $this->model;
+                        $createAction = clone $createAction;
+                        $createAction->url = ArrayHelper::merge($createAction->urlData, [
+                            'ShopDocument' => [
+                                'deals'          => [$model->id],
+                                'cms_company_id' => $model->cms_company_id ?: '',
+                                'cms_user_id'    => $model->cms_user_id ?: '',
+                            ],
+                        ]);
+                        $createAction->name = 'Создать документ';
+
+                        $event->content = ControllerActionsWidget::widget([
+                            'actions'      => [$createAction],
+                            'minViewCount' => 1,
+                            'itemTag'      => 'button',
+                            'itemOptions'  => ['class' => 'btn btn-primary'],
+                        ]).'<br>';
+                    }
+                });
 
                 return $indexAction->run();
             }

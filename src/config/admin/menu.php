@@ -344,6 +344,12 @@ return array_merge(dashboardsMenu(), [
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/bill.svg'],
                 "url"      => ["cms/admin-cms-bill"],
             ],
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Документы'),
+                'priority' => 216,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/bill.svg'],
+                "url"      => ["cms/admin-cms-document"],
+            ],
 
             [
                 "label" => \Yii::t('skeeks/cms', 'Реквизиты'),

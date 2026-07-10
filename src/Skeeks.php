@@ -31,6 +31,7 @@ use skeeks\cms\models\CmsWebNotify;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopBonusTransaction;
 use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopDocument;
 use skeeks\cms\shop\models\ShopPayment;
 use skeeks\modules\cms\form2\cmsWidgets\form2\FormWidget;
 use yii\base\BootstrapInterface;
@@ -374,6 +375,11 @@ class Skeeks extends Component implements BootstrapInterface
             'name'       => 'Счета',
             'name_one'   => 'Счет',
             'controller' => 'cms/admin-cms-bill',
+        ],
+        ShopDocument::class        => [
+            'name'       => 'Документы',
+            'name_one'   => 'Документ',
+            'controller' => 'cms/admin-cms-document',
         ],
         ShopPayment::class        => [
             'name'       => 'Платежи',

@@ -34,6 +34,9 @@ use skeeks\cms\money\Money;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\queries\ShopBillQuery;
 use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopDocument;
+use skeeks\cms\shop\models\ShopDocument2bill;
+use skeeks\cms\shop\models\ShopDocumentItem;
 use skeeks\cms\shop\models\ShopPaySystem;
 use skeeks\cms\shop\paysystem\BankTransferPaysystemHandler;
 use skeeks\cms\widgets\AjaxSelect;
@@ -71,6 +74,12 @@ class AdminCmsBillController extends BackendModelStandartController
         $this->permissionName = 'cms/admin-company';
 
         $this->generateAccessActions = false;
+
+        $this->modelHeader = function () {
+            return $this->renderPartial("@skeeks/cms/views/admin-cms-bill/_model_header", [
+                'model' => $this->model,
+            ]);
+        };
 
         parent::init();
     }
@@ -111,6 +120,13 @@ class AdminCmsBillController extends BackendModelStandartController
                 'callback' => [$this, 'payments'],
                 'icon'     => 'fa fa-credit-card',
             ],
+            'documents' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Документы',
+                'priority' => 30,
+                'callback' => [$this, 'documents'],
+                'icon'     => 'fa fa-file-signature',
+            ],
             'close' => [
                 'class'          => BackendModelAction::class,
                 'name'           => 'Отменить счет',
@@ -140,6 +156,7 @@ class AdminCmsBillController extends BackendModelStandartController
                         'paid',
                         'crated',
                         'paidat',
+                        'documents',
                     ],
 
                     'filtersModel' => [
@@ -149,10 +166,12 @@ class AdminCmsBillController extends BackendModelStandartController
                             ['ready', 'safe'],
                             ['crated', 'safe'],
                             ['paid', 'safe'],
+                            ['documents', 'safe'],
                         ],
                         'attributeDefines' => [
                             'q',
                             'paid',
+                            'documents',
                             'crated',
                             'paidat',
                         ],
@@ -250,6 +269,36 @@ class AdminCmsBillController extends BackendModelStandartController
                                         $query->andWhere([
                                             "is not", ShopBill::tableName().'.closed_at', null,
                                         ]);
+                                    }
+                                },
+                            ],
+
+                            'documents' => [
+                                'class'    => SelectField::class,
+                                'multiple' => false,
+                                'label'    => 'Закрывающие документы',
+                                'items'    => [
+                                    'no_documents' => 'Без актов/УПД',
+                                    'not_closed'   => 'Не закрыты документами',
+                                    'closed'       => 'Закрыты документами',
+                                    'has_documents'=> 'Есть документы',
+                                ],
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /** @var ActiveQuery $query */
+                                    $query = $e->dataProvider->query;
+                                    if (!$e->field->value) {
+                                        return;
+                                    }
+
+                                    $amountSql = $this->closingDocumentsAmountSql();
+                                    if ($e->field->value == 'no_documents') {
+                                        $query->andWhere(new Expression("{$amountSql} <= 0"));
+                                    } elseif ($e->field->value == 'not_closed') {
+                                        $query->andWhere(new Expression("{$amountSql} < ".ShopBill::tableName().".amount"));
+                                    } elseif ($e->field->value == 'closed') {
+                                        $query->andWhere(new Expression("{$amountSql} >= ".ShopBill::tableName().".amount"));
+                                    } elseif ($e->field->value == 'has_documents') {
+                                        $query->andWhere(new Expression("{$amountSql} > 0"));
                                     }
                                 },
                             ],
@@ -352,11 +401,10 @@ class AdminCmsBillController extends BackendModelStandartController
                         //'type',
 
                         'amount',
-                        
-                        'cms_company_id',
-                        'cms_user_id',
 
-                        'sender_contractor_id',
+                        'documents',
+
+                        'client',
 
                         //'receiver_crm_contractor_id',
 
@@ -371,6 +419,37 @@ class AdminCmsBillController extends BackendModelStandartController
                         'amount' => [
                             'value' => function (ShopBill $ShopBill) {
                                 return (string)$ShopBill->money;
+                            },
+                        ],
+
+                        'documents' => [
+                            'label' => 'Документы',
+                            'format' => 'raw',
+                            'value' => function (ShopBill $ShopBill) {
+                                $result = [];
+
+                                if ($ShopBill->isClosedByDocuments && $ShopBill->amount > 0) {
+                                    $result[] = '<small style="display:block;margin-bottom:4px;color:#087a2f;font-weight:600;"><i class="fa fa-check"></i> Закрыт</small>';
+                                } elseif ($ShopBill->documentedAmount > 0) {
+                                    $result[] = '<small style="display:block;margin-bottom:4px;color:#a66a00;">Осталось закрыть: '.Html::encode((string)$ShopBill->documentBalanceMoney).'</small>';
+                                }
+
+                                foreach ($ShopBill->closingDocuments as $document) {
+                                    $result[] = AjaxControllerActionsWidget::widget([
+                                        'controllerId' => '/cms/admin-cms-document',
+                                        'modelId'      => $document->id,
+                                        'content'      => '<i class="far fa-file"></i> '.Html::encode($document->asText()),
+                                        'options'      => [
+                                            'style' => 'text-align: left;',
+                                        ],
+                                    ]);
+                                }
+
+                                if (!$result) {
+                                    $result[] = '<span class="text-muted">Нет</span>';
+                                }
+
+                                return implode('', $result);
                             },
                         ],
 
@@ -509,58 +588,45 @@ CSS
                         ],
 
 
-                        'sender_contractor_id' => [
-                            'value' => function (ShopBill $crmDeal) {
+                        'client' => [
+                            'label'  => 'Клиент / плательщик',
+                            'format' => 'raw',
+                            'value'  => function (ShopBill $shopBill) {
+                                $result = [];
 
-                                if ($crmDeal->sender_contractor_id) {
-                                    return AjaxControllerActionsWidget::widget([
-                                        'controllerId' => '/cms/admin-cms-contractor',
-                                        'modelId'      => $crmDeal->senderContractor->id,
-                                        'content'      => '<i class="far fa-user"></i> '.$crmDeal->senderContractor->asText,
-                                        'options'      => [
-                                            'style' => 'text-align: left;',
-                                        ],
-                                    ]);
-                                }
-                                return '';
-                                
-
-                            },
-                        ],
-                        'cms_company_id' => [
-                            'value' => function (ShopBill $crmDeal) {
-
-                                if ($crmDeal->cms_company_id) {
-                                    return AjaxControllerActionsWidget::widget([
+                                if ($shopBill->cms_company_id && $shopBill->company) {
+                                    $result[] = AjaxControllerActionsWidget::widget([
                                         'controllerId' => '/cms/admin-cms-company',
-                                        'modelId'      => $crmDeal->company->id,
-                                        'content'      => '<i class="fas fa-users"></i> '.$crmDeal->company->asText,
+                                        'modelId'      => $shopBill->company->id,
+                                        'content'      => '<i class="fas fa-users"></i> '.Html::encode($shopBill->company->asText),
                                         'options'      => [
                                             'style' => 'text-align: left;',
                                         ],
                                     ]);
-                                }
-                                return '';
-
-
-                            },
-                        ],
-                        'cms_user_id' => [
-                            'value' => function (ShopBill $crmDeal) {
-
-                                if ($crmDeal->cms_user_id) {
-                                    return AjaxControllerActionsWidget::widget([
+                                } elseif ($shopBill->cms_user_id && $shopBill->cmsUser) {
+                                    $result[] = AjaxControllerActionsWidget::widget([
                                         'controllerId' => '/cms/admin-user',
-                                        'modelId'      => $crmDeal->cmsUser->id,
-                                        'content'      => '<i class="far fa-user"></i> '.$crmDeal->cmsUser->asText,
+                                        'modelId'      => $shopBill->cmsUser->id,
+                                        'content'      => '<i class="far fa-user"></i> '.Html::encode($shopBill->cmsUser->asText),
                                         'options'      => [
                                             'style' => 'text-align: left;',
                                         ],
                                     ]);
                                 }
-                                return '';
 
+                                if ($shopBill->sender_contractor_id && $shopBill->senderContractor) {
+                                    $result[] = '<small class="text-muted" style="display:block;margin-top:5px;">Юр. лицо плательщика</small>';
+                                    $result[] = AjaxControllerActionsWidget::widget([
+                                        'controllerId' => '/cms/admin-cms-contractor',
+                                        'modelId'      => $shopBill->senderContractor->id,
+                                        'content'      => '<i class="fas fa-briefcase"></i> '.Html::encode($shopBill->senderContractor->asText),
+                                        'options'      => [
+                                            'style' => 'text-align: left;',
+                                        ],
+                                    ]);
+                                }
 
+                                return $result ? implode('', $result) : '<span class="text-muted">Не указан</span>';
                             },
                         ],
 
@@ -739,6 +805,129 @@ HTML
         }
 
         throw new ForbiddenHttpException("Нет доступа к разделу");
+    }
+
+    public function documents()
+    {
+        if ($controller = \Yii::$app->createController('/cms/admin-cms-document')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->backendShowings = false;
+
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                ArrayHelper::removeValue($visibleColumns, 'cms_company_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+
+                $indexAction->grid['on init'] = function (Event $e) {
+                    $dataProvider = $e->sender->dataProvider;
+                    $dataProvider->query->forManager();
+                    $dataProvider->query->joinWith('bills as bills');
+                    $dataProvider->query->andWhere(['bills.id' => $this->model->id]);
+                    $dataProvider->query->groupBy(ShopDocument::tableName().'.id');
+                };
+
+                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
+                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        /** @var ShopBill $model */
+                        $model = $this->model;
+                        $documentTypes = [
+                            ShopDocument::TYPE_ACT => [
+                                'name' => 'Акт',
+                                'icon' => 'fa fa-file-signature',
+                            ],
+                            ShopDocument::TYPE_UPD => [
+                                'name' => 'УПД',
+                                'icon' => 'fa fa-file-invoice',
+                            ],
+                            ShopDocument::TYPE_WAYBILL => [
+                                'name' => 'Накладная',
+                                'icon' => 'fa fa-truck',
+                            ],
+                            ShopDocument::TYPE_INVOICE_FACTURE => [
+                                'name' => 'Счет-фактура',
+                                'icon' => 'fa fa-file-text-o',
+                            ],
+                        ];
+
+                        $actions = [];
+                        foreach ($documentTypes as $type => $data) {
+                            $action = clone $createAction;
+                            $action->isVisible = true;
+                            $action->name = $data['name'];
+                            $action->icon = $data['icon'];
+                            $action->url = ArrayHelper::merge($action->urlData, [
+                                'bill_id' => $model->id,
+                                'type' => $type,
+                                '_sxb' => [
+                                    'el'  => 1,
+                                    'noa' => 1,
+                                ],
+                            ]);
+                            $actions[] = $action;
+                        }
+
+                        $event->content = ContextMenuControllerActionsWidget::widget([
+                                'actions'         => $actions,
+                                'isOpenNewWindow' => true,
+                                'button'          => [
+                                    'class' => 'btn btn-primary',
+                                    'tag'   => 'button',
+                                    'label' => 'Добавить документ',
+                                ],
+                            ])."<br><br>";
+                    }
+                });
+
+                return $indexAction->run();
+            }
+        }
+
+        throw new ForbiddenHttpException("Нет доступа к разделу");
+    }
+
+    protected function closingDocumentsAmountSql()
+    {
+        $db = \Yii::$app->db;
+        $billTable = ShopBill::tableName();
+        $documentItemTable = ShopDocumentItem::tableName();
+        $types = implode(',', array_map(function ($type) use ($db) {
+            return $db->quoteValue($type);
+        }, ShopDocument::closingTypes()));
+        $canceledStatus = $db->quoteValue(ShopDocument::STATUS_CANCELED);
+
+        return "(SELECT COALESCE(SUM(
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM {$documentItemTable} sdi_any
+                        WHERE sdi_any.shop_document_id = sd.id
+                            AND sdi_any.source_shop_bill_id IS NOT NULL
+                    ) THEN (
+                        SELECT COALESCE(SUM(sdi.amount), 0)
+                        FROM {$documentItemTable} sdi
+                        WHERE sdi.shop_document_id = sd.id
+                            AND sdi.source_shop_bill_id = {$billTable}.id
+                    )
+                    ELSE sd.amount
+                END
+            ), 0)
+            FROM ".ShopDocument::tableName()." sd
+            INNER JOIN ".ShopDocument2bill::tableName()." sdb ON sdb.shop_document_id = sd.id
+            WHERE sdb.shop_bill_id = {$billTable}.id
+                AND sd.type IN ({$types})
+                AND sd.status <> {$canceledStatus})";
     }
 
     public function closeBillAction(BackendModelAction $action)

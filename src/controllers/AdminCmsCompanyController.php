@@ -32,6 +32,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\queries\CmsCompanyQuery;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopDocument;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
@@ -678,6 +679,18 @@ HTML
             ],
 
 
+            'documents' => [
+                'class'    => BackendModelAction::class,
+                'priority' => 360,
+                'name'     => 'Документы',
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
+                'icon'     => 'fas fa-file-signature',
+                'callback' => [$this, 'documents'],
+            ],
+
+
             'payments' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Платежи',
@@ -793,6 +806,97 @@ HTML
         ]);
     }
 
+
+
+    public function documents()
+    {
+        if ($controller = \Yii::$app->createController('/cms/admin-cms-document')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->backendShowings = false;
+
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                ArrayHelper::removeValue($visibleColumns, 'cms_company_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+
+                $indexAction->grid['on init'] = function (Event $e) {
+                    $dataProvider = $e->sender->dataProvider;
+                    $dataProvider->query->forManager();
+                    $dataProvider->query->andWhere([
+                        ShopDocument::tableName().'.cms_company_id' => $this->model->id,
+                    ]);
+                };
+
+                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
+                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        /** @var CmsCompany $model */
+                        $model = $this->model;
+                        $documentTypes = [
+                            ShopDocument::TYPE_ACT => [
+                                'name' => 'Акт',
+                                'icon' => 'fa fa-file-signature',
+                            ],
+                            ShopDocument::TYPE_UPD => [
+                                'name' => 'УПД',
+                                'icon' => 'fa fa-file-invoice',
+                            ],
+                            ShopDocument::TYPE_WAYBILL => [
+                                'name' => 'Накладная',
+                                'icon' => 'fa fa-truck',
+                            ],
+                            ShopDocument::TYPE_INVOICE_FACTURE => [
+                                'name' => 'Счет-фактура',
+                                'icon' => 'fa fa-file-text-o',
+                            ],
+                        ];
+
+                        $actions = [];
+                        foreach ($documentTypes as $type => $data) {
+                            $action = clone $createAction;
+                            $action->isVisible = true;
+                            $action->name = $data['name'];
+                            $action->icon = $data['icon'];
+                            $action->url = ArrayHelper::merge($action->urlData, [
+                                'type'           => $type,
+                                'cms_company_id' => $model->id,
+                                '_sxb' => [
+                                    'el'  => 1,
+                                    'noa' => 1,
+                                ],
+                            ]);
+                            $actions[] = $action;
+                        }
+
+                        $event->content = ContextMenuControllerActionsWidget::widget([
+                            'actions'         => $actions,
+                            'isOpenNewWindow' => true,
+                            'button'          => [
+                                'class' => 'btn btn-primary',
+                                'tag'   => 'button',
+                                'label' => 'Добавить документ',
+                            ],
+                        ])."<br><br>";
+                    }
+                });
+
+                return $indexAction->run();
+            }
+        }
+
+        throw new ForbiddenHttpException("Нет доступа к разделу");
+    }
 
 
     public function payments()

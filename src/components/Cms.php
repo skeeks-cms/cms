@@ -767,7 +767,6 @@ class Cms extends \skeeks\cms\base\Component
         return $result;
     }
 
-
     /**
      * @var null|CmsSmsProvider
      */
@@ -792,7 +791,6 @@ class Cms extends \skeeks\cms\base\Component
         $this->_smsProvider = $smsProvider;
         return $this;
     }
-
 
     /**
      * @var array
