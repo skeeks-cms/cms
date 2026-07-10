@@ -110,34 +110,44 @@ JS
                             );
                         }
 
-                        $event->content = \skeeks\cms\widgets\StorageFileManager::widget([
-                                'clientOptions' => [
-                                    'completeUploadFile' => new \yii\web\JsExpression(<<<JS
-        function(data)
-        {
-            window.location.reload();
-        }
-JS
-                                    ),
-                                ],
-                            ])."<br />";
-                        
-                        /*$dm = new DynamicModel();
+                        $dm = new DynamicModel();
                         $dm->defineAttribute("files", 'safe');
-                        
+
+                        $storeUploadedFilesUrl = \yii\helpers\Url::to(['store-uploaded-files']);
                         $event->content = $event->content . AjaxFileUploadWidget::widget([
-                                'model' => $dm,
-                                'attribite' => "files",
-                                'clientOptions' => [
-                                    'completeUploadFile' => new \yii\web\JsExpression(<<<JS
-        function(data)
+                                'id'        => 'storage_file_uploader',
+                                'model'     => $dm,
+                                'attribute' => "files",
+                                'multiple'  => true,
+                            ])."<br />";
+
+                        Yii::$app->view->registerJs(<<<JS
+        sx.storage_file_uploader.bind('endUpload', function()
         {
-            window.location.reload();
-        }
+            var files = $('#storage_file_uploader .sx-element').val() || [];
+            if (!files.length) {
+                return;
+            }
+
+            $.ajax({
+                url: '{$storeUploadedFilesUrl}',
+                type: 'POST',
+                dataType: 'json',
+                data: {files: files},
+                success: function(response) {
+                    if (response.success) {
+                        window.location.reload();
+                    } else {
+                        alert(response.message || 'Не удалось сохранить загруженные файлы');
+                    }
+                },
+                error: function() {
+                    alert('Не удалось сохранить загруженные файлы');
+                }
+            });
+        });
 JS
-                                    ),
-                                ],
-                            ])."<br />";*/
+                        );
                     },
                     'on init'         => function ($e) {
                         $action = $e->sender;
@@ -525,6 +535,53 @@ JS
         }
 
         return $response;
+    }
+
+    /**
+     * Moves files assembled by the chunked uploader from its private temporary
+     * directory into the CMS storage.
+     */
+    public function actionStoreUploadedFiles()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $files = (array) Yii::$app->request->post('files', []);
+        $module = Yii::$app->getModule('ajaxfileupload');
+        $tmpRoot = $module ? realpath(Yii::getAlias($module->private_tmp_dir)) : false;
+
+        if (!$tmpRoot || !$files) {
+            return ['success' => false, 'message' => 'Не переданы загруженные файлы'];
+        }
+
+        $tmpRoot = rtrim(str_replace('\\', '/', $tmpRoot), '/').'/';
+        $storedFiles = [];
+
+        try {
+            foreach ($files as $filePath) {
+                $realPath = realpath($filePath);
+                $normalizedPath = $realPath ? str_replace('\\', '/', $realPath) : '';
+
+                if (!$realPath || !is_file($realPath) || strpos($normalizedPath, $tmpRoot) !== 0) {
+                    throw new \RuntimeException('Некорректный путь временного файла');
+                }
+
+                $storageFile = Yii::$app->storage->upload($realPath, [
+                    'name'          => '',
+                    'original_name' => basename($realPath),
+                ]);
+                $storageFile->save(false);
+                $storedFiles[] = $storageFile->id;
+
+                if (is_file($realPath)) {
+                    @unlink($realPath);
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e, static::class);
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+
+        return ['success' => true, 'files' => $storedFiles];
     }
 
     public function _actionRemoteUpload()
