@@ -82,6 +82,12 @@ return [
                 'normalizeTrailingSlash' => true,
                 'action' => \yii\web\UrlNormalizer::ACTION_REDIRECT_PERMANENT,
             ],
+            'rules' => [
+                '.well-known/oauth-authorization-server' => 'cms/oauth/authorization-server',
+                '.well-known/oauth-authorization-server/<path:.+>' => 'cms/oauth/authorization-server',
+                '.well-known/oauth-protected-resource' => 'cms/oauth/protected-resource',
+                '.well-known/oauth-protected-resource/<path:.+>' => 'cms/oauth/protected-resource',
+            ],
             /*'rules' => [
                 'u' => 'cms/user/index',
                 'u/<username>' => 'cms/user/view',
