@@ -1,0 +1,4 @@
+interface:
+  display_name: "SkeekS CMS"
+  short_description: "Develop and operate SkeekS CMS projects"
+  default_prompt: "Use $skeeks-cms to inspect and safely change this SkeekS CMS project."
