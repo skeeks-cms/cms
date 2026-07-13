@@ -51,6 +51,8 @@ MCP and OAuth are deliberately outside this package:
 
 For MCP, tools must remain thin and delegate validation, model access, transactions and business rules to services. There are no delete tools: create drafts first and publish explicitly.
 
+For a site with `skeeks/cms-mcp` installed, the canonical endpoint is `https://<site-domain>/cms/mcp`. In Codex, both `url` and `oauth_resource` must contain that exact site-specific URL. Never configure the obsolete `/cms/mcp-task/create` route. Use the actual target site's public domain rather than assuming `skeeks.com`.
+
 When the user asks to create a SkeekS CMS task through MCP, use `create_cms_task`. Default `executor_id` is `1` unless the user specifies another executor.
 
 ## AI-assisted content direction
