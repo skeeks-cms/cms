@@ -135,6 +135,28 @@ deployment base path. Do not use the obsolete `/cms/mcp-task/create` endpoint.
 After changing global MCP configuration, tell the user that restarting the
 client or opening a new task may be required to reload the tool registry.
 
+### Connection lifecycle and fast path
+
+Treat the MCP tool registry as fixed for the lifetime of the current Codex
+task or process. Configuration changes and newly completed OAuth sessions do
+not hot-load a missing server into an already running task.
+
+- If the site's MCP tools are already present, call the available site-context
+  tool immediately. Do not run CLI discovery or repeat OAuth first.
+- If a newly added server is absent from the current tool registry, do not try
+  to hot-reload it, launch a nested `codex exec`, wait for every global MCP
+  server to initialize, or bypass Codex with a direct HTTP request using stored
+  OAuth credentials.
+- Complete OAuth once through **Settings > MCP servers > Authenticate** or
+  `codex mcp login <server-name>`, then tell the user to restart Codex or open a
+  new task. Stop there when the current task still lacks the server; the next
+  task should call the site-context tool first.
+- Prefer project-scoped `.codex/config.toml` entries for site-specific MCP
+  servers. Keep unused global servers disabled so unrelated Codex processes do
+  not initialize them.
+- Use `enabled_tools` only to limit the exposed tool surface; do not claim that
+  it hot-loads a server or guarantees faster authentication.
+
 ### Operating a connected site
 
 Use runtime `tools/list` as the source of truth because installed optional
