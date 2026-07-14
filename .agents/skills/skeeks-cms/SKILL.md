@@ -122,12 +122,24 @@ site's canonical public origin:
 https://<site-domain>/cms/mcp
 ```
 
-In Codex, configure the server URL and OAuth resource to that exact endpoint:
+In Codex, configure the server URL and OAuth resource to that exact endpoint.
+Name the MCP server after the specific site, not generically after SkeekS,
+so multiple project sites can coexist without collisions. Use a stable
+lowercase ASCII key derived from the domain, for example `blizco` for
+`bliz.co`:
 
 ```toml
-[mcp_servers.skeeks]
+[mcp_servers.<site-key>]
 url = "https://<site-domain>/cms/mcp"
 oauth_resource = "https://<site-domain>/cms/mcp"
+```
+
+For `https://bliz.co/cms/mcp`, the project-scoped configuration should be:
+
+```toml
+[mcp_servers.blizco]
+url = "https://bliz.co/cms/mcp"
+oauth_resource = "https://bliz.co/cms/mcp"
 ```
 
 Use the actual target site's public domain and preserve any intentional
@@ -148,7 +160,7 @@ not hot-load a missing server into an already running task.
   server to initialize, or bypass Codex with a direct HTTP request using stored
   OAuth credentials.
 - Complete OAuth once through **Settings > MCP servers > Authenticate** or
-  `codex mcp login <server-name>`, then tell the user to restart Codex or open a
+  `codex mcp login <site-key>`, then tell the user to restart Codex or open a
   new task. Stop there when the current task still lacks the server; the next
   task should call the site-context tool first.
 - Prefer project-scoped `.codex/config.toml` entries for site-specific MCP
