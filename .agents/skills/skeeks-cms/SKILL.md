@@ -168,6 +168,8 @@ at the site's canonical public origin:
 ```text
 GET  /cms/rest-api                  authenticated API metadata
 GET  /cms/rest-api/tools            authorized tools and JSON Schemas
+GET  /cms/rest-api/tools/index      compact authorized tool index
+GET  /cms/rest-api/tools/{name}     one authorized tool schema
 GET  /cms/rest-api/context          site-context shortcut
 GET  /cms/rest-api/openapi          authorized OpenAPI 3.0 document
 POST /cms/rest-api/tools/{tool_name} execute a tool
@@ -184,10 +186,11 @@ For every REST workflow:
 1. Complete authorization code + PKCE for the REST resource and requested
    scopes. Store client credentials and tokens only in an operating-system
    credential store or an equivalently protected local store.
-2. Call `GET /cms/rest-api/tools` with bearer authorization at the beginning of
-   the workflow. Treat the returned authorized schemas as the source of truth;
-   optional packages, project providers, OAuth scopes and CMS permissions
-   change the inventory.
+2. Treat `GET /cms/rest-api/tools` as the source of truth, but persist its
+   credential-specific ETag and response outside the chat. Revalidate with
+   `If-None-Match`; reuse the cached schemas on `304 Not Modified`. Optional
+   packages, project providers, OAuth scopes and CMS permissions change the
+   authorized `tools_revision`, so do not key the cache only by package version.
 3. Call `GET /cms/rest-api/context` when site context is needed.
 4. Execute a discovered tool with `POST /cms/rest-api/tools/<url-encoded-name>`,
    `Content-Type: application/json`, and its arguments as the top-level JSON
@@ -198,6 +201,59 @@ For every REST workflow:
    successful rotation.
 6. If refresh is revoked or expired, repeat authorization code + PKCE. Never
    print, log, commit or place decrypted credentials in command arguments.
+
+#### Fast Windows REST client
+
+When Codex runs on Windows and the site has a DPAPI-protected credential store
+at `%USERPROFILE%\.codex\oauth\<domain>-rest-api.json`, locate the active
+`skeeks/cms-mcp` package and use its `scripts/skeeks-rest.ps1` instead of
+writing inline PowerShell for DPAPI or HTTP.
+The helper handles hex-encoded DPAPI values, refresh-token rotation with an
+inter-process lock, atomic credential-store replacement, UTF-8 output and REST
+requests without exposing tokens in command arguments or output. It also keeps
+the authorized tool catalog under
+`%USERPROFILE%\.codex\cache\skeeks-cms\<domain>` and revalidates it by ETag.
+The cache contains schemas and revision metadata only, never OAuth secrets.
+
+Run the helper with Windows PowerShell outside the sandbox on the first attempt:
+DPAPI `CurrentUser` keys may be unavailable inside an isolated process. Request
+approval for the fixed script command when necessary; do not first experiment
+with `ProtectedData`, encodings or decrypted values in ad-hoc commands.
+
+```powershell
+& '<cms-mcp-dir>\scripts\skeeks-rest.ps1' -Site 'example.com' -Action tools -ToolPattern '^cms_task_'
+& '<cms-mcp-dir>\scripts\skeeks-rest.ps1' -Site 'example.com' -Action context
+$json = '{"named_filters":["mine","active"],"limit":100}'
+$arguments = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json))
+& '<cms-mcp-dir>\scripts\skeeks-rest.ps1' -Site 'example.com' -Action execute -ToolName 'cms_task_list' -ArgumentsBase64 $arguments
+```
+
+Prefer `-ArgumentsBase64` for generated arguments because native Windows
+PowerShell invocation can remove JSON quotes. Use `-ArgumentsPath <json-file>`
+when the JSON already exists as a file. Reserve `-ArgumentsJson` for invocation
+contexts that preserve arguments without native shell re-parsing.
+The output contains request duration and the REST response. A missing credential
+store means that the one-time REST OAuth authorization must be completed; do
+not fall back to inventing credentials or reading an MCP token for the distinct
+REST resource.
+
+For speed, let `-Action tools` reuse or conditionally revalidate its persistent
+catalog, filter the cached result with `-ToolPattern`, then execute the resolved
+tool directly. The output `cache_status` is `hit`, `validated` or `updated`.
+Use `-Action tool-schema -ToolName <name>` only when one uncached schema is
+needed, and `-Action tools-index` for a compact inventory. Do not call `context`
+for ordinary CRM requests such as
+"my active tasks": filters such as `mine` derive the user from OAuth, and site
+theme context is irrelevant. Do not inspect the credential JSON, probe DPAPI or
+repeat OAuth while the helper succeeds. A typical CRM read should require one
+cache lookup or lightweight ETag revalidation and one execute request.
+
+The catalog exposes `api_version`, `server_version` and `tools_revision`.
+`tools_revision` is the only reliable schema cache validator because it covers
+the exact OAuth/RBAC-authorized inventory. Reuse known schemas across Codex
+tasks instead of making the model rediscover every method. The server also
+supports `/tools?prefix=cms_task_`, comma-separated `names`, and `q` filters for
+clients that do not use the helper.
 
 Before a REST mutation, resolve referenced records and check duplicates. Let
 the server derive ownership from the OAuth identity, honor confirmation

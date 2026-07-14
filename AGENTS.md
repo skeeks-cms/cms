@@ -53,6 +53,19 @@ For MCP, tools must remain thin and delegate validation, model access, transacti
 
 For a site with `skeeks/cms-mcp` installed, the canonical endpoint is `https://<site-domain>/cms/mcp`. In Codex, both `url` and `oauth_resource` must contain that exact site-specific URL. Never configure the obsolete `/cms/mcp-task/create` route. Use the actual target site's public domain rather than assuming `skeeks.com`.
 
+The same authorized tools are available to non-MCP AI clients at
+`https://<site-domain>/cms/rest-api`. The catalog has three identifiers:
+`api_version`, `server_version` and the OAuth/RBAC-specific `tools_revision`.
+Persist the `/tools` response outside the chat and revalidate its private ETag;
+reuse cached schemas after `304 Not Modified`. Do not download and reinterpret
+the complete catalog for every user request. Use `/tools/index`,
+`/tools/{tool_name}` or the `prefix`, `names` and `q` catalog filters when only
+a small part of an uncached inventory is needed. Never share catalog caches
+between OAuth credential stores.
+The Windows REST helper is owned by `skeeks/cms-mcp` at
+`scripts/skeeks-rest.ps1`; this core package only documents how agents locate
+and invoke the installed helper.
+
 When the user asks to create a SkeekS CMS task through MCP, use `create_cms_task`. Default `executor_id` is `1` unless the user specifies another executor.
 
 ## AI-assisted content direction
