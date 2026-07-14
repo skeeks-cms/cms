@@ -115,8 +115,20 @@ drafts first and publish explicitly.
 
 ## Connected SkeekS sites
 
-For a site with `skeeks/cms-mcp` installed, derive its MCP endpoint from the
-site's canonical public origin:
+For a site with `skeeks/cms-mcp` installed, two OAuth-protected transports expose
+the same authorized tool registry and domain services:
+
+```text
+MCP:  https://<site-domain>/cms/mcp
+REST: https://<site-domain>/cms/rest-api
+```
+
+Use MCP when the current AI client can register an MCP server. Use REST for
+clients, scripts or environments that can make OAuth bearer HTTP requests but
+cannot load an MCP server. REST is not a separate or reduced business API: it
+executes the same tools and applies the same OAuth scopes and CMS RBAC checks.
+
+Derive the MCP endpoint from the site's canonical public origin:
 
 ```text
 https://<site-domain>/cms/mcp
@@ -146,6 +158,57 @@ Use the actual target site's public domain and preserve any intentional
 deployment base path. Do not use the obsolete `/cms/mcp-task/create` endpoint.
 After changing global MCP configuration, tell the user that restarting the
 client or opening a new task may be required to reload the tool registry.
+
+### REST connection
+
+Do not assume that a SkeekS CMS site exposes a static conventional CRUD API.
+When `skeeks/cms-mcp` is installed, use the self-describing REST adapter rooted
+at the site's canonical public origin:
+
+```text
+GET  /cms/rest-api                  authenticated API metadata
+GET  /cms/rest-api/tools            authorized tools and JSON Schemas
+GET  /cms/rest-api/context          site-context shortcut
+GET  /cms/rest-api/openapi          authorized OpenAPI 3.0 document
+POST /cms/rest-api/tools/{tool_name} execute a tool
+```
+
+The OAuth protected-resource identifier is the exact absolute REST root, for
+example `https://example.com/cms/rest-api`; it is distinct from the MCP
+resource `https://example.com/cms/mcp`. Discover OAuth server metadata through
+the site's well-known endpoints. The standard SkeekS endpoints include
+`/cms/oauth/authorize`, `/cms/oauth/token` and `/cms/oauth/register`.
+
+For every REST workflow:
+
+1. Complete authorization code + PKCE for the REST resource and requested
+   scopes. Store client credentials and tokens only in an operating-system
+   credential store or an equivalently protected local store.
+2. Call `GET /cms/rest-api/tools` with bearer authorization at the beginning of
+   the workflow. Treat the returned authorized schemas as the source of truth;
+   optional packages, project providers, OAuth scopes and CMS permissions
+   change the inventory.
+3. Call `GET /cms/rest-api/context` when site context is needed.
+4. Execute a discovered tool with `POST /cms/rest-api/tools/<url-encoded-name>`,
+   `Content-Type: application/json`, and its arguments as the top-level JSON
+   object.
+5. Refresh an expired or nearly expired access token through
+   `/cms/oauth/token` with `grant_type=refresh_token`. Refresh tokens rotate:
+   atomically save both returned tokens and never retry a token after a
+   successful rotation.
+6. If refresh is revoked or expired, repeat authorization code + PKCE. Never
+   print, log, commit or place decrypted credentials in command arguments.
+
+Before a REST mutation, resolve referenced records and check duplicates. Let
+the server derive ownership from the OAuth identity, honor confirmation
+responses before consequential actions, then read the changed record back and
+report its identifier and state.
+
+When project instructions designate a central SkeekS CRM, use that CRM's REST
+root for companies, projects, tasks and finance. For pages, content, settings
+and other website-level work, use the current website's own MCP or REST root.
+If the intended site remains ambiguous and a mutation could affect the wrong
+project, ask the user to identify it.
 
 ### Connection lifecycle and fast path
 
