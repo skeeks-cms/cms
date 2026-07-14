@@ -204,10 +204,27 @@ For every REST workflow:
 
 #### Fast Windows REST client
 
-When Codex runs on Windows and the site has a DPAPI-protected credential store
-at `%USERPROFILE%\.codex\oauth\<domain>-rest-api.json`, locate the active
-`skeeks/cms-mcp` package and use its `scripts/skeeks-rest.ps1` instead of
-writing inline PowerShell for DPAPI or HTTP.
+When Codex runs on Windows, locate the active `skeeks/cms-mcp` package. If the
+site does not yet have a DPAPI-protected credential store at
+`%USERPROFILE%\.codex\oauth\<domain>-rest-api.json`, run its canonical login
+client once:
+
+```powershell
+& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File '<cms-mcp-dir>\scripts\skeeks-rest-login.ps1' -Site 'example.com'
+```
+
+The login client discovers OAuth metadata, dynamically registers an expandable
+client, creates PKCE S256, starts a loopback callback, opens the user's default
+browser and saves the resulting token pair with DPAPI. It deliberately ignores
+browser callback requests that do not contain `code` or `error`; do not replace
+it with an ad-hoc listener, inspect browser cookies, poll for a credential file
+or register another client while it is running. If a valid credential store
+already exists, the script exits without opening OAuth; use
+`-ForceAuthorization` only after refresh has genuinely failed or the connection
+was revoked.
+
+After authorization, use `scripts/skeeks-rest.ps1` instead of writing inline
+PowerShell for DPAPI or HTTP.
 The helper handles hex-encoded DPAPI values, refresh-token rotation with an
 inter-process lock, atomic credential-store replacement, UTF-8 output and REST
 requests without exposing tokens in command arguments or output. It also keeps
@@ -221,11 +238,13 @@ approval for the fixed script command when necessary; do not first experiment
 with `ProtectedData`, encodings or decrypted values in ad-hoc commands.
 
 ```powershell
-& '<cms-mcp-dir>\scripts\skeeks-rest.ps1' -Site 'example.com' -Action tools -ToolPattern '^cms_task_'
-& '<cms-mcp-dir>\scripts\skeeks-rest.ps1' -Site 'example.com' -Action context
+$powershell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+$restClient = '<cms-mcp-dir>\scripts\skeeks-rest.ps1'
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $restClient -Site 'example.com' -Action tools -ToolPattern '^cms_task_'
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $restClient -Site 'example.com' -Action context
 $json = '{"named_filters":["mine","active"],"limit":100}'
 $arguments = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json))
-& '<cms-mcp-dir>\scripts\skeeks-rest.ps1' -Site 'example.com' -Action execute -ToolName 'cms_task_list' -ArgumentsBase64 $arguments
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $restClient -Site 'example.com' -Action execute -ToolName 'cms_task_list' -ArgumentsBase64 $arguments
 ```
 
 Prefer `-ArgumentsBase64` for generated arguments because native Windows
