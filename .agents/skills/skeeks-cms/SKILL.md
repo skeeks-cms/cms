@@ -1,338 +1,171 @@
 ---
 name: skeeks-cms
-description: Develop and operate SkeekS CMS and Yii/PHP projects that depend on any Composer package matching skeeks/*. Use for SkeekS CMS internals, models, controllers, components, package extensions, usages, inheritance, dependencies, connected SkeekS MCP site operations, content, CRM, shop management, or OAuth2 server architecture.
+description: Develop SkeekS CMS/Yii PHP code and handle advanced or unfamiliar site content, shop, MCP, REST and OAuth2 workflows. Routine central CRM reads use the global AGENTS direct-first client and do not require this skill.
 ---
 
 # SkeekS CMS
 
-## Overview
+## Start here
 
-Use this skill for development and operations involving SkeekS CMS, its Yii2
-packages, and sites that expose SkeekS MCP tools.
+Treat a project as SkeekS CMS when the user says so or `composer.json` depends
+on a `skeeks/*` package.
 
-## Detection
+Choose the target before acting:
 
-Treat a project as a SkeekS CMS project when either condition is true:
+- team CRM entities such as companies, projects, tasks, deals and finance use
+  the configured central CRM REST API, normally `https://skeeks.com/cms/rest-api`;
+- pages, publications, files, settings and products of a project website use
+  that website's site-specific MCP server when it is available;
+- use the website REST adapter when MCP is unavailable or the client is a script.
 
-- The user says the project uses SkeekS CMS.
-- The project `composer.json` contains a dependency or development dependency
-  whose package name matches `skeeks/*`.
+Read `.codex/skeeks.json` from the current project when present. It is a small,
+non-secret routing profile:
 
-Check `composer.json` early for PHP project tasks unless the user only asks a
-general question. Do not load the entire Composer vendor directory into context.
-
-## Package discovery
-
-When package internals are needed, locate the active Composer package rather
-than assuming a machine-specific path. Prefer these sources in order:
-
-1. The current repository when its `composer.json` names the requested package.
-2. The project's `vendor/skeeks/<package>` directory.
-3. The installed path reported by Composer.
-
-Use the package version installed by the current project unless the user
-explicitly asks to inspect another checkout or version.
-
-## Code search workflow
-
-For PHP symbols, classes, usages, implementations, callers, inheritance, and
-dependencies, use `ast-index` before raw text search when it is available:
-
-```powershell
-ast-index search "Query"
-ast-index class "ClassName"
-ast-index symbol "SymbolName"
-ast-index usages "SymbolName"
-ast-index implementations "InterfaceName"
-ast-index callers "methodName"
-ast-index outline "path\to\file.php"
+```json
+{
+  "profile_version": 1,
+  "site": "example.com",
+  "crm": "skeeks.com",
+  "site_transport": "rest",
+  "crm_transport": "rest"
+}
 ```
 
-Run indexed searches from the Composer vendor root or the indexed repository
-root. Use `rg` or an equivalent text search when:
+## Create the project AI profile
 
-- `ast-index` returns no useful result or is unavailable.
-- The task involves raw text, configuration, translations, markup, or regular
-  expressions.
-- The search targets application code outside the indexed vendor tree.
+When the user says "создай файл в проекте для быстрого взаимодействия с ИИ",
+"подготовь SkeekS-проект для ИИ", "создай профиль SkeekS" or an equivalent
+phrase, create `<project-root>/.codex/skeeks.json` with the schema above.
 
-Do not rebuild or update a shared index unless the user explicitly requests it.
+- Determine `site` from the project's configured public host/domain. Prefer an
+  explicit project domain over the current directory name. Remove the scheme,
+  path and trailing slash.
+- Set `crm` to the project's configured central CRM domain; use `skeeks.com`
+  when the project has no explicit override.
+- Default to `site_transport: "rest"` and `crm_transport: "rest"`.
+- Create the `.codex` directory when it does not exist.
+- Do not put OAuth credentials, tokens, client secrets or cookies in this file.
+- If the profile already exists, read and preserve valid project-specific
+  values. Do not overwrite a different site or CRM silently.
+- If the site domain cannot be determined reliably, ask only for the domain;
+  do not start OAuth or guess a production target.
+- After creating the file, report its path and resolved routing. Authorization
+  is a separate, one-time action and should run only when access is requested.
 
-## Development rules
+Do not read package source, inspect OAuth files, call site context or download
+the tool catalog before an ordinary known read.
 
-When working in an application project:
+## Direct-first REST path
 
-- Read the local `composer.json`, repository instructions, and relevant
-  application files first.
-- Use vendor lookups only for framework or package behavior and symbol
-  discovery.
-- Prefer existing project conventions over generic Yii or SkeekS assumptions.
-- Keep edits scoped to the application or package requested by the user.
-- Do not modify installed vendor code unless the user explicitly asks to change
-  package internals in a source checkout.
-
-When working in a SkeekS package repository:
-
-- Read its `AGENTS.md` or equivalent repository instructions completely before
-  editing.
-- Check Git status and preserve unrelated work.
-- Avoid unrelated refactors in shared packages.
-- Verify public contracts and usages before changing them.
-- Run `php -l` for changed PHP files and the narrowest relevant tests.
-
-## Core package boundaries
-
-The `skeeks/cms` package owns reusable CMS models, controllers, migrations,
-widgets, components, and configuration. Keep browser and administration
-behavior in backend controllers, shared business behavior in services or
-models, and transport controllers narrow.
-
-Use code search to verify current definitions and contracts. Common starting
-points include:
-
-- `CmsTree` for site sections and pages.
-- `CmsContent` for configured content containers.
-- `CmsContentType` for section and content type metadata.
-- `CmsContentElement` for publications and other content records.
-- Storage models and services for uploaded files.
-- Task models and services for CRM task behavior.
-
-## MCP and OAuth packages
-
-Keep package ownership separated:
-
-- `skeeks/cms-mcp` owns MCP transport, tool contracts, providers, and
-  MCP-specific application services.
-- `skeeks/cms-oauth2-server` owns OAuth controllers, models, migrations,
-  resources, and scopes.
-- `skeeks/cms` owns reusable CMS domain behavior and must not absorb MCP or
-  OAuth transport code.
-
-For MCP or OAuth work, read the target package's repository instructions before
-editing. Keep tools thin and delegate model access, validation, transactions,
-and business rules to domain services. Do not introduce delete tools; create
-drafts first and publish explicitly.
-
-## Connected SkeekS sites
-
-For a site with `skeeks/cms-mcp` installed, two OAuth-protected transports expose
-the same authorized tool registry and domain services:
-
-```text
-MCP:  https://<site-domain>/cms/mcp
-REST: https://<site-domain>/cms/rest-api
-```
-
-Use MCP when the current AI client can register an MCP server. Use REST for
-clients, scripts or environments that can make OAuth bearer HTTP requests but
-cannot load an MCP server. REST is not a separate or reduced business API: it
-executes the same tools and applies the same OAuth scopes and CMS RBAC checks.
-
-Derive the MCP endpoint from the site's canonical public origin:
-
-```text
-https://<site-domain>/cms/mcp
-```
-
-In Codex, configure the server URL and OAuth resource to that exact endpoint.
-Name the MCP server after the specific site, not generically after SkeekS,
-so multiple project sites can coexist without collisions. Use a stable
-lowercase ASCII key derived from the domain, for example `blizco` for
-`bliz.co`:
-
-```toml
-[mcp_servers.<site-key>]
-url = "https://<site-domain>/cms/mcp"
-oauth_resource = "https://<site-domain>/cms/mcp"
-```
-
-For `https://bliz.co/cms/mcp`, the project-scoped configuration should be:
-
-```toml
-[mcp_servers.blizco]
-url = "https://bliz.co/cms/mcp"
-oauth_resource = "https://bliz.co/cms/mcp"
-```
-
-Use the actual target site's public domain and preserve any intentional
-deployment base path. Do not use the obsolete `/cms/mcp-task/create` endpoint.
-After changing global MCP configuration, tell the user that restarting the
-client or opening a new task may be required to reload the tool registry.
-
-### REST connection
-
-Do not assume that a SkeekS CMS site exposes a static conventional CRUD API.
-When `skeeks/cms-mcp` is installed, use the self-describing REST adapter rooted
-at the site's canonical public origin:
-
-```text
-GET  /cms/rest-api                  authenticated API metadata
-GET  /cms/rest-api/tools            authorized tools and JSON Schemas
-GET  /cms/rest-api/tools/index      compact authorized tool index
-GET  /cms/rest-api/tools/{name}     one authorized tool schema
-GET  /cms/rest-api/context          site-context shortcut
-GET  /cms/rest-api/openapi          authorized OpenAPI 3.0 document
-POST /cms/rest-api/tools/{tool_name} execute a tool
-```
-
-The OAuth protected-resource identifier is the exact absolute REST root, for
-example `https://example.com/cms/rest-api`; it is distinct from the MCP
-resource `https://example.com/cms/mcp`. Discover OAuth server metadata through
-the site's well-known endpoints. The standard SkeekS endpoints include
-`/cms/oauth/authorize`, `/cms/oauth/token` and `/cms/oauth/register`.
-
-For every REST workflow:
-
-1. Complete authorization code + PKCE for the REST resource and requested
-   scopes. Store client credentials and tokens only in an operating-system
-   credential store or an equivalently protected local store.
-2. Treat `GET /cms/rest-api/tools` as the source of truth, but persist its
-   credential-specific ETag and response outside the chat. Revalidate with
-   `If-None-Match`; reuse the cached schemas on `304 Not Modified`. Optional
-   packages, project providers, OAuth scopes and CMS permissions change the
-   authorized `tools_revision`, so do not key the cache only by package version.
-3. Call `GET /cms/rest-api/context` when site context is needed.
-4. Execute a discovered tool with `POST /cms/rest-api/tools/<url-encoded-name>`,
-   `Content-Type: application/json`, and its arguments as the top-level JSON
-   object.
-5. Refresh an expired or nearly expired access token through
-   `/cms/oauth/token` with `grant_type=refresh_token`. Refresh tokens rotate:
-   atomically save both returned tokens and never retry a token after a
-   successful rotation.
-6. If refresh is revoked or expired, repeat authorization code + PKCE. Never
-   print, log, commit or place decrypted credentials in command arguments.
-
-#### Fast Windows REST client
-
-When Codex runs on Windows, locate the active `skeeks/cms-mcp` package. If the
-site does not yet have a DPAPI-protected credential store at
-`%USERPROFILE%\.codex\oauth\<domain>-rest-api.json`, run its canonical login
-client once:
-
-```powershell
-& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File '<cms-mcp-dir>\scripts\skeeks-rest-login.ps1' -Site 'example.com'
-```
-
-The login client discovers OAuth metadata, dynamically registers an expandable
-client, creates PKCE S256, starts a loopback callback, opens the user's default
-browser and saves the resulting token pair with DPAPI. It deliberately ignores
-browser callback requests that do not contain `code` or `error`; do not replace
-it with an ad-hoc listener, inspect browser cookies, poll for a credential file
-or register another client while it is running. If a valid credential store
-already exists, the script exits without opening OAuth; use
-`-ForceAuthorization` only after refresh has genuinely failed or the connection
-was revoked.
-
-After authorization, use `scripts/skeeks-rest.ps1` instead of writing inline
-PowerShell for DPAPI or HTTP.
-The helper handles hex-encoded DPAPI values, refresh-token rotation with an
-inter-process lock, atomic credential-store replacement, UTF-8 output and REST
-requests without exposing tokens in command arguments or output. It also keeps
-the authorized tool catalog under
-`%USERPROFILE%\.codex\cache\skeeks-cms\<domain>` and revalidates it by ETag.
-The cache contains schemas and revision metadata only, never OAuth secrets.
-
-Run the helper with Windows PowerShell outside the sandbox on the first attempt:
-DPAPI `CurrentUser` keys may be unavailable inside an isolated process. Request
-approval for the fixed script command when necessary; do not first experiment
-with `ProtectedData`, encodings or decrypted values in ad-hoc commands.
+On Windows, locate the installed `skeeks/cms-mcp` package and invoke its fast
+client with Windows PowerShell 5.1 outside the sandbox:
 
 ```powershell
 $powershell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-$restClient = '<cms-mcp-dir>\scripts\skeeks-rest.ps1'
-& $powershell -NoProfile -ExecutionPolicy Bypass -File $restClient -Site 'example.com' -Action tools -ToolPattern '^cms_task_'
-& $powershell -NoProfile -ExecutionPolicy Bypass -File $restClient -Site 'example.com' -Action context
-$json = '{"named_filters":["mine","active"],"limit":100}'
-$arguments = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json))
-& $powershell -NoProfile -ExecutionPolicy Bypass -File $restClient -Site 'example.com' -Action execute -ToolName 'cms_task_list' -ArgumentsBase64 $arguments
+$api = '<cms-mcp-dir>\scripts\skeeks-api.ps1'
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $api -Operation company.search -Query 'SkeekS' -Limit 10
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $api -Operation task.mine.active -Limit 20
 ```
 
-Prefer `-ArgumentsBase64` for generated arguments because native Windows
-PowerShell invocation can remove JSON quotes. Use `-ArgumentsPath <json-file>`
-when the JSON already exists as a file. Reserve `-ArgumentsJson` for invocation
-contexts that preserve arguments without native shell re-parsing.
-The output contains request duration and the REST response. A missing credential
-store means that the one-time REST OAuth authorization must be completed; do
-not fall back to inventing credentials or reading an MCP token for the distinct
-REST resource.
+Stable fast operations:
 
-For speed, let `-Action tools` reuse or conditionally revalidate its persistent
-catalog, filter the cached result with `-ToolPattern`, then execute the resolved
-tool directly. The output `cache_status` is `hit`, `validated` or `updated`.
-Use `-Action tool-schema -ToolName <name>` only when one uncached schema is
-needed, and `-Action tools-index` for a compact inventory. Do not call `context`
-for ordinary CRM requests such as
-"my active tasks": filters such as `mine` derive the user from OAuth, and site
-theme context is irrelevant. Do not inspect the credential JSON, probe DPAPI or
-repeat OAuth while the helper succeeds. A typical CRM read should require one
-cache lookup or lightweight ETag revalidation and one execute request.
+- `company.search -Query <text>` and `company.get -Id <id>`;
+- `project.search -Query <text>`;
+- `worker.search -Query <text>`;
+- `task.mine.active`, optionally with `-ProjectId` or `-CompanyId`;
+- `task.search`, optionally with query, executor, project or company;
+- `task.day`, optionally with date or executor;
+- `site.context`;
+- `tree.list`, optionally with `-ParentId`;
+- `content.list`, optionally with `-ContentId` or `-ParentId`;
+- `tool.call -ToolName <name> -ArgumentsBase64 <json-base64>`.
 
-The catalog exposes `api_version`, `server_version` and `tools_revision`.
-`tools_revision` is the only reliable schema cache validator because it covers
-the exact OAuth/RBAC-authorized inventory. Reuse known schemas across Codex
-tasks instead of making the model rediscover every method. The server also
-supports `/tools?prefix=cms_task_`, comma-separated `names`, and `q` filters for
-clients that do not use the helper.
+These operations execute the known tool immediately. Do not preflight `/tools`.
+If the direct call fails because the tool is unknown or its arguments changed,
+the client fetches only that tool schema. Only then inspect the schema or the
+compact tools index.
+List operations return compact records by default; pass `-Full` only when the
+user actually needs complete descriptions or configuration.
 
-Before a REST mutation, resolve referenced records and check duplicates. Let
-the server derive ownership from the OAuth identity, honor confirmation
-responses before consequential actions, then read the changed record back and
-report its identifier and state.
+For an unfamiliar tool, use the lower-level client:
 
-When project instructions designate a central SkeekS CRM, use that CRM's REST
-root for companies, projects, tasks and finance. For pages, content, settings
-and other website-level work, use the current website's own MCP or REST root.
-If the intended site remains ambiguous and a mutation could affect the wrong
-project, ask the user to identify it.
+```powershell
+$rest = '<cms-mcp-dir>\scripts\skeeks-rest.ps1'
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $rest -Site 'example.com' -Action tool-schema -ToolName 'cms_company_stats'
+$json = '{"group_by":"status"}'
+$arguments = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json))
+& $powershell -NoProfile -ExecutionPolicy Bypass -File $rest -Site 'example.com' -Action execute -ToolName 'cms_company_stats' -ArgumentsBase64 $arguments
+```
 
-### Connection lifecycle and fast path
+The REST client handles DPAPI, access-token refresh, refresh-token rotation,
+UTF-8 and the credential-specific tool cache. Never decrypt or print OAuth
+credentials manually. Every execution returns API version, server version and
+the authorized tools revision; reuse known schemas until an error or revision
+change requires refresh.
 
-Treat the MCP tool registry as fixed for the lifetime of the current Codex
-task or process. Configuration changes and newly completed OAuth sessions do
-not hot-load a missing server into an already running task.
+## One-time REST authorization
 
-- If the site's MCP tools are already present, call the available site-context
-  tool immediately. Do not run CLI discovery or repeat OAuth first.
-- If a newly added server is absent from the current tool registry, do not try
-  to hot-reload it, launch a nested `codex exec`, wait for every global MCP
-  server to initialize, or bypass Codex with a direct HTTP request using stored
-  OAuth credentials.
-- Complete OAuth once through **Settings > MCP servers > Authenticate** or
-  `codex mcp login <site-key>`, then tell the user to restart Codex or open a
-  new task. Stop there when the current task still lacks the server; the next
-  task should call the site-context tool first.
-- Prefer project-scoped `.codex/config.toml` entries for site-specific MCP
-  servers. Keep unused global servers disabled so unrelated Codex processes do
-  not initialize them.
-- Use `enabled_tools` only to limit the exposed tool surface; do not claim that
-  it hot-loads a server or guarantees faster authentication.
+If no credential store exists, run the canonical login client once:
 
-### Operating a connected site
+```powershell
+& $powershell -NoProfile -ExecutionPolicy Bypass -File '<cms-mcp-dir>\scripts\skeeks-rest-login.ps1' -Site 'example.com'
+```
 
-Use runtime `tools/list` as the source of truth because installed optional
-packages and project providers change the tool inventory. Never invent a
-missing tool or rely on a copied static inventory.
+It owns metadata discovery, dynamic registration, PKCE S256, browser launch,
+loopback callback and DPAPI storage. Do not replace it with an ad-hoc listener,
+inspect browser cookies or poll credential files. Use `-ForceAuthorization`
+only after refresh genuinely failed or the user revoked the connection.
 
-Start a new site workflow by reading the available site-context tool. Read the
-active theme and effective component settings before generating content.
-Resolve foreign keys, types, statuses, categories, workers, tree parents,
-content types, and price types with read tools before mutations.
+## Connected site MCP
 
-For every mutation:
+The canonical project endpoint and OAuth resource are identical:
 
-1. Check prerequisites and possible duplicates.
-2. Create or update under the OAuth identity; do not pass ownership fields that
-   the server derives from authentication.
-3. Respect confirmation responses before retrying calls, messages, duplicate
-   creation, publication, or inventory approval.
-4. Read the record back and report its identifier, state, and verification URL
-   when available.
+```toml
+[mcp_servers.example]
+url = "https://example.com/cms/mcp"
+oauth_resource = "https://example.com/cms/mcp"
+```
 
-Create pages, publications, and product cards as drafts unless the user
-explicitly asks to publish. Prefer server-side filters, date ranges, pagination,
-and statistics tools over loading complete tables.
+Name each server after its domain. After adding it, complete OAuth once and
+restart the client or open a new task if the server is absent from the current
+tool registry. Do not attempt to hot-load a newly configured MCP server.
 
-When the user asks to create a SkeekS CMS task, use the task-creation tool
-actually exposed by the connected server. Resolve the executor from project
-context or ask the user. Apply a default executor only when local project
-instructions define one.
+For content generation, first read site context, active theme and effective
+settings; resolve section/content types and required properties; upload images;
+create a draft; validate; publish only when requested; then return the URL.
+
+## Mutation safety
+
+Known read operations may run immediately. Before a mutation:
+
+1. resolve referenced records and meaningful type/status/category choices;
+2. check duplicates where applicable;
+3. let OAuth determine creator/owner fields;
+4. stop when a tool returns `requires_confirmation`;
+5. read the changed object back and report its id, status and URL.
+
+There are no delete operations. Do not guess IDs. Create pages, publications
+and products as drafts unless the user explicitly requests publication. Never
+change stock quantity directly; use inventory movement documents and explicit
+approval.
+
+## Package development
+
+Package ownership:
+
+- `skeeks/cms` owns CMS models, reusable domain behavior and administration;
+- `skeeks/cms-mcp` owns MCP/REST transports, tool contracts and API services;
+- `skeeks/cms-oauth2-server` owns OAuth resources, clients, codes and tokens.
+
+For code changes, locate the active Composer package, read that package's
+`AGENTS.md` completely and preserve unrelated work. Use `ast-index` before raw
+search for PHP symbols, usages, inheritance and callers. Do not update the
+shared vendor index unless the user explicitly asks. Keep transport tools thin
+and business logic in services/models. Run PHP syntax checks when PHP is
+available and the narrowest relevant tests.
+
+Project-only MCP providers belong in the application, for example under
+`common/mcp`, and are registered through `cmsMcp.toolProviders`. Consult
+`skeeks/cms-mcp/AGENTS.md` for the complete service map, tool inventory,
+extension configuration, logging categories and shop invariants only when the
+task actually changes package or project code.

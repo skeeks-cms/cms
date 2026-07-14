@@ -65,6 +65,9 @@ between OAuth credential stores.
 The Windows REST helper is owned by `skeeks/cms-mcp` at
 `scripts/skeeks-rest.ps1`; this core package only documents how agents locate
 and invoke the installed helper.
+Common reads should use the package's `scripts/skeeks-api.ps1` direct-first
+client. Known operations execute immediately; catalog or schema discovery is a
+fallback after an unknown-tool or validation error, not a mandatory preflight.
 
 When the user asks to create a SkeekS CMS task through MCP, use `create_cms_task`. Default `executor_id` is `1` unless the user specifies another executor.
 
