@@ -78,6 +78,8 @@ Stable fast operations:
 - `site.context`;
 - `tree.list`, optionally with `-ParentId`;
 - `content.list`, optionally with `-ContentId` or `-ParentId`;
+- `product.resolve`, with an exact `-Id`, `-Code`, `-BrandSku` or `-Barcode`;
+- `store-product.resolve`, with `-Id` or a store plus product/external id;
 - `tool.call -ToolName <name> -ArgumentsBase64 <json-base64>`.
 
 These operations execute the known tool immediately. Do not preflight `/tools`.
@@ -86,6 +88,21 @@ the client fetches only that tool schema. Only then inspect the schema or the
 compact tools index.
 List operations return compact records by default; pass `-Full` only when the
 user actually needs complete descriptions or configuration.
+
+For shop imports and catalog synchronization, never page through the complete
+product or store-position catalog to find one record. Resolve it exactly with
+`shop_product_resolve` or `shop_store_product_resolve`, then use the matching
+`*_upsert` tool. Use `shop_product_batch_upsert` (up to 20 items) and
+`shop_store_product_batch_upsert` (up to 50 items) for bounded batches. Product
+and store-position writes are separate OAuth scopes; upload files separately,
+then pass their stored references into product data. Stock `quantity` remains
+read-only and changes only through inventory movement documents.
+
+For dynamic content fields, start with the compact
+`cms_content_property_list`. Read one full definition with
+`cms_content_property_get`, and load enum options only through
+`cms_content_property_enum_list`. Do not request every component setting or
+enum value when only field names and codes are needed.
 
 For an unfamiliar tool, use the lower-level client:
 
