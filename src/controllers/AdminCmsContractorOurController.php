@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelCreateAction;
+use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
@@ -52,6 +53,12 @@ class AdminCmsContractorOurController extends BackendModelStandartController
         $this->generateAccessActions = false;
         $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
+        $this->modelHeader = function () {
+            return $this->renderPartial("@skeeks/cms/views/admin-cms-contractor/_model_header", [
+                'model' => $this->model,
+            ]);
+        };
+
         parent::init();
     }
 
@@ -61,6 +68,24 @@ class AdminCmsContractorOurController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+            'view' => [
+                'class'       => BackendModelAction::class,
+                'name'        => 'Реквизиты',
+                'icon'        => 'fa fa-id-card',
+                'priority'    => 1,
+                'defaultView' => '@skeeks/cms/views/admin-cms-contractor/view',
+            ],
+            'refresh-dadata' => [
+                'class'     => BackendModelAction::class,
+                'name'      => 'Актуализировать данные',
+                'icon'      => 'fa fa-sync-alt',
+                'priority'  => 15,
+                'callback'  => [$this, 'refreshDadata'],
+                'confirm'   => 'Получить актуальные данные по ИНН из DaData и обновить реквизиты?',
+                'method'    => 'post',
+                'request'   => 'ajax',
+                'isVisible' => false,
+            ],
             'index'  => [
 
                 'on beforeRender' => function (Event $e) {
@@ -167,7 +192,7 @@ HTML
             'bankData' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Банковские реквизиты',
-                'priority' => 500,
+                'priority' => 20,
                 'callback' => [$this, 'bankData'],
                 'icon'     => 'far fa-file-alt',
 
@@ -184,7 +209,13 @@ HTML
                 'fields' => [$this, 'updateFields'],
             ],
             "update" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'   => [$this, 'updateFields'],
+                'priority' => 10,
+            ],
+            'log' => [
+                'class'    => BackendModelLogAction::class,
+                'name'     => 'Активность',
+                'priority' => 100,
             ],
         ]);
     }
@@ -440,6 +471,7 @@ JS
                 'inn',
                 'kpp',
                 'ogrn',
+                'registration_date',
                 'okpo',
             ];
         } else {
@@ -453,6 +485,7 @@ JS
                 'inn',
                 'kpp',
                 'ogrn',
+                'registration_date',
                 'okpo',
             ];
         } else {
@@ -465,6 +498,7 @@ JS
                 ],
                 'kpp',
                 'ogrn',
+                'registration_date',
                 'okpo',
             ];
         }
@@ -528,6 +562,62 @@ JS
             $rr->message = $e->getMessage();
         }
 
+
+        return $rr;
+    }
+
+    /**
+     * Updates the current contractor with fresh DaData values by INN.
+     * Empty values returned by the service do not overwrite stored details.
+     *
+     * @param BackendModelAction $action
+     * @return RequestResponse
+     */
+    public function refreshDadata(BackendModelAction $action)
+    {
+        $rr = new RequestResponse();
+
+        try {
+            if (!\Yii::$app->request->isPost) {
+                throw new Exception('Актуализация данных доступна только после подтверждения.');
+            }
+
+            /** @var CmsContractor $model */
+            $model = $action->model;
+            $inn = trim((string)$model->inn);
+            if ($inn === '') {
+                throw new Exception('Нельзя актуализировать данные: у контрагента не указан ИНН.');
+            }
+
+            $dadata = \Yii::$app->dadataClient->suggest->findByIdParty($inn);
+            if (!isset($dadata[0]) || !$dadata[0]) {
+                throw new Exception('По указанному ИНН DaData не нашла организацию или ИП.');
+            }
+
+            $model->setAttributesFromDadata(new PartyModel($dadata[0]), true);
+            $changedAttributes = array_keys($model->getDirtyAttributes());
+
+            if (!$model->save()) {
+                $errors = [];
+                foreach ($model->getFirstErrors() as $attribute => $error) {
+                    $errors[] = $model->getAttributeLabel($attribute).': '.$error;
+                }
+                throw new Exception(implode('; ', $errors));
+            }
+
+            $changedLabels = [];
+            foreach ($changedAttributes as $attribute) {
+                $changedLabels[] = $model->getAttributeLabel($attribute);
+            }
+
+            $rr->success = true;
+            $rr->message = $changedLabels
+                ? 'Данные актуализированы: '.implode(', ', $changedLabels)
+                : 'Данные уже актуальны';
+        } catch (\Throwable $e) {
+            $rr->success = false;
+            $rr->message = $e->getMessage();
+        }
 
         return $rr;
     }

@@ -231,6 +231,12 @@ CSS
                 <div class="sx-contractor-label">ОГРН / ОГРНИП</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->ogrn); ?></div>
             </div>
+            <?php if ($model->hasAttribute('registration_date')) : ?>
+                <div class="sx-contractor-info">
+                    <div class="sx-contractor-label">Дата государственной регистрации</div>
+                    <div class="sx-contractor-value"><?= $formatValue($model->registration_date ? date('d.m.Y', strtotime($model->registration_date)) : null); ?></div>
+                </div>
+            <?php endif; ?>
             <div class="sx-contractor-info">
                 <div class="sx-contractor-label">Краткое наименование</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->asShortText); ?></div>

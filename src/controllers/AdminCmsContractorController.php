@@ -478,6 +478,7 @@ JS
                 'inn',
                 'kpp',
                 'ogrn',
+                'registration_date',
                 'okpo',
             ];
         } else {
@@ -491,6 +492,7 @@ JS
                 'inn',
                 'kpp',
                 'ogrn',
+                'registration_date',
                 'okpo',
             ];
         } else {
@@ -503,6 +505,7 @@ JS
                 ],
                 'kpp',
                 'ogrn',
+                'registration_date',
                 'okpo',
             ];
         }

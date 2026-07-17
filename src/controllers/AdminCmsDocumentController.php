@@ -1081,7 +1081,12 @@ JS
                 '<div class="col-md-6">'.$control('Грузоотправитель и адрес', ['upd', 'shipper']).'</div>'.
                 '<div class="col-md-6">'.$control('Грузополучатель и адрес', ['upd', 'consignee']).'</div>'.
                 '</div>'.
-                $control('Основание передачи', ['upd', 'base_document'], ['type' => 'textarea']).
+                '<div class="row">'.
+                '<div class="col-md-4">'.$control('Вид документа-основания', ['upd', 'base_document_name'], ['default' => 'Счет']).'</div>'.
+                '<div class="col-md-4">'.$control('Номер документа-основания', ['upd', 'base_document_number']).'</div>'.
+                '<div class="col-md-4">'.$control('Дата документа-основания', ['upd', 'base_document_date'], ['type' => 'date']).'</div>'.
+                '</div>'.
+                $control('Дополнительные сведения об основании передачи', ['upd', 'base_document'], ['type' => 'textarea']).
                 $control('Данные о транспортировке и грузе', ['upd', 'transport_info'], ['type' => 'textarea']).
                 '<div class="row">'.
                 '<div class="col-md-6">'.$control('Иные сведения об отгрузке, передаче', ['upd', 'seller_other_info'], ['type' => 'textarea']).'</div>'.

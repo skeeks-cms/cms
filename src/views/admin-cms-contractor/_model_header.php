@@ -72,6 +72,24 @@ CSS
     </div>
 
     <div class="sx-contractor-model-side">
+        <?php $refreshDadataAction = $controller->createAction('refresh-dadata'); ?>
+        <?php if ($refreshDadataAction && $refreshDadataAction->isAllow) : ?>
+            <?php
+            $refreshActionData = Json::encode([
+                'url'     => $refreshDadataAction->url,
+                'confirm' => $refreshDadataAction->confirm,
+                'method'  => $refreshDadataAction->method,
+                'request' => $refreshDadataAction->request,
+            ]);
+            ?>
+            <?= Html::a('<i class="fa fa-sync-alt sx-action-icon"></i> Актуализировать данные', '#', [
+                'onclick'     => "new sx.classes.backend.widgets.Action({$refreshActionData}).go(); return false;",
+                'class'       => 'btn btn-primary',
+                'data-toggle' => 'tooltip',
+                'title'       => 'Обновить реквизиты по ИНН через DaData',
+            ]); ?>
+        <?php endif; ?>
+
         <?php if ($deleteAction = ArrayHelper::getValue($controller->modelActions, 'delete')) : ?>
             <?php
             $actionData = Json::encode([

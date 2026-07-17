@@ -30,6 +30,7 @@ use yii\validators\EmailValidator;
  * @property string|null         $patronymic
  * @property string              $inn ИНН
  * @property string|null         $ogrn ОГРН
+ * @property string|null         $registration_date Дата государственной регистрации
  * @property string|null         $kpp КПП
  * @property string|null         $okpo ОКПО
  * @property string|null         $address Адрес организации
@@ -102,7 +103,7 @@ class CmsContractor extends ActiveRecord
      */
     public function rules()
     {
-        return array_merge(parent::rules(), [
+        $rules = array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'is_our'], 'integer'],
             [['contractor_type'], 'required'],
             [
@@ -233,6 +234,13 @@ class CmsContractor extends ActiveRecord
             ],
 
         ]);
+
+        if ($this->hasAttribute('registration_date')) {
+            $rules[] = [['registration_date'], 'date', 'format' => 'php:Y-m-d'];
+            $rules[] = [['registration_date'], 'default', 'value' => null];
+        }
+
+        return $rules;
     }
 
     /**
@@ -251,6 +259,7 @@ class CmsContractor extends ActiveRecord
             'patronymic'              => 'Отчество',
             'inn'                     => 'ИНН',
             'ogrn'                    => 'ОГРН',
+            'registration_date'       => 'Дата государственной регистрации',
             'kpp'                     => 'КПП',
             'okpo'                    => 'ОКПО',
             'address'                 => 'Адрес',
@@ -416,20 +425,42 @@ class CmsContractor extends ActiveRecord
 
     /**
      * @param PartyModel $party
+     * @param bool $skipEmpty Do not replace existing values with empty DaData values.
      * @return $this
      */
-    public function setAttributesFromDadata(PartyModel $party)
+    public function setAttributesFromDadata(PartyModel $party, $skipEmpty = false)
     {
-        $this->name = $party->unrestricted_value;
-        $this->full_name = $party->unrestricted_value;
+        $setValue = function ($attribute, $value) use ($skipEmpty) {
+            if ($skipEmpty && trim((string)$value) === '') {
+                return;
+            }
 
-        $this->kpp = $party->kpp;
-        $this->ogrn = $party->ogrn;
-        $this->okpo = $party->getDataValue("okpo");
-        $this->address = (string)$party->address;
-        $this->mailing_address = (string)$party->address;
-        $this->mailing_postcode = $party->getDataValue("address.data.postal_code");
-        $this->inn = $party->inn;
+            $this->{$attribute} = $value;
+        };
+
+        $setValue('name', $party->unrestricted_value);
+        $setValue('full_name', $party->unrestricted_value);
+        $setValue('kpp', $party->kpp);
+        $setValue('ogrn', $party->ogrn);
+        $registrationDate = $party->getDataValue("state.registration_date");
+        if ($registrationDate) {
+            if (is_numeric($registrationDate)) {
+                $registrationTimestamp = (int)$registrationDate;
+                if ($registrationTimestamp > 20000000000) {
+                    $registrationTimestamp = (int)floor($registrationTimestamp / 1000);
+                }
+            } else {
+                $registrationTimestamp = strtotime((string)$registrationDate);
+            }
+            if ($registrationTimestamp && $this->hasAttribute('registration_date')) {
+                $setValue('registration_date', date('Y-m-d', $registrationTimestamp));
+            }
+        }
+        $setValue('okpo', $party->getDataValue("okpo"));
+        $setValue('address', (string)$party->address);
+        $setValue('mailing_address', (string)$party->address);
+        $setValue('mailing_postcode', $party->getDataValue("address.data.postal_code"));
+        $setValue('inn', $party->inn);
         //$this->dadata = $party->toArray();
 
         if ($party->type == "LEGAL") {
@@ -437,7 +468,10 @@ class CmsContractor extends ActiveRecord
         } elseif ($party->type == "INDIVIDUAL") {
             $this->contractor_type = self::TYPE_INDIVIDUAL;
 
-            [$this->last_name, $this->first_name, $this->patronymic] = explode(" ", $party->name->full);
+            $fio = array_pad(preg_split('/\s+/u', trim((string)$party->name->full), 3), 3, '');
+            $setValue('last_name', $fio[0]);
+            $setValue('first_name', $fio[1]);
+            $setValue('patronymic', $fio[2]);
 
         } else {
             throw new InvalidArgumentException("Тип {$party->type} не предусмотрен");
