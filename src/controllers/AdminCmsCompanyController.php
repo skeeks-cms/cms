@@ -860,6 +860,11 @@ HTML
                                 'name' => 'Счет-фактура',
                                 'icon' => 'fa fa-file-text-o',
                             ],
+                            ShopDocument::TYPE_RECONCILIATION_ACT => [
+                                'name' => 'Акт сверки',
+                                'icon' => 'fa fa-balance-scale',
+                                'is_reconciliation' => true,
+                            ],
                         ];
 
                         $actions = [];
@@ -868,14 +873,25 @@ HTML
                             $action->isVisible = true;
                             $action->name = $data['name'];
                             $action->icon = $data['icon'];
-                            $action->url = ArrayHelper::merge($action->urlData, [
-                                'type'           => $type,
-                                'cms_company_id' => $model->id,
-                                '_sxb' => [
-                                    'el'  => 1,
-                                    'noa' => 1,
-                                ],
-                            ]);
+                            if (!empty($data['is_reconciliation'])) {
+                                $action->url = [
+                                    '/cms/admin-cms-document/create-reconciliation',
+                                    'company_id' => $model->id,
+                                    '_sxb' => [
+                                        'el'  => 1,
+                                        'noa' => 1,
+                                    ],
+                                ];
+                            } else {
+                                $action->url = ArrayHelper::merge($action->urlData, [
+                                    'type'           => $type,
+                                    'cms_company_id' => $model->id,
+                                    '_sxb' => [
+                                        'el'  => 1,
+                                        'noa' => 1,
+                                    ],
+                                ]);
+                            }
                             $actions[] = $action;
                         }
 

@@ -442,6 +442,9 @@ JS
             </div>
         <?php endif; ?>
 
+        <?php if ($model->type === ShopDocument::TYPE_RECONCILIATION_ACT) : ?>
+            <?= $this->render('_reconciliation', ['model' => $model]); ?>
+        <?php else : ?>
         <div class="sx-document-section">
             <h3 class="sx-document-section-title">Позиции документа</h3>
             <div class="sx-document-items-wrap">
@@ -489,6 +492,7 @@ JS
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
     </div>
 </div>

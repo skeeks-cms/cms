@@ -12,14 +12,18 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\base\DynamicModel;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContractor;
 use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\money\Currency;
 use skeeks\cms\money\Money;
+use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\document\FnsUpdXmlGenerator;
+use skeeks\cms\shop\document\ReconciliationActBuilder;
 use skeeks\cms\shop\models\queries\ShopDocumentQuery;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopDocument;
@@ -78,7 +82,9 @@ class AdminCmsDocumentController extends BackendModelStandartController
                 'fields'   => [$this, 'updateFields'],
                 'priority' => 10,
                 'accessCallback' => function (BackendModelAction $action) {
-                    return $action->model && $action->model->isEditable;
+                    return $action->model
+                        && $action->model->isEditable
+                        && $action->model->type !== ShopDocument::TYPE_RECONCILIATION_ACT;
                 },
             ],
             'delete' => [
@@ -333,6 +339,106 @@ class AdminCmsDocumentController extends BackendModelStandartController
                 'noa' => $sxb['noa'] ?? 1,
             ],
         ]));
+    }
+
+    public function actionCreateReconciliation($company_id)
+    {
+        $company = CmsCompany::find()->forManager()->andWhere(['id' => (int)$company_id])->one();
+        if (!$company) {
+            throw new NotFoundHttpException('Компания не найдена');
+        }
+
+        $ourContractors = CmsContractor::find()->our()->forManager()->orderBy(['name' => SORT_ASC])->all();
+        $counterparties = $company->getContractors()
+            ->andWhere(['is_our' => 0])
+            ->orderBy(['name' => SORT_ASC])
+            ->all();
+
+        $ourItems = ArrayHelper::map($ourContractors, 'id', 'asText');
+        $counterpartyItems = ArrayHelper::map($counterparties, 'id', 'asText');
+        $currencyItems = [];
+        $currencyModels = MoneyCurrency::find()->where(['is_active' => 1])->orderBy(['priority' => SORT_ASC, 'code' => SORT_ASC])->all();
+        if (!$currencyModels) {
+            $currencyModels = MoneyCurrency::find()->orderBy(['priority' => SORT_ASC, 'code' => SORT_ASC])->all();
+        }
+        foreach ($currencyModels as $currency) {
+            $symbol = $currency->code === 'RUB'
+                ? 'руб.'
+                : ((string)Currency::getInstance($currency->code)->symbol ?: $currency->code);
+            $name = trim((string)$currency->name);
+            $currencyItems[$currency->code] = trim($symbol.($name !== '' ? ' — '.$name : '')) ?: $currency->code;
+        }
+        $defaultCurrencyCode = (string)\Yii::$app->money->currencyCode;
+        if (!isset($currencyItems[$defaultCurrencyCode])) {
+            $defaultCurrencyCode = $currencyItems ? (string)array_key_first($currencyItems) : 'RUB';
+        }
+
+        $formModel = new DynamicModel();
+        $formModel->formName = 'ReconciliationAct';
+        $formModel->defineAttribute('seller_contractor_id', $ourItems ? (int)array_key_first($ourItems) : null);
+        $formModel->defineAttribute('buyer_contractor_id', $counterpartyItems ? (int)array_key_first($counterpartyItems) : null);
+        $formModel->defineAttribute('period', date('01.m.Y').' - '.date('t.m.Y'));
+        $formModel->defineAttribute('currency_code', $defaultCurrencyCode);
+        $formModel->addRule(['seller_contractor_id', 'buyer_contractor_id', 'period', 'currency_code'], 'required');
+        $formModel->addRule(['seller_contractor_id', 'buyer_contractor_id'], 'integer');
+        $formModel->addRule('seller_contractor_id', 'in', ['range' => array_keys($ourItems)]);
+        $formModel->addRule('buyer_contractor_id', 'in', ['range' => array_keys($counterpartyItems)]);
+        $formModel->addRule('currency_code', 'in', ['range' => array_keys($currencyItems)]);
+        $formModel->addRule('period', function ($attribute) use ($formModel) {
+            if (!DaterangeInputWidget::parseRange($formModel->{$attribute})) {
+                $formModel->addError($attribute, 'Выберите корректный период');
+            }
+        });
+
+        $previewData = null;
+        if ($formModel->load(\Yii::$app->request->post()) && $formModel->validate()) {
+            [$periodStart, $periodEnd] = DaterangeInputWidget::parseRange($formModel->period);
+            $ourContractor = CmsContractor::findOne((int)$formModel->seller_contractor_id);
+            $counterparty = CmsContractor::findOne((int)$formModel->buyer_contractor_id);
+
+            try {
+                $builder = new ReconciliationActBuilder();
+                if (\Yii::$app->request->post('submit') === 'preview') {
+                    $previewData = $builder->build(
+                        $ourContractor,
+                        $counterparty,
+                        $periodStart,
+                        $periodEnd,
+                        $formModel->currency_code,
+                        $company->id
+                    );
+                } else {
+                    $document = $builder->createDocument(
+                        $company,
+                        $ourContractor,
+                        $counterparty,
+                        $periodStart,
+                        $periodEnd,
+                        $formModel->currency_code
+                    );
+                    \Yii::$app->session->setFlash('success', 'Акт сверки сформирован');
+
+                    return $this->redirect([
+                        'view',
+                        $this->requestPkParamName => $document->id,
+                        '_sxb' => (array)\Yii::$app->request->get('_sxb', []),
+                    ]);
+                }
+            } catch (\Throwable $exception) {
+                $formModel->addError('period', $exception->getMessage());
+            }
+        }
+
+        $this->view->title = 'Новый акт сверки — '.$company->asText;
+
+        return $this->render('@skeeks/cms/views/admin-cms-document/create-reconciliation', [
+            'company'              => $company,
+            'formModel'            => $formModel,
+            'ourItems'             => $ourItems,
+            'counterpartyItems'    => $counterpartyItems,
+            'currencyItems'        => $currencyItems,
+            'previewData'          => $previewData,
+        ]);
     }
 
     public function actionXml($pk)
