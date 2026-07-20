@@ -151,6 +151,126 @@ For content generation, first read site context, active theme and effective
 settings; resolve section/content types and required properties; upload images;
 create a draft; validate; publish only when requested; then return the URL.
 
+## AI-managed site design
+
+Use the theme API and the `html-content` section type when the user wants an
+agent to design a site without filesystem or PHP-template access.
+
+### Unique site header and footer
+
+1. Read `cms_site_context_get`, then read the active theme with
+   `cms_theme_get_active` or `cms_theme_get`. Preserve its id and existing
+   effective configuration.
+2. For an Unify-based theme, enable custom markup with a partial
+   `cms_theme_update` call:
+
+   ```json
+   {
+     "id": 5,
+     "config": {
+       "header": "custom",
+       "header_custom_html": "<header>...</header>",
+       "footer": "custom",
+       "footer_custom_html": "<footer>...</footer>"
+     }
+   }
+   ```
+
+3. Send only the keys being changed. Never copy the complete effective config
+   back into `cms_theme_update`: it also contains form metadata and may hide
+   newer settings. The service validates the editable keys and merges the
+   partial config.
+4. `header_custom_html` and `footer_custom_html` are trusted HTML strings, not
+   PHP/Yii view files. Do not generate PHP code. Avoid third-party scripts,
+   trackers and remote assets unless the user explicitly requests them.
+5. The `cms.theme.write` OAuth scope is required. An older token created before
+   that scope was installed must be authorized again.
+
+### Site-wide CSS
+
+The Unify theme setting `css_code` is registered on every normal page of the
+theme. Read the current theme first, then update it through the same partial
+`cms_theme_update` call:
+
+```json
+{
+  "id": 5,
+  "config": {
+    "css_code": ":root { --brand: #2457ff; }\n.site-hero { ... }"
+  }
+}
+```
+
+Store CSS only, without a surrounding `<style>` tag. Prefer scoped class names,
+responsive rules and CSS variables. Preserve existing CSS unless the user asks
+for a replacement; when extending it, read and deliberately merge the current
+value. Custom header/footer markup may rely on these global styles.
+
+### Global head and end-of-body code
+
+The optional `skeeks/cms-seo` package exposes the application component
+`seo` (`skeeks\\cms\\seo\\CmsSeoComponent`). It provides two site-wide trusted
+HTML settings:
+
+- `header_content` is inserted immediately before `</head>` on normal HTML
+  responses;
+- `countersContent` is inserted near the end of `<body>` in a hidden container
+  and is intended for counters, analytics, chat widgets and other global code.
+  A `<script>` stored there still executes.
+
+Use `cms_component_settings_get_effective` with `component: "seo"` and the
+target `cms_site_id` before changing either field. Then call
+`cms_component_settings_update` with only the attributes that must change:
+
+```json
+{
+  "component": "seo",
+  "cms_site_id": 6,
+  "attributes": {
+    "header_content": "<script>...</script>",
+    "countersContent": "<script>...</script>"
+  }
+}
+```
+
+`cms_component_settings_update` writes only the site-level override, validates
+the component's safe attributes, and merges the partial values. It requires
+the `cms.settings.write` OAuth scope; older clients must authorize again.
+
+Use `header_content` for code that is required in `<head>` (verification tags,
+preloads or scripts whose vendor explicitly requires head placement). Use
+`countersContent` for analytics and deferred integrations. Do not put CSS here
+when the theme's `css_code` setting is sufficient. Never replace existing
+analytics, verification or consent code implicitly: read it, preserve it, and
+append or remove a clearly identified block only when requested. Do not add
+trackers, remote scripts or credentials without explicit user authorization.
+
+### Full-control HTML pages
+
+`html-content` is the canonical `cms_tree_type.code` for a clean HTML page. Its
+view renders `CmsTree.description_full` directly, without the theme content
+container, breadcrumbs, sidebars or automatic content blocks. The site header,
+footer, global assets and `css_code` still apply.
+
+1. Resolve the type through `cms_tree_type_list` and match the exact code
+   `html-content`; do not guess its numeric id. If it is absent, report that the
+   site needs the current `skeeks/cms` and Unify theme migrations/package
+   versions rather than silently using another type.
+2. Resolve the parent section. Create the page as a draft with
+   `cms_tree_create`, passing `tree_type_id` and the complete page markup in
+   `description_full` (top-level or inside `attributes`, according to the
+   runtime tool schema).
+3. Use semantic HTML and make the page responsive. Do not include `<html>`,
+   `<head>` or `<body>` because the theme layout owns the document shell.
+4. Validate with `cms_tree_validate`, publish only when requested, read the
+   page back, and verify its public URL in a browser when browser control is
+   available.
+
+For a fully custom visual system, normally combine one custom header, one
+custom footer, global `css_code`, uploaded site assets, and one or more
+`html-content` pages. Keep navigation URLs and asset URLs based on records
+resolved from the target site rather than invented paths.
+
 ## Mutation safety
 
 Known read operations may run immediately. Before a mutation:
