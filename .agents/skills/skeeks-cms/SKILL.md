@@ -1,6 +1,6 @@
 ---
 name: skeeks-cms
-description: Develop SkeekS CMS/Yii PHP code and handle advanced or unfamiliar site content, shop, MCP, REST and OAuth2 workflows. Routine central CRM reads use the global AGENTS direct-first client and do not require this skill.
+description: Develop SkeekS CMS/Yii PHP code and handle advanced or unfamiliar site content, AI-managed themes and HTML pages, shop, MCP, REST and OAuth2 workflows. Use for custom site headers and footers, site-wide CSS or scripts, and html-content pages. Routine central CRM reads use the global AGENTS direct-first client and do not require this skill.
 ---
 
 # SkeekS CMS
@@ -256,6 +256,8 @@ footer, global assets and `css_code` still apply.
    `html-content`; do not guess its numeric id. If it is absent, report that the
    site needs the current `skeeks/cms` and Unify theme migrations/package
    versions rather than silently using another type.
+   Treat `text-full` as an unrelated legacy or project-specific type. Never
+   rename it, modify it, or use it as an automatic fallback for `html-content`.
 2. Resolve the parent section. Create the page as a draft with
    `cms_tree_create`, passing `tree_type_id` and the complete page markup in
    `description_full` (top-level or inside `attributes`, according to the
