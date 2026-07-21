@@ -212,7 +212,10 @@ class CmsContentElement extends RelatedElementModel
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            TimestampPublishedBehavior::className() => TimestampPublishedBehavior::className(),
+            TimestampPublishedBehavior::className() => [
+                'class' => TimestampPublishedBehavior::className(),
+                'preserveNonEmptyValues' => true,
+            ],
 
             HasStorageFile::className()      => [
                 'class'  => HasStorageFile::className(),
