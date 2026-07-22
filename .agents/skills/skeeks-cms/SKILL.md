@@ -169,7 +169,33 @@ If no credential store exists, run the canonical login client once:
 It owns metadata discovery, dynamic registration, PKCE S256, browser launch,
 loopback callback and DPAPI storage. Do not replace it with an ad-hoc listener,
 inspect browser cookies or poll credential files. Use `-ForceAuthorization`
-only after refresh genuinely failed or the user revoked the connection.
+only after refresh genuinely failed, the user revoked the connection, or an
+explicit scope upgrade is required for newly deployed tools. A changed tools
+revision alone is not a reason to force authorization.
+
+### OAuth scope upgrades after API expansion
+
+When a site deploys new REST tools, an existing refresh token may remain valid
+but lack their new scopes. If the user requests reauthorization, or an expected
+tool is absent from the authorized catalog, run the canonical login client once
+with `-ForceAuthorization`. Let the browser complete the normal consent and
+loopback callback; do not inspect or copy tokens.
+
+After authorization, read `tools-index` and verify the exact required tool names
+and scopes, not only the total tool count. Record the returned `tools_revision`
+for diagnostics. Common expanded families include:
+
+- `cms_saved_filter_*`: `cms.saved_filter.read` / `cms.saved_filter.write`;
+- `form2_form_*`: `cms.form.read` / `cms.form.write`;
+- `form2_form_send_*`: `cms.form_send.read` / `cms.form_send.write`;
+- `cms_site_phone_*`, `cms_site_email_*`, `cms_site_address_*` and
+  `cms_site_social_*`: `cms.site_contact.read` / `cms.site_contact.write`;
+- `cms_site_info_get`, `cms_site_update` and `cms_site_domain_*`:
+  `cms.site.read` / `cms.site.write`.
+
+Do not repeat forced authorization when the required methods are already in the
+authorized catalog. A schema change with the same scopes only requires the
+relevant tool schema or cache refresh.
 
 ## Connected site MCP
 
