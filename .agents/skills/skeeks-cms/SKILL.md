@@ -76,8 +76,13 @@ Stable fast operations:
 - `task.search`, optionally with query, executor, project or company;
 - `task.day`, optionally with date or executor;
 - `site.context`;
+- `site.info`, optionally with `-Id`;
 - `tree.list`, optionally with `-ParentId`;
 - `content.list`, optionally with `-ContentId` or `-ParentId`;
+- `saved-filter.search`, optionally with `-Query` or `-TreeId`, and
+  `saved-filter.get -Id <id>`;
+- `form.search -Query <text>`, `form.schema -Id <id>` and
+  `form.submissions`, optionally with `-FormId` and `-Status`;
 - `product.resolve`, with an exact `-Id`, `-Code`, `-BrandSku` or `-Barcode`;
 - `store-product.resolve`, with `-Id` or a store plus product/external id;
 - `tool.call -ToolName <name> -ArgumentsBase64 <json-base64>`.
@@ -103,6 +108,39 @@ For dynamic content fields, start with the compact
 `cms_content_property_get`, and load enum options only through
 `cms_content_property_enum_list`. Do not request every component setting or
 enum value when only field names and codes are needed.
+
+For sites with `skeeks/cms-module-form2`, manage `/form2/admin-form` through
+the `form2_*` tools. Read `form2_form_property_component_list` before choosing
+field types. Use `form2_form_create_full` for atomic creation of a form with
+fields and list options, and verify it with `form2_form_schema_get`. Reordering
+requires the complete current ID sequence. Form submissions are available via
+`form2_form_send_*`; only their status and manager comment are editable, and
+the API intentionally omits stored server, session, cookie and raw request
+dumps. Do not confuse these Form2 fields with `cms_content_property_*`.
+
+Manage `/cms/admin-cms-saved-filter` through `cms_saved_filter_*`. These records
+are public SEO landing pages for catalog filters, not personal admin-grid
+presets. Resolve a section and exactly one selector (content element, property
+enum, shop brand or country); element and enum selectors require the matching
+content property. Use `cms_saved_filter_resolve` before creation, upload an
+optional image through storage, validate the record, then create or update it.
+Creation is idempotent for an exact section/selector duplicate. No delete tool
+is available.
+
+For general site identity and contacts, use the table-oriented site tools:
+
+- `cms_site_info_get` and `cms_site_update` for the name, logo, favicon and
+  work schedule from `/cms/admin-cms-site-info`;
+- `cms_site_phone_*`, `cms_site_email_*`, `cms_site_address_*` and
+  `cms_site_social_*` for site contacts;
+- `cms_site_social_type_list` before choosing `social_type`;
+- `cms_site_domain_*` for hostnames, HTTPS and the main-domain flag.
+
+Upload logo, favicon and address images with `cms_storage_file_upload`, then
+pass their IDs. Contact/domain lists default to the current site. Read existing
+records first, create or partially update only the requested values, and read
+them back afterward. Setting a domain's `is_main` flag replaces the previous
+main domain. No delete tools are available.
 
 For an unfamiliar tool, use the lower-level client:
 
