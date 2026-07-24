@@ -25,7 +25,7 @@ class UserOnlineWidget extends Widget
     public $user = null;
 
     /**
-     * @var null
+     * @var array|null
      */
     public $options = null;
 

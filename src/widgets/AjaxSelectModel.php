@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\widgets;
 
+use skeeks\cms\base\ActiveRecord;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 
@@ -30,7 +31,7 @@ use yii\db\ActiveQuery;
 class AjaxSelectModel extends AjaxSelect
 {
     /**
-     * @var null
+     * @var class-string<ActiveRecord>|null
      */
     public $modelClass = null;
 
@@ -50,7 +51,7 @@ class AjaxSelectModel extends AjaxSelect
     public $limit = 25;
 
     /**
-     * @var null
+     * @var callable|null
      */
     public $searchQuery = null;
 
