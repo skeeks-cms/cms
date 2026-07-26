@@ -14,6 +14,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\BooleanColumn;
@@ -39,6 +40,7 @@ use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\yii2\dadataClient\models\PartyModel;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
@@ -49,7 +51,9 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\web\ForbiddenHttpException;
+use yii\web\JsExpression;
 use YooKassa\Model\SafeDeal;
 
 /**
@@ -106,13 +110,16 @@ HTML
                 "filters" => [
                     'visibleFilters' => [
                         'q',
+                        'company_binding',
                     ],
                     "filtersModel" => [
                         'rules'            => [
                             ['q', 'safe'],
+                            ['company_binding', 'safe'],
                         ],
                         'attributeDefines' => [
                             'q',
+                            'company_binding',
                         ],
 
                         'fields' => [
@@ -132,6 +139,33 @@ HTML
                                     }
                                 },
                             ],
+                            'company_binding' => [
+                                'class' => SelectField::class,
+                                'label' => 'Связь с компанией',
+                                'items' => [
+                                    'with_company'    => 'С компанией',
+                                    'without_company' => 'Без компании',
+                                ],
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /** @var ActiveQuery $query */
+                                    $query = $e->dataProvider->query;
+                                    $attribute = CmsProject::tableName().'.cms_company_id';
+
+                                    if ($e->field->value === 'with_company') {
+                                        $query->andWhere([
+                                            'and',
+                                            ['is not', $attribute, null],
+                                            ['<>', $attribute, 0],
+                                        ]);
+                                    } elseif ($e->field->value === 'without_company') {
+                                        $query->andWhere([
+                                            'or',
+                                            [$attribute => null],
+                                            [$attribute => 0],
+                                        ]);
+                                    }
+                                },
+                            ],
                         ],
                     ],
                 ],
@@ -144,7 +178,9 @@ HTML
                          * @var $query CmsCompanyQuery
                          */
                         $query = $e->sender->dataProvider->query;
-                        $query->forManager();
+                        $query
+                            ->forManager()
+                            ->with(['cmsCompany']);
                     },
 
                     'defaultOrder' => [
@@ -155,6 +191,7 @@ HTML
                         'checkbox',
                         'actions',
                         'custom',
+                        'company',
                         'managers',
                         'users',
                         //'code',
@@ -167,6 +204,73 @@ HTML
                             'attribute' => 'name',
                             'value'     => function (CmsProject $model) {
                                 return CmsProjectViewWidget::widget(['project' => $model]);
+                            },
+                        ],
+                        'company' => [
+                            'format' => 'raw',
+                            'label'  => 'Компания',
+                            'value'  => function (CmsProject $model) {
+                                if (!$model->cmsCompany) {
+                                    return Html::tag(
+                                        'span',
+                                        Html::tag('i', '', [
+                                            'class' => 'fas fa-unlink',
+                                            'aria-hidden' => 'true',
+                                        ]).' Без компании',
+                                        [
+                                            'class' => 'badge badge-warning',
+                                            'title' => 'Проект не связан с компанией',
+                                            'style' => 'font-size: 12px; font-weight: 500; padding: 6px 9px;',
+                                        ]
+                                    );
+                                }
+
+                                $companyUrl = ['/cms/admin-cms-company/view', 'pk' => $model->cmsCompany->id];
+                                $actionData = Json::encode([
+                                    'isOpenNewWindow' => true,
+                                    'url' => (string) BackendUrlHelper::createByParams($companyUrl)
+                                        ->enableEmptyLayout()
+                                        ->enableNoActions()
+                                        ->url,
+                                ]);
+
+                                $companyLogoUrl = $model->cmsCompany->cmsImage
+                                    ? \Yii::$app->imaging->thumbnailUrlOnRequest(
+                                        $model->cmsCompany->cmsImage->src,
+                                        new \skeeks\cms\components\imaging\filters\Thumbnail([
+                                            'h' => 50,
+                                            'w' => 50,
+                                            'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
+                                        ])
+                                    )
+                                    : Image::getCapSrc();
+
+                                $companyLogo = Html::tag(
+                                    'span',
+                                    Html::img($companyLogoUrl, [
+                                        'alt' => '',
+                                        'style' => 'max-width: 40px; max-height: 40px; border-radius: 50%; width: 100%; height: 100%; margin: auto;',
+                                    ]),
+                                    [
+                                        'style' => 'display: flex; flex: 0 0 40px; overflow: hidden; width: 40px; height: 40px; border: 2px solid #ededed; border-radius: 50%;',
+                                    ]
+                                );
+
+                                return Html::a(
+                                    $companyLogo.Html::tag(
+                                        'span',
+                                        Html::encode($model->cmsCompany->asText)
+                                    ),
+                                    $companyUrl,
+                                    [
+                                        'data-pjax' => 0,
+                                        'title' => 'Открыть компанию',
+                                        'style' => 'display: inline-flex; align-items: center; gap: 8px; border-bottom: 0; font-weight: 500;',
+                                        'onclick' => new JsExpression(
+                                            "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;"
+                                        ),
+                                    ]
+                                );
                             },
                         ],
                         'managers' => [
