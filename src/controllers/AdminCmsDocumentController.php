@@ -343,12 +343,15 @@ class AdminCmsDocumentController extends BackendModelStandartController
 
     public function actionCreateReconciliation($company_id)
     {
-        $company = CmsCompany::find()->forManager()->andWhere(['id' => (int)$company_id])->one();
+        $company = CmsCompany::find()
+            ->forManager()
+            ->andWhere([CmsCompany::tableName().'.id' => (int)$company_id])
+            ->one();
         if (!$company) {
             throw new NotFoundHttpException('Компания не найдена');
         }
 
-        $ourContractors = CmsContractor::find()->our()->forManager()->orderBy(['name' => SORT_ASC])->all();
+        $ourContractors = CmsContractor::find()->our()->orderBy(['name' => SORT_ASC])->all();
         $counterparties = $company->getContractors()
             ->andWhere(['is_our' => 0])
             ->orderBy(['name' => SORT_ASC])
