@@ -1,6 +1,16 @@
 
-.sx-tree ul li.sx-tree-node .row:hover {
-    background: rgba(192, 192, 192, 0.17);
+.sx-tree {
+    color: var(--sx-color-text);
+}
+
+.sx-tree ul li.sx-tree-node > .row {
+    min-height: 28px;
+    align-items: center;
+    border-radius: var(--sx-radius-sm);
+}
+
+.sx-tree ul li.sx-tree-node > .row:hover {
+    background: var(--sx-color-surface-hover);
 }
 
 .sx-tree ul li.sx-tree-node .row .sx-controll-node {
@@ -15,7 +25,7 @@
 
 .sx-tree ul li.sx-tree-node .row .sx-controll-node .btn {
     height: 22px;
-    border-color: #afafaf;
+    border-color: var(--sx-color-border-strong);
 }
 
 .sx-tree .dropdown-menu {
@@ -48,6 +58,7 @@
     padding-top: 5px;
     padding-left: 20px;
     font-size: 11px;
+    color: var(--sx-color-text-muted);
 }
 
 .sx-tree ul li:hover > .row .sx-tree-type {
@@ -79,10 +90,19 @@
 
 .sx-tree ul li.sx-tree-node .sx-node-open-close > a {
     font-size: 6px;
-    color: #000000;
-    background: white;
+    color: var(--sx-color-text-muted);
+    background: var(--sx-color-surface);
     padding: 2px 4px;
-    border: 1px solid #e6ecec;
+    border: 1px solid var(--sx-color-border);
+    border-radius: 999px;
+}
+
+.sx-tree ul li.sx-tree-node .sx-node-open-close > a:hover,
+.sx-tree ul li.sx-tree-node .sx-node-open-close > a:focus {
+    color: var(--sx-color-accent);
+    border-color: var(--sx-color-accent);
+    background: var(--sx-color-accent-soft);
+    text-decoration: none;
 }
 
 .btn-tree-node-controll {
@@ -98,8 +118,8 @@
 
 .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button {
     font-size: 6px;
-    color: #000000;
-    background: white;
+    color: var(--sx-color-text);
+    background: var(--sx-color-surface-raised);
     padding: 2px 4px;
 }
 
@@ -112,12 +132,18 @@
 .sx-tree ul li.sx-tree-node .sx-label-node > a {
     font-size: 15px;
     font-weight: bold;
-    color: #000000;
+    color: var(--sx-color-text);
+}
+
+.sx-tree ul li.sx-tree-node .sx-label-node > a:hover,
+.sx-tree ul li.sx-tree-node .sx-label-node > a:focus {
+    color: var(--sx-color-accent);
+    text-decoration: none;
 }
 
 .sx-tree ul li.sx-tree-node .sx-label-node.status-N > a,
 .sx-tree ul li.sx-tree-node .sx-label-node.status-N > i {
-    color: silver;
+    color: var(--sx-color-text-subtle);
 }
 .sx-tree ul li.sx-tree-node .sx-label-node.is-index-0 > a {
     text-decoration: line-through;
@@ -134,7 +160,9 @@
 
 
 .sx-tree-search input {
-    background: #f3f3f3;
+    color: var(--sx-input-color);
+    border-color: var(--sx-input-border-color);
+    background: var(--sx-input-background);
 }
 
 .sx-tree-search input,

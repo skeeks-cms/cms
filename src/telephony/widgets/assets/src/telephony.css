@@ -1,0 +1,140 @@
+.telephony-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 9999;
+    width: min(280px, calc(100vw - 40px));
+    color: var(--sx-color-text);
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel);
+    background: var(--sx-color-surface-raised);
+    box-shadow: var(--sx-panel-shadow);
+}
+
+.telephony-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--sx-color-border);
+}
+
+.telephony-title {
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.telephony-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: var(--sx-color-text-muted);
+    border: 0;
+    border-radius: var(--sx-radius-control);
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        color var(--sx-button-transition-duration) var(--sx-button-transition-easing),
+        background-color var(--sx-button-transition-duration) var(--sx-button-transition-easing);
+}
+
+.telephony-close:hover {
+    color: var(--sx-color-text);
+    background: var(--sx-color-surface-hover);
+}
+
+.telephony-close:focus-visible {
+    outline: var(--sx-button-focus-outline);
+    outline-offset: var(--sx-button-focus-outline-offset);
+}
+
+.telephony-body {
+    padding: 12px;
+}
+
+.telephony-entities {
+    margin-bottom: 8px;
+}
+
+.telephony-party {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.telephony-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    margin-right: 10px;
+    overflow: hidden;
+    border: 2px solid var(--sx-color-border-strong);
+    border-radius: 50%;
+    background: var(--sx-color-surface-muted);
+}
+
+.telephony-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.telephony-avatar-company {
+    border-color: var(--sx-color-success);
+}
+
+.telephony-avatar-client {
+    border-color: var(--sx-color-info);
+}
+
+.telephony-party-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.telephony-party-name {
+    overflow: hidden;
+    color: var(--sx-color-text);
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.telephony-party-sub {
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+}
+
+.telephony-phone {
+    margin-top: 6px;
+    color: var(--sx-color-text);
+    font-size: 17px;
+    font-weight: 650;
+}
+
+.telephony-status {
+    margin-top: 4px;
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.telephony-actions {
+    padding: 10px 12px;
+    border-top: 1px solid var(--sx-color-border);
+    text-align: right;
+}
+
+@media (max-width: 575.98px) {
+    .telephony-panel {
+        right: 12px;
+        bottom: 12px;
+        width: calc(100vw - 24px);
+    }
+}

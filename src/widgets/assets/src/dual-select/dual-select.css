@@ -1,6 +1,6 @@
 .sx-dual-select-separator {
     font-size: 3em;
-    color: #999;
+    color: var(--sx-color-text-subtle, #999);
     margin-top: 50px;
 }
 
@@ -9,8 +9,9 @@
     -moz-user-select:none;
     padding:0;
     border-radius:4px;
-    border:1px solid #ddd;
-    background-color: #fff;
+    color: var(--sx-color-text, #262626);
+    border:1px solid var(--sx-color-border, #ddd);
+    background-color: var(--sx-color-surface-raised, #fff);
     max-height: 400px;
     overflow: auto;
     min-height: 400px;
@@ -18,7 +19,9 @@
 
 
 .sx-sortable-list li{
-    border:1px solid #ddd;
+    color: var(--sx-color-text, #262626);
+    border:1px solid var(--sx-color-border, #ddd);
+    background-color: var(--sx-color-surface, transparent);
     list-style:none outside none;
     margin:4px;
     padding:8px;
@@ -31,7 +34,7 @@
     cursor:not-allowed
 }
 .sx-sortable-list li:focus,.sx-sortable-list li:hover{
-    background-color:#eee
+    background-color:var(--sx-color-surface-hover, #eee)
 }
 .sx-sortable-list.grid{
     overflow:hidden
@@ -54,6 +57,6 @@
 }
 .sx-sortable-list li.sx-sortable-list-placeholder {
     background:none repeat scroll 0 0 rgba(0,0,0,0);
-    border:1px dashed #CCC;
+    border:1px dashed var(--sx-color-border-strong, #CCC);
     padding:16px
 }

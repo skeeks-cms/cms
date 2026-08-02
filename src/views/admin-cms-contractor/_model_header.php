@@ -9,49 +9,12 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 
 $controller = $this->context;
-
-$this->registerCss(<<<CSS
-.sx-contractor-model-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 1.125rem;
-    align-items: flex-start;
-    margin-bottom: .5rem;
-}
-.sx-contractor-model-header h1 {
-    margin: 0;
-    line-height: 1.1;
-}
-.sx-contractor-model-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .3rem .65rem;
-    margin-top: .3rem;
-    color: silver;
-    font-size: .625rem;
-}
-.sx-contractor-model-side {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-}
-@media (max-width: 56.25rem) {
-    .sx-contractor-model-header {
-        flex-direction: column;
-    }
-    .sx-contractor-model-side {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-CSS
-);
 ?>
 
-<div class="sx-contractor-model-header">
-    <div>
-        <h1><?= Html::encode($model->asText); ?></h1>
-        <div class="sx-contractor-model-meta">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <h1 class="sx-model-header__title"><?= Html::encode($model->asText); ?></h1>
+        <div class="sx-model-header__meta">
             <span data-toggle="tooltip" title="ID записи">
                 <i class="fas fa-key"></i> <?= (int)$model->id; ?>
             </span>
@@ -71,7 +34,7 @@ CSS
         </div>
     </div>
 
-    <div class="sx-contractor-model-side">
+    <div class="sx-model-header__side">
         <?php $refreshDadataAction = $controller->createAction('refresh-dadata'); ?>
         <?php if ($refreshDadataAction && $refreshDadataAction->isAllow) : ?>
             <?php

@@ -7,5 +7,5 @@ form .sx-form-fieldset-title {
 }
 
 form .sx-field-set-hidden .sx-form-fieldset-title {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--sx-form-section-border-color, #ddd);
 }

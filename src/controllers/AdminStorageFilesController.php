@@ -280,83 +280,66 @@ JS
 
                             'name' => [
                                 'value'  => function (StorageFile $model) {
-                                    $result = [];
+                                    $names = array_values(array_unique(array_filter([
+                                        $model->downloadName,
+                                        $model->name,
+                                    ])));
+                                    $displayName = $names[0] ?? $model->extension ?: \Yii::t('skeeks/cms', 'File');
+                                    $content = Html::tag('div', Html::encode($displayName), [
+                                        'class' => 'sx-preview-card__title',
+                                    ]);
 
-                                    if ($model->downloadName) {
-                                        $result[] = $model->downloadName;
-                                    }
-
-                                    if ($model->name) {
-                                        $result[] = $model->name;
-                                    }
-
-
-                                    $result[] = Html::tag('label', $model->extension, [
-                                            'title' => $model->extension,
-                                            'class' => "",
-                                            'style' => "    font-size: 10px;
-    padding: 2px;
-    padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    background: silver;
-        margin-bottom: 0;
-        margin-right: 5px;
-        border-radius: 20px;
-        color: white;
-            line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    color: #fff;
-        ",
-                                        ]).Html::tag('label', $model->mime_type, [
-                                            'title' => $model->mime_type,
-                                            'class' => "",
-                                            'style' => "    font-size: 10px;
-    padding: 2px;
-    padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    background: silver;
-    color: white;
-        margin-bottom: 0;
-        margin-right: 5px;
-        border-radius: 20px;
-            line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    color: #fff;
-        ",
+                                    if (isset($names[1])) {
+                                        $content .= Html::tag('div', Html::encode($names[1]), [
+                                            'class' => 'sx-preview-card__meta',
                                         ]);
+                                    }
 
-                                    $info = implode("<br />", $result);
+                                    $statuses = [];
+                                    if ($model->extension) {
+                                        $statuses[] = Html::tag('span', Html::encode($model->extension), [
+                                            'title' => $model->extension,
+                                            'class' => 'sx-status sx-status--accent',
+                                        ]);
+                                    }
+                                    if ($model->mime_type) {
+                                        $statuses[] = Html::tag('span', Html::encode($model->mime_type), [
+                                            'title' => $model->mime_type,
+                                            'class' => 'sx-status',
+                                        ]);
+                                    }
+                                    if ($statuses) {
+                                        $content .= Html::tag('div', implode('', $statuses), [
+                                            'class' => 'sx-preview-card__statuses',
+                                        ]);
+                                    }
 
                                     if ($model->isImage() && $model->size < 1024 * 1024 * 4) {
-
                                         $preview = \Yii::$app->imaging->getPreview($model, new \skeeks\cms\components\imaging\filters\Thumbnail());
-
-                                        return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='' style='width: 50px;'>
-                                                <a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms', 'Increase')."'>
-                                                    <img src='".$preview->src."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a></div>
-                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
+                                        $mediaContent = Html::img($preview->src, [
+                                            'class' => 'sx-photo sx-img-size-50',
+                                            'alt' => '',
+                                        ]);
+                                    } else {
+                                        $mediaContent = Html::tag(
+                                            'span',
+                                            Html::encode(strtoupper($model->extension ?: '?')),
+                                            ['class' => 'sx-no-photo sx-img-size-50']
+                                        );
                                     }
 
-                                    return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='' style='width: 50px;'><a href='".$model->src."' style='text-decoration: none; border-bottom: 0;' class='sx-fancybox' target='_blank' data-pjax='0' title='".\Yii::t('skeeks/cms',
-                                            'Increase')."'>".\yii\helpers\Html::tag('span', $model->extension,
-                                            [
-                                                'class' => 'label label-primary u-label u-label-primary',
-                                                'style' => '
-                                                font-size: 18px;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    line-height: 38px;',
-                                            ])
-                                        ."</a></div>
-                                                <div style='margin-left: 5px;'>".$info."</div></div>";
+                                    $media = Html::tag('div', Html::a($mediaContent, $model->src, [
+                                        'class' => 'sx-preview-card__media-link sx-fancybox',
+                                        'target' => '_blank',
+                                        'data-pjax' => 0,
+                                        'title' => \Yii::t('skeeks/cms', 'Increase'),
+                                    ]), ['class' => 'sx-preview-card__media']);
+
+                                    return Html::tag(
+                                        'div',
+                                        $media.Html::tag('div', $content, ['class' => 'sx-preview-card__content']),
+                                        ['class' => 'sx-preview-card sx-preview-card--file sx-trigger-action']
+                                    );
                                 },
                                 'format' => 'raw',
                             ],

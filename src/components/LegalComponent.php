@@ -605,11 +605,21 @@ TEXT;
     left: 2rem;
     bottom: 2rem;
     font-size: 0.8rem;
-    background: white;
+    color: var(--sx-color-text, #262626);
+    border: 1px solid var(--sx-color-border, #dedede);
+    background: var(--sx-color-surface-raised, #fff);
+    box-shadow: var(--sx-shadow-panel, 0 3px 8px rgba(0, 0, 0, .16));
     padding: 1rem;
     z-index: 99;
     opacity: 1;
-    border-radius: var(--base-radius);
+    border-radius: var(--sx-radius-panel, var(--base-radius, 8px));
+}
+.sx-legal-cookie a {
+    color: var(--sx-color-accent, #2067b0);
+}
+.sx-legal-cookie a:hover,
+.sx-legal-cookie a:focus {
+    color: var(--sx-color-accent-hover, #195891);
 }
 @media (max-width: 768px) {
     .sx-legal-cookie {

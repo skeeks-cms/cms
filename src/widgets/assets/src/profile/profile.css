@@ -1,0 +1,50 @@
+.sx-profile-form {
+    max-width: 50rem;
+}
+
+.sx-profile-info {
+    margin-bottom: 1.5rem;
+}
+
+.sx-profile-info__label {
+    color: var(--sx-color-text-muted);
+    font-size: 1rem;
+}
+
+.sx-profile-info__value {
+    overflow-wrap: anywhere;
+    color: var(--sx-color-text);
+    font-size: 1.25rem;
+}
+
+.sx-profile-photo__image {
+    width: 100%;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel);
+    background: var(--sx-color-surface-muted);
+}
+
+.sx-password-control {
+    position: relative;
+}
+
+.sx-password-toggle {
+    position: absolute;
+    top: 2.25rem;
+    right: .5rem;
+    z-index: 2;
+}
+
+.sx-password-control input[data-sx-password-input] {
+    padding-right: 3rem;
+}
+
+.sx-password-generate {
+    border-bottom: 1px dashed currentColor;
+}
+
+.sx-password-generate:hover,
+.sx-password-generate:focus {
+    border-bottom-color: transparent;
+    text-decoration: none;
+}

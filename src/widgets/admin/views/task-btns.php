@@ -14,47 +14,16 @@
 $widget = $this->context;
 $user = $widget->user;
 
-$accepted = \skeeks\cms\models\CmsTask::STATUS_ACCEPTED;
-$canceled = \skeeks\cms\models\CmsTask::STATUS_CANCELED;
-$work = \skeeks\cms\models\CmsTask::STATUS_IN_WORK;
-$on_check = \skeeks\cms\models\CmsTask::STATUS_ON_CHECK;
-$on_pause = \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE;
-$on_ready = \skeeks\cms\models\CmsTask::STATUS_READY;
-
-$this->registerCss(<<<CSS
-    .btn-task {
-        color: white;
-        border-radius: var(--border-radius);
-        margin-right: 0.25rem;
-    }
-    .btn-task:hover {
-        color: white;
-    }
-    
-    .btn-task-{$accepted} {
-        background: #9a69cb;
-    }
-    
-    .btn-task-{$canceled} {
-        background: var(--color-gray);
-    }
-    
-    .btn-task-{$work} {
-        background-color: #22e3be;
-    }
-    
-    .btn-task-{$on_check} {
-        background-color: #00bed6;
-    }
-    
-    .btn-task-{$on_pause} {
-        background-color: #e57d20;
-    }
-    .btn-task-{$on_ready} {
-        background-color: green;
-    }
-CSS
-);
+$taskButtonClass = static function ($status) {
+    return \yii\helpers\ArrayHelper::getValue([
+        \skeeks\cms\models\CmsTask::STATUS_ACCEPTED => 'sx-button--info',
+        \skeeks\cms\models\CmsTask::STATUS_CANCELED => 'sx-button--secondary',
+        \skeeks\cms\models\CmsTask::STATUS_IN_WORK  => 'sx-button--success',
+        \skeeks\cms\models\CmsTask::STATUS_ON_CHECK => 'sx-button--info',
+        \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE => 'sx-button--warning',
+        \skeeks\cms\models\CmsTask::STATUS_READY    => 'sx-button--success',
+    ], $status, 'sx-button--secondary');
+};
 ?>
 
 <? if ($widget->isPjax) : ?>
@@ -64,7 +33,7 @@ CSS
         'isBlock'         => false,
         'timeout'         => 10000,
         'options'         => [
-            'class' => 'g-color-gray-dark-v6',
+            'class' => 'sx-task-btns-pjax',
         ],
     ]); ?>
 <? endif; ?>
@@ -123,6 +92,7 @@ $form = \yii\widgets\ActiveForm::begin([
     'id'      => "form-".$widget->id,
     'options' => [
         'data-pjax' => 1,
+        'class'     => 'sx-button-group',
     ],
 ]);
 
@@ -142,7 +112,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_ACCEPTED; ?>
         <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_ACCEPTED).'"></i> Взять задачу',
             [
-                'class'       => 'btn btn-task btn-task-' . \skeeks\cms\models\CmsTask::STATUS_ACCEPTED,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide');  $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_ACCEPTED).$title,
@@ -157,7 +127,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_IN_WORK; ?>
         <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_IN_WORK).'"></i> Начать работу',
             [
-                'class'       => 'btn btn-task btn-task-' . \skeeks\cms\models\CmsTask::STATUS_IN_WORK,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_IN_WORK).$title,
@@ -173,7 +143,7 @@ $title = '';
         <?/* if ($widget->task->notEndCrmTaskSchedule && $widget->task->notEndCrmTaskSchedule->date != date("Y-m-d")) : */?><!--
 
             <div class="row">
-                <div class="col-md-12" style="color: red;">
+                <div class="col-md-12 sx-text--danger">
                 Когда была завершена задача <?/*= \Yii::$app->formatter->asDate($widget->task->notEndCrmTaskSchedule->date); */?>?
             </div>
             <div class="col-md-3">
@@ -201,7 +171,7 @@ $title = '';
             <? $status = \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE; ?>
             <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_ON_PAUSE).'"></i> На паузу',
                 [
-                    'class'       => 'btn btn-task btn-task-'.\skeeks\cms\models\CmsTask::STATUS_ON_PAUSE,
+                    'class'       => 'btn sx-button ' . $taskButtonClass($status),
                     'type'        => 'submit',
                     'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                     'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_ON_PAUSE).$title,
@@ -213,7 +183,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_READY; ?>
             <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_READY).'"></i> Готова',
             [
-                'class'       => 'btn btn-task btn-task-'. \skeeks\cms\models\CmsTask::STATUS_READY,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_READY).$title,
@@ -225,7 +195,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_ON_CHECK; ?>
             <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_ON_CHECK).'"></i> На проверку',
                 [
-                    'class'       => 'btn btn-task btn-task-'.\skeeks\cms\models\CmsTask::STATUS_ON_CHECK,
+                    'class'       => 'btn sx-button ' . $taskButtonClass($status),
                     'type'        => 'submit',
                     'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                     'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_ON_CHECK).$title,
@@ -247,7 +217,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_IN_WORK; ?>
         <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_IN_WORK).'"></i> Начать работу',
             [
-                'class'       => 'btn btn-task btn-task-'.\skeeks\cms\models\CmsTask::STATUS_IN_WORK,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_IN_WORK).$title,
@@ -265,7 +235,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_CANCELED; ?>
         <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_CANCELED).'"></i> Отменить',
             [
-                'class'       => 'btn btn-task btn-task-'.\skeeks\cms\models\CmsTask::STATUS_CANCELED,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_CANCELED).$title,
@@ -280,7 +250,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE; ?>
         <?= \yii\helpers\Html::button('<i class="fas fa-redo"></i> Возобновить',
         [
-            'class'       => 'btn btn-task btn-task-' . \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE,
+            'class'       => 'btn sx-button ' . $taskButtonClass($status),
             'type'        => 'submit',
             'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
             'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_ON_PAUSE).$title,
@@ -298,7 +268,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE; ?>
         <?= \yii\helpers\Html::button('<i class="fas fa-redo"></i> Возобновить',
             [
-                'class'       => 'btn btn-task btn-task-' . \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_ON_PAUSE).$title,
@@ -309,7 +279,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_READY; ?>
         <?= \yii\helpers\Html::button('<i class="'.\skeeks\cms\models\CmsTask::statusesIcons(\skeeks\cms\models\CmsTask::STATUS_READY).'"></i> Готова',
             [
-                'class'       => 'btn btn-task btn-task-'. \skeeks\cms\models\CmsTask::STATUS_READY,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_READY).$title,
@@ -323,7 +293,7 @@ $title = '';
         <? $status = \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE; ?>
         <?= \yii\helpers\Html::button('<i class="fas fa-redo"></i> Возобновить',
             [
-                'class'       => 'btn btn-task btn-task-' . \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE,
+                'class'       => 'btn sx-button ' . $taskButtonClass($status),
                 'type'        => 'submit',
                 'onclick'     => "$(this).tooltip('hide'); $('.sx-task-status', '#form-{$widget->id}').val('{$status}');",
                 'title'       => \skeeks\cms\models\CmsTask::statusesFeatureHints(\skeeks\cms\models\CmsTask::STATUS_ON_PAUSE).$title,

@@ -274,69 +274,60 @@ class AdminUserController extends BackendModelStandartController
                             'attribute' => 'id',
                             'label'     => 'Аккаунт',
                             'value'     => function (CmsUser $cmsUser) {
-                                //$data[] = $cmsUser->asText;
-                                $data[] = Html::a($cmsUser->shortDisplayNameWithAlias, "#", [
-                                    'style' => 'font-size: 15px;
-                                                display: block;',
-                                ]);
-                                /*if ($cmsUser->phone) {
-                                    $data[] = "<div style='color: gray;'>" . $cmsUser->phone . "</div>";
-                                }
-                                if ($cmsUser->email) {
-                                    $data[] = "<div style='color: gray;'>" . $cmsUser->email . "</div>";
-                                }*/
-
                                 $rolesData = [];
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
                                     foreach ($roles as $role) {
-                                        $rolesData[] = Html::tag('label', $role->description, [
+                                        $rolesData[] = Html::tag('span', Html::encode($role->description), [
                                             'title' => $role->name,
-                                            'class' => "".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 10px;
-    padding: 2px;
-    padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    background: silver;
-    color: white;
-        margin-bottom: 0;
-        margin-right: 5px;
-        border-radius: 20px;
-            line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    margin-top: 5px;
-    margin-bottom: 0;
-    color: #fff;",
+                                            'class' => 'sx-status'.($role->name === 'root' ? ' sx-status--danger' : ''),
                                         ]);
                                     }
                                 }
 
+                                $content = Html::a(
+                                    Html::encode($cmsUser->shortDisplayNameWithAlias),
+                                    '#',
+                                    [
+                                        'class' => 'sx-preview-card__title sx-collection-cell__primary sx-trigger-action',
+                                    ]
+                                );
+
                                 if ($rolesData) {
-                                    $data[] = implode("", $rolesData);
+                                    $content .= Html::tag(
+                                        'div',
+                                        implode('', $rolesData),
+                                        ['class' => 'sx-preview-card__statuses']
+                                    );
                                 }
 
+                                $media = Html::tag(
+                                    'div',
+                                    Html::a(
+                                        Html::img(
+                                            $cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc(),
+                                            [
+                                                'class' => 'sx-photo sx-img-size-50',
+                                                'alt'   => '',
+                                            ]
+                                        ),
+                                        '#',
+                                        [
+                                            'class'      => 'sx-preview-card__media-link sx-trigger-action',
+                                            'aria-label' => $cmsUser->shortDisplayNameWithAlias,
+                                        ]
+                                    ),
+                                    ['class' => 'sx-preview-card__media']
+                                );
 
-                                $info = implode("", $data);
-
-                                return "<div class='row no-gutters sx-trigger-action' style='cursor: pointer;'>
-                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none;
-    border-bottom: 0;
-    width: 54px;
-    border-radius: 50%;
-    border: 2px solid #ededed;
-    height: 54px;
-    
-    display: flex;
-    overflow: hidden;'>
-                                                    <img src='".($cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc())."' style='    max-width: 50px;
-    max-height: 50px;
-    border-radius: 50%;
-    margin: auto;' />
-                                                </a>
-                                                </div>
-                                                <div style='margin-left: 10px; line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
+                                return Html::tag(
+                                    'div',
+                                    $media.Html::tag(
+                                        'div',
+                                        $content,
+                                        ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
+                                    ),
+                                    ['class' => 'sx-preview-card sx-trigger-action']
+                                );
                             },
                         ],
                         'created_at'             => [
@@ -355,7 +346,9 @@ class AdminUserController extends BackendModelStandartController
                             'class' => ImageColumn2::class,
                         ],
                         'is_active'              => [
-                            'class' => BooleanColumn::class,
+                            'class'     => BooleanColumn::class,
+                            'trueIcon'  => '<span class="sx-text--success">✓</span>',
+                            'falseIcon' => '<span class="sx-text--danger">×</span>',
                         ],
                         'role'                   => [
                             'value'  => function ($cmsUser) {

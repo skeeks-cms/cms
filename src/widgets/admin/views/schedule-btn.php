@@ -14,132 +14,12 @@ $widget = $this->context;
 $user = $widget->user;
 $pjaxId = $widget->pjaxId;
 $layout = $widget->layout;
-$pjaxIdJson = \yii\helpers\Json::htmlEncode($pjaxId);
-?>
-
-<? $this->registerJs(<<<JS
-(function(sx, $, _)
-{
-sx.classes.InfoSchedule = sx.classes.Component.extend({
-
-    _init: function()
-    {
-        var self = this;
-        setInterval(function()
-        {
-            self.update();
-        }, 30000);
-    },
-
-    update: function()
-    {
-        $.pjax.reload("#" + this.get('id'), {async:false});
-    },
-
-});
-
-new sx.classes.InfoSchedule({
-    'id': {$pjaxIdJson}
-});
-})(sx, sx.$, sx._);
-JS
-);
-$this->registerCss(<<<CSS
-
-.sx-schedule-pjax {
-    display: flex;
-}
-
-.sx-schedule-pjax>div {
-    margin-left: 1rem;
-}
-
-.sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
-    width: 2rem;
-    height: 2rem;
-}
-
-.sx-schedule-pjax .sx-current-task .sx-main-info {
-    overflow: hidden;
-    max-height: 40px;
-}
-.sx-schedule-pjax .sx-current-task {
-    line-height: 1;
-    max-width: 30rem;
-    max-height: 40px;
-    
-    margin-left: 2rem;
-}
-
-.sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
-    width: 2rem;
-    height: 2rem;
-}
-
-.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    padding: 1rem;
-}
-
-.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar>div {
-    margin-left: .75rem;
-    margin-top: 0;
-}
-
-.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar form {
-    flex: 1 1 auto;
-    margin: 0;
-}
-
-.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar form .btn {
-    width: 100%;
-}
-
-.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar .sx-current-task {
-    flex: 0 0 100%;
-    max-width: none;
-    max-height: none;
-    margin-left: 0;
-    margin-top: 1.75rem;
-    padding-top: .5rem;
-}
-
-.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar .col-md-12 {
-    flex: 0 0 100%;
-    margin-left: 0;
-    margin-top: .75rem;
-}
-
-.sx-schedule-last {
-    animation: sx-pulse 3s infinite ease;
-}
-@keyframes sx-pulse {
-    0%{
-        opacity: 1;
-        background: rgba(255, 48, 26, 0);
-        box-shadow: none;
-    }
-
-    54%{
-        background: rgba(255, 48, 26, 0);
-        box-shadow: none;
-        opacity: 0;
-    }
-    55%{
-        opacity: 0;
-        /*box-shadow: 0 0 9px 1px red, 0 0 10px 0px red;*/
-        /*background: #5c5c5c;*/
-    }
-    100%{
-        opacity: 1;
-        /*box-shadow: 0 0 13px -9px red, 0 0 32px 20px red;*/
-        /*background: rgba(255, 48, 26, 0);*/
-    }
-}
-CSS
-);
+$refreshUrl = \yii\helpers\Url::to([
+    '/cms/ajax/schedule-control',
+    'id' => $pjaxId,
+    'layout' => $layout,
+]);
+\skeeks\cms\widgets\assets\CmsUserScheduleAsset::register($this);
 ?>
 
 <? $pjax = \skeeks\cms\widgets\Pjax::begin([
@@ -149,6 +29,8 @@ CSS
     'timeout'         => 100000,
     'options'         => [
         'class' => 'sx-schedule-pjax sx-schedule-layout-'.$layout,
+        'data-sx-schedule-refresh' => 30000,
+        'data-sx-schedule-url' => $refreshUrl,
     ],
 ]); ?>
 <? $form = \yii\widgets\ActiveForm::begin([
@@ -159,7 +41,7 @@ CSS
 ]); ?>
 
 <?php
-$notEndCrmSchedule = \skeeks\cms\models\CmsUserSchedule::find()->user($user)->notEnd()->one();
+$notEndCrmSchedule = $cmsUserSchedule->getIsNewRecord() ? null : $cmsUserSchedule;
 ?>
 
 <? if ($notEndCrmSchedule) : ?>
@@ -169,7 +51,7 @@ $notEndCrmSchedule = \skeeks\cms\models\CmsUserSchedule::find()->user($user)->no
         <?
         $time = $notEndCrmSchedule->durationAsText;
         ?>
-        <?= \yii\helpers\Html::button('<i class="fa fa-stop" style="color: white;"></i> '.\Yii::$app->formatter->asTime($notEndCrmSchedule->start_at,
+        <?= \yii\helpers\Html::button(\skeeks\cms\backend\helpers\BackendIcon::render('stop', ['size' => 14]).' '.\Yii::$app->formatter->asTime($notEndCrmSchedule->start_at,
                 "short")." — <span class='sx-schedule-last'>".\Yii::$app->formatter->asTime(time(),
                 "short")."</span>",
             [
@@ -183,7 +65,7 @@ $notEndCrmSchedule = \skeeks\cms\models\CmsUserSchedule::find()->user($user)->no
             ]); ?>
     <? else : ?>
 
-        <div style="color: red;">
+        <div class="sx-text--danger">
             Когда вы закончили работу?<br/>
             <?= \Yii::$app->formatter->asDate($user->notEndCrmSchedule->date); ?>
         </div>
@@ -203,9 +85,9 @@ $notEndCrmSchedule = \skeeks\cms\models\CmsUserSchedule::find()->user($user)->no
         <?
         $time = $user->notEndCrmSchedule->durationAsText;
         ?>
-        <?= \yii\helpers\Html::button('<i class="fa fa-stop"></i> '.\Yii::$app->formatter->asTime($user->notEndCrmSchedule->start_time, "short")." — <span style='color: silver;'>?</span>",
+        <?= \yii\helpers\Html::button(\skeeks\cms\backend\helpers\BackendIcon::render('stop', ['size' => 14]).' '.\Yii::$app->formatter->asTime($user->notEndCrmSchedule->start_time, "short")." — <span>?</span>",
             [
-                'class'          => 'btn btn-md u-btn-inset u-btn-inset--rounded u-btn-primary g-font-weight-600 g-letter-spacing-0_5 g-brd-2 g-rounded-50 g-mr-10',
+                'class'          => 'btn btn-md btn-primary sx-button sx-button--primary',
                 'type'           => 'submit',
                 'onclick'        => "$(this).tooltip('hide')",
                 'title'          => 'Остановить работу. <br />В промежутке: '.$time,
@@ -217,7 +99,7 @@ $notEndCrmSchedule = \skeeks\cms\models\CmsUserSchedule::find()->user($user)->no
     <? endif; ?>
 <? else : ?>
     <input type="hidden" value="start" name="action-type"/>
-    <?= \yii\helpers\Html::button('<i class="fa fa-play" style="color: white;"></i> Начать работу', [
+    <?= \yii\helpers\Html::button(\skeeks\cms\backend\helpers\BackendIcon::render('play', ['size' => 18]).' Начать работу', [
         'class'          => 'btn btn-md btn-primary',
         'type'           => 'submit',
         'onclick'        => "$(this).tooltip('hide')",
@@ -242,9 +124,9 @@ if ($cmsSchedulesByDate) : ?>
 
 
     <div class="my-auto">
-        <a href="#" style="cursor: unset;" data-toggle="tooltip" data-html="true"
+        <a href="#" class="sx-schedule-info" data-toggle="tooltip" data-html="true"
            title="Сегодня: <?php echo \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($cmsSchedulesByDate)."<br>".\skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules($cmsSchedulesByDate); ?>">
-            <i class="fas fa-info"></i>
+            <?= \skeeks\cms\backend\helpers\BackendIcon::render('info', ['size' => 15]); ?>
         </a>
     </div>
 
@@ -257,7 +139,7 @@ if ($cmsSchedulesByDate) : ?>
 
 <? if ($error) : ?>
     <div class="col-md-12">
-        <p style="color: red;"><?= $error; ?></p>
+        <p class="sx-text--danger"><?= $error; ?></p>
     </div>
 <? endif; ?>
 
@@ -281,15 +163,4 @@ if ($cmsSchedulesByDate) : ?>
 <?php endif; ?>
 
 <? $pjax::end(); ?>
-
-<? $this->registerJs(<<<JS
-$("body").on('click', ".sx-total-link", function() {
-    $('.sx-schedule-times').toggle();
-    $(this).tooltip('hide');
-    return false;
-});
-JS
-); ?>
-
-
 

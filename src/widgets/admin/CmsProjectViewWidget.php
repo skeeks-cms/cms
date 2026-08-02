@@ -9,6 +9,7 @@
 namespace skeeks\cms\widgets\admin;
 
 use common\models\User;
+use skeeks\cms\backend\assets\BackendAsset;
 use skeeks\cms\models\CmsProject;
 use skeeks\crm\models\CrmProject;
 use yii\base\Widget;
@@ -42,6 +43,8 @@ class CmsProjectViewWidget extends Widget
 
     public function run()
     {
+        BackendAsset::register($this->view);
+
         return $this->render('project-view');
     }
 }

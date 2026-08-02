@@ -26,6 +26,9 @@ $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'action'                 => \yii\helpers\Url::to($widget->backend_url),
     'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
+    'options'                => [
+        'class' => 'sx-comment-form',
+    ],
     'clientCallback'         => new \yii\web\JsExpression(<<<JS
 function (ActiveFormAjaxSubmit) {
     
@@ -70,81 +73,6 @@ JS
     <div class="col-12">
         <?php
 
-        $this->registerCss(<<<CSS
-.cke_bottom {
-background: none !important;
-border-top: none !important;
-}
-.cke_path {
-display: none !important;
-}
-.cke_chrome {
-box-shadow: none !important;
-border: 1px solid #C2C2C2 !important;
-border-radius: 0.5rem !important;
-}
-.cke_top {
-background: none !important;
-border-bottom: 1px solid #C2C2C2 !important;
-border-radius: 0.5rem !important;
-}
-.cke_inner {
-border-radius: 0.5rem !important;
-}
-.cke_toolgroup {
-background: none !important;
-border: none !important;
-}
-.sx-comment-pin-field {
-    margin: 0 0 1rem 0;
-}
-.sx-comment-pin-toggle {
-    align-items: center;
-    background: #f5f7fa;
-    border: 1px solid #dfe5ec;
-    border-radius: 999px;
-    color: #667085;
-    cursor: pointer;
-    display: inline-flex;
-    font-size: 0.88rem;
-    font-weight: 600;
-    gap: 0.45rem;
-    line-height: 1;
-    margin: 0;
-    padding: 0.55rem 0.85rem;
-    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
-}
-.sx-comment-pin-toggle:hover {
-    background: #edf6ff;
-    border-color: #b8d8f4;
-    color: #1e6ba8;
-}
-.sx-comment-pin-toggle:focus,
-.sx-comment-pin-toggle:active {
-    outline: none;
-}
-.sx-comment-pin-toggle.is-active {
-    background: #e8f7f4;
-    border-color: #9edbd0;
-    color: #11806f;
-}
-CSS
-        );
-        $this->registerJs(<<<JS
-$("body").off("click.sxCommentPinToggle").on("click.sxCommentPinToggle", ".sx-comment-pin-toggle", function(e) {
-    e.preventDefault();
-
-    var jBtn = $(this);
-    var jInput = $("#" + jBtn.data("input"));
-    var isActive = !jBtn.hasClass("is-active");
-
-    jBtn.toggleClass("is-active", isActive);
-    jInput.val(isActive ? 1 : 0);
-
-    return false;
-});
-JS
-        );
         echo $form->field($log, "comment")->widget(
             \skeeks\yii2\ckeditor\CKEditorWidget::class,
             [
@@ -206,7 +134,7 @@ JS
     </div>
 
     <div class="col-12">
-        <div style="display: none;">
+        <div class="d-none">
             <?php echo $form->field($log, "model_code"); ?>
             <?php echo $form->field($log, "model_id"); ?>
         </div>
@@ -225,15 +153,18 @@ JS
             'id' => $pinInputId,
             'value' => 0,
         ]); ?>
-        <button type="button" class="sx-comment-pin-toggle" data-input="<?php echo $pinInputId; ?>">
+        <button type="button"
+                class="sx-chip sx-comment-pin-toggle"
+                data-input="<?php echo $pinInputId; ?>"
+                aria-pressed="false">
             <i class="fas fa-thumbtack"></i>
             <span><?php echo \yii\helpers\Html::encode($pinLabel); ?></span>
         </button>
     </div>
     <div class="col-12">
-        <div class="d-flex">
-            <button type="submit" class="btn btn-primary" style="margin-right: 1rem;">Отправить</button>
-            <div class="sx-success-result my-auto" style="flex-grow: 1; color: green;"></div>
+        <div class="sx-comment-actions">
+            <button type="submit" class="btn sx-button sx-button--primary">Отправить</button>
+            <div class="sx-success-result sx-text--success my-auto" aria-live="polite"></div>
         </div>
     </div>
 

@@ -5,42 +5,6 @@
  */
 
 $controller = $this->context;
-$this->registerCss(<<<CSS
-button.sx-quick-access-favorite-btn {
-    all: unset;
-    display: inline-flex;
-    width: auto !important;
-    height: auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    color: #a8b0ba;
-    font-size: 17px;
-    line-height: 1;
-    vertical-align: 4px;
-    background: transparent none !important;
-    box-shadow: none !important;
-    cursor: pointer;
-    transition: color .15s ease;
-}
-button.sx-quick-access-favorite-btn:hover,
-button.sx-quick-access-favorite-btn:focus {
-    color: #d99a00;
-    background: transparent none !important;
-    box-shadow: none !important;
-    outline: 0;
-}
-button.sx-quick-access-favorite-btn.is-active {
-    color: #f0ad00;
-}
-CSS
-);
-
 $makeQuickAccessImageUrl = function ($model) {
     if ($model && $model->cmsImage) {
         return (string) \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src, new \skeeks\cms\components\imaging\filters\Thumbnail([
@@ -65,17 +29,17 @@ $quickAccessFavoriteItem = [
     'image'  => $makeQuickAccessImageUrl($model),
 ];
 ?>
-<div class="row" style="margin-bottom: 5px;">
+<div class="row sx-model-header">
     <?php if ($model->cmsImage) : ?>
-        <div class="col my-auto" style="max-width: 60px">
-            <img style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #ededed; border-radius: 50%;"
+        <div class="col my-auto sx-model-header__media">
+            <img class="sx-model-header__image sx-model-header__image--round"
                  src="<?= \yii\helpers\Html::encode($makeQuickAccessImageUrl($model)); ?>"
                  alt="">
         </div>
     <?php endif; ?>
 
     <div class="col my-auto">
-        <h1 class="sx-user-header-h1" style="margin-bottom: 0; line-height: 1.1;">
+        <h1 class="sx-user-header-h1 sx-model-header__title">
             <?= \yii\helpers\Html::encode($model->name); ?>
             <button type="button"
                     class="sx-quick-access-favorite-btn"
@@ -86,22 +50,22 @@ $quickAccessFavoriteItem = [
             </button>
         </h1>
 
-        <div class="sx-small-info" style="font-size: 10px; color: silver;">
+        <div class="sx-small-info sx-model-header__meta">
             <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip">
                 <i class="fas fa-key"></i> <?= (int) $model->id; ?>
             </span>
             <?php if ($model->created_at) : ?>
-                <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?= \Yii::$app->formatter->asDatetime($model->created_at); ?>">
+                <span data-toggle="tooltip" title="Запись создана в базе: <?= \Yii::$app->formatter->asDatetime($model->created_at); ?>">
                     <i class="far fa-clock"></i> <?= \Yii::$app->formatter->asDate($model->created_at); ?>
                 </span>
             <?php endif; ?>
             <?php if ($model->created_by && $model->createdBy) : ?>
-                <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?= (int) $model->createdBy->id; ?>">
+                <span data-toggle="tooltip" title="Запись создана пользователем с ID: <?= (int) $model->createdBy->id; ?>">
                     <i class="far fa-user"></i> <?= \yii\helpers\Html::encode($model->createdBy->shortDisplayName); ?>
                 </span>
             <?php endif; ?>
             <?php if ($model->cmsCompany) : ?>
-                <span style="margin-left: 5px;" data-toggle="tooltip" title="<?= \yii\helpers\Html::encode($model->cmsCompany->name); ?>">
+                <span data-toggle="tooltip" title="<?= \yii\helpers\Html::encode($model->cmsCompany->name); ?>">
                     <i class="far fa-building"></i> <?= \yii\helpers\Html::encode($model->cmsCompany->name); ?>
                 </span>
             <?php endif; ?>
@@ -123,7 +87,7 @@ $quickAccessFavoriteItem = [
             "size"            => isset($deleteAction->size) ? $deleteAction->size : "",
         ]);
         ?>
-        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+        <div class="col my-auto sx-model-header__actions">
             <?= \yii\helpers\Html::a('<i class="fa fa-trash sx-action-icon"></i>', "#", [
                 'onclick'     => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
                 'class'       => "btn btn-default",

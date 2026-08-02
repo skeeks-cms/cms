@@ -74,7 +74,7 @@ $renderTasksTable = function ($tasks, $user) {
 
             $trClass = $isCan ? '' : 'sx-task-hidden';
             if ($task->status == CmsTask::STATUS_IN_WORK) {
-                $trClass .= ' g-bg-in-work';
+                $trClass .= ' sx-row-in-work';
             }
             ?>
             <?php echo Html::beginTag('tr', ['class' => trim($trClass)]); ?>

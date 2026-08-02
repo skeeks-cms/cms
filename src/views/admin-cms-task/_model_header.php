@@ -11,7 +11,7 @@
  */
 $controller = $this->context;
 ?>
-<div class="row" style="margin-bottom: 5px;">
+<div class="row sx-model-header">
    
     <div class="col my-auto">
             <div>
@@ -25,14 +25,14 @@ $controller = $this->context;
             </div>
 
 
-            <div    class="sx-small-info" style="font-size: 10px; color: silver;">
+            <div class="sx-small-info sx-model-header__meta">
                     <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
                     <? if ($model->created_at) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
+                        <span data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
                                     class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
                     <? endif; ?>
                     <? if ($model->created_by) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
+                        <span data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
                                     class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
                     <? endif; ?>
                    
@@ -68,7 +68,7 @@ $controller = $this->context;
             'title'       => "Удалить",
         ]);
         ?>
-        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+        <div class="col my-auto sx-model-header__actions">
             <?php echo $href; ?>
         </div>
     <?php endif; ?>

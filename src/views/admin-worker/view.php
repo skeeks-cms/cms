@@ -102,157 +102,22 @@ $this->registerCSS(<<<CSS
 }
 
 
-/**
- * Современное оформление свойств
- */
-.sx-properties-wrapper.sx-columns-1 ul.sx-properties {
-    -moz-column-count: 1;
-    column-count: 1;
-}
-
-.sx-properties-wrapper.sx-columns-2 ul.sx-properties {
-    -moz-column-count: 2;
-    column-count: 2;
-}
-
-.sx-properties-wrapper.sx-columns-3 ul.sx-properties {
-    -moz-column-count: 3;
-    column-count: 3;
-}
-
-ul.sx-properties {
-    -moz-column-count: 2;
-    column-count: 2;
-    grid-column-gap: 40px;
-    -moz-column-gap: 40px;
-    column-gap: 40px;
-    margin: 0px;
-    padding: 0px;
-}
-
-ul.sx-properties li {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    page-break-inside: avoid;
-    -moz-column-break-inside: avoid;
-    break-inside: avoid;
-}
-
-ul.sx-properties .sx-properties--value {
-    text-align: right;
-    max-width: 200px;
-    line-height: 1.4;
-}
-
-ul.sx-properties .sx-properties--name {
-    color: gray;
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    white-space: nowrap;
-}
-
-ul.sx-properties .sx-properties--name:after {
-    content: "";
-    flex-grow: 1;
-    opacity: .25;
-    margin: 0 6px 0 2px;
-    border-bottom: 1px dotted gray;
-}
-
-
-
-.sx-table td, .sx-table th {
-    border: 0;
-    text-align: center;
-    padding: 7px 10px;
-    font-size: 13px;
-    border-bottom: 1px solid #dee2e68f;
-    background: white;
-}
-
-
-.sx-table th {
-    background: #f9f9f9;
-}
-
-.sx-table-wrapper {
-    border-radius: 5px;
-    border-left: 1px solid #dee2e68f;
-    border-right: 1px solid #dee2e68f;
-    border-top: 1px solid #dee2e68f;
-}
-.sx-table-wrapper table {
-    margin-bottom: 0;
-}
-
-
-.sx-info-block {
-    background: #f9f9f9;
-    margin-top: 10px;
-    padding: 10px;
-}
-.sx-title {
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-
-.sx-block-title {
-    font-size: 12px; 
-    text-transform: uppercase; 
-    margin-bottom: 5px; 
-    font-weight: bold;
-    color: #3a3a3a;
-}
-.sx-block {
-    margin-bottom: 20px;
-    /*padding: 10px;*/
-}
-.sx-block .sx-block-content {
-    /*padding: 10px;
-    background: #f9f9f9;*/
-}
-
-.sx-label {
-    font-size: 11px;
-    color: #a1a1a1;
-}
-
-.sx-value-row {
-    margin-bottom: 10px;
-    line-height: 1.3;
-}
-.sx-edit-btn {
-    color: silver;
-    cursor: pointer;
-    opacity: 0;
-    margin-right: 5px;
-    transition: 0.4s;
-}
-.sx-value-row:hover .sx-edit-btn {
-    opacity: 1;
-}
-
 CSS
 );
-$noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
 ?>
 
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
-    <div class="row">
+    <div class="sx-detail-layout">
 
 
-        <div class="col-lg-4 col-sm-6 col-12">
+        <div class="sx-detail-layout__aside">
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Сотрудник <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Сотрудник <i data-toggle="tooltip" data-html="true"
                                                          title="Информация о сотруднике"
-                                                         class="far fa-question-circle"></i>
+                                                         class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-phones-block">
                     <?php if ($model->post) : ?>
@@ -337,9 +202,9 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
             </div>
 
             <div class="sx-block">
-                <div class="sx-block-title">Телефон <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Телефон <i data-toggle="tooltip" data-html="true"
                                                        title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
-                                                       class="far fa-question-circle"></i>
+                                                       class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserPhones as $cmsUserPhone) : ?>
@@ -355,10 +220,10 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                                     <div class="sx-value">
                                         <a href="#"><?php echo $cmsUserPhone->value; ?></a>
                                         <?php if ($cmsUserPhone->is_approved) : ?>
-                                            <span data-html="true" data-toggle="tooltip" style="color: green;"
+                                            <span class="sx-text--success" data-html="true" data-toggle="tooltip"
                                                   title="Телефон подтвержден пользователем<br />Пользователь реально получил код на этот телефон и подтвердил его.">✓</span>
                                         <?php else : ?>
-                                            <span data-html="true" data-toggle="tooltip" style="color: silver; font-size: 12px;" title="Пользователь не подтверждал телефон."><i class="far fa-question-circle"></i></span>
+                                            <span class="sx-text--muted" data-html="true" data-toggle="tooltip" title="Пользователь не подтверждал телефон."><i class="far fa-question-circle"></i></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -422,9 +287,9 @@ JS
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Email <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Email <i data-toggle="tooltip" data-html="true"
                                                      title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
-                                                     class="far fa-question-circle"></i>
+                                                     class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-block-content">
                     <div class="sx-phones-block">
@@ -441,10 +306,10 @@ JS
                                     <div class="sx-value">
                                         <a href="#"><?php echo $cmsUserEmail->value; ?></a>
                                         <?php if ($cmsUserEmail->is_approved) : ?>
-                                            <span data-html="true" data-toggle="tooltip" style="color: green;"
+                                            <span class="sx-text--success" data-html="true" data-toggle="tooltip"
                                                   title="Email подтвержден пользователем<br />Пользователь реально получил код на этот email и подтвердил его.">✓</span>
                                         <?php else : ?>
-                                            <span data-html="true" data-toggle="tooltip" style="color: silver; font-size: 12px;" title="Пользователь не подтверждал email."><i class="far fa-question-circle"></i></span>
+                                            <span class="sx-text--muted" data-html="true" data-toggle="tooltip" title="Пользователь не подтверждал email."><i class="far fa-question-circle"></i></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -500,9 +365,9 @@ JS
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Адреса <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Адреса <i data-toggle="tooltip" data-html="true"
                                                       title="У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию."
-                                                      class="far fa-question-circle"></i>
+                                                      class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-block-content">
                     <div class="sx-phones-block">
@@ -565,8 +430,8 @@ JS
             </div>
 
             <div class="sx-block">
-                <div class="sx-block-title">Информация <i style="color: silver;" data-toggle="tooltip" data-html="true"
-                                                          title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle"></i></div>
+                <div class="sx-block-title">Информация <i data-toggle="tooltip" data-html="true"
+                                                          title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle sx-hint-icon"></i></div>
                 <div class="sx-block-content">
                     <?
                     $eav = $model->relatedPropertiesModel;
@@ -617,7 +482,7 @@ JS
 
         </div>
 
-        <div class="col-lg-8 col-sm-6 col-12" style="padding-left: 10px;">
+        <div class="sx-detail-layout__main">
             <?
             $isWorkingNow = (bool)$model->isWorkingNow;
             $currentTask = $model->getExecutorTasks()->statusInWork()->one();

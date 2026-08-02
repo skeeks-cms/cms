@@ -6,6 +6,8 @@
  * @date 25.05.2015
  */
 namespace skeeks\cms\widgets;
+
+use skeeks\cms\backend\widgets\assets\BackendFormAsset;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\View;
@@ -109,6 +111,7 @@ class Select extends Select2
             $view->registerJs("initS2Order('{$id}',{$val});");
         }
         $this->registerPlugin($this->pluginName, "jQuery('#{$id}')", "initS2Loading('{$id}','{$this->_s2OptionsVar}')");
+        BackendFormAsset::register($view);
     }
 
     /**

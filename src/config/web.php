@@ -85,7 +85,7 @@ $config = [
                     'personal' => [
                         'name' => ['skeeks/cms', 'Мой профиль'],
                         'url'  => ['/cms/upa-personal/view'],
-                        'icon' => 'icon-user',
+                        'icon' => 'far fa-user',
                     ],
                     'work' => [
                         'name'     => 'Кабинет сотрудника',

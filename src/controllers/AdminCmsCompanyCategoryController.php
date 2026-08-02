@@ -24,6 +24,7 @@ use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -68,17 +69,22 @@ class AdminCmsCompanyCategoryController extends BackendModelStandartController
                     'columns'        => [
                         'name' => [
                             'class' => DefaultActionColumn::class,
+                            'contentOptions' => [
+                                'class' => 'sx-collection-cell__primary',
+                            ],
+                        ],
+                        'sort' => [
+                            'format' => 'raw',
+                            'value' => static function (CmsCompanyCategory $model) {
+                                return Html::tag('span', \Yii::$app->formatter->asInteger($model->sort), [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]);
+                            },
                         ],
                         'countCompanies' => [
                             'attribute'            => 'countCompanies',
                             'format'               => 'raw',
                             'label'                => \Yii::t('skeeks/cms', 'Где используется'),
-                            'contentOptions'       => [
-                                'style' => 'max-width: 120px;',
-                            ],
-                            'headerOptions'        => [
-                                'style' => 'max-width: 120px;',
-                            ],
                             'beforeCreateCallback' => function (GridView $gridView) {
                                 $query = $gridView->dataProvider->query;
 
@@ -100,7 +106,12 @@ class AdminCmsCompanyCategoryController extends BackendModelStandartController
                                 ];
                             },
                             'value'                => function (CmsCompanyCategory $model) {
-                                return $model->raw_row['countCompanies'];
+                                return Html::tag(
+                                    'span',
+                                    Html::tag('strong', \Yii::$app->formatter->asInteger($model->raw_row['countCompanies']))
+                                    .Html::tag('small', \Yii::t('skeeks/cms', 'компаний')),
+                                    ['class' => 'sx-collection-cell--metric']
+                                );
                             },
                         ],
                     ],

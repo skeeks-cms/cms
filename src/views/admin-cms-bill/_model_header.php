@@ -10,97 +10,21 @@ use yii\helpers\Json;
 
 $controller = $this->context;
 
-$statusClass = 'is-waiting';
+$statusClass = 'sx-status--warning';
 $statusText = 'Ожидает оплаты';
 if ($model->closed_at) {
-    $statusClass = 'is-closed';
+    $statusClass = 'sx-status--danger';
     $statusText = 'Отменен';
 } elseif ($model->paid_at) {
-    $statusClass = 'is-paid';
+    $statusClass = 'sx-status--success';
     $statusText = 'Оплачен';
 }
-
-$this->registerCss(<<<CSS
-.sx-bill-model-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-.sx-bill-model-header h1 {
-    margin: 0;
-    line-height: 1.1;
-}
-.sx-bill-model-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px 10px;
-    margin-top: 5px;
-    color: silver;
-    font-size: 10px;
-}
-.sx-bill-model-status-box {
-    display: flex;
-    align-items: flex-end;
-    flex-direction: column;
-    gap: 0;
-    padding-top: 4px;
-}
-.sx-bill-model-side {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-.sx-bill-model-status {
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-.sx-bill-model-status.is-paid {
-    color: #087a2f;
-    background: #e8f7ee;
-}
-.sx-bill-model-status.is-closed {
-    color: #a51d1d;
-    background: #fdecec;
-}
-.sx-bill-model-status.is-waiting {
-    color: #6f5100;
-    background: #fff4cc;
-}
-.sx-bill-model-due {
-    color: #6f5100;
-    font-weight: 600;
-    white-space: nowrap;
-    font-size: 0.8rem;
-}
-.sx-bill-model-due.is-paid {
-    color: #087a2f;
-}
-.sx-bill-model-due i {
-    margin-right: 4px;
-}
-@media (max-width: 900px) {
-    .sx-bill-model-header {
-        flex-direction: column;
-    }
-    .sx-bill-model-status-box {
-        align-items: flex-start;
-    }
-    .sx-bill-model-side {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-CSS);
 ?>
 
-<div class="sx-bill-model-header">
-    <div>
-        <h1><?= Html::encode($model->asText); ?></h1>
-        <div class="sx-bill-model-meta">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <h1 class="sx-model-header__title"><?= Html::encode($model->asText); ?></h1>
+        <div class="sx-model-header__meta">
             <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip">
                 <i class="fas fa-key"></i> <?= (int)$model->id; ?>
             </span>
@@ -122,13 +46,13 @@ CSS);
         </div>
     </div>
 
-    <div class="sx-bill-model-side">
-        <div class="sx-bill-model-status-box">
-            <div class="sx-bill-model-status <?= Html::encode($statusClass); ?>"><?= Html::encode($statusText); ?></div>
+    <div class="sx-model-header__side">
+        <div class="sx-model-header__status-stack">
+            <div class="sx-status <?= Html::encode($statusClass); ?>"><?= Html::encode($statusText); ?></div>
             <?php if ($model->paid_at) : ?>
-                <div class="sx-bill-model-due is-paid"><i class="fa fa-check"></i> Оплачен <?= \Yii::$app->formatter->asDate($model->paid_at); ?></div>
+                <div class="sx-model-header__status-note sx-model-header__status-note--success"><i class="fa fa-check"></i> Оплачен <?= \Yii::$app->formatter->asDate($model->paid_at); ?></div>
             <?php elseif (!$model->closed_at && $model->due_at) : ?>
-                <div class="sx-bill-model-due"><i class="far fa-calendar"></i> Оплатить до <?= \Yii::$app->formatter->asDate($model->due_at); ?></div>
+                <div class="sx-model-header__status-note"><i class="far fa-calendar"></i> Оплатить до <?= \Yii::$app->formatter->asDate($model->due_at); ?></div>
             <?php endif; ?>
         </div>
 
@@ -143,7 +67,7 @@ CSS);
                 'size'            => isset($deleteAction->size) ? $deleteAction->size : '',
             ]);
             ?>
-            <div style="text-align: right; min-width: 48px;">
+            <div class="sx-model-header__actions">
                 <?= Html::a('<i class="fa fa-trash sx-action-icon"></i>', '#', [
                     'onclick'     => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
                     'class'       => 'btn btn-default',

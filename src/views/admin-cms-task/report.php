@@ -12,12 +12,14 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\Select;
 use skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget;
+use skeeks\cms\backend\widgets\assets\BackendFormAsset;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
 $controller = $this->context;
+BackendFormAsset::register($this);
 $params = $controller->getTaskReportParams();
 $report = $controller->buildTaskReport($params);
 $columns = $controller->taskReportColumns();
@@ -109,21 +111,24 @@ $makePieOptions = function ($title, array $items, $seriesName) {
 $this->registerCss(<<<CSS
 .sx-task-report .sx-report-filter-row {
     display: grid;
-    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 12px;
     margin-bottom: 12px;
 }
 .sx-task-report .sx-report-card {
-    background: #fff;
-    border: 1px solid #e7e7e7;
-    border-radius: 6px;
+    color: var(--sx-color-text);
+    background: var(--sx-color-surface);
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel);
     padding: 16px;
     margin-bottom: 16px;
+    box-shadow: var(--sx-panel-shadow);
 }
 .sx-task-report .sx-report-label {
     display: block;
-    color: #777;
+    color: var(--sx-color-text-muted);
     font-size: 12px;
+    font-weight: 600;
     margin-bottom: 5px;
 }
 .sx-task-report .sx-report-summary {
@@ -132,16 +137,24 @@ $this->registerCss(<<<CSS
     gap: 12px;
 }
 .sx-task-report .sx-report-summary-item {
-    border-left: 3px solid #2b7de9;
-    padding-left: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--sx-color-border);
+    border-left: 3px solid var(--sx-color-accent);
+    border-radius: var(--sx-radius-sm);
+    background: var(--sx-color-surface-muted);
 }
 .sx-task-report .sx-report-summary-value {
+    color: var(--sx-color-text);
     font-size: 24px;
     line-height: 1.2;
     font-weight: 600;
 }
 .sx-task-report .sx-report-checks label {
-    margin-right: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 18px 8px 0;
+    color: var(--sx-color-text);
     white-space: nowrap;
     font-weight: normal;
 }
@@ -170,8 +183,10 @@ $this->registerCss(<<<CSS
     flex: 1 1 33.333%;
 }
 .sx-task-report .sx-task-report-relation .btn.sx-active {
-    background: #6c757d !important;
-    color: #fff;
+    color: var(--sx-color-accent) !important;
+    border-color: var(--sx-color-accent) !important;
+    background: var(--sx-color-accent-soft) !important;
+    box-shadow: inset 0 -2px 0 var(--sx-color-accent);
 }
 .sx-task-report .sx-task-report-relation-field {
     display: none;
@@ -189,6 +204,14 @@ $this->registerCss(<<<CSS
 .sx-task-report .sx-report-table td {
     vertical-align: top;
 }
+.sx-task-report .sx-report-table {
+    color: var(--sx-color-text);
+    background: var(--sx-color-surface);
+}
+.sx-task-report .sx-report-table th,
+.sx-task-report .sx-report-table td {
+    border-color: var(--sx-color-border);
+}
 .sx-task-report .sx-report-chart {
     height: 320px;
     margin-top: 12px;
@@ -198,6 +221,19 @@ $this->registerCss(<<<CSS
 .sx-task-report .sx-report-chart svg {
     max-width: 100% !important;
 }
+.sx-task-report .sx-report-chart .highcharts-background {
+    fill: transparent !important;
+}
+.sx-task-report .sx-report-chart .highcharts-title,
+.sx-task-report .sx-report-chart .highcharts-axis-title,
+.sx-task-report .sx-report-chart .highcharts-axis-labels text,
+.sx-task-report .sx-report-chart .highcharts-legend-item text {
+    fill: var(--sx-color-text) !important;
+    color: var(--sx-color-text) !important;
+}
+.sx-task-report .sx-report-chart .highcharts-grid-line {
+    stroke: var(--sx-color-border) !important;
+}
 .sx-task-report .sx-report-result {
     white-space: pre-line;
 }
@@ -206,7 +242,7 @@ $this->registerCss(<<<CSS
     gap: 12px;
 }
 .sx-task-report .sx-report-task-item {
-    border-bottom: 1px solid #e5e9ef;
+    border-bottom: 1px solid var(--sx-color-border);
     padding: 0 0 14px;
 }
 .sx-task-report .sx-report-task-item:last-child {
@@ -214,13 +250,14 @@ $this->registerCss(<<<CSS
     padding-bottom: 0;
 }
 .sx-task-report .sx-report-task-title {
+    color: var(--sx-color-text);
     font-size: 20px;
     line-height: 1.3;
     font-weight: 600;
     margin: 0 0 8px;
 }
 .sx-task-report .sx-report-task-meta {
-    color: #687685;
+    color: var(--sx-color-text-muted);
     font-size: 13px;
     line-height: 1.5;
     margin-bottom: 10px;
@@ -230,8 +267,9 @@ $this->registerCss(<<<CSS
     margin-right: 16px;
 }
 .sx-task-report .sx-report-task-result {
-    border-left: 3px solid #d7dee8;
-    background: #f8fafc;
+    color: var(--sx-color-text);
+    border-left: 3px solid var(--sx-color-accent-border);
+    background: var(--sx-color-surface-muted);
     margin: 0;
     padding: 10px 12px;
     white-space: pre-line;
@@ -446,6 +484,9 @@ JS);
         <?php $form = \yii\bootstrap\ActiveForm::begin([
             'method' => 'get',
             'action' => Url::to(['report']),
+            'options' => [
+                'class' => 'sx-backend-form',
+            ],
         ]); ?>
 
         <div class="sx-report-filter-row">

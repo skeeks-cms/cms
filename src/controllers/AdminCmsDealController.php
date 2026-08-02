@@ -216,7 +216,7 @@ class AdminCmsDealController extends BackendModelStandartController
                                         'modelId'      => $cmsDeal->company->id,
                                         'content'      => '<i class="far fa-user"></i> '.$cmsDeal->company->asText,
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 } else {
@@ -242,7 +242,7 @@ class AdminCmsDealController extends BackendModelStandartController
                                         'modelId'      => $cmsDeal->user->id,
                                         'content'      => '<i class="far fa-user"></i> '.$cmsDeal->user->asText,
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 } else {
@@ -282,32 +282,12 @@ $('tr[data-key={$key}]').addClass('sx-tr-red');
 JS
                                     );
 
-                                    \Yii::$app->view->registerCss(<<<CSS
-tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
-{
-background: #ffecec40 !important;
-}
-CSS
-
-                                    );
-
-
-                                    $reuslt = "<div style='color: red;'>";
+                                    $reuslt = "<div class='sx-text--danger'>";
                                 } elseif (!$cmsDeal->is_active) {
                                     \Yii::$app->view->registerJs(<<<JS
 $('tr[data-key={$key}]').addClass('sx-tr-gray');
 JS
                                     );
-
-                                    \Yii::$app->view->registerCss(<<<CSS
-tr.sx-tr-gray, tr.sx-tr-gray:nth-of-type(odd), tr.sx-tr-gray td
-{
-background: #ececec !important;
-opacity: 0.9;
-}
-CSS
-                                    );
-
 
                                 }
 
@@ -321,7 +301,7 @@ CSS
                             'format' => 'raw',
                             'label'  => 'Договор',
                             'value'  => function (CmsDeal $cmsDeal, $key, $index) {
-                                $reuslt = "<div>";
+                                $reuslt = "<div class='sx-collection-cell sx-collection-cell--stack'>";
                                 $dateName = "Закончится";
                                 if ($cmsDeal->end_at < time() && $cmsDeal->end_at && $cmsDeal->is_active) {
                                     $dateName = "Закончилась";
@@ -330,14 +310,7 @@ $('tr[data-key={$key}]').addClass('sx-tr-red');
 JS
                                     );
 
-                                    \Yii::$app->view->registerCss(<<<CSS
-tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
-{
-background: #ffecec40 !important;
-}
-CSS
-                                    );
-                                    $reuslt = "<div style='color: red;'>";
+                                    $reuslt = "<div class='sx-collection-cell sx-collection-cell--stack'>";
                                 } elseif (!$cmsDeal->is_active) {
                                     $dateName = "Закончилась";
                                     \Yii::$app->view->registerJs(<<<JS
@@ -345,29 +318,37 @@ $('tr[data-key={$key}]').addClass('sx-tr-gray');
 JS
                                     );
 
-                                    \Yii::$app->view->registerCss(<<<CSS
-tr.sx-tr-gray, tr.sx-tr-gray:nth-of-type(odd), tr.sx-tr-gray td
-{
-background: #ececec !important;
-opacity: 0.5;
-}
-CSS
-                                    );
                                 }
-                                $reuslt .= "<small style='color: gray;'>{$cmsDeal->dealType->name}</small><br />";
-                                $reuslt .= Html::a($cmsDeal->asShortText, ['/crm/crm-deal/view', 'pk' => $cmsDeal->id], [
+                                $reuslt .= Html::tag(
+                                    'small',
+                                    Html::encode($cmsDeal->dealType->name),
+                                    ['class' => 'sx-collection-cell__subtle']
+                                );
+                                $reuslt .= Html::a(Html::encode($cmsDeal->asShortText), ['/crm/crm-deal/view', 'pk' => $cmsDeal->id], [
                                     'data-pjax' => 0,
-                                    'class'     => 'sx-trigger-action',
-                                    'style'     => 'font-size: 15px;',
+                                    'class'     => 'sx-trigger-action sx-collection-cell__primary',
                                 ]);
-                                $reuslt .= "<br />";
 
                                 if ($cmsDeal->end_at) {
-                                    $reuslt .= "<div title='".\Yii::$app->formatter->asRelativeTime($cmsDeal->end_at)."'>{$dateName}: ".\Yii::$app->formatter->asDate($cmsDeal->end_at)."</div>";
+                                    $dateClass = $cmsDeal->end_at < time() && $cmsDeal->is_active
+                                        ? 'sx-collection-cell__secondary sx-text--danger'
+                                        : 'sx-collection-cell__secondary';
+                                    $reuslt .= Html::tag(
+                                        'div',
+                                        Html::encode($dateName.': '.\Yii::$app->formatter->asDate($cmsDeal->end_at)),
+                                        [
+                                            'class' => $dateClass,
+                                            'title' => \Yii::$app->formatter->asRelativeTime($cmsDeal->end_at),
+                                        ]
+                                    );
                                 }
 
                                 if ($cmsDeal->description) {
-                                    $reuslt .= "<small style='color: gray;'>{$cmsDeal->description}</small><br />";
+                                    $reuslt .= Html::tag(
+                                        'small',
+                                        Html::encode($cmsDeal->description),
+                                        ['class' => 'sx-collection-cell__secondary']
+                                    );
                                 }
 
 
@@ -378,6 +359,7 @@ CSS
                         ],
 
                         'amount' => [
+                            'format' => 'raw',
                             'headerOptions'  => [
                                 'style' => 'max-width: 80px;',
                             ],
@@ -393,10 +375,10 @@ CSS
                                         $money .= "/".StringHelper::strtolower($cmsDeal->periodAsText);
 
                                         if ($cmsDeal->is_auto) {
-                                            $money .= '&nbsp;<i class="fas fa-check" style="color: green;" title="Включено автопродление/автоотключение услуги"></i>';
+                                            $money .= '&nbsp;<i class="fas fa-check sx-text--success" title="Включено автопродление/автоотключение услуги"></i>';
                                         }
                                     }
-                                    return Html::tag('b', $money);
+                                    return Html::tag('span', $money, ['class' => 'sx-collection-cell__amount']);
                                 } else {
                                     return ' — ';
                                 }

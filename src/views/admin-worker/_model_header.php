@@ -9,36 +9,25 @@
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsContentElement
  */
-$this->registerCss(<<<CSS
-.sx-user-header-h1 .sx-controlls {
-    opacity: 0;
-    transition: 0.5s;
-}
-.sx-user-header-h1:hover .sx-controlls {
-    opacity: 1;
-}
-CSS
-);
 $controller = $this->context;
 
 $isCanEdit = \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
 
 ?>
-<div class="row" style="margin-bottom: 5px;">
-    <? if ($model->image) : ?>
-        <div class="col my-auto" style="max-width: 60px">
-            <img style="border: 2px solid #ededed; border-radius: 50%;" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
-                new \skeeks\cms\components\imaging\filters\Thumbnail([
-                    'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
-                ])); ?>"/>
-        </div>
-    <? endif; ?>
-    <div class="col my-auto">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <div class="sx-model-header__identity">
+            <? if ($model->image) : ?>
+                <div class="sx-model-header__media">
+                    <img class="sx-model-header__image sx-model-header__image--round" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
+                        new \skeeks\cms\components\imaging\filters\Thumbnail([
+                            'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
+                        ])); ?>"/>
+                </div>
+            <? endif; ?>
+            <div class="sx-model-header__content">
 
-        <div class="d-flex">
-            <div>
-
-                <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
+                <h1 class="sx-user-header-h1 sx-model-header__title"><?php echo $model->shortDisplayNameWithAlias; ?>
                     <?php echo \skeeks\cms\widgets\user\UserOnlineWidget::widget([
                         'user'    => $model,
                         'options' => [
@@ -46,33 +35,40 @@ $isCanEdit = \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model])
                             'height' => '11px',
                         ],
                     ]); ?>
-                    <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
+                    <?php if (!$model->is_active) : ?>
+                        <span class="sx-status sx-status--danger sx-model-header__state"
+                              data-toggle="tooltip"
+                              title="Пользователь отключен, значит не может авторизоваться на сайте!">Отключен</span>
+                    <?php endif; ?>
 
 
                 </h1>
 
-                <div class="sx-small-info" style="font-size: 10px; color: silver;">
+                <div class="sx-small-info sx-model-header__meta">
                     <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
                     <? if ($model->created_at) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
+                        <span data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
                                     class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
                     <? endif; ?>
                     <? if ($model->created_by) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
+                        <span data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
                                     class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
                     <? endif; ?>
                     <? if ($model->email) : ?>
-                        <span style="margin-left: 5px;"><i class="far fa-envelope"></i> <?php echo $model->email; ?></span>
+                        <span><i class="far fa-envelope"></i> <?php echo $model->email; ?></span>
                     <? endif; ?>
                     <? if ($model->phone) : ?>
-                        <span style="margin-left: 5px;"><i class="fas fa-phone"></i> <?php echo $model->phone; ?></span>
+                        <span><i class="fas fa-phone"></i> <?php echo $model->phone; ?></span>
                     <? endif; ?>
 
 
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="col my-auto">
+    <div class="sx-model-header__side">
+        <div class="sx-model-header__toolbar">
 
                 <!--<span>
             <? /*
@@ -132,10 +128,7 @@ JS
                 <a href="#" class="btn btn-default" title="Написать письмо" data-toggle="tooltip"><i class="far fa-envelope"></i></a>
             </span>
                 <?php endif; ?>
-            </div>
-
         </div>
-    </div>
 
     <?php
 
@@ -164,10 +157,10 @@ JS
             'title'       => "Удалить",
         ]);
         ?>
-        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+        <div class="sx-model-header__actions">
             <?php echo $href; ?>
         </div>
     <?php endif; ?>
 
-
+    </div>
 </div>

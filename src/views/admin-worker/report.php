@@ -64,7 +64,7 @@ $renderReportTasksTable = function ($tasks, $user) {
 
             $trClass = "sx-task-tr".($isCan ? "" : " sx-task-hidden");
             if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
-                $trClass .= " g-bg-in-work";
+                $trClass .= " sx-row-in-work";
             }
             ?>
             <?php echo \yii\helpers\Html::beginTag('tr', [

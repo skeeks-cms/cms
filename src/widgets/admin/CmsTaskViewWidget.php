@@ -9,6 +9,7 @@
 namespace skeeks\cms\widgets\admin;
 
 use common\models\User;
+use skeeks\cms\backend\assets\BackendAsset;
 use skeeks\cms\models\CmsTask;
 use skeeks\crm\models\CrmProject;
 use skeeks\crm\models\CrmTask;
@@ -53,30 +54,10 @@ class CmsTaskViewWidget extends Widget
     public $isAction = true;
 
 
-    static protected $_isRegisterAssets = false;
-
     public function run()
     {
-        if (self::$_isRegisterAssets === false) {
-            self::$_isRegisterAssets = true;
-            $this->view->registerCss(<<<CSS
-.sx-task-info .img-wrapper {
-    margin-right: 0.75rem;
-}
-.sx-task-wrapper .sx-task-status {
-    margin: auto;
-    margin-left: 0.5rem;
-}
-.sx-task-info {
-    display: flex;
-    align-items: center;
-}
-.sx-task-wrapper {
-    display: flex;
-}
-CSS
-            );
-        }
+        BackendAsset::register($this->view);
+
         return $this->render('task-view');
     }
 }

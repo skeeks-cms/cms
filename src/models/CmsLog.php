@@ -387,8 +387,11 @@ class CmsLog extends ActiveRecord
             Html::tag('span', Html::encode($preview), ['class' => 'sx-log-value-preview']).
             ' '.
             Html::button('Показать полностью', [
-                'type'  => 'button',
-                'class' => 'sx-log-value-toggle',
+                'type'                => 'button',
+                'class'               => 'sx-chip sx-chip--compact sx-log-value-toggle',
+                'aria-expanded'       => 'false',
+                'data-open-label'     => 'Показать полностью',
+                'data-close-label'    => 'Свернуть',
             ]).
             Html::tag('div', $full, ['class' => 'sx-log-value-full']),
             ['class' => 'sx-log-value-collapsed']

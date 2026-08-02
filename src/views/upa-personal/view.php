@@ -7,61 +7,49 @@
  *
  * @var $model \skeeks\cms\models\User
  */
-/** 
-* @var $this yii\web\View
-*/
-
-$this->registerCss(<<<CSS
-.sx-info .label {
-    font-size: 1rem;
-}
-.sx-info .sx-value {
-    font-size: 1.25rem;
-}
-.sx-info {
-    margin-bottom: 1.5rem;
-}
-CSS
-);
+/**
+ * @var $this yii\web\View
+ */
+\skeeks\cms\widgets\assets\CmsProfileAsset::register($this);
 ?>
 <h1><?php echo $model->displayName; ?></h1>
 
 <div class="sx-content">
     <div class="row">
         <div class="col-md-3">
-            <div class="sx-photo">
-                <div class="sx-info" style="margin-bottom: 0;">
+            <div class="sx-profile-photo">
+                <div>
                     <img src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($model->image ? $model->image->src : \skeeks\cms\helpers\Image::getCapSrc(),
                         new \skeeks\cms\components\imaging\filters\Thumbnail([
                             'h' => 300,
                             'w' => 300,
                             'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
                         ])); ?>" alt=""
-                         class="img-fluid" data-toggle="tooltip" data-html="true" style="    border-radius: var(--base-radius);" data-original-title="" title="">
+                         class="img-fluid sx-profile-photo__image" data-toggle="tooltip" data-html="true" data-original-title="" title="">
                 </div>
             </div>
         </div>
         <div class="col-md-9">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="sx-info">
-                        <div class="sx-label">E-mail</div>
-                        <div class="sx-value"><?php echo $model->email; ?></div>
+                    <div class="sx-profile-info">
+                        <div class="sx-profile-info__label">E-mail</div>
+                        <div class="sx-profile-info__value"><?php echo $model->email; ?></div>
                     </div>
-                    <div class="sx-info">
-                        <div class="sx-label">Зарегистрирован</div>
-                        <div class="sx-value"><?php echo \Yii::$app->formatter->asDate($model->created_at); ?></div>
+                    <div class="sx-profile-info">
+                        <div class="sx-profile-info__label">Зарегистрирован</div>
+                        <div class="sx-profile-info__value"><?php echo \Yii::$app->formatter->asDate($model->created_at); ?></div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="sx-info">
-                        <div class="sx-label">Телефон</div>
-                        <div class="sx-value"><?php echo $model->phone; ?></div>
+                    <div class="sx-profile-info">
+                        <div class="sx-profile-info__label">Телефон</div>
+                        <div class="sx-profile-info__value"><?php echo $model->phone; ?></div>
                     </div>
                     <?php if($model->birthday_at) : ?>
-                        <div class="sx-info">
-                            <div class="sx-label">Дата рождения</div>
-                            <div class="sx-value"><?php echo \Yii::$app->formatter->asDate($model->birthday_at); ?></div>
+                        <div class="sx-profile-info">
+                            <div class="sx-profile-info__label">Дата рождения</div>
+                            <div class="sx-profile-info__value"><?php echo \Yii::$app->formatter->asDate($model->birthday_at); ?></div>
                         </div>
                     <?php endif; ?>
                 </div>

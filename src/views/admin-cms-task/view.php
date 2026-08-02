@@ -142,7 +142,7 @@ $this->registerCss(<<<CSS
     */
     flex-direction: column;
     padding: 1rem;
-    border: 1px solid #ebebeb;
+    border: 1px solid var(--sx-color-border);
     border-radius: var(--border-radius);
 }
 .sx-task-description-empty {
@@ -151,7 +151,7 @@ $this->registerCss(<<<CSS
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
 }
 
 .sx-block-task div {
@@ -165,20 +165,20 @@ $this->registerCss(<<<CSS
 .sx-block-task .sx-files img {
     border-radius: var(--border-radius);
     max-width: 10rem;
-    border: 1px solid var(--color-light-gray);
+    border: 1px solid var(--sx-color-border);
 }
 
 .sx-block-task .sx-files .sx-file-item {
     margin-bottom: 0.25rem;
 }
 .sx-block-task .sx-files .sx-title {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     font-size: 0.85rem;
     margin-bottom: 0.5rem;
     margin-top: 1rem;
 }
 .sx-block-task .sx-files .sx-files-block {
-    background: var(--bg-color-light);
+    background: var(--sx-color-surface-muted);
     padding: 1rem;
     border-radius: var(--border-radius);
 }
@@ -193,7 +193,7 @@ $this->registerCss(<<<CSS
     white-space: nowrap;
 }
 .sx-task-related-title {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     font-size: 0.9rem;
     margin-bottom: 0.75rem;
 }
@@ -202,7 +202,7 @@ $this->registerCss(<<<CSS
 }
 .sx-task-related-table th {
     font-weight: normal;
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     border-top: 0;
 }
 .sx-task-related-table td {
@@ -447,7 +447,7 @@ JS
                 <?php if($model->executor_end_at) : ?>
                     <li>
                     <span class="sx-properties--name">
-                        Время завершения <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip" title="" data-original-title="Примерное время завершения задачи. Учитывается рабочий график исполнителя и загруженность по другим задачам."></i>
+                        Время завершения <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip" title="" data-original-title="Примерное время завершения задачи. Учитывается рабочий график исполнителя и загруженность по другим задачам."></i>
                     </span>
                             <span class="sx-properties--value" >
                         <?php echo \Yii::$app->formatter->asDatetime($model->executor_end_at); ?>

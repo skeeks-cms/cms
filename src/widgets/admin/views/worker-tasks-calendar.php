@@ -17,12 +17,11 @@ $model = $user;
     <div class="col-sm-12">
         <!--<h5 class="g-mt-14">Календарь задач</h5>-->
 
-        <div class="row g-mb-20" style="margin-bottom: 1rem;">
-            <div class="col-sm-12">
-                <div class="pull-left">
-                    <button class="btn btn-primary sx-save-priority-btn"><i class="fa fa-save"></i> Сохранить порядок задач</button>
-                </div>
-                <div class="pull-right">
+        <div class="sx-task-calendar__toolbar">
+            <div class="sx-task-calendar__toolbar-start">
+                <button class="btn btn-primary sx-save-priority-btn"><i class="fa fa-save"></i> Сохранить порядок задач</button>
+            </div>
+            <div class="sx-task-calendar__toolbar-end">
 
                     <?
                     $btnCreateTask = '';
@@ -61,8 +60,7 @@ $model = $user;
                         }
                     }
                     ?>
-                    <?= $btnCreateTask; ?>
-                </div>
+                <?= $btnCreateTask; ?>
             </div>
         </div>
 
@@ -166,95 +164,6 @@ JS
                 );
                 ?>
                 <?
-                $this->registerCss(<<<CSS
-        @keyframes sx-save-priority-pulse {
-          0% {
-            box-shadow: 0 0 5px 0px var(--primary-color), 0 0 5px 0px var(--primary-color); 
-          }
-          100% {
-            box-shadow: 0 0 5px 6px rgba(255, 48, 26, 0), 0 0 4px 10px rgba(255, 48, 26, 0); 
-          } 
-        }
-
-        .sx-save-priority-btn {
-            position: fixed;
-            display: none;
-            left: 50%;
-            top: 50%;
-            z-index: 99;
-            animation: sx-save-priority-pulse 1.5s infinite linear;
-        }
-        .sx-task-hidden .sx-task-td {
-            position: relative;
-        }
-        
-        .sx-task-hidden .sx-task-td:after {
-            position: absolute;
-            content: "Не доступна";
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* filter: blur(1.5rem); */
-            background: white;
-            display: flex;
-            justify-content: left;
-            align-items: center;
-            color: silver;
-        }
-        .table.sx-calendar-day thead th {
-            border-bottom: 0;
-        }
-        .sx-calendar-day th {
-            background: var(--primary-color) !important;
-            color: white;
-            border: none;
-        }
-        .sx-calendar-day{
-            border: 1px solid var(--primary-color);
-            background: white;
-            overflow: hidden;
-            border-radius: var(--border-radius);
-            border: 0;
-        }
-        .sx-not-work-day {
-            border-radius: var(--border-radius);
-        }
-
-        .sx-not-work-day th {
-            background: var(--color-gray) !important;
-        }
-        .sx-not-today-day {
-            opacity: 0.9;
-        }
-        .sx-not-today-day:hover {
-            opacity: 1;
-        }
-        .sx-expired-tasks th {
-            background: #dc3545 !important;
-        }
-        .sx-task-expired {
-            background: #fff5f5;
-        }
-        .sx-task-planned {
-            background: #f8fbff;
-        }
-        .sx-unfinished-tasks {
-            overflow: hidden;
-            border-radius: var(--border-radius);
-            background: white;
-        }
-        .sx-unfinished-tasks thead th {
-            background: #e57d20 !important;
-            color: white;
-            border: none;
-        }
-        .sx-unfinished-task {
-            background: #fff8f1;
-        }
-CSS
-                );
-
                 $todayDate = \Yii::$app->formatter->asDate(time(), "php:Y-m-d");
                 $todayStartAt = strtotime($todayDate . ' 00:00:00');
                 $todayEndAt = strtotime($todayDate . ' 23:59:59');
@@ -414,13 +323,13 @@ CSS
                             ];
 
                             if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
-                                $tr['class'] = "sx-task-tr g-bg-in-work sx-task-expired";
+                                $tr['class'] = "sx-task-tr sx-row-in-work sx-task-expired";
                             }
                             ?>
                             <?= \yii\helpers\Html::beginTag('tr', $tr); ?>
                             <td style="width: 45px;">
                                 <span title="Перетащите для изменеия порядка" style="line-height: 35px;">
-                                    <a href="#" class="btn u-btn-white sx-move-btn" style="color: gray; cursor: n-resize;">
+                                    <a href="#" class="btn sx-move-btn sx-task-calendar__move">
                                         <i class="fas fa-arrows-alt-v"></i>
                                     </a>
                                 </span>
@@ -473,7 +382,7 @@ CSS
                     <tr>
                         <th class="text-center" colspan="4"><?= \Yii::$app->formatter->asDate($date, 'full'); ?>
                                 <? if ($times) : ?>
-                                <a href="<?= \yii\helpers\Url::to(['/cms/admin-user/planschedule', 'pk' => $model->id]); ?>" target="_blank" style="color: white;">
+                                <a href="<?= \yii\helpers\Url::to(['/cms/admin-user/planschedule', 'pk' => $model->id]); ?>" class="sx-task-calendar__header-link" target="_blank">
                                     <small data-toggle="tooltip" title="Время по графику: <br /><br /><?= \skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules($times); ?>" data-html="true">
                                         (всего по графику: <?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($seconds); ?>)
                                     </small>
@@ -498,7 +407,7 @@ CSS
 
 
                             <? else : ?>
-                                <a href="<?= \yii\helpers\Url::to(['/crm/crm-user/planschedule', 'pk' => $model->id]); ?>" target="_blank" style="color: white;">
+                                <a href="<?= \yii\helpers\Url::to(['/crm/crm-user/planschedule', 'pk' => $model->id]); ?>" class="sx-task-calendar__header-link" target="_blank">
                                     <small>(Не работает)</small>
                                 </a>
                             <? endif; ?>
@@ -555,9 +464,7 @@ CSS
                                 }
                                 ?>
                                 <?= \yii\helpers\Html::beginTag('tr', [
-                                    'class' => 'sx-task-tr ' . ($isCan ? "" : "sx-task-hidden"),
-                                    'style' => '    opacity: 0.5;
-    background: #e5fde5;'
+                                    'class' => 'sx-task-tr sx-task-completed ' . ($isCan ? "" : "sx-task-hidden"),
                                 ]); ?>
                                 <td style="width: 45px;">
                                 </td>
@@ -608,14 +515,14 @@ CSS
                                 ];
 
                                 if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
-                                    $tr['class'] = "sx-task-tr g-bg-in-work sx-task-planned";
+                                    $tr['class'] = "sx-task-tr sx-row-in-work sx-task-planned";
                                 }
                                 ?>
 
                                 <?= \yii\helpers\Html::beginTag('tr', $tr); ?>
                                 <td style="width: 45px;">
                                     <span title="Перетащите для изменеия порядка" style="line-height: 35px;">
-                                        <a href="#" class="btn u-btn-white sx-move-btn" style="color: gray; cursor: n-resize;">
+                                        <a href="#" class="btn sx-move-btn sx-task-calendar__move">
                                             <i class="fas fa-arrows-alt-v"></i>
                                         </a>
                                     </span>
@@ -662,14 +569,14 @@ CSS
                                 ];
 
                                 if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
-                                    $tr['class'] = "sx-task-tr g-bg-in-work" . ($isCan ? "" : " sx-task-hidden");
+                                    $tr['class'] = "sx-task-tr sx-row-in-work" . ($isCan ? "" : " sx-task-hidden");
                                 }
                                 ?>
 
                                 <?= \yii\helpers\Html::beginTag('tr', $tr); ?>
                                 <td style="width: 45px;">
                                     <span title="Перетащите для изменеия порядка" style="line-height: 35px;">
-                                        <a href="#" class="btn u-btn-white sx-move-btn" style="color: gray; cursor: n-resize;">
+                                        <a href="#" class="btn sx-move-btn sx-task-calendar__move">
                                             <i class="fas fa-arrows-alt-v"></i>
                                         </a>
                                     </span>
@@ -709,7 +616,7 @@ CSS
                     <? else : ?>
                         <thead>
                         <tr>
-                            <td class="text-center" colspan="4" style="color: gray;">
+                            <td class="text-center sx-task-calendar__empty" colspan="4">
                                 Не делает задачи в этот день
                             </td>
                         </tr>
@@ -726,4 +633,3 @@ CSS
 
     </div>
 </div>
-

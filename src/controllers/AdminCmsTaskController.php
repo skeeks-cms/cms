@@ -339,6 +339,12 @@ class AdminCmsTaskController extends BackendModelStandartController
 
                     'columns' => [
                         'executor_id' => [
+                            'headerOptions' => [
+                                'style' => 'min-width: 190px; width: 190px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'min-width: 190px; width: 190px;',
+                            ],
                             'value' => function (CmsTask $CmsTask) {
                                 return CmsWorkerViewWidget::widget(['user' => $CmsTask->executor, 'isSmall' => true]);
                             },
@@ -465,7 +471,7 @@ class AdminCmsTaskController extends BackendModelStandartController
                                 if ($CmsTask->status == CmsTask::STATUS_IN_WORK) {
 
                                     \Yii::$app->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('g-bg-in-work');
+$('tr[data-key={$key}]').addClass('sx-row-in-work');
 JS
                                     );
 
@@ -475,6 +481,12 @@ JS
                             },
                         ],
                         'created_by' => [
+                            'headerOptions' => [
+                                'style' => 'min-width: 190px; width: 190px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'min-width: 190px; width: 190px;',
+                            ],
                             'value' => function (CmsTask $CmsTask) {
                                 return CmsWorkerViewWidget::widget(['user' => $CmsTask->createdBy, 'isSmall' => true]);
                             },

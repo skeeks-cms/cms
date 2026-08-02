@@ -134,7 +134,7 @@ if ($model->cms_content_model_id) {
         'pager'        => [
             'container' => '.list-view-products',
             'item'      => '.product-item',
-            'class'     => \skeeks\cms\themes\unify\widgets\ScrollAndSpPager::class,
+            'class'     => \skeeks\cms\backend\widgets\BackendScrollAndSpPager::class,
         ],
         //"\n{items}<div class=\"box-paging\">{pager}</div>{summary}<div class='sx-js-pagination'></div>",
         'layout'       => '<div class="row"><div class="col-md-12">{summary}</div></div>
@@ -149,7 +149,6 @@ if ($model->cms_content_model_id) {
 
     <?php endforeach; ?>
 <?php endif; ?>
-
 
 
 

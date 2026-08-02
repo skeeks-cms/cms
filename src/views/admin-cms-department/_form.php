@@ -12,7 +12,7 @@ use yii\helpers\Html;
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 $controller = $this->context;
 $action = $controller->action;
-\skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
+\skeeks\cms\backend\assets\BackendIframeAsset::register($this);
 ?>
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>

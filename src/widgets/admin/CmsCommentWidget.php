@@ -10,6 +10,7 @@ namespace skeeks\cms\widgets\admin;
 
 use common\models\User;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\widgets\assets\CmsActivityAsset;
 use skeeks\crm\models\CrmContractor;
 use yii\base\Widget;
 
@@ -34,6 +35,8 @@ class CmsCommentWidget extends Widget
 
     public function run()
     {
+        CmsActivityAsset::register($this->getView());
+
         return $this->render('comment');
     }
 }

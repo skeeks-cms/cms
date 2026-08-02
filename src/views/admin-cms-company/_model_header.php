@@ -9,48 +9,6 @@
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsContentElement
  */
-$this->registerCss(<<<CSS
-.sx-user-header-h1 .sx-controlls {
-    opacity: 0;
-    transition: 0.5s;
-}
-.sx-user-header-h1:hover .sx-controlls {
-    opacity: 1;
-}
-button.sx-quick-access-favorite-btn {
-    all: unset;
-    display: inline-flex;
-    width: auto !important;
-    height: auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    color: #a8b0ba;
-    font-size: 17px;
-    line-height: 1;
-    vertical-align: 4px;
-    background: transparent none !important;
-    box-shadow: none !important;
-    cursor: pointer;
-    transition: color .15s ease;
-}
-button.sx-quick-access-favorite-btn:hover,
-button.sx-quick-access-favorite-btn:focus {
-    color: #d99a00;
-    background: transparent none !important;
-    box-shadow: none !important;
-    outline: 0;
-}
-button.sx-quick-access-favorite-btn.is-active {
-    color: #f0ad00;
-}
-CSS
-);
 $controller = $this->context;
 $makeQuickAccessActionUrl = function ($route, $id) {
     return (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
@@ -86,10 +44,10 @@ $quickAccessFavoriteItem = [
     'image'  => $makeQuickAccessImageUrl($model),
 ];
 ?>
-<div class="row" style="margin-bottom: 5px;">
+<div class="row sx-model-header">
     <? if ($model->image) : ?>
-        <div class="col my-auto" style="max-width: 60px">
-            <img style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #ededed; border-radius: 50%;" src="<?php echo \yii\helpers\Html::encode($makeQuickAccessImageUrl($model)); ?>"/>
+        <div class="col my-auto sx-model-header__media">
+            <img class="sx-model-header__image sx-model-header__image--round" src="<?php echo \yii\helpers\Html::encode($makeQuickAccessImageUrl($model)); ?>"/>
         </div>
     <? endif; ?>
     <div class="col my-auto">
@@ -97,8 +55,12 @@ $quickAccessFavoriteItem = [
         <div class="d-flex">
             <div>
 
-                <h1 class="sx-user-header-h1" style="margin-bottom: 0px; line-height: 1.1;"><?php echo $model->shortDisplayNameWithAlias; ?>
-                    <?php echo $model->is_active ? '' : '<span data-toggle="tooltip" title="Пользователь отключен, значит не может авторизоваться на сайте!" style="color: red; font-size: 20px;">(отключен!)</span>' ?>
+                <h1 class="sx-user-header-h1 sx-model-header__title"><?php echo $model->shortDisplayNameWithAlias; ?>
+                    <?php if (!$model->is_active) : ?>
+                        <span class="sx-status sx-status--danger sx-model-header__state"
+                              data-toggle="tooltip"
+                              title="Пользователь отключен, значит не может авторизоваться на сайте!">Отключен</span>
+                    <?php endif; ?>
                     <button type="button"
                             class="sx-quick-access-favorite-btn"
                             data-sx-quick-access-favorite
@@ -110,28 +72,28 @@ $quickAccessFavoriteItem = [
 
                 </h1>
 
-                <div class="sx-small-info" style="font-size: 10px; color: silver;">
+                <div class="sx-small-info sx-model-header__meta">
                     <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
                     <? if ($model->created_at) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
+                        <span data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i
                                     class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
                     <? endif; ?>
                     <? if ($model->created_by) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
+                        <span data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i
                                     class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
                     <? endif; ?>
                     <? if ($model->email) : ?>
-                        <span style="margin-left: 5px;"><i class="far fa-envelope"></i> <?php echo $model->email; ?></span>
+                        <span><i class="far fa-envelope"></i> <?php echo $model->email; ?></span>
                     <? endif; ?>
                     <? if ($model->phone) : ?>
-                        <span style="margin-left: 5px;"><i class="fas fa-phone"></i> <?php echo $model->phone; ?></span>
+                        <span><i class="fas fa-phone"></i> <?php echo $model->phone; ?></span>
                     <? endif; ?>
 
 
                 </div>
             </div>
 
-            <div class="col my-auto">
+            <div class="col my-auto sx-model-header__toolbar">
 
         <span>
             <?
@@ -221,7 +183,7 @@ JS
             'title'       => "Удалить",
         ]);
         ?>
-        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+        <div class="col my-auto sx-model-header__actions">
             <?php echo $href; ?>
         </div>
     <?php endif; ?>

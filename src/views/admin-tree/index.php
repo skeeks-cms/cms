@@ -23,57 +23,6 @@ $("body").on("click", ".sx-first-action-trigger", function() {
 JS
 );
 
-$this->registerCss(<<<CSS
-
-.sx-tree ul li.sx-tree-node .row .sx-controll-node
-{
-    display: none;
-    float: left;
-}
-
-.sx-tree ul li.sx-tree-node .row .sx-controll-node .sx-btn-caret-action
-{
-    width: 21px;
-    height: 22px;
-}
-.sx-tree ul li.sx-tree-node .row .sx-controll-node .btn
-{
-    height: 22px;
-}
-
-
-.sx-tree ul li.sx-tree-node .row:hover .sx-controll-node
-{
-    display: block;
-}
-
-.btn-tree-node-controll
-{
-    font-size: 8px;
-}
-
-    .sx-tree ul li.sx-tree-node .sx-controll-node
-    {
-        width: auto;
-        float: left;
-        margin-left: 10px;
-        padding-top: 0px;
-    }
-
-        .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button
-        {
-            font-size: 6px;
-            color: #000000;
-            background: white;
-            padding: 2px 4px;
-        }
-
-.sx-tree-move
-{
-    cursor: move;
-}
-CSS
-);
 ?>
 <div class="col-md-12">
     <?php $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([

@@ -303,30 +303,16 @@ class AdminWorkerController extends BackendModelStandartController
 
                                 if ($roles = \Yii::$app->authManager->getRolesByUser($cmsUser->id)) {
                                     foreach ($roles as $role) {
-                                        $result[] = Html::tag('label', $role->description, [
+                                        $result[] = Html::tag('span', Html::encode($role->description), [
                                             'title' => $role->name,
-                                            'class' => "".($role->name == 'root' ? 'u-label-danger' : ''),
-                                            'style' => "font-size: 10px;
-    padding: 2px;
-    padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    background: silver;
-    color: white;
-        margin-bottom: 0;
-        margin-right: 5px;
-        border-radius: 20px;
-            line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    margin-top: 5px;
-    margin-bottom: 0;
-    color: #fff;",
+                                            'class' => 'sx-status'.($role->name === 'root' ? ' sx-status--danger' : ''),
                                         ]);
                                     }
                                 }
 
-                                return implode("", $result);
+                                return $result
+                                    ? Html::tag('div', implode('', $result), ['class' => 'sx-preview-card__statuses'])
+                                    : '';
                             },
                             'format' => 'raw',
                             'label'  => \Yii::t('skeeks/cms', 'Roles'),

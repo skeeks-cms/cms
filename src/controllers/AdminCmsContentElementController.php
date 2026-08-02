@@ -455,12 +455,12 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                     $time = \Yii::$app->formatter->asRelativeTime($model->published_at);
                                     $dateTime = \Yii::$app->formatter->asDatetime($model->published_at);
                                     return <<<HTML
-<span class="text-success" title="{$dateTime} ({$time})">✓</span>
+<span class="sx-text--success" title="{$dateTime} ({$time})">✓</span>
 HTML;
 
                                 } else {
                                     return <<<HTML
-<span class="text-danger" title="">x</span>
+<span class="sx-text--danger" title="">×</span>
 HTML;
                                 }
                             },
@@ -468,54 +468,68 @@ HTML;
                         'custom'       => [
                             'attribute' => 'id',
                             'format'    => 'raw',
+                            'label'     => 'Публикация',
                             'headerOptions' => [
                                 'style' => 'min-width: 300px;'
                             ],
                             'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
-
                                 $data = [];
-                                /*$data[] = "<div class='sx-trigger-action' style='width: 50px; float: left;'>".Html::a(
-                                        Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
-                                            'style' => 'max-width: 50px; max-height: 50px; border-radius: 5px;',
-                                        ])
-                                        , "#", ['class' => 'sx-trigger-action', 'style' => 'width: 50px;'])."</div>";*/
-
-                                $data[] = "<span style='max-width: 300px;'>".Html::a($model->name, "#", [
-                                        'class' => 'sx-trigger-action',
+                                $data[] = Html::a(Html::encode($model->name), "#", [
+                                        'class' => 'sx-trigger-action sx-preview-card__title sx-collection-cell__primary',
                                         'title' => "id: {$model->id}",
                                         'data-toggle' => "tooltip",
-                                        'style' => 'border-bottom: none;'
-                                    ])."</span>";
+                                    ]);
 
                                 if ($model->tree_id) {
-                                    $data[] = '<i class="far fa-folder" style="color: gray;"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                                    $data[] = Html::a(
+                                        '<i class="far fa-folder"></i> '.Html::encode($model->cmsTree->name),
+                                        $model->cmsTree->url,
+                                        [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $model->cmsTree->fullName,
-                                            'style'     => 'color: #333; max-width: 200px; display: inline-block; color: gray; cursor: pointer; white-space: nowrap; border-bottom: none;',
-                                        ]);
+                                            'class'     => 'sx-preview-card__related',
+                                        ]
+                                    );
                                 }
 
                                 if ($model->cmsTrees) {
                                     foreach ($model->cmsTrees as $cmsTree) {
-                                        $data[] = '<i class="far fa-folder" style="color: silver;"></i> ' . Html::a($cmsTree->name, $cmsTree->url, [
+                                        $data[] = Html::a(
+                                            '<i class="far fa-folder"></i> '.Html::encode($cmsTree->name),
+                                            $cmsTree->url,
+                                            [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $cmsTree->fullName,
-                                            'style'     => 'color: #333; max-width: 200px; display: inline-block; color: gray; cursor: pointer; white-space: nowrap;  border-bottom: none;',
-                                        ]);
+                                            'class'     => 'sx-preview-card__related',
+                                            ]
+                                        );
                                     }
                                 }
 
-                                $info = implode("<br />", $data);
+                                $media = Html::tag(
+                                    'div',
+                                    Html::a(
+                                        Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
+                                            'class' => 'sx-photo sx-img-size-50',
+                                            'alt'   => '',
+                                        ]),
+                                        '#',
+                                        ['class' => 'sx-trigger-action sx-preview-card__media-link']
+                                    ),
+                                    ['class' => 'sx-preview-card__media']
+                                );
 
-                                return "<div class='d-flex no-gutters'>
-                                                <div class='sx-trigger-action my-auto' style='width: 50px; margin-right: 10px; float: left;'>
-                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                        <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
-                                                    </a>
-                                                </div>
-                                                <div style='line-height: 1.1;' class='my-auto'>".$info."</div></div>";;
+                                return Html::tag(
+                                    'div',
+                                    $media.Html::tag(
+                                        'div',
+                                        implode('', $data),
+                                        ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
+                                    ),
+                                    ['class' => 'sx-preview-card sx-preview-card--file']
+                                );
                             },
                         ],
                         'image_id'     => [

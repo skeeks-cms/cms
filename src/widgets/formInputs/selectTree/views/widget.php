@@ -38,7 +38,7 @@ use \skeeks\cms\widgets\formInputs\selectTree\SelectTree;
     </div>
 
 <?php
-\skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
+\skeeks\cms\backend\assets\BackendIframeAsset::register($this);
 $this->registerJs(<<<JS
 
 (function(sx, $, _)

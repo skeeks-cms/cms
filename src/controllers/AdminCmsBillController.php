@@ -417,8 +417,13 @@ class AdminCmsBillController extends BackendModelStandartController
 
                     'columns' => [
                         'amount' => [
+                            'format' => 'raw',
                             'value' => function (ShopBill $ShopBill) {
-                                return (string)$ShopBill->money;
+                                return Html::tag(
+                                    'span',
+                                    Html::encode((string)$ShopBill->money),
+                                    ['class' => 'sx-collection-cell__amount']
+                                );
                             },
                         ],
 
@@ -429,9 +434,17 @@ class AdminCmsBillController extends BackendModelStandartController
                                 $result = [];
 
                                 if ($ShopBill->isClosedByDocuments && $ShopBill->amount > 0) {
-                                    $result[] = '<small style="display:block;margin-bottom:4px;color:#087a2f;font-weight:600;"><i class="fa fa-check"></i> Закрыт</small>';
+                                    $result[] = Html::tag(
+                                        'small',
+                                        '<i class="fa fa-check"></i> Закрыт',
+                                        ['class' => 'sx-status sx-status--success']
+                                    );
                                 } elseif ($ShopBill->documentedAmount > 0) {
-                                    $result[] = '<small style="display:block;margin-bottom:4px;color:#a66a00;">Осталось закрыть: '.Html::encode((string)$ShopBill->documentBalanceMoney).'</small>';
+                                    $result[] = Html::tag(
+                                        'small',
+                                        'Осталось закрыть: '.Html::encode((string)$ShopBill->documentBalanceMoney),
+                                        ['class' => 'sx-status sx-status--warning']
+                                    );
                                 }
 
                                 foreach ($ShopBill->closingDocuments as $document) {
@@ -440,16 +453,20 @@ class AdminCmsBillController extends BackendModelStandartController
                                         'modelId'      => $document->id,
                                         'content'      => '<i class="far fa-file"></i> '.Html::encode($document->asText()),
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 }
 
                                 if (!$result) {
-                                    $result[] = '<span class="text-muted">Нет</span>';
+                                    $result[] = '<span class="sx-collection-cell__secondary">Нет</span>';
                                 }
 
-                                return implode('', $result);
+                                return Html::tag(
+                                    'div',
+                                    implode('', $result),
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
 
@@ -484,24 +501,32 @@ class AdminCmsBillController extends BackendModelStandartController
 JS
                                     );
 
-                                    \Yii::$app->view->registerCss(<<<CSS
-                                        tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
-                                        {
-                                        background: #a1e8a136 !important;
-                                        }
-CSS
+                                    $last = Html::tag(
+                                        'small',
+                                        '<i class="fa fa-check"></i> Оплачен',
+                                        ['class' => 'sx-status sx-status--success', 'title' => 'Оплачен']
                                     );
-
-                                    $last = "<br /><small style='color: green;' title='Оплачен'><i class=\"fa fa-check\"></i> </small>";
                                     if ($ShopBill->payments) {
-                                        $last .= "<small>".\Yii::$app->formatter->asDate($ShopBill->paid_at)."</small><br />";
+                                        $last .= Html::tag(
+                                            'small',
+                                            \Yii::$app->formatter->asDate($ShopBill->paid_at),
+                                            ['class' => 'sx-collection-cell__secondary']
+                                        );
                                         foreach ($ShopBill->payments as $payment)
                                         {
-                                            $last .= "<small>{$payment->asText}</small>";
+                                            $last .= Html::tag(
+                                                'small',
+                                                Html::encode($payment->asText),
+                                                ['class' => 'sx-collection-cell__secondary']
+                                            );
                                         }
 
                                     } else {
-                                        $last .= "<small style='color: red;'>Платежа нет!</small>";
+                                        $last .= Html::tag(
+                                            'small',
+                                            'Платежа нет!',
+                                            ['class' => 'sx-status sx-status--danger']
+                                        );
                                     }
 
                                 }
@@ -512,20 +537,11 @@ CSS
 JS
                                     );
 
-                                    \Yii::$app->view->registerCss(<<<CSS
-                                        tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
-                                        {
-                                            background: #f9f9f9 !important;
-                                            opacity: 0.3;
-                                        }
-                                        tr.sx-tr-red:hover, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red:hover td
-                                        {
-                                            opacity: 1;
-                                        }
-CSS
+                                    $last = Html::tag(
+                                        'small',
+                                        '<i class="fa fa-times-circle"></i> Отменен '.\Yii::$app->formatter->asDate($ShopBill->closed_at),
+                                        ['class' => 'sx-status sx-status--danger', 'title' => 'Отменен']
                                     );
-
-                                    $last = "<br /><small style='color: red;' title='Отменен'><i class=\"fa fa-times-circle\"></i> ".\Yii::$app->formatter->asDate($ShopBill->closed_at)."</small>";
                                 }
 
                             $title = "Счет №".$ShopBill->id." от ".\Yii::$app->formatter->asDate($ShopBill->created_at);
@@ -533,17 +549,25 @@ CSS
                                     'controllerId'            => '/cms/admin-cms-bill',
                                     'modelId'                 => $ShopBill->id,
                                     'isRunFirstActionOnClick' => true,
-                                    'tag'                     => 'span',
+                                    'tag'                     => 'a',
                                     'content'                 => $title,
                                     'options'                 => [
-                                        'class' => 'sx-bill-grid-title-action',
-                                    'style' => 'cursor: pointer; color: #1d70b8; display: inline-block; font-size: 15px; white-space: nowrap;',
+                                        'href'  => '#',
+                                        'class' => 'sx-collection-cell__primary',
                                     ],
                                 ]);
 
-                            return $titleAction
-                                .Html::tag('small', $ShopBill->shopPaySystem->name)
-                                .$last;
+                            return Html::tag(
+                                'div',
+                                $titleAction
+                                .Html::tag(
+                                    'small',
+                                    Html::encode($ShopBill->shopPaySystem->name),
+                                    ['class' => 'sx-collection-cell__secondary']
+                                )
+                                .$last,
+                                ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                            );
                             },
                         ],
                         'paid_at'        => [
@@ -556,14 +580,6 @@ CSS
                                     \Yii::$app->view->registerJs(<<<JS
                     $('tr[data-key={$key}]').addClass('sx-tr-green');
 JS
-                                    );
-
-                                    \Yii::$app->view->registerCss(<<<CSS
-                    tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
-                    {
-                    background: #a1e8a136 !important;
-                    }
-CSS
                                     );
 
                                     return \Yii::$app->formatter->asDatetime($ShopBill->paid_at)."<br />{$ShopBill->crmPayment->asText}";
@@ -600,7 +616,7 @@ CSS
                                         'modelId'      => $shopBill->company->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($shopBill->company->asText),
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 } elseif ($shopBill->cms_user_id && $shopBill->cmsUser) {
@@ -609,24 +625,28 @@ CSS
                                         'modelId'      => $shopBill->cmsUser->id,
                                         'content'      => '<i class="far fa-user"></i> '.Html::encode($shopBill->cmsUser->asText),
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 }
 
                                 if ($shopBill->sender_contractor_id && $shopBill->senderContractor) {
-                                    $result[] = '<small class="text-muted" style="display:block;margin-top:5px;">Юр. лицо плательщика</small>';
+                                    $result[] = '<small class="sx-collection-cell__subtle">Юр. лицо плательщика</small>';
                                     $result[] = AjaxControllerActionsWidget::widget([
                                         'controllerId' => '/cms/admin-cms-contractor',
                                         'modelId'      => $shopBill->senderContractor->id,
                                         'content'      => '<i class="fas fa-briefcase"></i> '.Html::encode($shopBill->senderContractor->asText),
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 }
 
-                                return $result ? implode('', $result) : '<span class="text-muted">Не указан</span>';
+                                return Html::tag(
+                                    'div',
+                                    $result ? implode('', $result) : '<span class="sx-collection-cell__secondary">Не указан</span>',
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
 
@@ -642,7 +662,7 @@ CSS
                                             'modelId'      => $crmDeal->id,
                                             'content'      => '<i class="far fa-file"></i> '.$crmDeal->asText,
                                             'options'      => [
-                                                'style' => 'text-align: left;',
+                                                'class' => 'sx-preview-card__related',
                                             ],
                                         ]);
                                     }
@@ -742,7 +762,7 @@ HTML
                 ],
             ];
 
-            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+            if ($indexAction = $controller->createAction('index')) {
                 $indexAction->url = $this->action->urlData;
                 $indexAction->backendShowings = false;
 
@@ -759,7 +779,7 @@ HTML
                 };
 
                 $indexAction->on('beforeRender', function (Event $event) use ($controller) {
-                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                    if ($createAction = $controller->createAction('create')) {
                         $model = $this->model;
                         $actions = [];
                         $createAction->isVisible = true;
@@ -821,7 +841,7 @@ HTML
                 ],
             ];
 
-            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+            if ($indexAction = $controller->createAction('index')) {
                 $indexAction->url = $this->action->urlData;
                 $indexAction->backendShowings = false;
 
@@ -839,7 +859,7 @@ HTML
                 };
 
                 $indexAction->on('beforeRender', function (Event $event) use ($controller) {
-                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                    if ($createAction = $controller->createAction('create')) {
                         /** @var ShopBill $model */
                         $model = $this->model;
                         $documentTypes = [

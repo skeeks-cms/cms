@@ -22,7 +22,8 @@ class DaterangeInputWidgetAsset extends AssetBundle
 
     public $css = [
         /*'https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css',*/
-        'css/daterangepicker-3.1.css'
+        'css/daterangepicker-3.1.css',
+        'css/daterangepicker-theme.css',
     ];
 
     public $js = [

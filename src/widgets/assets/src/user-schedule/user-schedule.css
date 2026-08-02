@@ -1,0 +1,86 @@
+.sx-schedule-pjax {
+    display: flex;
+}
+
+.sx-schedule-pjax > div {
+    margin-left: 1rem;
+}
+
+.sx-schedule-pjax .sx-current-task {
+    max-width: 30rem;
+    max-height: 40px;
+    margin-left: 2rem;
+    line-height: 1;
+}
+
+.sx-schedule-pjax .sx-current-task .sx-main-info {
+    max-height: 40px;
+    overflow: hidden;
+}
+
+.sx-schedule-pjax .sx-current-task .sx-preview-card img.sx-photo {
+    width: 2rem;
+    height: 2rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 1rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar > div {
+    margin-top: 0;
+    margin-left: .75rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar form {
+    flex: 1 1 auto;
+    margin: 0;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar form .btn {
+    width: 100%;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar .sx-current-task {
+    max-width: none;
+    max-height: none;
+    flex: 0 0 100%;
+    margin-top: 1.75rem;
+    margin-left: 0;
+    padding-top: .5rem;
+}
+
+.sx-schedule-pjax.sx-schedule-layout-mobile-sidebar .col-md-12 {
+    flex: 0 0 100%;
+    margin-top: .75rem;
+    margin-left: 0;
+}
+
+.sx-schedule-info {
+    cursor: default;
+}
+
+.sx-schedule-last {
+    animation: sx-schedule-pulse 3s infinite ease;
+}
+
+@keyframes sx-schedule-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    54%,
+    55% {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sx-schedule-last {
+        animation: none;
+    }
+}

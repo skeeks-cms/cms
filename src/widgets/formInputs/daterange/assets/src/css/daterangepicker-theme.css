@@ -1,0 +1,92 @@
+/*
+ * Semantic SkeekS backend adapter for the legacy daterangepicker skin.
+ * It stays next to the widget so the legacy vendor CSS is loaded only by
+ * actual daterange consumers.
+ */
+html[data-sx-theme] .daterangepicker {
+    color: var(--sx-calendar-color, #242833);
+    border-color: var(--sx-calendar-border-color, #d7dce5);
+    background: var(--sx-calendar-background, #fff);
+    box-shadow: var(--sx-calendar-shadow, 0 12px 30px rgba(23, 25, 35, .13));
+    font-family: inherit;
+}
+
+html[data-sx-theme] .daterangepicker::before {
+    border-bottom-color: var(--sx-calendar-border-color, #d7dce5);
+}
+
+html[data-sx-theme] .daterangepicker::after {
+    border-bottom-color: var(--sx-calendar-background, #fff);
+}
+
+html[data-sx-theme] .daterangepicker.drop-up::before {
+    border-top-color: var(--sx-calendar-border-color, #d7dce5);
+}
+
+html[data-sx-theme] .daterangepicker.drop-up::after {
+    border-top-color: var(--sx-calendar-background, #fff);
+}
+
+html[data-sx-theme] .daterangepicker .calendar-table,
+html[data-sx-theme] .daterangepicker td.off,
+html[data-sx-theme] .daterangepicker td.off.in-range,
+html[data-sx-theme] .daterangepicker td.off.start-date,
+html[data-sx-theme] .daterangepicker td.off.end-date {
+    border-color: transparent;
+    background: var(--sx-calendar-background, #fff);
+}
+
+html[data-sx-theme] .daterangepicker .calendar-table,
+html[data-sx-theme] .daterangepicker .calendar-table th,
+html[data-sx-theme] .daterangepicker .calendar-table td {
+    color: var(--sx-calendar-color, #242833);
+}
+
+html[data-sx-theme] .daterangepicker td.off,
+html[data-sx-theme] .daterangepicker td.week,
+html[data-sx-theme] .daterangepicker th.week,
+html[data-sx-theme] .daterangepicker td.disabled,
+html[data-sx-theme] .daterangepicker option.disabled,
+html[data-sx-theme] .daterangepicker .calendar-time select.disabled {
+    color: var(--sx-calendar-muted-color, #7b8496);
+}
+
+html[data-sx-theme] .daterangepicker td.available:hover,
+html[data-sx-theme] .daterangepicker th.available:hover,
+html[data-sx-theme] .daterangepicker .ranges li:hover {
+    color: var(--sx-calendar-color, #242833);
+    background: var(--sx-calendar-hover-background, #f2f4f8);
+}
+
+html[data-sx-theme] .daterangepicker td.in-range {
+    color: var(--sx-color-accent, #ed7044);
+    background: var(--sx-color-accent-soft, #fff4ea);
+}
+
+html[data-sx-theme] .daterangepicker td.active,
+html[data-sx-theme] .daterangepicker td.active:hover,
+html[data-sx-theme] .daterangepicker .ranges li.active {
+    color: var(--sx-calendar-active-color, #10141a);
+    border-color: var(--sx-calendar-active-background, #ed7044);
+    background: var(--sx-calendar-active-background, #ed7044);
+}
+
+html[data-sx-theme] .daterangepicker .calendar-table .next span,
+html[data-sx-theme] .daterangepicker .calendar-table .prev span {
+    color: var(--sx-calendar-color, #242833);
+    border-color: currentColor;
+}
+
+html[data-sx-theme] .daterangepicker select {
+    color: var(--sx-form-control-color, #242833);
+    border-color: var(--sx-form-control-border-color, #bfc6d2);
+    background: var(--sx-form-control-background, #fff);
+}
+
+html[data-sx-theme] .daterangepicker .drp-buttons,
+html[data-sx-theme] .daterangepicker.show-ranges.single.rtl .drp-calendar.left,
+html[data-sx-theme] .daterangepicker.show-ranges.single.ltr .drp-calendar.left,
+html[data-sx-theme] .daterangepicker.show-ranges.rtl .drp-calendar.right,
+html[data-sx-theme] .daterangepicker.show-ranges.ltr .drp-calendar.left {
+    border-color: var(--sx-calendar-border-color, #d7dce5);
+}

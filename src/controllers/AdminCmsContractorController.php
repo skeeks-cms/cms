@@ -157,25 +157,41 @@ HTML
                     'columns' => [
                         'custom' => [
                             'format' => 'raw',
+                            'label'  => 'Реквизиты',
                             'value'  => function (CmsContractor $model) {
+                                $title = Html::a(Html::encode($model->asText), '#', [
+                                    'class' => 'sx-trigger-action sx-preview-card__title sx-collection-cell__primary',
+                                ]);
+                                $media = Html::tag(
+                                    'div',
+                                    Html::a(
+                                        Html::img($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc(), [
+                                            'class' => 'sx-photo sx-img-size-50',
+                                            'alt'   => '',
+                                        ]),
+                                        '#',
+                                        ['class' => 'sx-trigger-action sx-preview-card__media-link']
+                                    ),
+                                    ['class' => 'sx-preview-card__media']
+                                );
 
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
-
-                                $info = implode("<br />", $data);
-
-                                return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                                </div>
-                                                <div class='my-auto' style='margin-left: 5px;'>".$info."</div></div>";;
+                                return Html::tag(
+                                    'div',
+                                    $media.Html::tag(
+                                        'div',
+                                        $title,
+                                        ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
+                                    ),
+                                    ['class' => 'sx-preview-card sx-preview-card--file']
+                                );
                             },
                         ],
 
                         'is_active' => [
-                            'class' => BooleanColumn::class,
+                            'class'     => BooleanColumn::class,
+                            'label'     => 'Активен',
+                            'trueIcon'  => '<span class="sx-text--success">✓</span>',
+                            'falseIcon' => '<span class="sx-text--danger">×</span>',
                         ],
 
                         'image_id' => [

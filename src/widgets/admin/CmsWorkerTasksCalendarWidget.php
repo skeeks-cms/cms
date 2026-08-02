@@ -11,6 +11,7 @@ namespace skeeks\cms\widgets\admin;
 use common\models\User;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsTask;
+use skeeks\cms\backend\assets\WorkerTasksCalendarAsset;
 use yii\base\Widget;
 use yii\helpers\Html;
 
@@ -33,6 +34,8 @@ class CmsWorkerTasksCalendarWidget extends Widget
 
     public function run()
     {
+        WorkerTasksCalendarAsset::register($this->view);
+
         $this->options['id'] = $this->id;
         Html::addCssClass($this->options, "sx-worker-tasks-calendar-widget");
 

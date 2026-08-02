@@ -12,12 +12,10 @@
 $widget = $this->context;
 $cmsUser = $widget->cmsUser;
 
-$class = 'g-brd-gray-light-v4';
-
 ?>
-<div class="d-flex flex-row sx-preview-card">
+<div class="d-flex flex-row sx-preview-card sx-preview-card--person">
 
-    <div>
+    <div class="sx-preview-card__media">
         <?php
         $w = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
             'controllerId' => '/cms/admin-user',
@@ -28,7 +26,7 @@ $class = 'g-brd-gray-light-v4';
                 'data-toggle' => 'tooltip',
                 'data-html'   => 'true',
                 'data-pjax'   => '0',
-                'style'       => 'border: 0;',
+                'class'       => 'sx-preview-card__media-link',
             ],
         ]); ?>
         <? if ($cmsUser->image) : ?>
@@ -38,12 +36,12 @@ $class = 'g-brd-gray-light-v4';
                     'w' => $widget->prviewImageSize,
                     'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
                 ])); ?>" alt=""
-                 class="sx-photo <?= $class; ?> sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>"
+                 class="sx-photo sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>"
                  data-toggle="tooltip"
                  data-html="true"
             >
         <? else : ?>
-            <div class="sx-no-photo g-brd-gray-light-v4 sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>">
+            <div class="sx-no-photo sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>">
                 <?= \skeeks\cms\helpers\StringHelper::strtoupper(
                     \skeeks\cms\helpers\StringHelper::substr($cmsUser->shortDisplayNameWithAlias, 0, 2)
                 ); ?>
@@ -52,11 +50,10 @@ $class = 'g-brd-gray-light-v4';
         <?php $w::end(); ?>
     </div>
 
-    <div>
+    <div class="sx-preview-card__content sx-collection-cell sx-collection-cell--stack">
 
         <?php
         $options = \yii\helpers\ArrayHelper::merge([
-            'style' => 'text-align: left; white-space: nowrap;',
             'class' => '',
             'href'  => '#',
 
@@ -64,6 +61,7 @@ $class = 'g-brd-gray-light-v4';
             'data-html'   => 'true',
             'data-pjax'   => '0',
         ], (array) $widget->tagNameOptions);
+        \yii\helpers\Html::addCssClass($options, ['sx-preview-card__title', 'sx-collection-cell__primary']);
 
         echo \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
             'controllerId' => '/cms/admin-user',
@@ -78,15 +76,15 @@ $class = 'g-brd-gray-light-v4';
         <? if ($widget->isShowOnlyName === false) : ?>
 
             <? if ($cmsUser->phone) : ?>
-                <div class="sx-phone">
-                    <a href="tel:<?= $cmsUser->phone; ?>" style="color: gray; font-size: 12px; text-decoration: none; border-bottom: 0px;">
+                <div class="sx-phone sx-preview-card__meta sx-collection-cell__secondary">
+                    <a href="tel:<?= $cmsUser->phone; ?>">
                         <i class="fas fa-phone"></i> <?= $cmsUser->phone; ?>
                     </a>
                 </div>
             <? endif; ?>
             <? if ($cmsUser->email) : ?>
-                <div class="sx-mail">
-                    <a href="mailto:<?= $cmsUser->email; ?>"  style="color: gray; font-size: 12px; text-decoration: none; border-bottom: 0px;">
+                <div class="sx-mail sx-preview-card__meta sx-collection-cell__secondary">
+                    <a href="mailto:<?= $cmsUser->email; ?>">
                         <i class="far fa-envelope"></i> <?= $cmsUser->email; ?>
                     </a>
                 </div>
@@ -99,5 +97,3 @@ $class = 'g-brd-gray-light-v4';
 
 
 </div>
-
-

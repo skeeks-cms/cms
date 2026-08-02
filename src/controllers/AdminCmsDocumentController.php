@@ -211,30 +211,35 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                     'tag'                     => 'span',
                                     'content'                 => Html::encode($model->asText),
                                     'options'                 => [
-                                        'style' => 'cursor: pointer; color: #1d70b8; display: inline-block; font-size: 15px; white-space: nowrap;',
+                                        'class' => 'sx-collection-cell__primary',
                                     ],
                                 ]);
 
-                                $statusColors = $model->statusColors;
-                                $status = Html::tag('small', '<i class="'.Html::encode($model->statusIcon).'" style="margin-right:3px;"></i> '.Html::encode($model->statusAsText), [
-                                    'style' => Html::cssStyleFromArray([
-                                        'display'          => 'inline-block',
-                                        'margin-top'       => '5px',
-                                        'padding'          => '3px 8px',
-                                        'border'           => '1px solid '.$statusColors['border'],
-                                        'border-radius'    => '999px',
-                                        'background-color' => $statusColors['background'],
-                                        'color'            => $statusColors['text'],
-                                        'font-weight'      => '600',
-                                    ]),
+                                $statusClass = [
+                                    ShopDocument::STATUS_ISSUED   => '',
+                                    ShopDocument::STATUS_SENT     => 'sx-status--warning',
+                                    ShopDocument::STATUS_SIGNED   => 'sx-status--success',
+                                    ShopDocument::STATUS_CANCELED => 'sx-status--danger',
+                                ][$model->status] ?? '';
+                                $status = Html::tag('small', '<i class="'.Html::encode($model->statusIcon).'"></i> '.Html::encode($model->statusAsText), [
+                                    'class' => trim('sx-status '.$statusClass),
                                 ]);
 
-                                return $titleAction.'<br>'.$status;
+                                return Html::tag(
+                                    'div',
+                                    $titleAction.$status,
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
                         'amount' => [
+                            'format' => 'raw',
                             'value' => function (ShopDocument $model) {
-                                return (string)$model->money;
+                                return Html::tag(
+                                    'span',
+                                    Html::encode((string)$model->money),
+                                    ['class' => 'sx-collection-cell__amount']
+                                );
                             },
                         ],
                         'cms_company_id' => [
@@ -248,7 +253,7 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                     'controllerId' => '/cms/admin-cms-company',
                                     'modelId'      => $model->company->id,
                                     'content'      => '<i class="fas fa-users"></i> '.Html::encode($model->company->asText),
-                                    'options'      => ['style' => 'text-align: left;'],
+                                    'options'      => ['class' => 'sx-preview-card__related'],
                                 ]);
                             },
                         ],
@@ -261,7 +266,7 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                         'controllerId' => '/cms/admin-cms-contractor',
                                         'modelId'      => $model->buyerContractor->id,
                                         'content'      => '<i class="far fa-user"></i> '.Html::encode($model->buyerContractor->asText),
-                                        'options'      => ['style' => 'text-align: left;'],
+                                        'options'      => ['class' => 'sx-preview-card__related'],
                                     ]);
                                 }
 
@@ -278,11 +283,15 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                         'controllerId' => '/cms/admin-cms-bill',
                                         'modelId'      => $bill->id,
                                         'content'      => '<i class="far fa-file"></i> '.Html::encode($bill->asText),
-                                        'options'      => ['style' => 'text-align: left;'],
+                                        'options'      => ['class' => 'sx-preview-card__related'],
                                     ]);
                                 }
 
-                                return implode('', $result);
+                                return Html::tag(
+                                    'div',
+                                    implode('', $result),
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
                         'deals' => [
@@ -295,11 +304,15 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                         'controllerId' => '/cms/admin-cms-deal',
                                         'modelId'      => $deal->id,
                                         'content'      => '<i class="far fa-file"></i> '.Html::encode($deal->asText),
-                                        'options'      => ['style' => 'text-align: left;'],
+                                        'options'      => ['class' => 'sx-preview-card__related'],
                                     ]);
                                 }
 
-                                return implode('', $result);
+                                return Html::tag(
+                                    'div',
+                                    implode('', $result),
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
                     ],

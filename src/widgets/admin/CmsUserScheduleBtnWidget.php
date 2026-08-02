@@ -83,6 +83,9 @@ class CmsUserScheduleBtnWidget extends Widget
             } catch (\Exception $e) {
                 $error = $e->getMessage();
             }
+
+            // Always render the actual persisted state after a start/stop request.
+            $CmsUserSchedule = CmsUserSchedule::find()->user($this->user)->notEnd()->one();
         }
 
         return $this->render('schedule-btn', [

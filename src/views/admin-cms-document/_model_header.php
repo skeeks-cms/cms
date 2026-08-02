@@ -11,48 +11,12 @@ use yii\helpers\Json;
 $controller = $this->context;
 
 $documentDate = $model->issued_at ?: $model->created_at;
-
-$this->registerCss(<<<CSS
-.sx-document-model-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-.sx-document-model-header h1 {
-    margin: 0;
-    line-height: 1.1;
-}
-.sx-document-model-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px 10px;
-    margin-top: 5px;
-    color: silver;
-    font-size: 10px;
-}
-.sx-document-model-side {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-@media (max-width: 900px) {
-    .sx-document-model-header {
-        flex-direction: column;
-    }
-    .sx-document-model-side {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-CSS);
 ?>
 
-<div class="sx-document-model-header">
-    <div>
-        <h1><?= Html::encode($model->asText); ?></h1>
-        <div class="sx-document-model-meta">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <h1 class="sx-model-header__title"><?= Html::encode($model->asText); ?></h1>
+        <div class="sx-model-header__meta">
             <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip">
                 <i class="fas fa-key"></i> <?= (int)$model->id; ?>
             </span>
@@ -72,7 +36,7 @@ CSS);
         </div>
     </div>
 
-    <div class="sx-document-model-side">
+    <div class="sx-model-header__side">
         <?php if ($model->isEditable && ($deleteAction = ArrayHelper::getValue($controller->modelActions, 'delete'))) : ?>
             <?php
             $actionData = Json::encode([
@@ -84,7 +48,7 @@ CSS);
                 'size'            => isset($deleteAction->size) ? $deleteAction->size : '',
             ]);
             ?>
-            <div style="text-align: right; min-width: 48px;">
+            <div class="sx-model-header__actions">
                 <?= Html::a('<i class="fa fa-trash sx-action-icon"></i>', '#', [
                     'onclick'     => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
                     'class'       => 'btn btn-default',

@@ -15,6 +15,7 @@ $user = $widget->user;
 
 \skeeks\cms\backend\widgets\assets\ControllerActionsWidgetAsset::register($this);
 \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::registerAssets();
+\skeeks\cms\widgets\assets\CmsWebNotifyAsset::register($this);
 ?>
 
 <?
@@ -386,9 +387,7 @@ sx.classes.WebNotify = sx.classes.Component.extend({
                 self.jStaleModal.modal("hide");
                 self.setStaleWorkSnoozedUntil(self.staleWorkData, Date.now() + 24 * 60 * 60 * 1000);
                 sx.notify.success("\u0420\u0430\u0431\u043e\u0447\u0435\u0435 \u0432\u0440\u0435\u043c\u044f \u0438\u0441\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e.");
-                if ($.pjax && $("#sx-schedule-pjax").length) {
-                    $.pjax.reload("#sx-schedule-pjax", {async: false});
-                }
+                $(document).trigger("sx:schedule:refresh");
             }
         });
     },
@@ -471,9 +470,7 @@ sx.classes.WebNotify = sx.classes.Component.extend({
                 self.jIdleModal.modal("hide");
                 self.setIdleWorkSnoozedUntil(self.idleWorkData, Date.now() + 24 * 60 * 60 * 1000);
                 sx.notify.success("Рабочее время завершено.");
-                if ($.pjax && $("#sx-schedule-pjax").length) {
-                    $.pjax.reload("#sx-schedule-pjax", {async: false});
-                }
+                $(document).trigger("sx:schedule:refresh");
             }
         });
     },
@@ -723,286 +720,15 @@ new sx.classes.WebNotify({$js});
 })(sx, sx.$, sx._);
 JS
 );
-$this->registerCss(<<<CSS
-.sx-notifies .sx-notifies-btns {
-    display: flex;
-    justify-content: right;
-    margin-top: 1rem;
-}
-
-
-.sx-notifies .sx-model .sx-action-trigger {
-    cursor: pointer;
-    border-bottom: 1px solid;
-}
-.sx-notifies .sx-notifies-list .sx-item .sx-time {
-    color: #8294b9;
-}
-.sx-notifies .sx-notifies-list .sx-item.sx-not-read {
-    margin-left: 1rem;
-}
-.sx-notifies .sx-notifies-list .sx-item.sx-not-read:before {
-    content: "•";
-    position: absolute;
-    left: -1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-red-pale);
-}
-.sx-notifies .sx-notifies-list .sx-item {
-    margin-bottom: 1rem;
-    position: relative;
-}
-.sx-notifies .sx-notifies-list .sx-item:last-child {
-    margin-bottom: 0;
-}
-
-.sx-notifies {
-    background: #1d1d1d !important;
-    /*background: white !important;*/
-    width: 25rem;
-    display: none;
-    position: absolute;
-    top: 4rem;
-    right: -2rem;
-    min-height: 4rem;
-    border-radius: var(--border-radius);
-    padding: 0.5rem;
-    box-shadow: 0 7px 21px rgba(83, 92, 105, .12), 0 -1px 6px 0 rgba(83, 92, 105, .06);
-}
-
-
-.sx-notifies-wrapper .sx-notifies-has-items,
-.sx-notifies-wrapper .sx-empty {
-    display: none;
-    
-}
-
-.sx-notifies-wrapper .sx-empty {
-    text-align: center;
-}
-
-.sx-notifies-wrapper .sx-browser-permission {
-    display: none;
-    margin: 0.5rem;
-    padding: 0.75rem;
-    border-radius: var(--border-radius);
-    background: rgba(43, 123, 220, 0.16);
-    color: #fff;
-}
-
-.sx-notifies-wrapper .sx-browser-permission-enable,
-.sx-notifies-wrapper .sx-browser-permission-denied {
-    display: none;
-}
-
-.sx-notifies-wrapper .sx-browser-permission-denied {
-    border-left: 3px solid var(--color-red-pale);
-    padding-left: 0.75rem;
-}
-
-.sx-notifies-wrapper .sx-browser-permission-title {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.sx-notifies-wrapper .sx-browser-permission-text {
-    color: #b8c7e6;
-    font-size: 0.875rem;
-    line-height: 1.35;
-    margin-bottom: 0.65rem;
-}
-
-
-.sx-notifies-wrapper .dropdown-toggle::after {
-    content: none;
-}
-
-.sx-notifies-wrapper .sx-notifies-list {
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-.sx-notifies-wrapper .sx-notifies-list,
-.sx-notifies-wrapper .sx-empty {
-    padding: 1rem;
-}
-
-.sx-notifies-wrapper .sx-bage-notifies {
-    display: none;
-    transition: all .2s;
-    animation: sx-pulse-bage 1.5s infinite linear;
-}
-
-.sx-notifies-wrapper.sx-has-notifies .sx-bage-notifies {
-    display: block;
-}
-
-.sx-idle-work-modal .modal-body {
-    color: #333;
-    font-size: 16px;
-    line-height: 1.45;
-    min-height: auto;
-    padding: 20px;
-}
-
-.sx-idle-work-modal .modal-title {
-    color: #333;
-    flex: 1 1 auto;
-    font-size: 20px;
-    line-height: 1.3;
-    margin: 0;
-}
-
-.sx-idle-work-modal .modal-footer,
-.sx-idle-work-modal .modal-header {
-    padding: 15px 20px;
-}
-
-.sx-idle-work-modal .modal-header {
-    align-items: center;
-    display: flex;
-    gap: 16px;
-}
-
-.sx-idle-work-modal .modal-header .close {
-    flex: 0 0 auto;
-    float: none;
-    font-size: 24px;
-    line-height: 1;
-    margin: 0 0 0 auto;
-    opacity: .55;
-    order: 2;
-}
-
-.sx-idle-work-modal p {
-    margin: 0 0 12px;
-}
-
-.sx-idle-work-modal p:last-child {
-    margin-bottom: 0;
-}
-
-.sx-idle-work-modal .sx-idle-work-time {
-    font-weight: 600;
-}
-
-.sx-stale-work-modal .modal-dialog {
-    max-width: 720px;
-    width: 720px;
-}
-
-.sx-stale-work-modal .modal-body {
-    color: #333;
-    font-size: 15px;
-    line-height: 1.45;
-    padding: 20px;
-}
-
-.sx-stale-work-modal .modal-title {
-    color: #333;
-    flex: 1 1 auto;
-    font-size: 20px;
-    line-height: 1.3;
-    margin: 0;
-}
-
-.sx-stale-work-modal .modal-header {
-    align-items: center;
-    display: flex;
-    gap: 16px;
-    padding: 15px 20px;
-}
-
-.sx-stale-work-modal .modal-header .close {
-    flex: 0 0 auto;
-    float: none;
-    font-size: 24px;
-    line-height: 1;
-    margin: 0 0 0 auto;
-    opacity: .55;
-    order: 2;
-}
-
-.sx-stale-work-modal .modal-footer {
-    align-items: center;
-    display: flex;
-    gap: 10px;
-    padding: 15px 20px;
-}
-
-.sx-stale-work-modal .sx-stale-work-form {
-    align-items: center;
-    display: flex;
-    gap: 8px;
-    margin-right: auto;
-}
-
-.sx-stale-work-modal .sx-stale-work-form label {
-    color: #555;
-    font-weight: 400;
-    margin: 0;
-}
-
-.sx-stale-work-modal .sx-stale-work-end-time {
-    max-width: 120px;
-}
-
-.sx-stale-work-modal .sx-stale-work-section {
-    margin-top: 16px;
-}
-
-.sx-stale-work-modal .sx-stale-work-section-title {
-    color: #222;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.sx-stale-work-modal .sx-stale-work-interval {
-    border-left: 3px solid #d9e1ea;
-    margin-bottom: 8px;
-    padding: 6px 0 6px 10px;
-}
-
-.sx-stale-work-modal .sx-stale-work-interval.sx-is-open {
-    border-left-color: var(--color-red-pale);
-}
-
-.sx-stale-work-modal .sx-stale-work-interval-time {
-    color: #333;
-    font-weight: 600;
-}
-
-.sx-stale-work-modal .sx-stale-work-task-name,
-.sx-stale-work-modal .sx-stale-work-empty,
-.sx-stale-work-modal .sx-stale-work-hint {
-    color: #777;
-}
-
-.sx-stale-work-modal .sx-stale-work-error {
-    display: none;
-    margin: 0 20px 15px;
-}
-
-@keyframes sx-pulse-bage {
-  0% {
-    box-shadow: 0 0 5px 0px var(--color-red), 0 0 5px 0px var(--color-red); 
-  }
-  100% {
-    box-shadow: 0 0 5px 6px rgba(255, 48, 26, 0), 0 0 4px 10px rgba(255, 48, 26, 0); 
-  } 
-}
-
-CSS
-);
-
-
 ?>
 
 <div class="sx-btn-backend-header sx-notifies-wrapper <?php echo $notReaded ? "sx-has-notifies" : ""; ?>" id="sx-notifies-wrapper">
     <a class="d-block sx-trigger-notifies" href="#">
         <span class="sx-badge sx-bage-notifies"><?php echo $notReaded; ?></span>
-        <i class="hs-admin-bell g-absolute-centered"></i>
+        <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('bell', [
+            'size'  => 20,
+            'class' => 'sx-icon-centered',
+        ]); ?>
     </a>
     <div class="sx-notifies">
         <div class="sx-browser-permission">

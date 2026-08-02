@@ -16,7 +16,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\Tree;
 use skeeks\cms\modules\admin\Module;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
-use skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset;
+use skeeks\cms\backend\assets\BackendIframeAsset;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\widgets\InputWidget;
@@ -64,7 +64,7 @@ class SelectTree extends InputWidget
     public function run()
     {
         try {
-            UnifyAdminIframeAsset::register($this->view);
+        BackendIframeAsset::register($this->view);
 
             $this->_initAndValidate();
 

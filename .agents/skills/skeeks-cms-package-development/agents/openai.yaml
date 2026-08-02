@@ -1,0 +1,7 @@
+interface:
+  display_name: "SkeekS CMS Package Development"
+  short_description: "Develop shared SkeekS CMS Composer packages"
+  default_prompt: "Use $skeeks-cms-package-development to safely develop reusable SkeekS CMS Composer packages."
+
+policy:
+  allow_implicit_invocation: false

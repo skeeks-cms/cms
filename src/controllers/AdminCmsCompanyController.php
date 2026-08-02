@@ -342,9 +342,7 @@ HTML
 
                                 $data = [];
                                 $data[] = Html::a($model->asText, "#", [
-                                    'class' => 'sx-trigger-action',
-                                    'style' => 'font-size: 15px;
-                                                display: block;',
+                                    'class' => 'sx-trigger-action sx-preview-card__title sx-collection-cell__primary',
                                 ]);
 
                                 $additionalData = [];
@@ -364,31 +362,19 @@ HTML
                                 }
                                 $info = implode("", $data);
 
-                                return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none;
-    border-bottom: 0;
-    width: 54px;
-    border-radius: 50%;
-    border: 2px solid #ededed;
-    height: 54px;
-    
-    display: flex;
-    overflow: hidden;'>
+                                return "<div class='sx-preview-card'>
+                                                <div class='sx-preview-card__media sx-trigger-action'>
+                                                <a href='#' class='sx-preview-card__media-link'>
                                                     <img src='".($model->cmsImage ? \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src,
                                         new \skeeks\cms\components\imaging\filters\Thumbnail([
                                             'h' => 50,
                                             'w' => 50,
                                             'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
-                                        ])) : Image::getCapSrc())."' style='    max-width: 50px;
-    max-height: 50px;
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
-    margin: auto;' />
+                                        ])) : Image::getCapSrc())."' class='sx-photo sx-img-size-50' alt='' />
                                                 </a>
                                                 </div>
-                                                <div class='my-auto' style='margin-left: 10px; line-height: 1.4;' class='my-auto''>".$info."</div></div>";;
+                                                <div class='sx-preview-card__content sx-collection-cell sx-collection-cell--stack'>".$info."</div>
+                                        </div>";
                             },
                         ],
                         'managers' => [

@@ -9,7 +9,7 @@
  */
 /* @var $this yii\web\View */
 
-\skeeks\cms\themes\unify\admin\assets\UnifyAdminIframeAsset::register($this);
+\skeeks\cms\backend\assets\BackendIframeAsset::register($this);
 
 $this->registerCss(<<<CSS
 li.divider

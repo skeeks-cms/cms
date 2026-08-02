@@ -12,7 +12,6 @@
 $widget = $this->context;
 $cmsUser = $widget->user;
 
-$class = 'g-brd-gray-light-v4';
 $currentTask = null;
 $isWorkingNow = (bool)$cmsUser->isWorkingNow;
 $isCurrentTaskAvailable = true;
@@ -25,35 +24,10 @@ if ($isWorkingNow) {
     }
 }
 
-$css = <<<CSS
-.sx-worker-work-state {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 14px;
-    height: 14px;
-    margin-left: 6px;
-    border-radius: 50%;
-    vertical-align: middle;
-    color: #fff;
-    font-size: 7px;
-    line-height: 1;
-}
-.sx-worker-work-state.is-task {
-    background: #14b8a6;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(20, 184, 166, 0.18);
-}
-.sx-worker-work-state.is-without-task {
-    background: #f59e0b;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(245, 158, 11, 0.18);
-}
-CSS;
-$this->registerCss($css, [], 'sx-worker-work-state');
-
 ?>
-<div class="d-flex flex-row sx-preview-card">
+<div class="d-flex flex-row sx-preview-card sx-preview-card--person">
 
-    <div class="my-auto">
+    <div class="my-auto sx-preview-card__media">
         <?php
         $w = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
             'controllerId'            => '/cms/admin-worker',
@@ -64,7 +38,7 @@ $this->registerCss($css, [], 'sx-worker-work-state');
                 'data-toggle' => 'tooltip',
                 'data-html'   => 'true',
                 'data-pjax'   => '0',
-                'style'       => 'border: 0;',
+                'class'       => 'sx-preview-card__media-link',
             ],
         ]); ?>
         <? if ($cmsUser->image) : ?>
@@ -74,12 +48,12 @@ $this->registerCss($css, [], 'sx-worker-work-state');
                     'w' => $widget->prviewImageSize,
                     'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
                 ])); ?>" alt=""
-                 class="sx-photo <?= $class; ?> sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>"
+                 class="sx-photo sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>"
                  data-toggle="tooltip"
                  data-html="true"
             >
         <? else : ?>
-            <div class="sx-no-photo g-brd-gray-light-v4 sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>">
+            <div class="sx-no-photo sx-img-size-<?= $widget->isSmall ? "small" : $widget->prviewImageSize; ?>">
                 <?= \skeeks\cms\helpers\StringHelper::strtoupper(
                     \skeeks\cms\helpers\StringHelper::substr($cmsUser->shortDisplayNameWithAlias, 0, 2)
                 ); ?>
@@ -88,11 +62,10 @@ $this->registerCss($css, [], 'sx-worker-work-state');
         <?php $w::end(); ?>
     </div>
 
-    <div class="my-auto">
+    <div class="my-auto sx-preview-card__content sx-collection-cell sx-collection-cell--stack">
 
         <?php
         $options = \yii\helpers\ArrayHelper::merge([
-            'style' => 'text-align: left; white-space: nowrap;',
             'class' => '',
             'href'  => '#',
 
@@ -100,6 +73,7 @@ $this->registerCss($css, [], 'sx-worker-work-state');
             'data-html'   => 'true',
             'data-pjax'   => '0',
         ], (array)$widget->tagNameOptions);
+        \yii\helpers\Html::addCssClass($options, ['sx-preview-card__title', 'sx-collection-cell__primary']);
         ?>
 
         <? $ajaxWidget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
@@ -134,7 +108,7 @@ $this->registerCss($css, [], 'sx-worker-work-state');
 
         <?php if ($widget->isSmall === false) : ?>
             <?php if ($cmsUser->post) : ?>
-                <div style="color: gray; font-size: 12px; text-decoration: none; border-bottom: 0px;"><?php echo $cmsUser->post; ?></div>
+                <div class="sx-preview-card__meta sx-collection-cell__secondary"><?php echo $cmsUser->post; ?></div>
             <?php endif; ?>
 
 

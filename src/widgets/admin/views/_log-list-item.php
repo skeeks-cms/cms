@@ -14,29 +14,33 @@ $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx
 $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['model' => $log]);
 ?>
 <div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-block sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
-    <div class="sx-controlls d-flex" style="margin-bottom: 0.25rem;">
-        <div class="d-flex sx-log-meta" style="flex-grow: 1;">
+    <div class="sx-controlls d-flex">
+        <div class="d-flex sx-log-meta">
             <div class="sx-log-meta-item"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
             <div class="sx-log-meta-item"><?php echo $log->logTypeAsText; ?></div>
             <button type="button"
-                    class="sx-log-share"
+                    class="sx-icon-action sx-log-share"
                     data-url="<?php echo \yii\helpers\Html::encode($shareUrl); ?>"
+                    data-success-message="Ссылка на комментарий скопирована"
+                    aria-label="Скопировать ссылку на комментарий"
                     title="Скопировать ссылку на комментарий">
                 <i class="fas fa-link"></i>
             </button>
             <?php if ($is_show_pin_controls) : ?>
             <button type="button"
-                    class="sx-log-pin-toggle <?php echo $log->is_pinned ? 'is-pinned' : ''; ?>"
+                    class="sx-chip sx-chip--compact sx-log-pin-toggle <?php echo $log->is_pinned ? 'is-pinned is-active' : ''; ?>"
                     data-id="<?php echo (int)$log->id; ?>"
                     data-url="<?php echo $togglePinUrl; ?>"
                     data-value="<?php echo $log->is_pinned ? 0 : 1; ?>"
+                    data-error-message="Не удалось обновить комментарий."
+                    aria-pressed="<?php echo $log->is_pinned ? 'true' : 'false'; ?>"
                     title="<?php echo \yii\helpers\Html::encode($log->is_pinned ? $unpinLabel : $pinLabel); ?>">
                 <i class="fas fa-thumbtack"></i>
                 <span><?php echo $log->is_pinned ? 'Закреплено' : $pinLabel; ?></span>
             </button>
             <?php endif; ?>
         </div>
-        <div style="margin-right: 1rem; font-size: 0.8rem; color: #a1a1a1;" class="my-auto">
+        <div class="sx-log-author my-auto">
             <?php
             if ($log->createdBy) {
                 $u = $log->createdBy;
@@ -53,14 +57,13 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
     <div class="">
 
         <?php if ($log->model && $log->model->id != $model->id) : ?>
-            <div class="d-flex sx-model" style="flex-grow: 1;">
+            <div class="d-flex sx-model sx-log-model">
                 <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                     'controllerId'            => \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->model_code, 'controller']),
                     'modelId'                 => $log->model->id,
                     'isRunFirstActionOnClick' => true,
                     'options'                 => [
-                        'class' => 'sx-dashed',
-                        'style' => 'cursor: pointer; border-bottom: 1px dashed; color: #a1a1a1;',
+                        'class' => 'sx-dashed sx-log-model-link',
                     ],
                 ]); ?>
                 <?php echo $log->model->asText; ?>
@@ -69,14 +72,13 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
         <?php endif; ?>
 
         <?php if ($log->subModel) : ?>
-            <div class="d-flex" style="flex-grow: 1;">
+            <div class="d-flex sx-log-model">
                 <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                     'controllerId'            => \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->sub_model_code, 'controller']),
                     'modelId'                 => $log->subModel->id,
                     'isRunFirstActionOnClick' => true,
                     'options'                 => [
-                        'class' => 'sx-dashed',
-                        'style' => 'cursor: pointer; border-bottom: 1px dashed; color: #a1a1a1;',
+                        'class' => 'sx-dashed sx-log-model-link',
                     ],
                 ]); ?>
                 <?php echo $log->subModel->asText; ?>
@@ -137,7 +139,7 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
             'tag'          => 'div',
             'options'      => [
                 'title' => 'Редактировать',
-                'class' => 'sx-edit-btn btn btn-default',
+                'class' => 'sx-edit-btn sx-icon-action btn btn-default',
             ],
         ]);
         ?>

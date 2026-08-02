@@ -26,7 +26,10 @@ use skeeks\cms\models\CmsUserUniversalPropertyEnum;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCollection;
+use skeeks\cms\widgets\admin\CmsUserScheduleBtnWidget;
 use yii\web\Controller;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 /**
@@ -35,6 +38,38 @@ use yii\web\Response;
 class AjaxController extends Controller
 {
     const IDLE_WORK_REMINDER_DELAY = 3600;
+
+    /**
+     * Renders only the current-user schedule control for background refreshes.
+     *
+     * @return string
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     */
+    public function actionScheduleControl()
+    {
+        if (\Yii::$app->user->isGuest) {
+            throw new ForbiddenHttpException();
+        }
+
+        $pjaxId = (string) \Yii::$app->request->get('id', 'sx-schedule-pjax');
+        $layout = (string) \Yii::$app->request->get('layout', 'default');
+
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/', $pjaxId)) {
+            throw new BadRequestHttpException('Invalid schedule control ID.');
+        }
+
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/', $layout)) {
+            throw new BadRequestHttpException('Invalid schedule control layout.');
+        }
+
+        \Yii::$app->response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate');
+
+        return CmsUserScheduleBtnWidget::widget([
+            'pjaxId' => $pjaxId,
+            'layout' => $layout,
+        ]);
+    }
 
     protected function getDayStart($timestamp)
     {
