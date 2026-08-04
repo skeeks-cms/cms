@@ -9,6 +9,7 @@
 namespace skeeks\cms\components;
 
 use skeeks\cms\backend\BackendComponent;
+use skeeks\cms\backend\themes\BackendTheme;
 use yii\helpers\Url;
 use yii\web\Application;
 
@@ -18,6 +19,12 @@ use yii\web\Application;
  */
 class UpaBackendComponent extends BackendComponent
 {
+    /** @var string|array|null */
+    public $themeClass = BackendTheme::class;
+
+    /** @var bool */
+    public $enableThemeCustomization = true;
+
     /**
      * @var string
      */
@@ -29,6 +36,41 @@ class UpaBackendComponent extends BackendComponent
     public $urlRule = [
         'urlPrefix' => '~upa',
     ];
+
+    /**
+     * Applies the standard client-cabinet palette, header and lazy customizer.
+     * A project may replace themeClass without rebuilding this configuration.
+     *
+     * @param BackendTheme $theme
+     */
+    protected function configureTheme(BackendTheme $theme)
+    {
+        parent::configureTheme($theme);
+
+        if ($this->enableThemeCustomization) {
+            $settings = new BackendThemePaletteSettings([
+                'namespace' => 'backend-theme-upa',
+            ]);
+
+            if (!$theme->palette) {
+                $theme->palette = $settings->getValidatedPalette();
+            }
+            if (!$theme->headerModes) {
+                $theme->headerModes = $settings->getValidatedHeaderModes();
+            }
+            if ($theme->themeCustomizer === []) {
+                $theme->themeCustomizer = [
+                    'scope'    => 'upa',
+                    'panelUrl' => Url::to(['/cms/theme-palette/panel', 'scope' => 'upa']),
+                ];
+            }
+        }
+
+        $theme->logoHref = Url::to(['/upa-home']);
+        if (\Yii::$app->has('admin') && \Yii::$app->has('skeeks')) {
+            \Yii::$app->admin->applyLogoSources($theme, \Yii::$app->skeeks->site);
+        }
+    }
 
     /*protected $_menu = [
         'data' => [
