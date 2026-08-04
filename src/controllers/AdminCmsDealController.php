@@ -17,7 +17,7 @@ use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\BooleanColumn;
@@ -211,10 +211,10 @@ class AdminCmsDealController extends BackendModelStandartController
                             'value' => function (CmsDeal $cmsDeal) {
 
                                 if ($cmsDeal->company) {
-                                    return AjaxControllerActionsWidget::widget([
+                                    return BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-company',
                                         'modelId'      => $cmsDeal->company->id,
-                                        'content'      => '<i class="far fa-user"></i> '.$cmsDeal->company->asText,
+                                        'content'      => '<i class="far fa-user"></i> '.Html::encode($cmsDeal->company->asText),
                                         'options'      => [
                                             'class' => 'sx-preview-card__related',
                                         ],
@@ -237,10 +237,10 @@ class AdminCmsDealController extends BackendModelStandartController
                             'value' => function (CmsDeal $cmsDeal) {
 
                                 if ($cmsDeal->user) {
-                                    return AjaxControllerActionsWidget::widget([
+                                    return BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-user',
                                         'modelId'      => $cmsDeal->user->id,
-                                        'content'      => '<i class="far fa-user"></i> '.$cmsDeal->user->asText,
+                                        'content'      => '<i class="far fa-user"></i> '.Html::encode($cmsDeal->user->asText),
                                         'options'      => [
                                             'class' => 'sx-preview-card__related',
                                         ],
@@ -324,9 +324,13 @@ JS
                                     Html::encode($cmsDeal->dealType->name),
                                     ['class' => 'sx-collection-cell__subtle']
                                 );
-                                $reuslt .= Html::a(Html::encode($cmsDeal->asShortText), ['/crm/crm-deal/view', 'pk' => $cmsDeal->id], [
-                                    'data-pjax' => 0,
-                                    'class'     => 'sx-trigger-action sx-collection-cell__primary',
+                                $reuslt .= BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-deal',
+                                    'modelId'      => $cmsDeal->id,
+                                    'label'        => $cmsDeal->asShortText,
+                                    'options'      => [
+                                        'class' => 'sx-collection-cell__primary',
+                                    ],
                                 ]);
 
                                 if ($cmsDeal->end_at) {

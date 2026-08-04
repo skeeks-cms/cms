@@ -29,16 +29,18 @@ $quickAccessFavoriteItem = [
     'image'  => $makeQuickAccessImageUrl($model),
 ];
 ?>
-<div class="row sx-model-header">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <div class="sx-model-header__identity">
     <?php if ($model->cmsImage) : ?>
-        <div class="col my-auto sx-model-header__media">
+        <div class="sx-model-header__media">
             <img class="sx-model-header__image sx-model-header__image--round"
                  src="<?= \yii\helpers\Html::encode($makeQuickAccessImageUrl($model)); ?>"
                  alt="">
         </div>
     <?php endif; ?>
 
-    <div class="col my-auto">
+        <div class="sx-model-header__content">
         <h1 class="sx-user-header-h1 sx-model-header__title">
             <?= \yii\helpers\Html::encode($model->name); ?>
             <button type="button"
@@ -70,6 +72,7 @@ $quickAccessFavoriteItem = [
                 </span>
             <?php endif; ?>
         </div>
+        </div>
     </div>
 
     <?php
@@ -87,13 +90,15 @@ $quickAccessFavoriteItem = [
             "size"            => isset($deleteAction->size) ? $deleteAction->size : "",
         ]);
         ?>
-        <div class="col my-auto sx-model-header__actions">
+        <div class="sx-model-header__side">
+        <div class="sx-model-header__actions">
             <?= \yii\helpers\Html::a('<i class="fa fa-trash sx-action-icon"></i>', "#", [
                 'onclick'     => "new sx.classes.backend.widgets.Action({$actionData}).go(); return false;",
                 'class'       => "btn btn-default",
                 'data-toggle' => "tooltip",
                 'title'       => "Удалить",
             ]); ?>
+        </div>
         </div>
     <?php endif; ?>
 </div>

@@ -11,16 +11,16 @@
  */
 $controller = $this->context;
 ?>
-<div class="row sx-model-header">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <div class="sx-model-header__identity">
     <? if ($model->image) : ?>
-        <div class="col my-auto sx-model-header__media">
+        <div class="sx-model-header__media">
             <img class="sx-model-header__image" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
                 new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"/>
         </div>
     <? endif; ?>
-    <div class="col my-auto">
-        <div class="d-flex">
-            <div>
+            <div class="sx-model-header__content">
                 <h1 class="sx-model-header__title">
                     <?php echo $model->name; ?>
                     <? if ($model->is_adult) : ?>
@@ -72,18 +72,15 @@ $controller = $this->context;
 
                 </div>
             </div>
-
-            <? if ($model->cmsContent->is_have_page) : ?>
-                <div class="col my-auto sx-model-header__actions">
-                    <a href="<?php echo $model->url; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i
-                                class="fas fa-external-link-alt"></i></a>
-                </div>
-            <? endif; ?>
-
         </div>
-
     </div>
 
+    <div class="sx-model-header__side">
+        <div class="sx-model-header__actions">
+            <? if ($model->cmsContent->is_have_page) : ?>
+                <a href="<?php echo $model->url; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i
+                            class="fas fa-external-link-alt"></i></a>
+            <? endif; ?>
     <?php
 
     $modelActions = $controller->modelActions;
@@ -111,8 +108,8 @@ $controller = $this->context;
             'title'       => "Удалить",
         ]);
         ?>
-        <div class="col my-auto sx-model-header__actions">
-            <?php echo $href; ?>
-        </div>
+        <?php echo $href; ?>
     <?php endif; ?>
+        </div>
+    </div>
 </div>

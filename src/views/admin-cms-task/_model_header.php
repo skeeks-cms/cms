@@ -11,9 +11,9 @@
  */
 $controller = $this->context;
 ?>
-<div class="row sx-model-header">
-   
-    <div class="col my-auto">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <div class="sx-model-header__content">
             <div>
                 <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget([
                     'task'            => $model,
@@ -39,6 +39,7 @@ $controller = $this->context;
 
                 </div>
 
+        </div>
     </div>
 
     <?php
@@ -68,8 +69,10 @@ $controller = $this->context;
             'title'       => "Удалить",
         ]);
         ?>
-        <div class="col my-auto sx-model-header__actions">
-            <?php echo $href; ?>
+        <div class="sx-model-header__side">
+            <div class="sx-model-header__actions">
+                <?php echo $href; ?>
+            </div>
         </div>
     <?php endif; ?>
 </div>

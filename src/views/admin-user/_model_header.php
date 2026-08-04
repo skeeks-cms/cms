@@ -25,19 +25,18 @@ if (!$model->is_worker) {
     ];
 }
 ?>
-<div class="row sx-model-header">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <div class="sx-model-header__identity">
     <? if ($model->image) : ?>
-        <div class="col my-auto sx-model-header__media">
+        <div class="sx-model-header__media">
             <img class="sx-model-header__image sx-model-header__image--round" src="<?php echo \Yii::$app->imaging->getImagingUrl($model->image->src,
                 new \skeeks\cms\components\imaging\filters\Thumbnail([
                     'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
                 ])); ?>"/>
         </div>
     <? endif; ?>
-    <div class="col my-auto">
-
-        <div class="d-flex">
-            <div>
+            <div class="sx-model-header__content">
 
                 <h1 class="sx-user-header-h1 sx-model-header__title"><?php echo $model->shortDisplayNameWithAlias; ?>
                     <?php if (!$model->is_active) : ?>
@@ -78,8 +77,11 @@ if (!$model->is_worker) {
 
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="col my-auto sx-model-header__toolbar">
+    <div class="sx-model-header__side">
+            <div class="sx-model-header__toolbar">
 
                 <!--<span>
             <? /*
@@ -139,9 +141,6 @@ JS
                 <?php endif; ?>
             </div>
 
-        </div>
-    </div>
-
     <?php
 
     $modelActions = $controller->modelActions;
@@ -169,10 +168,9 @@ JS
             'title'       => "Удалить",
         ]);
         ?>
-        <div class="col my-auto sx-model-header__actions">
+        <div class="sx-model-header__actions">
             <?php echo $href; ?>
         </div>
     <?php endif; ?>
-
-
+    </div>
 </div>

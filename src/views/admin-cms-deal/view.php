@@ -4,7 +4,7 @@
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use yii\helpers\Html;
 
 $controller = $this->context;
@@ -24,7 +24,7 @@ $entityCard = static function ($controllerId, $entity, $title, $displayName, $su
         return '';
     }
 
-    $content = '<div class="sx-deal-entity">'
+    $content = '<div class="sx-surface sx-deal-entity">'
         . '<div class="sx-deal-entity-icon"><i class="'.$icon.'"></i></div>'
         . '<div class="sx-deal-entity-body">'
         . '<div class="sx-deal-entity-label">'.Html::encode($title).'</div>'
@@ -36,12 +36,11 @@ $entityCard = static function ($controllerId, $entity, $title, $displayName, $su
 
     $content .= '</div></div>';
 
-    return AjaxControllerActionsWidget::widget([
-        'controllerId'            => $controllerId,
-        'modelId'                 => $entity->id,
-        'isRunFirstActionOnClick' => true,
-        'content'                 => $content,
-        'options'                 => [
+    return BackendEntityLink::widget([
+        'controllerId' => $controllerId,
+        'modelId'      => $entity->id,
+        'content'      => $content,
+        'options'      => [
             'class' => 'sx-deal-entity-link',
         ],
     ]);
@@ -70,14 +69,11 @@ $datePeriod = implode(' — ', $periodParts);
 
 $this->registerCss(<<<CSS
 .sx-deal-card {
-    background: #fff;
-    border: 1px solid #e3e7eb;
-    border-radius: 10px;
     overflow: hidden;
 }
 .sx-deal-section {
-    padding: 22px 28px;
-    border-bottom: 1px solid #edf0f2;
+    padding: var(--sx-surface-padding);
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-deal-section:last-child {
     border-bottom: 0;
@@ -95,18 +91,15 @@ $this->registerCss(<<<CSS
 .sx-deal-overview-item {
     min-height: 82px;
     padding: 14px;
-    border: 1px solid #e3e7eb;
-    border-radius: 8px;
-    background: #fff;
 }
 .sx-deal-overview-label,
 .sx-deal-entity-label {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
     margin-bottom: 4px;
 }
 .sx-deal-overview-value {
-    color: #303942;
+    color: var(--sx-color-text);
     font-weight: 600;
     overflow-wrap: anywhere;
 }
@@ -121,22 +114,22 @@ $this->registerCss(<<<CSS
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #8a929a;
+    background: var(--sx-color-text-subtle);
 }
 .sx-deal-status.is-active {
-    color: #188b38;
+    color: var(--sx-color-success);
 }
 .sx-deal-status.is-active:before {
-    background: #27a846;
+    background: var(--sx-color-success);
 }
 .sx-deal-status.is-expired {
-    color: #c43c35;
+    color: var(--sx-color-danger);
 }
 .sx-deal-status.is-expired:before {
-    background: #d54a43;
+    background: var(--sx-color-danger);
 }
 .sx-deal-status.is-inactive {
-    color: #6d767f;
+    color: var(--sx-color-text-muted);
 }
 .sx-deal-entities {
     display: grid;
@@ -158,12 +151,9 @@ $this->registerCss(<<<CSS
     min-height: 84px;
     height: 100%;
     padding: 14px;
-    border: 1px solid #e3e7eb;
-    border-radius: 8px;
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background: #fff;
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-deal-entity-link:hover,
@@ -174,15 +164,15 @@ $this->registerCss(<<<CSS
 }
 .sx-deal-entity-link:hover .sx-deal-entity,
 .sx-deal-entity-link:focus .sx-deal-entity {
-    border-color: #9dc8f0;
-    box-shadow: 0 8px 24px rgba(31, 82, 130, .08);
+    border-color: var(--sx-color-accent-border);
+    box-shadow: var(--sx-button-focus-shadow);
 }
 .sx-deal-entity-icon {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #eef3f7;
-    color: #607080;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -194,18 +184,18 @@ $this->registerCss(<<<CSS
     overflow-wrap: anywhere;
 }
 .sx-deal-entity-subtitle {
-    color: #606a73;
+    color: var(--sx-color-text-muted);
     font-size: 13px;
     margin-top: 4px;
 }
 .sx-deal-description {
     margin: 0;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 .sx-deal-muted {
-    color: #a5adb5;
+    color: var(--sx-color-text-subtle);
 }
 @media (max-width: 1100px) {
     .sx-deal-overview {
@@ -222,24 +212,24 @@ CSS
 );
 ?>
 
-<div class="sx-deal-card">
+<div class="sx-panel sx-deal-card">
     <section class="sx-deal-section">
         <div class="sx-deal-overview">
-            <div class="sx-deal-overview-item">
+            <div class="sx-surface sx-deal-overview-item">
                 <div class="sx-deal-overview-label">Статус</div>
                 <div class="sx-deal-overview-value sx-deal-status <?= $statusClass; ?>">
                     <?= Html::encode($statusTitle); ?>
                 </div>
             </div>
-            <div class="sx-deal-overview-item">
+            <div class="sx-surface sx-deal-overview-item">
                 <div class="sx-deal-overview-label">Тип сделки</div>
                 <div class="sx-deal-overview-value"><?= $formatValue($model->dealType ? $model->dealType->name : ''); ?></div>
             </div>
-            <div class="sx-deal-overview-item">
+            <div class="sx-surface sx-deal-overview-item">
                 <div class="sx-deal-overview-label">Сумма</div>
                 <div class="sx-deal-overview-value"><?= $formatValue($model->moneyAsText, 'Без суммы'); ?></div>
             </div>
-            <div class="sx-deal-overview-item">
+            <div class="sx-surface sx-deal-overview-item">
                 <div class="sx-deal-overview-label">Период действия</div>
                 <div class="sx-deal-overview-value"><?= $formatValue($datePeriod, 'Без ограничения'); ?></div>
             </div>
