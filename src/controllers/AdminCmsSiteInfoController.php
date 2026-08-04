@@ -73,6 +73,14 @@ class AdminCmsSiteInfoController extends BackendModelController
                     'multiple' => false,
                 ],
             ],
+            'logo_light_image_id'     => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,
+                'widgetConfig' => [
+                    'accept'   => 'image/*',
+                    'multiple' => false,
+                ],
+            ],
             'favicon_storage_file_id' => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => \skeeks\cms\widgets\AjaxFileUploadWidget::class,

@@ -35,6 +35,7 @@ use yii\helpers\ArrayHelper;
  * @property string                 $internal_name
  * @property string                 $description
  * @property integer                $image_id
+ * @property integer                $logo_light_image_id
  * @property integer                $favicon_storage_file_id
  * @property array                  $work_time
  *
@@ -49,6 +50,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsTree[]              $cmsTrees
  * @property CmsContentElement[]    $cmsContentElements
  * @property CmsStorageFile         $image
+ * @property CmsStorageFile         $logoLightImage
  * @property CmsStorageFile         $favicon
  * @property CmsComponentSettings[] $cmsComponentSettings
  * @property CmsSiteEmail|null      $cmsSiteEmail
@@ -110,7 +112,7 @@ class CmsSite extends ActiveRecord
 
             HasStorageFile::className()        => [
                 'class'  => HasStorageFile::className(),
-                'fields' => ['image_id', 'favicon_storage_file_id'],
+                'fields' => ['image_id', 'logo_light_image_id', 'favicon_storage_file_id'],
             ],
             HasJsonFieldsBehavior::className() => [
                 'class'  => HasJsonFieldsBehavior::className(),
@@ -190,7 +192,8 @@ class CmsSite extends ActiveRecord
             'name'                    => Yii::t('skeeks/cms', 'Name'),
             'internal_name'           => Yii::t('skeeks/cms', 'Внутреннее название'),
             'description'             => Yii::t('skeeks/cms', 'Description'),
-            'image_id'                => Yii::t('skeeks/cms', 'Логотип'),
+            'image_id'                => Yii::t('skeeks/cms', 'Логотип для тёмного фона'),
+            'logo_light_image_id'     => Yii::t('skeeks/cms', 'Логотип для светлого фона'),
             'favicon_storage_file_id' => Yii::t('skeeks/cms', 'Favicon'),
             'work_time'               => Yii::t('skeeks/cms', 'Рабочее время'),
         ]);
@@ -204,6 +207,8 @@ class CmsSite extends ActiveRecord
         return array_merge(parent::attributeHints(), [
             'name'                    => Yii::t('skeeks/cms', 'Основное название сайта, отображается в разных местах шаблона, в заголовках писем и других местах.'),
             'internal_name'           => Yii::t('skeeks/cms', 'Название сайта, чаще всего невидимое для клиента, но видимое администраторам и менеджерам.'),
+            'image_id'                => Yii::t('skeeks/cms', 'Основной логотип компании. Используется на тёмном фоне и как запасной вариант, если отдельный логотип для светлого фона не задан.'),
+            'logo_light_image_id'     => Yii::t('skeeks/cms', 'Необязательно. Вариант логотипа, который хорошо читается на светлом фоне.'),
             'favicon_storage_file_id' => Yii::t('skeeks/cms',
                 'Формат: ICO (рекомендуемый), Размер: 16 × 16, 32 × 32 или 120 × 120 пикселей. Иконка сайта отображаемая в браузере, а так же в различных поисковиках. <br />Подробная документация <a href="https://yandex.ru/support/webmaster/search-results/favicon.html" target="_blank" data-pjax="0">https://yandex.ru/support/webmaster/search-results/favicon.html</a>'),
         ]);
@@ -226,12 +231,12 @@ class CmsSite extends ActiveRecord
             ['internal_name', 'default', 'value' => null],
             ['is_default', 'default', 'value' => null],
             /*[['is_default'], 'unique'],*/
-            [['image_id'], 'safe'],
+            [['image_id', 'logo_light_image_id'], 'safe'],
             [['work_time'], 'safe'],
             [['favicon_storage_file_id'], 'safe'],
 
             [
-                ['image_id'],
+                ['image_id', 'logo_light_image_id'],
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 'mimeTypes'   => [
@@ -443,6 +448,14 @@ class CmsSite extends ActiveRecord
     public function getImage()
     {
         return $this->hasOne(CmsStorageFile::className(), ['id' => 'image_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLogoLightImage()
+    {
+        return $this->hasOne(CmsStorageFile::className(), ['id' => 'logo_light_image_id']);
     }
 
 
