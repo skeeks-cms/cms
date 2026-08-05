@@ -112,6 +112,7 @@
 }
 
 .sx-log-list .sx-log-item {
+    margin-bottom: 1rem;
     transition:
         background-color 350ms var(--sx-button-transition-easing),
         box-shadow 350ms var(--sx-button-transition-easing),

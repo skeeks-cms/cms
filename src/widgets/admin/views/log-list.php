@@ -66,7 +66,7 @@ $logListClass = $widget->is_show_model
     'viewParams'   => [
         'is_show_pin_controls' => (bool)$widget->is_show_pin_controls,
     ],
-    'emptyText'    => '<div class="sx-block">Записей нет</div>',
+    'emptyText'    => '<div class="sx-surface sx-surface--padded">Записей нет</div>',
     'options'      => [
         'class' => '',
         'tag'   => 'div',

@@ -13,7 +13,7 @@ $togglePinUrl = \yii\helpers\Url::to(['/cms/admin-cms-log/toggle-pin']);
 $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx-log-'.(int)$log->id;
 $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['model' => $log]);
 ?>
-<div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-block sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
+<div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-surface sx-surface--padded sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
     <div class="sx-controlls d-flex">
         <div class="d-flex sx-log-meta">
             <div class="sx-log-meta-item"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
