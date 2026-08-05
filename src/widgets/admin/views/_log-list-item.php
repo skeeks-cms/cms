@@ -14,8 +14,8 @@ $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx
 $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['model' => $log]);
 ?>
 <div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-surface sx-surface--padded sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
-    <div class="sx-controlls d-flex">
-        <div class="d-flex sx-log-meta">
+    <header class="sx-log-controls sx-log-item__header">
+        <div class="sx-log-meta">
             <div class="sx-log-meta-item"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
             <div class="sx-log-meta-item"><?php echo $log->logTypeAsText; ?></div>
             <button type="button"
@@ -40,7 +40,7 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
             </button>
             <?php endif; ?>
         </div>
-        <div class="sx-log-author my-auto">
+        <div class="sx-log-author">
             <?php
             if ($log->createdBy) {
                 $u = $log->createdBy;
@@ -52,12 +52,11 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
             }
             ?>
         </div>
-    </div>
-    <div class="sx-headers"></div>
-    <div class="">
+    </header>
+    <div class="sx-log-item__content">
 
         <?php if ($log->model && $log->model->id != $model->id) : ?>
-            <div class="d-flex sx-model sx-log-model">
+            <div class="sx-model sx-log-model">
                 <?php
                 $modelControllerId = \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->model_code, 'controller']);
                 echo $modelControllerId
@@ -76,7 +75,7 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
         <?php endif; ?>
 
         <?php if ($log->subModel) : ?>
-            <div class="d-flex sx-log-model">
+            <div class="sx-log-model">
                 <?php
                 $subModelControllerId = \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->sub_model_code, 'controller']);
                 echo $subModelControllerId
@@ -147,7 +146,7 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
             'tag'          => 'div',
             'options'      => [
                 'title' => 'Редактировать',
-                'class' => 'sx-edit-btn sx-icon-action btn btn-default',
+                'class' => 'sx-edit-btn sx-icon-action',
             ],
         ]);
         ?>

@@ -68,12 +68,12 @@ $logListClass = $widget->is_show_model
     ],
     'emptyText'    => '<div class="sx-surface sx-surface--padded">Записей нет</div>',
     'options'      => [
-        'class' => '',
+        'class' => 'sx-log-list-view',
         'tag'   => 'div',
     ],
     'itemOptions'  => [
         'tag'   => 'div',
-        'class' => 'sx-item-wrapper col-12',
+        'class' => 'sx-item-wrapper sx-log-list__item',
     ],
     'pager'        => [
         'container' => '.sx-list',
@@ -83,8 +83,8 @@ $logListClass = $widget->is_show_model
     //'summary'      => "Всего товаров: {totalCount}",
     'summary'      => false,
     //"\n{items}<div class=\"box-paging\">{pager}</div>{summary}<div class='sx-js-pagination'></div>",
-    'layout'       => '<div class="row"><div class="col-md-12 sx-list-summary">{summary}</div></div>
-    <div class="no-gutters row sx-list '.$logListClass.'">{items}</div>
-    <div class="row"><div class="col-md-12">{pager}</div></div>',
+    'layout'       => '<div class="sx-list-summary sx-log-list__summary">{summary}</div>
+    <div class="sx-list '.$logListClass.'">{items}</div>
+    <div class="sx-log-list__pager">{pager}</div>',
 ], (array) $widget->list_view_config))
 ?>

@@ -69,8 +69,8 @@ JS
     ),
 ]); ?>
 
-<div class="row">
-    <div class="col-12">
+<div class="sx-comment-form__layout">
+    <div class="sx-comment-form__editor">
         <?php
 
         echo $form->field($log, "comment")->widget(
@@ -133,11 +133,10 @@ JS
             ])->label(false); ?>
     </div>
 
-    <div class="col-12">
-        <div class="d-none">
-            <?php echo $form->field($log, "model_code"); ?>
-            <?php echo $form->field($log, "model_id"); ?>
-        </div>
+    <?php echo \yii\helpers\Html::activeHiddenInput($log, 'model_code'); ?>
+    <?php echo \yii\helpers\Html::activeHiddenInput($log, 'model_id'); ?>
+
+    <div class="sx-comment-form__attachments">
         <?php echo $form->field($log, "fileIds")->widget(\skeeks\cms\widgets\AjaxFileUploadWidget::class, [
             //'accept'            => 'image/*',
             'multiple' => true,
@@ -148,7 +147,7 @@ JS
             ],*/
         ])->label(false); ?>
     </div>
-    <div class="col-12 sx-comment-pin-field">
+    <div class="sx-comment-pin-field">
         <?php echo \yii\helpers\Html::activeHiddenInput($log, 'is_pinned', [
             'id' => $pinInputId,
             'value' => 0,
@@ -161,11 +160,9 @@ JS
             <span><?php echo \yii\helpers\Html::encode($pinLabel); ?></span>
         </button>
     </div>
-    <div class="col-12">
-        <div class="sx-comment-actions">
-            <button type="submit" class="btn sx-button sx-button--primary">Отправить</button>
-            <div class="sx-success-result sx-text--success my-auto" aria-live="polite"></div>
-        </div>
+    <div class="sx-comment-actions">
+        <button type="submit" class="sx-button sx-button--primary">Отправить</button>
+        <div class="sx-success-result sx-text--success" aria-live="polite"></div>
     </div>
 
 </div>
