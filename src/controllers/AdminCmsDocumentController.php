@@ -11,7 +11,7 @@ use kartik\datecontrol\DateControl;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsCompany;
@@ -204,14 +204,13 @@ class AdminCmsDocumentController extends BackendModelStandartController
                             'label' => 'Документ',
                             'format' => 'raw',
                             'value' => function (ShopDocument $model) {
-                                $titleAction = AjaxControllerActionsWidget::widget([
-                                    'controllerId'            => '/cms/admin-cms-document',
-                                    'modelId'                 => $model->id,
-                                    'isRunFirstActionOnClick' => true,
-                                    'tag'                     => 'span',
-                                    'content'                 => Html::encode($model->asText),
-                                    'options'                 => [
-                                        'class' => 'sx-collection-cell__primary',
+                                $titleAction = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-document',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => [
+                                        'class'      => 'sx-collection-cell__primary',
+                                        'aria-label' => (string)$model->asText,
                                     ],
                                 ]);
 
@@ -249,11 +248,14 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                     return '';
                                 }
 
-                                return AjaxControllerActionsWidget::widget([
+                                return BackendEntityLink::widget([
                                     'controllerId' => '/cms/admin-cms-company',
                                     'modelId'      => $model->company->id,
                                     'content'      => '<i class="fas fa-users"></i> '.Html::encode($model->company->asText),
-                                    'options'      => ['class' => 'sx-preview-card__related'],
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__related',
+                                        'aria-label' => (string)$model->company->asText,
+                                    ],
                                 ]);
                             },
                         ],
@@ -262,11 +264,14 @@ class AdminCmsDocumentController extends BackendModelStandartController
                             'format' => 'raw',
                             'value' => function (ShopDocument $model) {
                                 if ($model->buyerContractor) {
-                                    return AjaxControllerActionsWidget::widget([
+                                    return BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-contractor',
                                         'modelId'      => $model->buyerContractor->id,
                                         'content'      => '<i class="far fa-user"></i> '.Html::encode($model->buyerContractor->asText),
-                                        'options'      => ['class' => 'sx-preview-card__related'],
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$model->buyerContractor->asText,
+                                        ],
                                     ]);
                                 }
 
@@ -279,11 +284,14 @@ class AdminCmsDocumentController extends BackendModelStandartController
                             'value' => function (ShopDocument $model) {
                                 $result = [];
                                 foreach ($model->bills as $bill) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-bill',
                                         'modelId'      => $bill->id,
                                         'content'      => '<i class="far fa-file"></i> '.Html::encode($bill->asText),
-                                        'options'      => ['class' => 'sx-preview-card__related'],
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$bill->asText,
+                                        ],
                                     ]);
                                 }
 
@@ -300,11 +308,14 @@ class AdminCmsDocumentController extends BackendModelStandartController
                             'value' => function (ShopDocument $model) {
                                 $result = [];
                                 foreach ($model->deals as $deal) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-deal',
                                         'modelId'      => $deal->id,
                                         'content'      => '<i class="far fa-file"></i> '.Html::encode($deal->asText),
-                                        'options'      => ['class' => 'sx-preview-card__related'],
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$deal->asText,
+                                        ],
                                     ]);
                                 }
 

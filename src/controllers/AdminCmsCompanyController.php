@@ -14,6 +14,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\ImageColumn2;
@@ -340,9 +341,13 @@ HTML
                             'attribute' => 'name',
                             'value'     => function (CmsCompany $model) {
 
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", [
-                                    'class' => 'sx-trigger-action sx-preview-card__title sx-collection-cell__primary',
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-company',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => [
+                                        'class' => 'sx-preview-card__title sx-collection-cell__primary',
+                                    ],
                                 ]);
 
                                 $additionalData = [];
@@ -358,23 +363,38 @@ HTML
                                 }
 
                                 if ($additionalData) {
-                                    $data[] = implode(" / ", $additionalData);
+                                    $meta = Html::tag('div', Html::encode(implode(" / ", $additionalData)), [
+                                        'class' => 'sx-collection-cell__secondary',
+                                    ]);
+                                } else {
+                                    $meta = '';
                                 }
-                                $info = implode("", $data);
 
-                                return "<div class='sx-preview-card'>
-                                                <div class='sx-preview-card__media sx-trigger-action'>
-                                                <a href='#' class='sx-preview-card__media-link'>
-                                                    <img src='".($model->cmsImage ? \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src,
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-company',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::img($model->cmsImage ? \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src,
                                         new \skeeks\cms\components\imaging\filters\Thumbnail([
                                             'h' => 50,
                                             'w' => 50,
                                             'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
-                                        ])) : Image::getCapSrc())."' class='sx-photo sx-img-size-50' alt='' />
-                                                </a>
-                                                </div>
-                                                <div class='sx-preview-card__content sx-collection-cell sx-collection-cell--stack'>".$info."</div>
-                                        </div>";
+                                        ])) : Image::getCapSrc(), [
+                                        'class' => 'sx-photo sx-img-size-50',
+                                        'alt'   => '',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $title.$meta, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card']
+                                );
                             },
                         ],
                         'managers' => [
@@ -418,7 +438,11 @@ HTML
                             'attribute'            => 'countDeals',
                             'value'                => function (CmsCompany $CmsTask) {
                                 if ($CmsTask->raw_row['countDeals']) {
-                                    return "<span style='color: var(--color-red);'>".\Yii::$app->formatter->asInteger($CmsTask->raw_row['countDeals'])." шт.</span>";
+                                    return Html::tag(
+                                        'span',
+                                        \Yii::$app->formatter->asInteger($CmsTask->raw_row['countDeals'])." шт.",
+                                        ['class' => 'sx-collection-cell sx-collection-cell--metric sx-text--danger']
+                                    );
                                 } else {
                                     return "";
                                 }
@@ -456,7 +480,11 @@ HTML
                             'attribute'            => 'countDeals',
                             'value'                => function (CmsCompany $CmsTask) {
                                 if ($CmsTask->raw_row['countNotPaidBills']) {
-                                    return "<span style='color: var(--color-red);'>".\Yii::$app->formatter->asInteger($CmsTask->raw_row['countNotPaidBills'])." шт.</span>";
+                                    return Html::tag(
+                                        'span',
+                                        \Yii::$app->formatter->asInteger($CmsTask->raw_row['countNotPaidBills'])." шт.",
+                                        ['class' => 'sx-collection-cell sx-collection-cell--metric sx-text--danger']
+                                    );
                                 } else {
                                     return "";
                                 }
@@ -496,7 +524,11 @@ HTML
                             'attribute'            => 'countTasks',
                             'value'                => function (CmsCompany $CmsTask) {
                                 if ($CmsTask->raw_row['countTasks']) {
-                                    return "<span>".\Yii::$app->formatter->asInteger($CmsTask->raw_row['countTasks'])." шт.</span>";
+                                    return Html::tag(
+                                        'span',
+                                        \Yii::$app->formatter->asInteger($CmsTask->raw_row['countTasks'])." шт.",
+                                        ['class' => 'sx-collection-cell sx-collection-cell--metric']
+                                    );
                                 } else {
                                     return "";
                                 }

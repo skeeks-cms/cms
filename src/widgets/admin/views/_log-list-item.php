@@ -58,31 +58,39 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
 
         <?php if ($log->model && $log->model->id != $model->id) : ?>
             <div class="d-flex sx-model sx-log-model">
-                <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId'            => \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->model_code, 'controller']),
-                    'modelId'                 => $log->model->id,
-                    'isRunFirstActionOnClick' => true,
-                    'options'                 => [
-                        'class' => 'sx-dashed sx-log-model-link',
-                    ],
-                ]); ?>
-                <?php echo $log->model->asText; ?>
-                <?php $widget::end(); ?>
+                <?php
+                $modelControllerId = \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->model_code, 'controller']);
+                echo $modelControllerId
+                    ? \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                        'controllerId' => $modelControllerId,
+                        'modelId'      => $log->model->id,
+                        'label'        => $log->model->asText,
+                        'options'      => [
+                            'class'      => 'sx-dashed sx-log-model-link',
+                            'aria-label' => (string)$log->model->asText,
+                        ],
+                    ])
+                    : \yii\helpers\Html::encode($log->model->asText);
+                ?>
             </div>
         <?php endif; ?>
 
         <?php if ($log->subModel) : ?>
             <div class="d-flex sx-log-model">
-                <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId'            => \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->sub_model_code, 'controller']),
-                    'modelId'                 => $log->subModel->id,
-                    'isRunFirstActionOnClick' => true,
-                    'options'                 => [
-                        'class' => 'sx-dashed sx-log-model-link',
-                    ],
-                ]); ?>
-                <?php echo $log->subModel->asText; ?>
-                <?php $widget::end(); ?>
+                <?php
+                $subModelControllerId = \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->sub_model_code, 'controller']);
+                echo $subModelControllerId
+                    ? \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                        'controllerId' => $subModelControllerId,
+                        'modelId'      => $log->subModel->id,
+                        'label'        => $log->subModel->asText,
+                        'options'      => [
+                            'class'      => 'sx-dashed sx-log-model-link',
+                            'aria-label' => (string)$log->subModel->asText,
+                        ],
+                    ])
+                    : \yii\helpers\Html::encode($log->subModel->asText);
+                ?>
             </div>
         <?php endif; ?>
 

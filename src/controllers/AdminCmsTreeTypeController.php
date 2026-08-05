@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsTreeType;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -139,13 +140,10 @@ class AdminCmsTreeTypeController extends BackendModelStandartController
                             'class' => BooleanColumn::class,
                         ],
                         'custom'        => [
-                            'attribute' => "name",
-                            'format'    => "raw",
-                            'value'     => function (CmsTreeType $model) {
-                                return Html::a($model->asText, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                            },
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/cms/admin-cms-tree-type',
+                            'attribute'     => 'name',
+                            'viewAttribute' => 'asText',
                         ],
                     ],
                 ],

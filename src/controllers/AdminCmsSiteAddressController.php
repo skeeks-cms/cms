@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\models\CmsSiteAddress;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
@@ -89,20 +90,23 @@ HTML
                     ],
                     'columns'        => [
                         'custom' => [
-                            'attribute' => 'value',
-                            'format'    => "raw",
-                            'value'     => function ($model) {
-                                $data[] = Html::a($model->value, "#", [
-                                    'class' => "sx-trigger-action",
-                                    'style' => "font-size: 18px;",
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/cms/admin-cms-site-address',
+                            'attribute'    => 'value',
+                            'content'      => function (CmsSiteAddress $model) {
+                                $content = Html::tag('span', Html::encode($model->value), [
+                                    'class' => 'sx-collection-cell__primary',
                                 ]);
 
                                 if ($model->name) {
-                                    $data[] = "<span style='color: gray;'>(".$model->name.")</span>";
+                                    $content .= Html::tag('span', '('.Html::encode($model->name).')', [
+                                        'class' => 'sx-collection-cell__secondary',
+                                    ]);
                                 }
 
-                                return implode(" ", $data);
+                                return $content;
                             },
+                            'linkOptions' => ['class' => 'sx-collection-cell sx-collection-cell--stack'],
                         ],
                     ],
                 ],

@@ -1,4 +1,7 @@
 <?php
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use yii\helpers\Html;
+
 /* @var $model \skeeks\cms\models\CmsUser */
 /* @var $this yii\web\View */
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
@@ -200,159 +203,24 @@ $this->registerCSS(<<<CSS
 }
 
 
-/**
- * Современное оформление свойств
- */
-.sx-properties-wrapper.sx-columns-1 ul.sx-properties {
-    -moz-column-count: 1;
-    column-count: 1;
-}
-
-.sx-properties-wrapper.sx-columns-2 ul.sx-properties {
-    -moz-column-count: 2;
-    column-count: 2;
-}
-
-.sx-properties-wrapper.sx-columns-3 ul.sx-properties {
-    -moz-column-count: 3;
-    column-count: 3;
-}
-
-ul.sx-properties {
-    -moz-column-count: 2;
-    column-count: 2;
-    grid-column-gap: 40px;
-    -moz-column-gap: 40px;
-    column-gap: 40px;
-    margin: 0px;
-    padding: 0px;
-}
-
-ul.sx-properties li {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    page-break-inside: avoid;
-    -moz-column-break-inside: avoid;
-    break-inside: avoid;
-}
-
-ul.sx-properties .sx-properties--value {
-    text-align: right;
-    max-width: 200px;
-    line-height: 1.4;
-}
-
-ul.sx-properties .sx-properties--name {
-    color: gray;
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    white-space: nowrap;
-}
-
-ul.sx-properties .sx-properties--name:after {
-    content: "";
-    flex-grow: 1;
-    opacity: .25;
-    margin: 0 6px 0 2px;
-    border-bottom: 1px dotted gray;
-}
-
-
-
-.sx-table td, .sx-table th {
-    border: 0;
-    text-align: center;
-    padding: 7px 10px;
-    font-size: 13px;
-    border-bottom: 1px solid #dee2e68f;
-    background: white;
-}
-
-
-.sx-table th {
-    background: #f9f9f9;
-}
-
-.sx-table-wrapper {
-    border-radius: 5px;
-    border-left: 1px solid #dee2e68f;
-    border-right: 1px solid #dee2e68f;
-    border-top: 1px solid #dee2e68f;
-}
-.sx-table-wrapper table {
-    margin-bottom: 0;
-}
-
-
-.sx-info-block {
-    background: #f9f9f9;
-    margin-top: 10px;
-    padding: 10px;
-}
-.sx-title {
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-
-.sx-block-title {
-    font-size: 12px; 
-    text-transform: uppercase; 
-    margin-bottom: 5px; 
-    font-weight: bold;
-    color: #3a3a3a;
-}
-.sx-block {
-    margin-bottom: 20px;
-    /*padding: 10px;*/
-}
-/*.sx-block .sx-block-content {
-    padding: 10px;
-    background: #f9f9f9;
-}*/
-
-.sx-label {
-    font-size: 11px;
-    color: #a1a1a1;
-}
-
-.sx-value-row {
-    margin-bottom: 10px;
-    line-height: 1.3;
-}
-.sx-edit-btn {
-    color: silver;
-    cursor: pointer;
-    opacity: 0;
-    margin-right: 5px;
-    transition: 0.4s;
-}
-.sx-value-row:hover .sx-edit-btn {
-    opacity: 1;
-}
-
 CSS
 );
-$noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
 ?>
 
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
     'id' => 'sx-global',
 ]); ?>
-    <div class="row">
+    <div class="sx-detail-layout">
 
 
-        <div class="col-lg-4 col-sm-6 col-12">
+        <div class="sx-detail-layout__aside">
 
             <?php if ($model->description || $model->categories || $model->cms_company_status_id) : ?>
                 <div class="sx-block">
-                    <div class="sx-block-title">Общая информация <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                    <div class="sx-block-title">Общая информация <i data-toggle="tooltip" data-html="true"
                                                                     title=""
-                                                                    class="far fa-question-circle"></i>
+                                                                     class="far fa-question-circle sx-hint-icon"></i>
                     </div>
 
 
@@ -360,7 +228,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                         <div class="sx-phones-block">
                             <?php if ($model->status) : ?>
                                 <div class="sx-value-row d-flex">
-                                    <div style="width: 100%;">
+                                    <div class="w-100">
                                         <div class="sx-label">
                                             Статус
                                         </div>
@@ -372,7 +240,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                             <?php endif; ?>
                             <?php if ($model->categories) : ?>
                                 <div class="sx-value-row d-flex">
-                                    <div style="width: 100%;">
+                                    <div class="w-100">
                                         <div class="sx-label">
                                             Сферы деятельности
                                         </div>
@@ -384,7 +252,7 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                             <?php endif; ?>
                             <?php if ($model->description) : ?>
                                 <div class="sx-value-row d-flex">
-                                    <div style="width: 100%;">
+                                    <div class="w-100">
                                         <div class="sx-label">
                                             Описание
                                         </div>
@@ -400,9 +268,9 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
             <?php endif; ?>
 
             <div class="sx-block">
-                <div class="sx-block-title">Контакты <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Контакты <i data-toggle="tooltip" data-html="true"
                                                         title="Сотрудники или люди связанные с компанией. Они являются полноценными пользователями, которые могут авторизоваться на сайте и смотерть данные по этой компании в личном кабинете."
-                                                        class="far fa-question-circle"></i>
+                                                        class="far fa-question-circle sx-hint-icon"></i>
                 </div>
 
 
@@ -411,11 +279,13 @@ $noValue = "<span style='color: silver;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>";
                         <? if ($model->cmsCompany2users) : ?>
                             <? foreach ($model->getCmsCompany2users()->orderBy(['sort' => SORT_ASC])->all() as $cmsCompany2users) : ?>
                                 <div class="sx-value-row d-flex">
-                                    <div style="width: 100%;">
+                                    <div class="w-100">
                                         <div class="my-auto">
                                             <?php echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget([
                                                 'cmsUser' => $cmsCompany2users->cmsUser,
-                                                'append'  => "<span style='color: gray; font-size: 12px; text-decoration: none; border-bottom: 0px;'>{$cmsCompany2users->comment}</span>",
+                                                'append'  => Html::tag('span', Html::encode($cmsCompany2users->comment), [
+                                                    'class' => 'sx-collection-cell__secondary',
+                                                ]),
                                             ]); ?>
                                         </div>
                                     </div>
@@ -570,15 +440,16 @@ JS
             </div>
 
             <div class="sx-block">
-                <div class="sx-block-title">Телефон <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Телефон <i data-toggle="tooltip" data-html="true"
                                                        title="У компании может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
-                                                       class="far fa-question-circle"></i>
+                                                       class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-block-content">
                     <div class="sx-phones-block">
                         <? foreach ($model->phones as $cmsUserPhone) : ?>
+                            <?php $phoneUrl = 'tel:'.preg_replace('/[^\d+]/', '', (string) $cmsUserPhone->value); ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsUserPhone->name) : ?>
                                             <? echo $cmsUserPhone->name; ?>
@@ -587,7 +458,9 @@ JS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="#"><?php echo $cmsUserPhone->value; ?></a>
+                                        <?php echo Html::a(Html::encode($cmsUserPhone->value), $phoneUrl, [
+                                            'data-pjax' => '0',
+                                        ]); ?>
                                     </div>
                                 </div>
 
@@ -610,14 +483,14 @@ JS
                                 </div>
                                 <div class="my-auto d-flex">
 
-                                    <div class="btn btn-default sx-send-sms-trigger" data-phone="<?php echo $cmsUserPhone->value; ?>" data-html="true" title="Написать sms" style="margin-right: 5px;">
+                                    <button type="button" class="btn btn-default sx-send-sms-trigger mr-1" data-phone="<?php echo Html::encode($cmsUserPhone->value); ?>" data-html="true" title="Написать sms">
                                         <i class="fas fa-sms"></i>
-                                    </div>
+                                    </button>
 
 
-                                    <div class="btn btn-default sx-telephony-btn" data-value="<?php echo $cmsUserPhone->value; ?>" data-html="true" title="Начать звонок">
+                                    <button type="button" class="btn btn-default sx-telephony-btn" data-value="<?php echo Html::encode($cmsUserPhone->value); ?>" data-html="true" title="Начать звонок">
                                         <i class="fas fa-phone"></i>
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
                         <? endforeach; ?>
@@ -645,15 +518,15 @@ JS
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Email <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Email <i data-toggle="tooltip" data-html="true"
                                                      title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
-                                                     class="far fa-question-circle"></i>
+                                                     class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-block-content">
                     <div class="sx-phones-block">
                         <? foreach ($model->emails as $cmsUserEmail) : ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsUserEmail->name) : ?>
                                             <? echo $cmsUserEmail->name; ?>
@@ -662,7 +535,9 @@ JS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="#"><?php echo $cmsUserEmail->value; ?></a>
+                                        <?php echo Html::a(Html::encode($cmsUserEmail->value), 'mailto:'.(string) $cmsUserEmail->value, [
+                                            'data-pjax' => '0',
+                                        ]); ?>
                                     </div>
                                 </div>
 
@@ -684,9 +559,9 @@ JS
 
                                 </div>
                                 <div class="my-auto">
-                                    <div class="btn btn-default" data-html="true" title="Написать письмо">
+                                    <a class="btn btn-default" href="<?= Html::encode('mailto:'.(string) $cmsUserEmail->value); ?>" data-pjax="0" title="Написать письмо">
                                         <i class="far fa-envelope"></i>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         <? endforeach; ?>
@@ -714,15 +589,15 @@ JS
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Адреса <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Адреса <i data-toggle="tooltip" data-html="true"
                                                       title="У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию."
-                                                      class="far fa-question-circle"></i>
+                                                      class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-block-content">
                     <div class="sx-phones-block">
                         <? foreach ($model->addresses as $cmsUserAddress) : ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsUserAddress->name) : ?>
                                             <? echo $cmsUserAddress->name; ?>
@@ -731,7 +606,7 @@ JS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="#"><?php echo $cmsUserAddress->value; ?></a>
+                                        <?php echo Html::encode($cmsUserAddress->value); ?>
                                     </div>
                                 </div>
 
@@ -778,13 +653,23 @@ JS
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Реквизиты <i style="color: silver;" data-toggle="tooltip" data-html="true"
-                                                         title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle"></i></div>
+                <div class="sx-block-title">Реквизиты <i data-toggle="tooltip" data-html="true"
+                                                         title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle sx-hint-icon"></i></div>
 
 
                 <? foreach ($model->contractors as $cmsContractor) : ?>
+                    <?php
+                    $contractorContent = Html::tag('span', Html::encode($cmsContractor->asText), [
+                        'class' => 'sx-collection-cell__primary',
+                    ]);
+                    if ($cmsContractor->inn) {
+                        $contractorContent .= Html::tag('small', 'ИНН '.Html::encode($cmsContractor->inn), [
+                            'class' => 'sx-collection-cell__secondary',
+                        ]);
+                    }
+                    ?>
                     <div class="sx-value-row d-flex">
-                        <div style="width: 100%;">
+                        <div class="w-100">
                             <div class="sx-label">
                                 <? if ($cmsContractor->contractor_type) : ?>
                                     <? echo $cmsContractor->getTypeAsText(); ?>
@@ -793,13 +678,17 @@ JS
                                 <? endif; ?>
                             </div>
                             <div class="sx-value">
-                                <a href="#">
-                                    <?php echo $cmsContractor->asText; ?>
-                                    <?php if ($cmsContractor->inn) : ?>
-                                        <br/><small style="color: gray;"><?php echo $cmsContractor->inn; ?></small>
-                                    <?php endif; ?>
-
-                                </a>
+                                <?php echo BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-contractor',
+                                    'modelId'      => $cmsContractor->id,
+                                    'content'      => Html::tag('span', $contractorContent, [
+                                        'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__related',
+                                        'aria-label' => $cmsContractor->asText,
+                                    ],
+                                ]); ?>
                             </div>
                         </div>
 
@@ -891,15 +780,15 @@ JS
 
 
             <div class="sx-block">
-                <div class="sx-block-title">Ссылки <i style="color: silver;" data-toggle="tooltip" data-html="true"
+                <div class="sx-block-title">Ссылки <i data-toggle="tooltip" data-html="true"
                                                       title="Ссылки на социальные сети и сайты компании"
-                                                      class="far fa-question-circle"></i>
+                                                      class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-block-content">
                     <div class="sx-phones-block">
                         <? foreach ($model->links as $cmsLink) : ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsLink->name) : ?>
                                             <? echo $cmsLink->name; ?>
@@ -908,7 +797,11 @@ JS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="<?php echo $cmsLink->url; ?>" target="_blank" data-pjax="0"><?php echo $cmsLink->url; ?></a>
+                                        <?php echo Html::a(Html::encode($cmsLink->url), $cmsLink->url, [
+                                            'target'    => '_blank',
+                                            'rel'       => 'noopener noreferrer',
+                                            'data-pjax' => '0',
+                                        ]); ?>
                                     </div>
                                 </div>
 
@@ -960,8 +853,8 @@ JS
 
             <? if ($model->managers) : ?>
                 <div class="sx-block">
-                    <div class="sx-block-title">Работают с компанией <i style="color: silver;" data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этой компанией."
-                                                                        class="far fa-question-circle"></i></div>
+                    <div class="sx-block-title">Работают с компанией <i data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этой компанией."
+                                                                        class="far fa-question-circle sx-hint-icon"></i></div>
 
                     <div class="sx-block-content">
                         <div class="sx-users-block">
@@ -988,12 +881,20 @@ JS
             </div>-->
         </div>
 
-        <div class="col-lg-8 col-sm-6 col-12" style="padding-left: 10px;">
+        <div class="sx-detail-layout__main">
 
             <?
             $this->registerCss(<<<CSS
 .sx-expired-tasks .sx-preview-card {
     flex-grow: 1;
+}
+
+.sx-company-task-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 CSS
             );
@@ -1019,11 +920,7 @@ CSS
                     
                     foreach ($tasks as $task) : ?>
                         <div class="sx-block">
-                            <div style="    display: flex
-;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;">
+                            <div class="sx-company-task-row">
                                 <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
                                 <? echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task]); ?>
                             </div>

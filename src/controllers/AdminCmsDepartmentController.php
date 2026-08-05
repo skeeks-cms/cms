@@ -50,66 +50,6 @@ class AdminCmsDepartmentController extends BackendModelStandartController
                 'isVisible' => false,
             ],
 
-            /*'list'  => [
-                'isVisible'       => false,
-                "filters" => false,
-                "backendShowings" => false,
-                'on beforeRender' => function (Event $event) {
-                    if ($pid = \Yii::$app->request->get("pid")) {
-                        if ($model = CmsDepartment::find()->where(['id' => $pid])->one()) {
-                            $event->content = Html::tag("h2", $model->fullName);
-                        }
-
-                    }
-                },
-                'grid'    => [
-                    'defaultOrder'   => [
-                        'sort' => SORT_ASC,
-                    ],
-                    'on init' => function (Event $event) {
-                        if (!CmsDepartment::find()->one()) {
-                            //Создать первый отдел
-                            $cmsDepartment = new CmsDepartment();
-                            $cmsDepartment->makeRoot();
-                            $cmsDepartment->name = 'Руководство компании';
-                            $cmsDepartment->save();
-                        }
-                    },
-                    'visibleColumns' => [
-                        'actions',
-                        'name',
-                        'worker_id',
-                        'sort',
-                    ],
-                    'columns'        => [
-                        'name' => [
-                            'class' => DefaultActionColumn::class
-                        ],
-                        'custom'     => [
-                            'attribute' => 'name',
-                            'format'    => 'raw',
-                            'value'     => function (CmsCountry $model) {
-
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
-
-                                $info = implode("<br />", $data);
-
-                                return "<div class='row no-gutters'>
-                                            <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($model->flag ? $model->flag->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                            </div>
-                                            <div style='margin: auto 5px;'>".$info."</div>
-                                        </div>";;
-                            },
-                        ],
-
-                    ],
-                ],
-            ],*/
-
             "create" => new UnsetArrayValue(),
             "update" => [
                 'fields' => [$this, 'updateFields'],

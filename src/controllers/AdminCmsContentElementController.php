@@ -18,6 +18,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogUserWidget;
 use skeeks\cms\grid\BooleanColumn;
@@ -474,11 +475,16 @@ HTML;
                             ],
                             'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
                                 $data = [];
-                                $data[] = Html::a(Html::encode($model->name), "#", [
-                                        'class' => 'sx-trigger-action sx-preview-card__title sx-collection-cell__primary',
-                                        'title' => "id: {$model->id}",
-                                        'data-toggle' => "tooltip",
-                                    ]);
+                                $data[] = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-content-element',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->name,
+                                    'options'      => [
+                                        'class'       => 'sx-preview-card__title sx-collection-cell__primary',
+                                        'title'       => "id: {$model->id}",
+                                        'data-toggle' => 'tooltip',
+                                    ],
+                                ]);
 
                                 if ($model->tree_id) {
                                     $data[] = Html::a(
@@ -510,14 +516,18 @@ HTML;
 
                                 $media = Html::tag(
                                     'div',
-                                    Html::a(
-                                        Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
+                                    BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-cms-content-element',
+                                        'modelId'      => $model->id,
+                                        'content'      => Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
                                             'class' => 'sx-photo sx-img-size-50',
                                             'alt'   => '',
                                         ]),
-                                        '#',
-                                        ['class' => 'sx-trigger-action sx-preview-card__media-link']
-                                    ),
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__media-link',
+                                            'aria-label' => (string)$model->name,
+                                        ],
+                                    ]),
                                     ['class' => 'sx-preview-card__media']
                                 );
 

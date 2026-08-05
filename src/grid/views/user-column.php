@@ -7,20 +7,34 @@
  */
 /* @var $this yii\web\View */
 /* @var $user \skeeks\cms\models\CmsUser */
+
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\helpers\Image;
+use yii\helpers\Html;
+
+$name = (string)$user->shortDisplayName;
+$content = Html::tag(
+    'span',
+    Html::img($user->avatarSrc ?: Image::getCapSrc(), [
+        'class' => 'sx-photo sx-img-size-small',
+        'alt'   => '',
+    ]),
+    ['class' => 'sx-preview-card__media']
+)
+    .Html::tag(
+        'span',
+        Html::tag('span', Html::encode($name), [
+            'class' => 'sx-collection-cell__primary',
+        ]),
+        ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
+    );
 ?>
-<? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-    'controllerId' => 'cms/admin-user',
-    'modelId' => $user->id,
-    'isRunFirstActionOnClick' => true
+<?= BackendEntityLink::widget([
+    'controllerId' => '/cms/admin-user',
+    'modelId'      => $user->id,
+    'content'      => $content,
+    'options'      => [
+        'class'      => 'sx-preview-card sx-preview-card--person sx-preview-card__title',
+        'aria-label' => $name,
+    ],
 ]); ?>
-<div class="d-flex flex-row">
-    <div class="my-auto" style="margin-right: 5px;">
-        <img src='<?= $user->avatarSrc ? $user->avatarSrc : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 25px; max-height: 25px; border-radius: 50%;'/>
-    </div>
-    <div class="my-auto">
-        <div style="overflow: hidden; max-height: 40px; text-align: left;">
-            <?= $user->shortDisplayName; ?>
-        </div>
-    </div>
-</div>
-<? $widget::end(); ?>

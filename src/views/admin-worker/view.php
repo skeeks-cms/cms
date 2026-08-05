@@ -1,4 +1,7 @@
 <?php
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use yii\helpers\Html;
+
 /* @var $model \skeeks\cms\models\CmsUser */
 /* @var $this yii\web\View */
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
@@ -101,6 +104,13 @@ $this->registerCSS(<<<CSS
     border-bottom: 1px dotted;
 }
 
+.sx-current-worker-task__content {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
 
 CSS
 );
@@ -122,12 +132,12 @@ CSS
                 <div class="sx-phones-block">
                     <?php if ($model->post) : ?>
                         <div class="sx-value-row d-flex">
-                            <div style="width: 100%;">
+                            <div class="w-100">
                                 <div class="sx-label">
                                     Должность
                                 </div>
                                 <div class="sx-value">
-                                    <?php echo $model->post; ?>
+                                    <?= Html::encode($model->post); ?>
                                 </div>
                             </div>
                         </div>
@@ -135,7 +145,7 @@ CSS
 
                     <?php if ($model->work_shedule) : ?>
                         <div class="sx-value-row d-flex">
-                            <div style="width: 100%;">
+                            <div class="w-100">
                                 <div class="sx-label">
                                     График работы
                                 </div>
@@ -146,7 +156,7 @@ CSS
                                             <?
                                             $stringDay = implode(', ', \yii\helpers\ArrayHelper::getValue($row, 'daysStrings'));
                                             ?>
-                                            <b><?= $stringDay; ?></b> <?= \yii\helpers\ArrayHelper::getValue($row, 'startHour') ?>:<?= \yii\helpers\ArrayHelper::getValue($row, 'startMinutes') ?>
+                                            <b><?= Html::encode($stringDay); ?></b> <?= \yii\helpers\ArrayHelper::getValue($row, 'startHour') ?>:<?= \yii\helpers\ArrayHelper::getValue($row, 'startMinutes') ?>
                                             - <?= \yii\helpers\ArrayHelper::getValue($row, 'endHour') ?>:<?= \yii\helpers\ArrayHelper::getValue($row, 'endMinutes') ?>
                                         </div>
                                     <? endforeach; ?>
@@ -156,14 +166,19 @@ CSS
                     <?php endif; ?>
                     <?php if ($model->departments) : ?>
                         <div class="sx-value-row d-flex">
-                            <div style="width: 100%;">
+                            <div class="w-100">
                                 <div class="sx-label">
-                                    Откделы
+                                    Отделы
                                 </div>
                                 <div class="sx-value">
                                     <? foreach ($model->departments as $department) : ?>
                                         <div>
-                                            <?php echo $department->fullName; ?>
+                                            <?= BackendEntityLink::widget([
+                                                'controllerId' => '/cms/admin-cms-department',
+                                                'modelId'      => $department->id,
+                                                'label'        => $department->fullName,
+                                                'options'      => ['class' => 'sx-preview-card__related'],
+                                            ]); ?>
                                         </div>
                                     <? endforeach; ?>
                                 </div>
@@ -172,26 +187,36 @@ CSS
                     <?php endif; ?>
                     <?php if ($model->subordinates) : ?>
                         <div class="sx-value-row d-flex">
-                            <div style="width: 100%;">
+                            <div class="w-100">
                                 <div class="sx-label">
                                     Подчиненные
                                 </div>
                                 <div class="sx-value">
                                     <? foreach ($model->subordinates as $subordinate) : ?>
-                                        <div><?php echo $subordinate->shortDisplayName; ?></div>
+                                        <div><?= BackendEntityLink::widget([
+                                            'controllerId' => '/cms/admin-user',
+                                            'modelId'      => $subordinate->id,
+                                            'label'        => $subordinate->shortDisplayName,
+                                            'options'      => ['class' => 'sx-preview-card__related'],
+                                        ]); ?></div>
                                     <? endforeach; ?>
                                 </div>
                             </div>
                         </div>
                     <?php endif; ?><?php if ($model->leaders) : ?>
                         <div class="sx-value-row d-flex">
-                            <div style="width: 100%;">
+                            <div class="w-100">
                                 <div class="sx-label">
                                     Руководители
                                 </div>
                                 <div class="sx-value">
                                     <? foreach ($model->leaders as $leader) : ?>
-                                        <div><?php echo $leader->shortDisplayName; ?></div>
+                                        <div><?= BackendEntityLink::widget([
+                                            'controllerId' => '/cms/admin-user',
+                                            'modelId'      => $leader->id,
+                                            'label'        => $leader->shortDisplayName,
+                                            'options'      => ['class' => 'sx-preview-card__related'],
+                                        ]); ?></div>
                                     <? endforeach; ?>
                                 </div>
                             </div>
@@ -209,7 +234,7 @@ CSS
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserPhones as $cmsUserPhone) : ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsUserPhone->name) : ?>
                                             <? echo $cmsUserPhone->name; ?>
@@ -218,7 +243,10 @@ CSS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="#"><?php echo $cmsUserPhone->value; ?></a>
+                                        <?= Html::a(
+                                            Html::encode($cmsUserPhone->value),
+                                            'tel:' . preg_replace('/[^\d+]/', '', $cmsUserPhone->value)
+                                        ); ?>
                                         <?php if ($cmsUserPhone->is_approved) : ?>
                                             <span class="sx-text--success" data-html="true" data-toggle="tooltip"
                                                   title="Телефон подтвержден пользователем<br />Пользователь реально получил код на этот телефон и подтвердил его.">✓</span>
@@ -247,14 +275,17 @@ CSS
                                 </div>
                                 <div class="my-auto d-flex">
 
-                                    <div class="btn btn-default sx-send-sms-trigger" data-phone="<?php echo $cmsUserPhone->value; ?>" data-html="true" title="Написать sms" style="margin-right: 5px;">
+                                    <button type="button" class="btn btn-default sx-send-sms-trigger mr-1"
+                                            data-phone="<?= Html::encode($cmsUserPhone->value); ?>"
+                                            data-html="true" title="Написать sms">
                                         <i class="fas fa-sms"></i>
-                                    </div>
+                                    </button>
 
-
-                                    <div class="btn btn-default" data-html="true" title="Начать звонок">
+                                    <a class="btn btn-default"
+                                       href="tel:<?= Html::encode(preg_replace('/[^\d+]/', '', $cmsUserPhone->value)); ?>"
+                                       data-html="true" title="Начать звонок">
                                         <i class="fas fa-phone"></i>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         <? endforeach; ?>
@@ -295,7 +326,7 @@ JS
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserEmails as $cmsUserEmail) : ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsUserEmail->name) : ?>
                                             <? echo $cmsUserEmail->name; ?>
@@ -304,7 +335,10 @@ JS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="#"><?php echo $cmsUserEmail->value; ?></a>
+                                        <?= Html::a(
+                                            Html::encode($cmsUserEmail->value),
+                                            'mailto:' . $cmsUserEmail->value
+                                        ); ?>
                                         <?php if ($cmsUserEmail->is_approved) : ?>
                                             <span class="sx-text--success" data-html="true" data-toggle="tooltip"
                                                   title="Email подтвержден пользователем<br />Пользователь реально получил код на этот email и подтвердил его.">✓</span>
@@ -332,9 +366,11 @@ JS
 
                                 </div>
                                 <div class="my-auto">
-                                    <div class="btn btn-default" data-html="true" title="Написать письмо">
+                                    <a class="btn btn-default"
+                                       href="mailto:<?= Html::encode($cmsUserEmail->value); ?>"
+                                       data-html="true" title="Написать письмо">
                                         <i class="far fa-envelope"></i>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         <? endforeach; ?>
@@ -373,7 +409,7 @@ JS
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserAddresses as $cmsUserAddress) : ?>
                             <div class="sx-value-row d-flex">
-                                <div style="width: 100%;">
+                                <div class="w-100">
                                     <div class="sx-label">
                                         <? if ($cmsUserAddress->name) : ?>
                                             <? echo $cmsUserAddress->name; ?>
@@ -382,7 +418,7 @@ JS
                                         <? endif; ?>
                                     </div>
                                     <div class="sx-value">
-                                        <a href="#"><?php echo $cmsUserAddress->value; ?></a>
+                                        <?= Html::encode($cmsUserAddress->value); ?>
                                     </div>
                                 </div>
 
@@ -443,7 +479,7 @@ JS
                         <? foreach ($eav->toArray() as $key => $value) : ?>
                             <? if ($value) : ?>
                                 <div class="sx-value-row d-flex">
-                                    <div style="width: 100%;">
+                                    <div class="w-100">
                                         <div class="sx-label">
                                             <? echo $eav->getAttributeLabel($key); ?>
                                         </div>
@@ -494,7 +530,7 @@ JS
 
             $currentWorkerStateCss = <<<CSS
 .sx-current-worker-state .sx-state-title {
-    color: #8a8f99;
+    color: var(--sx-color-text-muted);
     font-size: 12px;
     margin-bottom: 8px;
     text-transform: uppercase;
@@ -503,7 +539,7 @@ JS
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #7a4b00;
+    color: var(--sx-color-warning-on-surface);
 }
 .sx-current-worker-state .sx-state-icon {
     display: inline-flex;
@@ -513,15 +549,15 @@ JS
     height: 34px;
     flex: 0 0 34px;
     border-radius: 50%;
-    background: #fff7e6;
-    color: #f59e0b;
+    background: var(--sx-color-warning-soft);
+    color: var(--sx-color-warning-on-soft);
 }
 .sx-current-worker-state .sx-state-message.is-unavailable {
-    color: #8a8f99;
+    color: var(--sx-color-text-muted);
 }
 .sx-current-worker-state .sx-state-message.is-unavailable .sx-state-icon {
-    background: #f3f4f6;
-    color: #9ca3af;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-subtle);
 }
 CSS;
             $this->registerCss($currentWorkerStateCss, [], 'sx-current-worker-state');
@@ -534,7 +570,7 @@ CSS;
                                 <div class="sx-state-title">Сейчас выполняет задачу</div>
                             </div>
                             <?php if ($isCurrentTaskAvailable) : ?>
-                                <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
+                                <div class="sx-current-worker-task__content">
                                     <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $currentTask]); ?>
                                     <? echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $currentTask]); ?>
                                 </div>

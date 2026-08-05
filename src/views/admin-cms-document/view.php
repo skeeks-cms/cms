@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopDocument */
 
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopDocument;
 use yii\bootstrap\Modal;
@@ -18,12 +18,13 @@ $publicUrl = $model->getUrl(true);
 $pdfUrl = $model->getPdfUrl(true);
 $pdfNoSignatureUrl = Url::to(['/shop/shop-document/pdf', 'code' => $model->code, 'noSignature' => '1'], true);
 $publicUrlJson = Json::htmlEncode($publicUrl);
-$statusColors = $model->statusColors;
-$statusStyle = Html::cssStyleFromArray([
-    'border-color' => $statusColors['border'],
-    'background'   => $statusColors['background'],
-    'color'        => $statusColors['text'],
-]);
+$statusClasses = [
+    ShopDocument::STATUS_ISSUED   => 'is-info',
+    ShopDocument::STATUS_SENT     => 'is-warning',
+    ShopDocument::STATUS_SIGNED   => 'is-success',
+    ShopDocument::STATUS_CANCELED => 'is-danger',
+];
+$statusClass = $statusClasses[$model->status] ?? 'is-info';
 
 $formatValue = function ($value) {
     $value = trim((string)$value);
@@ -54,12 +55,11 @@ $entityLink = function ($controllerId, $entity, $title, $subtitle = '', $icon = 
 
     $content .= '</div></div>';
 
-    return AjaxControllerActionsWidget::widget([
-        'controllerId'            => $controllerId,
-        'modelId'                 => $entity->id,
-        'isRunFirstActionOnClick' => true,
-        'content'                 => $content,
-        'options'                 => [
+    return BackendEntityLink::widget([
+        'controllerId' => $controllerId,
+        'modelId'      => $entity->id,
+        'content'      => $content,
+        'options'      => [
             'class' => 'sx-document-entity-link',
         ],
     ]);
@@ -90,7 +90,7 @@ $this->registerCss(<<<CSS
     gap: 8px 12px;
     margin-bottom: 0;
     padding: 12px 28px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-document-actions-main {
     display: flex;
@@ -102,14 +102,14 @@ $this->registerCss(<<<CSS
     margin-right: 5px;
 }
 .sx-document-card {
-    background: #fff;
-    border: 1px solid #e3e7eb;
+    background: var(--sx-color-surface);
+    border: 1px solid var(--sx-color-border);
     border-radius: 10px;
     overflow: hidden;
 }
 .sx-document-section {
     padding: 22px 28px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-document-section:last-child {
     border-bottom: 0;
@@ -144,12 +144,12 @@ $this->registerCss(<<<CSS
     height: 100%;
     min-height: 80px;
     padding: 14px;
-    border: 1px solid #e3e7eb;
+    border: 1px solid var(--sx-color-border);
     border-radius: 8px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: #fff;
+    background: var(--sx-color-surface);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-document-entity-link:hover,
@@ -160,22 +160,22 @@ $this->registerCss(<<<CSS
 }
 .sx-document-entity-link:hover .sx-document-entity,
 .sx-document-entity-link:focus .sx-document-entity {
-    border-color: #9dc8f0;
-    box-shadow: 0 8px 24px rgba(31, 82, 130, .08);
+    border-color: var(--sx-color-accent-border);
+    box-shadow: var(--sx-button-focus-shadow);
 }
 .sx-document-entity-icon {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #eef3f7;
-    color: #607080;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
 }
 .sx-document-entity-label {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
     margin-bottom: 4px;
 }
@@ -184,11 +184,11 @@ $this->registerCss(<<<CSS
 }
 .sx-document-entity-subtitle,
 .sx-document-muted {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
 }
 .sx-document-comment {
     margin: 0;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     white-space: pre-wrap;
 }
 .sx-document-items {
@@ -202,15 +202,15 @@ $this->registerCss(<<<CSS
 }
 .sx-document-items th,
 .sx-document-items td {
-    border-bottom: 1px solid #e3e7eb;
+    border-bottom: 1px solid var(--sx-color-border);
     padding: 12px 10px;
     vertical-align: top;
     white-space: nowrap;
 }
 .sx-document-items th {
-    color: #6d767f;
+    color: var(--sx-color-text-muted);
     font-weight: 600;
-    background: #f8fafb;
+    background: var(--sx-color-surface-muted);
 }
 .sx-document-items-name {
     min-width: 420px;
@@ -221,19 +221,19 @@ $this->registerCss(<<<CSS
 .sx-document-summary {
     margin-top: 18px;
     padding-top: 18px;
-    border-top: 1px solid #e3e7eb;
+    border-top: 1px solid var(--sx-color-border);
 }
 .sx-document-summary-row {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     font-size: 16px;
     line-height: 1.45;
 }
 .sx-document-total {
     margin-top: 10px;
-    color: #212529;
+    color: var(--sx-color-text);
     font-size: 24px;
     font-weight: 600;
 }
@@ -246,6 +246,26 @@ $this->registerCss(<<<CSS
     padding: 18px 20px;
     border: 1px solid;
     border-radius: 8px;
+}
+.sx-document-status-panel.is-info {
+    color: var(--sx-status-info-color);
+    border-color: var(--sx-status-info-border-color);
+    background: var(--sx-status-info-background);
+}
+.sx-document-status-panel.is-success {
+    color: var(--sx-status-success-color);
+    border-color: var(--sx-status-success-border-color);
+    background: var(--sx-status-success-background);
+}
+.sx-document-status-panel.is-warning {
+    color: var(--sx-status-warning-color);
+    border-color: var(--sx-status-warning-border-color);
+    background: var(--sx-status-warning-background);
+}
+.sx-document-status-panel.is-danger {
+    color: var(--sx-status-danger-color);
+    border-color: var(--sx-status-danger-border-color);
+    background: var(--sx-status-danger-background);
 }
 .sx-document-status-current {
     display: grid;
@@ -381,7 +401,7 @@ JS
         </div>
 
         <div class="sx-document-section">
-            <div class="sx-document-status-panel" style="<?= Html::encode($statusStyle); ?>">
+            <div class="sx-document-status-panel <?= Html::encode($statusClass); ?>">
                 <div class="sx-document-status-current">
                     <div class="sx-document-status-label">Статус документа</div>
                     <div class="sx-document-status-value">

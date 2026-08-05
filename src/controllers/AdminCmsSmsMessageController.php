@@ -124,14 +124,18 @@ HTML
                                 ]
                             ],
                             'value' => function(CmsSmsMessage $message) {
-                                $data[] = "<div>{$message->statusAsText}</div>";
+                                $data[] = Html::tag('div', Html::encode($message->statusAsText), [
+                                    'class' => $message->isError ? 'sx-text--danger' : 'sx-text--muted',
+                                ]);
                                 if ($message->cmsSmsProvider) {
-                                    $data[] = "<div style='font-size: 10px; color: gray;'>{$message->cmsSmsProvider->name}</div>";
+                                    $data[] = Html::tag('div', Html::encode($message->cmsSmsProvider->name), [
+                                        'class' => 'sx-collection-cell__secondary',
+                                    ]);
                                 }
 
                                 if ($message->isError) {
-                                    $data[] = Html::tag("small", $message->error_message, [
-                                        'style' => "color: red;"
+                                    $data[] = Html::tag("small", Html::encode($message->error_message), [
+                                        'class' => 'sx-text--danger',
                                     ]);
                                 }
                                 return implode("", $data);

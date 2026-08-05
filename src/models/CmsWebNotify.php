@@ -4,7 +4,9 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\queries\CmsWebNotifyQuery;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 /**
  * @property int         $id
  *
@@ -98,16 +100,18 @@ class CmsWebNotify extends ActiveRecord
 <div class="sx-model">
 HTML;
 if ($this->model) {
-    $items[] = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-        'controllerId'            => \yii\helpers\ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$this->model_code, 'controller']),
-        'modelId'                 => $this->model_id,
-        'tag'                 => 'span',
-        'isRunFirstActionOnClick' => true,
-        'content' => $this->model->asText,
-        'options'                 => [
-            'class' => 'sx-action-trigger',
-        ],
-    ]);
+    $controllerId = ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$this->model_code, 'controller']);
+    $items[] = $controllerId
+        ? BackendEntityLink::widget([
+            'controllerId' => $controllerId,
+            'modelId'      => $this->model_id,
+            'label'        => $this->model->asText,
+            'options'      => [
+                'class'      => 'sx-action-trigger',
+                'aria-label' => (string)$this->model->asText,
+            ],
+        ])
+        : Html::encode($this->model->asText);
 }
 
 

@@ -11,7 +11,9 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
@@ -51,6 +53,22 @@ class AdminCmsCountryController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
+                'presentationMode' => BackendGridModelAction::PRESENTATION_PAGE,
+                'pageHeader' => [
+                    'title' => \Yii::t('skeeks/cms', 'Страны'),
+                    'description' => \Yii::t('skeeks/cms', 'Справочник стран, доменных зон и телефонных кодов.'),
+                    'icon' => 'globe',
+                    'actions' => [
+                        [
+                            'backendAction' => 'create',
+                            'icon' => 'plus',
+                        ],
+                        [
+                            'backendAction' => 'import',
+                            'icon' => 'download',
+                        ],
+                    ],
+                ],
                 "filters" => [
                     'visibleFilters' => [
                         'name',
@@ -120,22 +138,32 @@ class AdminCmsCountryController extends BackendModelStandartController
                             'attribute' => 'name',
                             'format' => 'raw',
                             'value' => function (CmsCountry $model) {
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-country',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::img($model->flag ? $model->flag->src : Image::getCapSrc(), [
+                                        'class' => 'sx-photo sx-img-size-50',
+                                        'alt'   => '',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-country',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => ['class' => 'sx-preview-card__title sx-collection-cell__primary'],
+                                ]);
 
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
-
-                                $info = implode("<br />", $data);
-
-                                return "<div class='row no-gutters'>
-                                            <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($model->flag ? $model->flag->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                            </div>
-                                            <div style='margin: auto 5px;'>" . $info  . "</div>
-                                        </div>";
-
-                                            ;
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $title, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card']
+                                );
                             }
                         ],
 

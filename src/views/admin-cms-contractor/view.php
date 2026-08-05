@@ -4,7 +4,7 @@
  * @var \skeeks\cms\models\CmsContractor $model
  */
 
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use yii\helpers\Html;
 
 $controller = $this->context;
@@ -32,12 +32,11 @@ $entityCard = static function ($controllerId, $entity, $label, $title, $subtitle
 
     $content .= '</div></div>';
 
-    return AjaxControllerActionsWidget::widget([
-        'controllerId'            => $controllerId,
-        'modelId'                 => $entity->id,
-        'isRunFirstActionOnClick' => true,
-        'content'                 => $content,
-        'options'                 => [
+    return BackendEntityLink::widget([
+        'controllerId' => $controllerId,
+        'modelId'      => $entity->id,
+        'content'      => $content,
+        'options'      => [
             'class' => 'sx-contractor-entity-link',
         ],
     ]);
@@ -47,14 +46,14 @@ $hasPrintAssets = $model->cmsImage || $model->stamp || $model->directorSignature
 
 $this->registerCss(<<<CSS
 .sx-contractor-card {
-    background: #fff;
-    border: 1px solid #e3e7eb;
+    background: var(--sx-color-surface);
+    border: 1px solid var(--sx-color-border);
     border-radius: .625rem;
     overflow: hidden;
 }
 .sx-contractor-section {
     padding: 1.4rem 1.75rem;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-contractor-section:last-child {
     border-bottom: 0;
@@ -76,19 +75,19 @@ $this->registerCss(<<<CSS
 .sx-contractor-bank,
 .sx-contractor-media {
     padding: .9rem;
-    border: 1px solid #e3e7eb;
+    border: 1px solid var(--sx-color-border);
     border-radius: .5rem;
-    background: #fff;
+    background: var(--sx-color-surface);
     min-width: 0;
 }
 .sx-contractor-label {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
     font-size: .75rem;
     margin-bottom: .3rem;
 }
 .sx-contractor-value,
 .sx-contractor-bank-value {
-    color: #303942;
+    color: var(--sx-color-text);
     font-weight: 600;
     overflow-wrap: anywhere;
 }
@@ -100,12 +99,12 @@ $this->registerCss(<<<CSS
     margin-bottom: .85rem;
 }
 .sx-contractor-bank-state {
-    color: #188b38;
+    color: var(--sx-color-success);
     font-size: .75rem;
     white-space: nowrap;
 }
 .sx-contractor-bank-state.is-disabled {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
 }
 .sx-contractor-bank-details {
     display: grid;
@@ -131,25 +130,25 @@ $this->registerCss(<<<CSS
     min-height: 5.25rem;
     height: 100%;
     padding: .9rem;
-    border: 1px solid #e3e7eb;
+    border: 1px solid var(--sx-color-border);
     border-radius: .5rem;
     display: flex;
     align-items: flex-start;
     gap: .75rem;
-    background: #fff;
+    background: var(--sx-color-surface);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-contractor-entity-link:hover .sx-contractor-entity,
 .sx-contractor-entity-link:focus .sx-contractor-entity {
-    border-color: #9dc8f0;
-    box-shadow: 0 .5rem 1.5rem rgba(31, 82, 130, .08);
+    border-color: var(--sx-color-accent-border);
+    box-shadow: var(--sx-button-focus-shadow);
 }
 .sx-contractor-entity-icon {
     width: 2.125rem;
     height: 2.125rem;
     border-radius: 50%;
-    background: #eef3f7;
-    color: #607080;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -160,7 +159,7 @@ $this->registerCss(<<<CSS
     overflow-wrap: anywhere;
 }
 .sx-contractor-entity-subtitle {
-    color: #606a73;
+    color: var(--sx-color-text-muted);
     font-size: .8rem;
     margin-top: .25rem;
     overflow-wrap: anywhere;
@@ -185,12 +184,12 @@ $this->registerCss(<<<CSS
 }
 .sx-contractor-description {
     margin: 0;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 .sx-contractor-muted {
-    color: #a5adb5;
+    color: var(--sx-color-text-subtle);
     font-weight: 400;
 }
 @media (max-width: 68.75rem) {

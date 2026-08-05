@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\widgets;
 
+use yii\helpers\Json;
+
 /**
  * Class Pjax
  *
@@ -65,11 +67,12 @@ class Pjax extends \yii\widgets\Pjax
     {
         parent::registerClientScript();
         $errorMessage = \Yii::t('skeeks/admin', 'An unexpected error occurred. Refer to the developers.');
+        $errorMessageJson = Json::htmlEncode($errorMessage.': ');
 
         $errorNotify = '';
         $error = '';
         if ($this->isShowNotifyError) {
-            $errorNotify = "sx.notify.error('{$errorMessage}:<br />' + data.responseText);";
+            $errorNotify = "sx.notify.error({$errorMessageJson} + data.responseText, {allowHtml: false});";
         }
         if ($this->isShowError) {
 

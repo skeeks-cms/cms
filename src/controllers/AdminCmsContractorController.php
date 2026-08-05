@@ -14,6 +14,7 @@ use skeeks\cms\backend\actions\BackendModelCreateAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
@@ -159,19 +160,28 @@ HTML
                             'format' => 'raw',
                             'label'  => 'Реквизиты',
                             'value'  => function (CmsContractor $model) {
-                                $title = Html::a(Html::encode($model->asText), '#', [
-                                    'class' => 'sx-trigger-action sx-preview-card__title sx-collection-cell__primary',
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-contractor',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => [
+                                        'class' => 'sx-preview-card__title sx-collection-cell__primary',
+                                    ],
                                 ]);
                                 $media = Html::tag(
                                     'div',
-                                    Html::a(
-                                        Html::img($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc(), [
+                                    BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-cms-contractor',
+                                        'modelId'      => $model->id,
+                                        'content'      => Html::img($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc(), [
                                             'class' => 'sx-photo sx-img-size-50',
                                             'alt'   => '',
                                         ]),
-                                        '#',
-                                        ['class' => 'sx-trigger-action sx-preview-card__media-link']
-                                    ),
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__media-link',
+                                            'aria-label' => (string)$model->asText,
+                                        ],
+                                    ]),
                                     ['class' => 'sx-preview-card__media']
                                 );
 

@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsUserUniversalProperty;
@@ -71,12 +72,19 @@ class AdminCmsUserUniversalPropertyController extends BackendModelStandartContro
                     ],
                     'columns'        => [
                         'custom' => [
-                            'attribute' => "name",
-                            'format'    => "raw",
-                            'value'     => function (CmsUserUniversalProperty $model) {
-                                return Html::a($model->asText, "#", [
-                                        'class' => "sx-trigger-action",
-                                    ])."<br />".Html::tag('small', $model->handler->name);
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/cms/admin-cms-user-universal-property',
+                            'attribute'    => 'name',
+                            'content'      => function (CmsUserUniversalProperty $model) {
+                                return Html::tag('span',
+                                    Html::tag('span', Html::encode($model->asText), [
+                                        'class' => 'sx-collection-cell__primary',
+                                    ]).
+                                    Html::tag('span', Html::encode($model->handler->name), [
+                                        'class' => 'sx-collection-cell__secondary',
+                                    ]),
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
 

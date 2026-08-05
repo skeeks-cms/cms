@@ -2,8 +2,9 @@
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopBill */
 
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopDocument;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -47,26 +48,18 @@ $entityLink = function ($controllerId, $entity, $title, $subtitle = '', $icon = 
 
     $content .= '</div></div>';
 
-    return AjaxControllerActionsWidget::widget([
-        'controllerId'            => $controllerId,
-        'modelId'                 => $entity->id,
-        'isRunFirstActionOnClick' => true,
-        'content'                 => $content,
-        'options'                 => [
+    return BackendEntityLink::widget([
+        'controllerId' => $controllerId,
+        'modelId'      => $entity->id,
+        'content'      => $content,
+        'options'      => [
             'class' => 'sx-bill-entity-link',
         ],
     ]);
 };
 
-$relatedPill = static function ($controllerId, $entity, $title, $subtitle, $icon, $class = '', array $colors = []) {
-    $style = '';
-    if ($colors) {
-        $style = 'color: '.Html::encode($colors['text'])
-            .'; background: '.Html::encode($colors['background'])
-            .'; border-color: '.Html::encode($colors['border']).';';
-    }
-
-    $content = '<span class="sx-bill-related-pill '.$class.'" style="'.$style.'">'
+$relatedPill = static function ($controllerId, $entity, $title, $subtitle, $icon, $class = '') {
+    $content = '<span class="sx-bill-related-pill '.$class.'">'
         .'<i class="'.$icon.'"></i>'
         .'<span><strong>'.Html::encode($title).'</strong>';
 
@@ -76,16 +69,22 @@ $relatedPill = static function ($controllerId, $entity, $title, $subtitle, $icon
 
     $content .= '</span></span>';
 
-    return AjaxControllerActionsWidget::widget([
-        'controllerId'            => $controllerId,
-        'modelId'                 => $entity->id,
-        'isRunFirstActionOnClick' => true,
-        'content'                 => $content,
-        'options'                 => [
+    return BackendEntityLink::widget([
+        'controllerId' => $controllerId,
+        'modelId'      => $entity->id,
+        'content'      => $content,
+        'options'      => [
             'class' => 'sx-bill-related-link',
         ],
     ]);
 };
+
+$documentStatusClasses = [
+    ShopDocument::STATUS_ISSUED   => 'is-info',
+    ShopDocument::STATUS_SENT     => 'is-warning',
+    ShopDocument::STATUS_SIGNED   => 'is-success',
+    ShopDocument::STATUS_CANCELED => 'is-danger',
+];
 
 $payments = $model->payments;
 $documents = $model->documents;
@@ -116,7 +115,7 @@ $this->registerCss(<<<CSS
     gap: 8px 12px;
     margin-bottom: 0;
     padding: 12px 28px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-bill-actions-main {
     display: flex;
@@ -153,30 +152,42 @@ $this->registerCss(<<<CSS
     gap: 8px;
     min-height: 38px;
     padding: 7px 11px;
-    border: 1px solid #dbe2e8;
+    border: 1px solid var(--sx-color-border);
     border-radius: 7px;
-    background: #f8fafb;
-    color: #34424e;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text);
     transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 .sx-bill-related-pill.is-payment {
-    color: #18703a;
-    border-color: #cce8d6;
-    background: #eaf7ef;
+    color: var(--sx-status-success-color);
+    border-color: var(--sx-status-success-border-color);
+    background: var(--sx-status-success-background);
 }
+.sx-bill-related-pill.is-success,
 .sx-bill-related-pill.is-closed {
-    color: #18703a;
-    border-color: #cce8d6;
-    background: #eaf7ef;
+    color: var(--sx-status-success-color);
+    border-color: var(--sx-status-success-border-color);
+    background: var(--sx-status-success-background);
 }
+.sx-bill-related-pill.is-warning,
 .sx-bill-related-pill.is-open {
-    color: #806000;
-    border-color: #f0dfa7;
-    background: #fff7df;
+    color: var(--sx-status-warning-color);
+    border-color: var(--sx-status-warning-border-color);
+    background: var(--sx-status-warning-background);
+}
+.sx-bill-related-pill.is-danger {
+    color: var(--sx-status-danger-color);
+    border-color: var(--sx-status-danger-border-color);
+    background: var(--sx-status-danger-background);
+}
+.sx-bill-related-pill.is-info {
+    color: var(--sx-status-info-color);
+    border-color: var(--sx-status-info-border-color);
+    background: var(--sx-status-info-background);
 }
 .sx-bill-related-link:hover .sx-bill-related-pill,
 .sx-bill-related-link:focus .sx-bill-related-pill {
-    box-shadow: 0 5px 16px rgba(31, 82, 130, .1);
+    box-shadow: var(--sx-shadow-panel);
     transform: translateY(-1px);
 }
 .sx-bill-related-pill > i {
@@ -205,14 +216,14 @@ $this->registerCss(<<<CSS
     margin: 0;
 }
 .sx-bill-card {
-    background: #fff;
-    border: 1px solid #e3e7eb;
+    background: var(--sx-color-surface);
+    border: 1px solid var(--sx-color-border);
     border-radius: 10px;
     overflow: hidden;
 }
 .sx-bill-section {
     padding: 22px 28px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-bill-section:last-child {
     border-bottom: 0;
@@ -244,12 +255,12 @@ $this->registerCss(<<<CSS
     width: 100%;
     min-height: 80px;
     padding: 14px;
-    border: 1px solid #e3e7eb;
+    border: 1px solid var(--sx-color-border);
     border-radius: 8px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: #fff;
+    background: var(--sx-color-surface);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-bill-entity-link:hover,
@@ -260,15 +271,15 @@ $this->registerCss(<<<CSS
 }
 .sx-bill-entity-link:hover .sx-bill-entity,
 .sx-bill-entity-link:focus .sx-bill-entity {
-    border-color: #9dc8f0;
-    box-shadow: 0 8px 24px rgba(31, 82, 130, .08);
+    border-color: var(--sx-color-accent-border);
+    box-shadow: var(--sx-button-focus-shadow);
 }
 .sx-bill-entity-icon {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #eef3f7;
-    color: #607080;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -276,7 +287,7 @@ $this->registerCss(<<<CSS
     font-size: 15px;
 }
 .sx-bill-entity-label {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
     margin-bottom: 4px;
 }
@@ -284,16 +295,16 @@ $this->registerCss(<<<CSS
     font-weight: 600;
 }
 .sx-bill-entity-subtitle {
-    color: #606a73;
+    color: var(--sx-color-text-muted);
     font-size: 13px;
     margin-top: 4px;
 }
 .sx-bill-muted {
-    color: #a5adb5;
+    color: var(--sx-color-text-subtle);
 }
 .sx-bill-comment {
     margin: 0;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     white-space: pre-wrap;
 }
 .sx-bill-items {
@@ -307,22 +318,22 @@ $this->registerCss(<<<CSS
 }
 .sx-bill-items th,
 .sx-bill-items td {
-    border-bottom: 1px solid #e3e7eb;
+    border-bottom: 1px solid var(--sx-color-border);
     padding: 12px 10px;
     vertical-align: top;
     white-space: nowrap;
 }
 .sx-bill-items th {
-    color: #6d767f;
+    color: var(--sx-color-text-muted);
     font-weight: 600;
-    background: #f8fafb;
+    background: var(--sx-color-surface-muted);
 }
 .sx-bill-items tr:last-child td {
     border-bottom: 0;
 }
 .sx-bill-items-number {
     width: 48px;
-    color: #9aa3ab;
+    color: var(--sx-color-text-subtle);
 }
 .sx-bill-items-money {
     white-space: nowrap;
@@ -334,18 +345,18 @@ $this->registerCss(<<<CSS
 .sx-bill-summary {
     margin-top: 18px;
     padding-top: 18px;
-    border-top: 1px solid #e3e7eb;
+    border-top: 1px solid var(--sx-color-border);
 }
 .sx-bill-summary-row {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     font-size: 16px;
     line-height: 1.45;
 }
 .sx-bill-summary-label {
-    color: #6d767f;
+    color: var(--sx-color-text-muted);
 }
 .sx-bill-summary-value {
     min-width: 150px;
@@ -353,12 +364,12 @@ $this->registerCss(<<<CSS
     white-space: nowrap;
 }
 .sx-bill-summary-discount .sx-bill-summary-value {
-    color: #6d767f;
+    color: var(--sx-color-text-muted);
 }
 .sx-bill-total {
     margin-top: 10px;
     justify-content: flex-end;
-    color: #212529;
+    color: var(--sx-color-text);
     font-size: 24px;
     font-weight: 600;
 }
@@ -370,10 +381,10 @@ $this->registerCss(<<<CSS
 .sx-bill-requisite {
     padding: 12px;
     border-radius: 8px;
-    background: #f8fafb;
+    background: var(--sx-color-surface-muted);
 }
 .sx-bill-requisite-label {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
     margin-bottom: 4px;
 }
@@ -480,8 +491,7 @@ JS
                             $document->typeAsText.' №'.$document->number,
                             $document->statusAsText.' · '.Yii::$app->formatter->asDate($document->issued_at ?: $document->created_at),
                             $document->statusIcon,
-                            '',
-                            $document->statusColors
+                            $documentStatusClasses[$document->status] ?? 'is-info'
                         ); ?>
                     <?php endforeach; ?>
                 </div>

@@ -8,10 +8,8 @@
 
 namespace skeeks\cms\grid;
 
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\User;
 use yii\grid\DataColumn;
-use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -19,11 +17,11 @@ use yii\helpers\Html;
 class UserColumnData extends DataColumn
 {
     public $headerOptions = [
-        'style' => 'width: 150px;'
+        'class' => 'sx-preview-card-column',
     ];
 
     public $contentOptions = [
-        'style' => 'width: 150px;'
+        'class' => 'sx-preview-card-column',
     ];
 
     /**
@@ -36,7 +34,7 @@ class UserColumnData extends DataColumn
 
         if ($user) {
             return \Yii::$app->view->render('@skeeks/cms/grid/views/user-column', [
-                'user' => $user
+                'user' => $user,
             ]);
         } else {
             return null;

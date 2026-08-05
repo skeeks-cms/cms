@@ -7,107 +7,6 @@
  */
 /* @var $this yii\web\View */
 
-$this->registerJs(<<<JS
-
-$("body").on("dblclick", ".sx-tree-node", function() {
-    $(".sx-first-action", $(this)).click();
-    return false;
-});
-
-$("body").on("click", ".sx-first-action-trigger", function() {
-    /*console.log($(".sx-first-action", $(this).closest('.sx-tree-node')));*/
-    $(".sx-first-action", $(this).closest('.sx-tree-node')).first().click();
-    return false;
-});
-
-JS
-);
-
-$this->registerCss(<<<CSS
-
-.cms-tree-wrapper {
-    margin-left: 0;
-}
-
-.sx-department {
-    position: relative;
-}
-
-.sx-tree ul li.sx-tree-node .sx-node-open-close > a {
-    font-size: 12px;
-}
-.sx-department {
-    display: block;
-    min-width: 40rem;
-}
-.sx-department {
-    border: 1px solid silver;
-    border-radius: 1rem;
-    padding: 1rem;
-}
-
-
-.sx-tree ul li.sx-tree-node {
-    list-style-type: none;
-    padding-left: 3rem;
-}
-
-.sx-tree ul li.sx-tree-node .row:hover {
-    background: none;
-}
-
-.sx-tree ul li.sx-tree-node .row .sx-controll-node
-{
-    display: flex;
-    float: left;
-}
-
-.sx-tree ul li.sx-tree-node .row .sx-controll-node .sx-btn-caret-action
-{
-    width: 21px;
-    height: 22px;
-}
-.sx-tree ul li.sx-tree-node .row .sx-controll-node .btn
-{
-    height: 22px;
-}
-
-
-.sx-tree ul li.sx-tree-node .row:hover .sx-controll-node
-{
-    display: block;
-}
-
-.btn-tree-node-controll
-{
-    font-size: 8px;
-}
-
-    .sx-tree ul li.sx-tree-node .sx-controll-node
-    {
-        width: auto;
-        float: left;
-        margin-left: 10px;
-        padding-top: 0px;
-    }
-
-        .sx-tree ul li.sx-tree-node .sx-controll-node > .dropdown button
-        {
-            font-size: 6px;
-            color: #000000;
-            background: white;
-            padding: 2px 4px;
-        }
-
-.sx-tree-move
-{
-    cursor: move;
-    position: absolute;
-    right: 1rem;
-    top: 1rem;
-}
-CSS
-);
 if (!$models) {
     $cmsDepartment = new \skeeks\cms\models\CmsDepartment();
     $cmsDepartment->name = "Главный отдел";
@@ -118,8 +17,8 @@ if (!$models) {
     $models = [$cmsDepartment];
 }
 ?>
-<div class="h1">Структура компании</div>
-<div class="col-md-12">
+<h1>Структура компании</h1>
+<div class="sx-department-page">
     <?php $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
         "models" => $models,
         "isSearchEnabled" => false,

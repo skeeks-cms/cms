@@ -461,17 +461,15 @@ JS
                     </span>
                     <span class="sx-properties--value">
                         <?php if ($model->cms_company_id) : ?>
-                            <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                'controllerId'            => '/cms/admin-cms-company',
-                                'modelId'                 => $model->cmsCompany->id,
-                                'isRunFirstActionOnClick' => true,
-                                'options'                 => [
-                                    'class' => 'sx-dashed',
-                                    'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                            <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                                'controllerId' => '/cms/admin-cms-company',
+                                'modelId'      => $model->cmsCompany->id,
+                                'label'        => $model->cmsCompany->name,
+                                'options'      => [
+                                    'class'      => 'sx-preview-card__related',
+                                    'aria-label' => (string)$model->cmsCompany->name,
                                 ],
                             ]); ?>
-                            <?php echo $model->cmsCompany->name; ?>
-                            <?php $widget::end(); ?>
                         <?php else : ?>
                             —
                         <?php endif; ?>
@@ -483,17 +481,15 @@ JS
                     </span>
                     <span class="sx-properties--value">
                         <?php if ($model->cms_project_id) : ?>
-                            <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                'controllerId'            => '/cms/admin-cms-project',
-                                'modelId'                 => $model->cmsProject->id,
-                                'isRunFirstActionOnClick' => true,
-                                'options'                 => [
-                                    'class' => 'sx-dashed',
-                                    'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                            <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                                'controllerId' => '/cms/admin-cms-project',
+                                'modelId'      => $model->cmsProject->id,
+                                'label'        => $model->cmsProject->name,
+                                'options'      => [
+                                    'class'      => 'sx-preview-card__related',
+                                    'aria-label' => (string)$model->cmsProject->name,
                                 ],
                             ]); ?>
-                            <?php echo $model->cmsProject->name; ?>
-                            <?php $widget::end(); ?>
                         <?php else : ?>
                             —
                         <?php endif; ?>

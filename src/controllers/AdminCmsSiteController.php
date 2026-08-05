@@ -12,6 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
@@ -20,6 +21,7 @@ use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HiddenField;
 use skeeks\yii2\form\fields\SelectField;
@@ -177,31 +179,50 @@ class AdminCmsSiteController extends BackendModelStandartController
                             'attribute' => 'name',
                             'format'    => 'raw',
                             'value'     => function (CmsSite $model) {
+                                $titleContent = '';
+                                if ($model->is_default) {
+                                    $titleContent .= Html::tag('span', '✓', [
+                                        'class' => 'sx-text--success',
+                                        'title' => 'Сайт по умолчанию',
+                                    ]).' ';
+                                }
+                                $titleContent .= Html::encode($model->asText);
 
-                                $data = [];
-                                $data[] = ($model->is_default ? '<span class="text-success" title="Сайт по умолчанию">✓</span> ' : '').Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
-
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-site',
+                                    'modelId'      => $model->id,
+                                    'content'      => $titleContent,
+                                    'options'      => ['class' => 'sx-preview-card__title sx-collection-cell__primary'],
+                                ]);
+                                $meta = '';
                                 if ($model->cmsSiteMainDomain) {
-                                    /*foreach ($model->cmsSiteDomains as $cmsSiteDomain)
-                                    {*/
-                                    $data[] = Html::a($model->cmsSiteMainDomain->url, $model->cmsSiteMainDomain->url, [
+                                    $meta = Html::a(Html::encode($model->cmsSiteMainDomain->url), $model->cmsSiteMainDomain->url, [
                                         'data-pjax' => '0',
                                         'target'    => '_blank',
-                                        'style'     => 'color: #333; max-width: 200px;',
+                                        'class'     => 'sx-collection-cell__secondary',
                                     ]);
-                                    //}
-
                                 }
 
-                                $info = implode("<br />", $data);
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-site',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
+                                        'class' => 'sx-photo sx-img-size-50',
+                                        'alt'   => '',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
 
-                                return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                                </div>
-                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $title.$meta, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card']
+                                );
                             },
                         ],
 

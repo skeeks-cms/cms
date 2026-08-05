@@ -18,7 +18,7 @@ use skeeks\cms\backend\actions\BackendModelMultiAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\base\InputWidget;
 use skeeks\cms\grid\BooleanColumn;
@@ -448,7 +448,7 @@ class AdminCmsBillController extends BackendModelStandartController
                                 }
 
                                 foreach ($ShopBill->closingDocuments as $document) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-document',
                                         'modelId'      => $document->id,
                                         'content'      => '<i class="far fa-file"></i> '.Html::encode($document->asText()),
@@ -545,14 +545,11 @@ JS
                                 }
 
                             $title = "Счет №".$ShopBill->id." от ".\Yii::$app->formatter->asDate($ShopBill->created_at);
-                                $titleAction = AjaxControllerActionsWidget::widget([
-                                    'controllerId'            => '/cms/admin-cms-bill',
-                                    'modelId'                 => $ShopBill->id,
-                                    'isRunFirstActionOnClick' => true,
-                                    'tag'                     => 'a',
-                                    'content'                 => $title,
-                                    'options'                 => [
-                                        'href'  => '#',
+                                $titleAction = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-bill',
+                                    'modelId'      => $ShopBill->id,
+                                    'label'        => $title,
+                                    'options'      => [
                                         'class' => 'sx-collection-cell__primary',
                                     ],
                                 ]);
@@ -611,7 +608,7 @@ JS
                                 $result = [];
 
                                 if ($shopBill->cms_company_id && $shopBill->company) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-company',
                                         'modelId'      => $shopBill->company->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($shopBill->company->asText),
@@ -620,7 +617,7 @@ JS
                                         ],
                                     ]);
                                 } elseif ($shopBill->cms_user_id && $shopBill->cmsUser) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-user',
                                         'modelId'      => $shopBill->cmsUser->id,
                                         'content'      => '<i class="far fa-user"></i> '.Html::encode($shopBill->cmsUser->asText),
@@ -632,7 +629,7 @@ JS
 
                                 if ($shopBill->sender_contractor_id && $shopBill->senderContractor) {
                                     $result[] = '<small class="sx-collection-cell__subtle">Юр. лицо плательщика</small>';
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-contractor',
                                         'modelId'      => $shopBill->senderContractor->id,
                                         'content'      => '<i class="fas fa-briefcase"></i> '.Html::encode($shopBill->senderContractor->asText),
@@ -657,10 +654,10 @@ JS
                                 if ($ShopBill->deals) {
                                     $result = [];
                                     foreach ($ShopBill->deals as $crmDeal) {
-                                        $result[] = AjaxControllerActionsWidget::widget([
+                                        $result[] = BackendEntityLink::widget([
                                             'controllerId' => '/cms/admin-cms-deal',
                                             'modelId'      => $crmDeal->id,
-                                            'content'      => '<i class="far fa-file"></i> '.$crmDeal->asText,
+                                            'content'      => '<i class="far fa-file"></i> '.Html::encode($crmDeal->asText),
                                             'options'      => [
                                                 'class' => 'sx-preview-card__related',
                                             ],

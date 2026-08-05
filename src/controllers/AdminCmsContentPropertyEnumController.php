@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
@@ -156,16 +157,23 @@ class AdminCmsContentPropertyEnumController extends BackendModelStandartControll
                     ],
                     'columns'        => [
                         'value' => [
-                            'attribute' => "value",
-                            'format'    => "raw",
-                            'value'     => function (CmsContentPropertyEnum $model) {
-                                $name = $model->value;
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/cms/admin-cms-content-property-enum',
+                            'attribute'    => 'value',
+                            'content'      => function (CmsContentPropertyEnum $model) {
+                                $content = Html::tag('span', Html::encode($model->value), [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]);
                                 if ($model->sx_id) {
-                                    $name = $name . " <small data-toggle='tooltip' title='SkeekS ID: {$model->sx_id}'><i class='fas fa-link'></i></small>" ;
+                                    $content .= Html::tag('span', '<i class="fas fa-link"></i>', [
+                                        'class'       => 'sx-collection-cell__secondary',
+                                        'data-toggle' => 'tooltip',
+                                        'title'       => 'SkeekS ID: '.$model->sx_id,
+                                    ]);
                                 }
 
-                                return Html::a($name, "#", [
-                                    'class' => "sx-trigger-action",
+                                return Html::tag('span', $content, [
+                                    'class' => 'sx-collection-cell',
                                 ]);
                             },
                         ],

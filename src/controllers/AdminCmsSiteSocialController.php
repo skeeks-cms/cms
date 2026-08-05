@@ -9,6 +9,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\models\CmsSiteSocial;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\NumberField;
@@ -87,20 +88,23 @@ HTML
                     ],
                     'columns'        => [
                         'custom' => [
-                            'attribute' => 'url',
-                            'format'    => "raw",
-                            'value'     => function ($model) {
-                                $data[] = Html::a($model->url, "#", [
-                                    'class' => "sx-trigger-action",
-                                    'style' => "font-size: 18px;",
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/cms/admin-cms-site-social',
+                            'attribute'    => 'url',
+                            'content'      => function (CmsSiteSocial $model) {
+                                $content = Html::tag('span', Html::encode($model->url), [
+                                    'class' => 'sx-collection-cell__primary',
                                 ]);
 
                                 if ($model->name) {
-                                    $data[] = "<span style='color: gray;'>(".$model->name.")</span>";
+                                    $content .= Html::tag('span', '('.Html::encode($model->name).')', [
+                                        'class' => 'sx-collection-cell__secondary',
+                                    ]);
                                 }
 
-                                return implode(" ", $data);
+                                return $content;
                             },
+                            'linkOptions' => ['class' => 'sx-collection-cell sx-collection-cell--stack'],
                         ],
                     ],
                 ],

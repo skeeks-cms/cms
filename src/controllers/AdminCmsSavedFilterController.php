@@ -9,6 +9,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsSavedFilter;
@@ -237,29 +238,43 @@ class AdminCmsSavedFilterController extends BackendModelStandartController
                             'attribute' => 'id',
                             'format'    => 'raw',
                             'value'     => function (CmsSavedFilter $model) {
-
-                                $data = [];
-                                $data[] = Html::a($model->seoName, "#", ['class' => 'sx-trigger-action']);
-
-
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-saved-filter',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
+                                        'class' => 'sx-photo sx-img-size-50',
+                                        'alt'   => '',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->seoName,
+                                    ],
+                                ]);
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-saved-filter',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->seoName,
+                                    'options'      => ['class' => 'sx-preview-card__title sx-collection-cell__primary'],
+                                ]);
+                                $meta = '';
                                 if ($model->cmsTree) {
-                                    $data[] = '<i class="far fa-folder" style="color: gray;"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                                    $meta = Html::tag('span', '<i class="far fa-folder"></i>', [
+                                        'class' => 'sx-collection-cell__secondary',
+                                    ]).' '.Html::a(Html::encode($model->cmsTree->name), $model->cmsTree->url, [
                                             'data-pjax' => '0',
                                             'target'    => '_blank',
                                             'title'     => $model->cmsTree->fullName,
-                                            'style'     => 'color: #333; max-width: 200px; display: inline-block; color: gray; cursor: pointer; white-space: nowrap; border-bottom: none;',
+                                            'class'     => 'sx-collection-cell__secondary',
                                         ]);
                                 }
-                                $info = implode("<br />", $data);
 
-                                return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                                </div>
-                                                <div style='margin-left: 5px;'>".$info. /*. "<br />(" . $model->code . ")*/
-                                    "</div></div>";;
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $title.$meta, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card']
+                                );
                             },
                         ],
 

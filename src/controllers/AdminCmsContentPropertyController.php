@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
@@ -245,18 +246,31 @@ class AdminCmsContentPropertyController extends BackendModelStandartController
                     ],
                     'columns'        => [
                         'custom'  => [
-                            'attribute' => "name",
-                            'format'    => "raw",
-                            'value'     => function (CmsContentProperty $model) {
-                                $name = $model->asText;
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/cms/admin-cms-content-property',
+                            'attribute'    => 'name',
+                            'content'      => function (CmsContentProperty $model) {
+                                $title = Html::tag('span', Html::encode($model->asText), [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]);
                                 if ($model->sx_id) {
-                                    $name = $name . " <small data-toggle='tooltip' title='SkeekS ID: {$model->sx_id}'><i class='fas fa-link'></i></small>" ;
+                                    $title .= Html::tag('span', '<i class="fas fa-link"></i>', [
+                                        'class'       => 'sx-collection-cell__secondary',
+                                        'data-toggle' => 'tooltip',
+                                        'title'       => 'SkeekS ID: '.$model->sx_id,
+                                    ]);
                                 }
-                                return Html::a($name, "#", [
-                                        'class' => "sx-trigger-action",
+
+                                return Html::tag('span',
+                                    Html::tag('span', $title, ['class' => 'sx-collection-cell']).
+                                    Html::tag('span', Html::encode($model->handler->name), [
+                                        'class' => 'sx-collection-cell__secondary',
                                     ]).
-                                    "<br />".Html::tag('small', $model->handler->name).
-                                    "<br />".Html::tag('small', $model->code);
+                                    Html::tag('span', Html::encode($model->code), [
+                                        'class' => 'sx-collection-cell__subtle',
+                                    ]),
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
                         'content' => [

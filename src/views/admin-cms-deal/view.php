@@ -4,12 +4,15 @@
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 
+use skeeks\cms\backend\assets\BackendPanelAsset;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use yii\helpers\Html;
 
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
+
+BackendPanelAsset::register($this);
 
 $formatValue = static function ($value, $empty = 'Не указано') {
     $value = trim((string)$value);

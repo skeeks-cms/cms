@@ -9,6 +9,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\models\CmsTreeTypePropertyEnum;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\yii2\form\fields\SelectField;
@@ -55,13 +56,10 @@ class AdminCmsTreeTypePropertyEnumController extends BackendModelStandartControl
                     ],
                     'columns'        => [
                         'value' => [
-                            'attribute' => "value",
-                            'format'    => "raw",
-                            'value'     => function (CmsTreeTypePropertyEnum $model) {
-                                return Html::a($model->value, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                            },
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/cms/admin-cms-tree-type-property-enum',
+                            'attribute'     => 'value',
+                            'viewAttribute' => 'value',
                         ],
                     ],
                 ],

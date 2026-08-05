@@ -11,6 +11,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\Image;
@@ -69,21 +70,35 @@ class AdminCmsLangController extends BackendModelStandartController
                             'attribute' => 'name',
                             'format' => 'raw',
                             'value' => function (CmsLang $model) {
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-lang',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::img($model->image ? $model->image->src : Image::getCapSrc(), [
+                                        'class' => 'sx-photo sx-img-size-50',
+                                        'alt'   => '',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-lang',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => ['class' => 'sx-preview-card__title sx-collection-cell__primary'],
+                                ]);
 
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
-
-                                $info = implode("<br />", $data);
-
-                                return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='". ($model->image ? $model->image->src : Image::getCapSrc()) ."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                                </div>
-                                                <div style='margin-left: 5px;'>" . $info  . " (" . $model->code . ")</div></div>";
-
-                                            ;
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div',
+                                        $title.Html::tag('span', Html::encode($model->code), [
+                                            'class' => 'sx-collection-cell__secondary',
+                                        ]),
+                                        ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
+                                    ),
+                                    ['class' => 'sx-preview-card']
+                                );
                             }
                         ],
 

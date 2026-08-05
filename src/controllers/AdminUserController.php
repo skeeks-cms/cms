@@ -20,6 +20,7 @@ use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
@@ -284,13 +285,14 @@ class AdminUserController extends BackendModelStandartController
                                     }
                                 }
 
-                                $content = Html::a(
-                                    Html::encode($cmsUser->shortDisplayNameWithAlias),
-                                    '#',
-                                    [
-                                        'class' => 'sx-preview-card__title sx-collection-cell__primary sx-trigger-action',
-                                    ]
-                                );
+                                $content = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-user',
+                                    'modelId'      => $cmsUser->id,
+                                    'label'        => $cmsUser->shortDisplayNameWithAlias,
+                                    'options'      => [
+                                        'class' => 'sx-preview-card__title sx-collection-cell__primary',
+                                    ],
+                                ]);
 
                                 if ($rolesData) {
                                     $content .= Html::tag(
@@ -302,20 +304,21 @@ class AdminUserController extends BackendModelStandartController
 
                                 $media = Html::tag(
                                     'div',
-                                    Html::a(
-                                        Html::img(
+                                    BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-user',
+                                        'modelId'      => $cmsUser->id,
+                                        'content'      => Html::img(
                                             $cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc(),
                                             [
                                                 'class' => 'sx-photo sx-img-size-50',
                                                 'alt'   => '',
                                             ]
                                         ),
-                                        '#',
-                                        [
-                                            'class'      => 'sx-preview-card__media-link sx-trigger-action',
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__media-link',
                                             'aria-label' => $cmsUser->shortDisplayNameWithAlias,
-                                        ]
-                                    ),
+                                        ],
+                                    ]),
                                     ['class' => 'sx-preview-card__media']
                                 );
 
@@ -326,7 +329,7 @@ class AdminUserController extends BackendModelStandartController
                                         $content,
                                         ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
                                     ),
-                                    ['class' => 'sx-preview-card sx-trigger-action']
+                                    ['class' => 'sx-preview-card']
                                 );
                             },
                         ],

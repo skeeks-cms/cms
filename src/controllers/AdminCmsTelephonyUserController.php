@@ -6,7 +6,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -114,7 +114,12 @@ HTML
                         'cms_telephony_provider_id' => [
                             'format' => 'raw',
                             'value' => function (CmsTelephonyUser $model) {
-                                return $model->provider->name;
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-telephony-provider',
+                                    'modelId'      => $model->provider->id,
+                                    'label'        => $model->provider->name,
+                                    'options'      => ['class' => 'sx-preview-card__related'],
+                                ]);
                             }
                         ],
 

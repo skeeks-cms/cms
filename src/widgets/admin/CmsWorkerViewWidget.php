@@ -8,10 +8,8 @@
 
 namespace skeeks\cms\widgets\admin;
 
-use common\models\User;
 use skeeks\cms\backend\assets\BackendAsset;
 use skeeks\cms\models\CmsUser;
-use skeeks\crm\models\CrmContractor;
 use yii\base\Widget;
 
 class CmsWorkerViewWidget extends Widget
@@ -55,18 +53,10 @@ class CmsWorkerViewWidget extends Widget
     {
         BackendAsset::register($this->view);
 
-        if ($this->user) {
-            $cache = \Yii::$app->cache->get("cmsUser{$this->user->id}" . $this->tagName . $this->prviewImageSize . $this->isSmall);
-            if ($cache) {
-                return $cache;
-            }
-
-            $result = $this->render($this->viewFile);
-            \Yii::$app->cache->set("cmsUser{$this->user->id}", $result, 2);
-            return $result;
-        } else {
+        if (!$this->user) {
             return "";
         }
 
+        return $this->render($this->viewFile);
     }
 }

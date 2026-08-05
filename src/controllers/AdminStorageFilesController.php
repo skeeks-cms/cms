@@ -14,6 +14,7 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -285,8 +286,13 @@ JS
                                         $model->name,
                                     ])));
                                     $displayName = $names[0] ?? $model->extension ?: \Yii::t('skeeks/cms', 'File');
-                                    $content = Html::tag('div', Html::encode($displayName), [
-                                        'class' => 'sx-preview-card__title',
+                                    $content = BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-storage-files',
+                                        'modelId'      => $model->id,
+                                        'label'        => $displayName,
+                                        'options'      => [
+                                            'class' => 'sx-preview-card__title sx-collection-cell__primary',
+                                        ],
                                     ]);
 
                                     if (isset($names[1])) {
@@ -338,7 +344,7 @@ JS
                                     return Html::tag(
                                         'div',
                                         $media.Html::tag('div', $content, ['class' => 'sx-preview-card__content']),
-                                        ['class' => 'sx-preview-card sx-preview-card--file sx-trigger-action']
+                                        ['class' => 'sx-preview-card sx-preview-card--file']
                                     );
                                 },
                                 'format' => 'raw',

@@ -8,6 +8,8 @@
  * @var \skeeks\cms\models\CmsTree $model
  */
 
+use skeeks\cms\backend\widgets\BackendEntityLink;
+
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\widgets\tree\CmsTreeWidget */
 /* @var $model \skeeks\cms\models\CmsDepartment */
@@ -35,75 +37,64 @@ if ($additionalName) {
 
 ?>
 
-<div class="sx-department">
-    <div class="sx-label-node">
+<div class="sx-department sx-surface sx-surface--padded">
+    <div class="sx-department__header">
+        <div class="sx-label-node sx-department__identity">
+            <?php echo BackendEntityLink::widget([
+                'controllerId' => '/cms/admin-cms-department',
+                'modelId'      => $model->id,
+                'label'        => $result,
+                'options'      => [
+                    'class'      => 'sx-department__title sx-collection-cell__primary',
+                    'aria-label' => $result,
+                ],
+            ]); ?>
+        </div>
 
-        <? /* if ($widget->isOpenNode($model)) : */ ?><!--
-            <i class="far fa-folder-open"></i>
-        <? /* else : */ ?>
-            <i class="far fa-folder"></i>
-        --><? /* endif; */ ?>
+        <div class="sx-department__actions">
+            <button type="button" class="btn btn-default btn-sm add-tree-child"
+                    title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>"
+                    data-id="<?= (int) $model->id; ?>">
+                <span class="fa fa-plus" aria-hidden="true"></span>
+                Добавить отдел
+            </button>
 
-        <!--<a href="<? /*= $widget->getOpenCloseLink($model); */ ?>">
-            <? /*= $result; */ ?>
-        </a>-->
-
-        <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-            'controllerId'            => '/cms/admin-cms-department',
-            'modelId'                 => $model->id,
-            /*'rightClickSelectors' => ['.sx-tree-node-'.$model->id],*/
-            'isRunFirstActionOnClick' => true,
-            'options'                 => [
-                'tag'   => false,
-                'class' => '',
-                'style' => 'cursor: pointer; font-size: 1.5rem;',
-            ],
-        ]); ?>
-        <?= $result; ?>
-        <?php $widget::end(); ?>
-
-
-    </div>
-    <?php if($model->supervisor) : ?>
-    <div>
-        Руководитель: <?php echo $model->supervisor->shortDisplayName; ?>
-    </div>
-    <?php endif; ?>
-
-    <?php if($model->workers) : ?>
-    <div>
-        Сотрудники: <?php echo implode(", ", \yii\helpers\ArrayHelper::map($model->workers, 'id', 'shortDisplayName')); ?>
-    </div>
-    <?php endif; ?>
-
-
-    <div class="">
-        <div>
-            <a href="#" class="btn btn-default btn-sm add-tree-child"
-               title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>" data-id="<?= $model->id; ?>"><span
-                        class="fa fa-plus"></span> Добавить отдел</a>
+            <?php if ($model->pid > 0) : ?>
+                <button type="button" class="btn btn-default btn-sm sx-tree-move"
+                        title="<?= \Yii::t('skeeks/cms', 'Change sorting'); ?>"
+                        aria-label="<?= \Yii::t('skeeks/cms', 'Change sorting'); ?>">
+                    <span class="fas fa-arrows-alt-v" aria-hidden="true"></span>
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 
-
-    <? /*= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
-        "actions" => $controller->modelActions,
-        "renderFirstAction" => true,
-        "wrapperOptions" => ['class' => "dropdown pull-left"],
-        'clientOptions' =>
-            [
-                'pjax-id' => $widget->pjax->id
-            ]
-    ]); */ ?>
-
-
-    <?php if ($model->pid > 0) : ?>
-        <a href="#" class="btn btn-default sx-tree-move" style="cursor: move;"
-           title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
-            <span class="fas fa-arrows-alt-v"></span>
-        </a>
+    <?php if ($model->supervisor) : ?>
+        <div class="sx-department__meta sx-collection-cell__secondary">
+            <span class="sx-department__meta-label">Руководитель:</span>
+            <?php echo BackendEntityLink::widget([
+                'controllerId' => '/cms/admin-user',
+                'modelId'      => $model->supervisor->id,
+                'label'        => $model->supervisor->shortDisplayName,
+                'options'      => ['class' => 'sx-preview-card__related'],
+            ]); ?>
+        </div>
     <?php endif; ?>
 
-
+    <?php if ($model->workers) : ?>
+        <div class="sx-department__meta sx-collection-cell__secondary">
+            <span class="sx-department__meta-label">Сотрудники:</span>
+            <span class="sx-department__people">
+                <?php foreach ($model->workers as $worker) : ?>
+                    <?php echo BackendEntityLink::widget([
+                        'controllerId' => '/cms/admin-user',
+                        'modelId'      => $worker->id,
+                        'label'        => $worker->shortDisplayName,
+                        'options'      => ['class' => 'sx-preview-card__related'],
+                    ]); ?>
+                <?php endforeach; ?>
+            </span>
+        </div>
+    <?php endif; ?>
 </div>
 

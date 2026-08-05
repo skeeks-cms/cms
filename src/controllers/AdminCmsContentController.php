@@ -10,6 +10,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
@@ -98,13 +99,10 @@ class AdminCmsContentController extends BackendModelStandartController
                     'columns'        => [
 
                         'custom' => [
-                            'attribute' => "name",
-                            'format'    => "raw",
-                            'value'     => function (CmsContent $model) {
-                                return Html::a($model->asText, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                            },
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/cms/admin-cms-content',
+                            'attribute'     => 'name',
+                            'viewAttribute' => 'asText',
                         ],
 
                     ],
