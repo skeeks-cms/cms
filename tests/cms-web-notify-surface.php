@@ -18,6 +18,7 @@ webNotifySurfaceExpect(
 webNotifySurfaceExpect(strpos($view, 'sx-surface__body') !== false, 'Web notify popup has no canonical surface body.');
 webNotifySurfaceExpect(strpos($view, 'sx-surface__footer') !== false, 'Web notify popup has no canonical surface footer.');
 webNotifySurfaceExpect(strpos($view, 'sx-button sx-button--primary sx-button--sm') !== false, 'Web notify actions do not use semantic backend buttons.');
+webNotifySurfaceExpect(strpos($view, 'sx-trigger-notifies sx-shell-header__action sx-shell-header__action--icon') !== false, 'Web notify trigger does not use the shared header action contract.');
 webNotifySurfaceExpect(strpos($notifyView, 'btn btn-primary') === false, 'Web notify popup still depends on Bootstrap buttons.');
 webNotifySurfaceExpect(strpos($notifyView, 'class="d-block sx-trigger-notifies"') === false, 'Web notify trigger still depends on a Bootstrap display utility.');
 webNotifySurfaceExpect(strpos($css, '.sx-notifies .sx-notifies-list .sx-item-inner {') !== false, 'Web notify item layout owner is missing.');

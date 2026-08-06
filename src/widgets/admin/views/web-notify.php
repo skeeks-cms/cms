@@ -726,7 +726,7 @@ JS
 ?>
 
 <div class="sx-btn-backend-header sx-notifies-wrapper <?php echo $notReaded ? "sx-has-notifies" : ""; ?>" id="sx-notifies-wrapper">
-    <a class="sx-trigger-notifies" href="#" aria-label="Уведомления" aria-haspopup="dialog" aria-expanded="false" aria-controls="sx-notifies-panel">
+    <a class="sx-trigger-notifies sx-shell-header__action sx-shell-header__action--icon" href="#" aria-label="Уведомления" aria-haspopup="dialog" aria-expanded="false" aria-controls="sx-notifies-panel">
         <span class="sx-badge sx-bage-notifies"><?php echo $notReaded; ?></span>
         <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('bell', [
             'size'  => 20,
