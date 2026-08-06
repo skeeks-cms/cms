@@ -46,6 +46,7 @@ class ThemePaletteController extends Controller
                     'save' => ['POST'],
                     'save-default' => ['POST'],
                     'reset' => ['POST'],
+                    'reset-default' => ['POST'],
                 ],
             ],
         ];
@@ -63,12 +64,14 @@ class ThemePaletteController extends Controller
     {
         $component = $this->createSettings($scope);
         $customizer = [
-            'scope'             => $scope,
-            'saveUrl'           => Url::to(['/cms/theme-palette/save', 'scope' => $scope]),
-            'resetUrl'          => Url::to(['/cms/theme-palette/reset', 'scope' => $scope]),
-            'saveDefaultUrl'    => Url::to(['/cms/theme-palette/save-default', 'scope' => $scope]),
-            'canApplyDefault'   => \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS),
-            'headerModes'       => $component->getValidatedHeaderModes(),
+            'scope'               => $scope,
+            'saveUrl'             => Url::to(['/cms/theme-palette/save', 'scope' => $scope]),
+            'resetUrl'            => Url::to(['/cms/theme-palette/reset', 'scope' => $scope]),
+            'saveDefaultUrl'      => Url::to(['/cms/theme-palette/save-default', 'scope' => $scope]),
+            'resetDefaultUrl'     => Url::to(['/cms/theme-palette/reset-default', 'scope' => $scope]),
+            'canApplyDefault'     => \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS),
+            'resetDefaultConfirm' => \Yii::t('skeeks/backend', 'Reset shared settings for this color scheme?'),
+            'headerModes'         => $component->getValidatedHeaderModes(),
         ];
 
         return $this->renderPartial('@skeeks/cms/backend/widgets/views/theme-customizer-panel', [
@@ -129,10 +132,27 @@ class ThemePaletteController extends Controller
     {
         $mode = $this->readMode();
         $component = $this->createSettings($scope);
-        $model = CmsComponentSettings::findByComponentUser(
-            $component,
-            \Yii::$app->user->identity
-        )->one();
+        $model = $this->findStoredSettings($component, Component::OVERRIDE_USER);
+
+        return $this->resetStoredMode($component, $model, $mode);
+    }
+
+    public function actionResetDefault($scope)
+    {
+        if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+            throw new ForbiddenHttpException('You cannot reset the default theme palette.');
+        }
+
+        $mode = $this->readMode();
+        $component = $this->createSettings($scope);
+        $override = $component->cmsSite ? Component::OVERRIDE_SITE : Component::OVERRIDE_DEFAULT;
+        $model = $this->findStoredSettings($component, $override);
+
+        return $this->resetStoredMode($component, $model, $mode);
+    }
+
+    private function resetStoredMode(BackendThemePaletteSettings $component, $model, $mode)
+    {
 
         if (!$model) {
             return ['success' => true];
@@ -163,6 +183,21 @@ class ThemePaletteController extends Controller
 
         $component->invalidateCache();
         return ['success' => true];
+    }
+
+    private function findStoredSettings(BackendThemePaletteSettings $component, $override)
+    {
+        if ($override === Component::OVERRIDE_USER) {
+            return CmsComponentSettings::findByComponentUser(
+                $component,
+                \Yii::$app->user->identity
+            )->one();
+        }
+        if ($override === Component::OVERRIDE_SITE && $component->cmsSite) {
+            return CmsComponentSettings::findByComponentSite($component, $component->cmsSite)->one();
+        }
+
+        return CmsComponentSettings::findByComponentDefault($component)->one();
     }
 
     private function createSettings($scope)
@@ -217,16 +252,7 @@ class ThemePaletteController extends Controller
 
     private function readStoredPalette(BackendThemePaletteSettings $component, $override)
     {
-        if ($override === Component::OVERRIDE_USER) {
-            $model = CmsComponentSettings::findByComponentUser(
-                $component,
-                \Yii::$app->user->identity
-            )->one();
-        } elseif ($override === Component::OVERRIDE_SITE && $component->cmsSite) {
-            $model = CmsComponentSettings::findByComponentSite($component, $component->cmsSite)->one();
-        } else {
-            $model = CmsComponentSettings::findByComponentDefault($component)->one();
-        }
+        $model = $this->findStoredSettings($component, $override);
 
         if (!$model) {
             return [];
@@ -240,16 +266,7 @@ class ThemePaletteController extends Controller
 
     private function readStoredHeaderModes(BackendThemePaletteSettings $component, $override)
     {
-        if ($override === Component::OVERRIDE_USER) {
-            $model = CmsComponentSettings::findByComponentUser(
-                $component,
-                \Yii::$app->user->identity
-            )->one();
-        } elseif ($override === Component::OVERRIDE_SITE && $component->cmsSite) {
-            $model = CmsComponentSettings::findByComponentSite($component, $component->cmsSite)->one();
-        } else {
-            $model = CmsComponentSettings::findByComponentDefault($component)->one();
-        }
+        $model = $this->findStoredSettings($component, $override);
 
         if (!$model) {
             return [];
