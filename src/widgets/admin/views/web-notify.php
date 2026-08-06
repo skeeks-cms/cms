@@ -96,6 +96,7 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         self.jTrigger.on("click", function(e) {
             e.preventDefault();
             self.updateBrowserPermissionPanel();
+            self.jTrigger.attr("aria-expanded", "true");
             self.jContainer.fadeIn();
             self.loadMessages();
         });
@@ -140,6 +141,7 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         });
         
         self.jBtnClear.on("click", function() {
+            self.jTrigger.attr("aria-expanded", "false");
             self.jContainer.fadeOut();
             self.clearMessages();
         });
@@ -154,6 +156,7 @@ sx.classes.WebNotify = sx.classes.Component.extend({
                 
             
                 if (isClose) {
+                    self.jTrigger.attr("aria-expanded", "false");
                     self.jContainer.fadeOut();
                 }
             
@@ -723,19 +726,19 @@ JS
 ?>
 
 <div class="sx-btn-backend-header sx-notifies-wrapper <?php echo $notReaded ? "sx-has-notifies" : ""; ?>" id="sx-notifies-wrapper">
-    <a class="d-block sx-trigger-notifies" href="#">
+    <a class="sx-trigger-notifies" href="#" aria-label="Уведомления" aria-haspopup="dialog" aria-expanded="false" aria-controls="sx-notifies-panel">
         <span class="sx-badge sx-bage-notifies"><?php echo $notReaded; ?></span>
         <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('bell', [
             'size'  => 20,
             'class' => 'sx-icon-centered',
         ]); ?>
     </a>
-    <div class="sx-notifies">
+    <div class="sx-notifies sx-surface sx-surface--raised sx-surface--clip" id="sx-notifies-panel" role="dialog" aria-label="Уведомления">
         <div class="sx-browser-permission">
             <div class="sx-browser-permission-enable">
                 <div class="sx-browser-permission-title">&#1041;&#1088;&#1072;&#1091;&#1079;&#1077;&#1088;&#1085;&#1099;&#1077; &#1091;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103;</div>
                 <div class="sx-browser-permission-text">&#1056;&#1072;&#1079;&#1088;&#1077;&#1096;&#1080;&#1090;&#1077; &#1091;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103;, &#1095;&#1090;&#1086;&#1073;&#1099; &#1074;&#1080;&#1076;&#1077;&#1090;&#1100; &#1085;&#1086;&#1074;&#1099;&#1077; &#1089;&#1086;&#1073;&#1099;&#1090;&#1080;&#1103; &#1076;&#1072;&#1078;&#1077; &#1074; &#1076;&#1088;&#1091;&#1075;&#1086;&#1081; &#1074;&#1082;&#1083;&#1072;&#1076;&#1082;&#1077;.</div>
-                <button class="btn btn-primary btn-xs sx-btn-browser-permission">&#1042;&#1082;&#1083;&#1102;&#1095;&#1080;&#1090;&#1100;</button>
+                <button class="sx-button sx-button--primary sx-button--sm sx-btn-browser-permission">&#1042;&#1082;&#1083;&#1102;&#1095;&#1080;&#1090;&#1100;</button>
             </div>
             <div class="sx-browser-permission-denied">
                 <div class="sx-browser-permission-title">&#1059;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103; &#1079;&#1072;&#1073;&#1083;&#1086;&#1082;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1099;</div>
@@ -743,15 +746,15 @@ JS
             </div>
         </div>
         <div class="sx-notifies-has-items">
-            <div class="sx-notifies-list">
+            <div class="sx-notifies-list sx-surface__body">
 
             </div>
-            <div class="sx-notifies-btns">
-                <button class="btn btn-primary btn-xs sx-btn-clear">Очистить</button>
+            <div class="sx-notifies-btns sx-surface__footer">
+                <button class="sx-button sx-button--primary sx-button--sm sx-btn-clear">Очистить</button>
             </div>
         </div>
 
-        <div class="sx-empty">Все уведомления прочитаны</div>
+        <div class="sx-empty sx-surface__body">Все уведомления прочитаны</div>
     </div>
 </div>
 

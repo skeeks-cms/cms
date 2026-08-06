@@ -1,0 +1,27 @@
+<?php
+
+function webNotifySurfaceExpect($condition, $message)
+{
+    if (!$condition) {
+        throw new RuntimeException($message);
+    }
+}
+
+$view = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/web-notify.php');
+$css = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/web-notify/web-notify.css');
+$notifyView = strstr($view, '<div id="sx-stale-work-modal"', true);
+
+webNotifySurfaceExpect(
+    strpos($view, 'sx-notifies sx-surface sx-surface--raised sx-surface--clip') !== false,
+    'Web notify popup does not use the canonical raised surface.'
+);
+webNotifySurfaceExpect(strpos($view, 'sx-surface__body') !== false, 'Web notify popup has no canonical surface body.');
+webNotifySurfaceExpect(strpos($view, 'sx-surface__footer') !== false, 'Web notify popup has no canonical surface footer.');
+webNotifySurfaceExpect(strpos($view, 'sx-button sx-button--primary sx-button--sm') !== false, 'Web notify actions do not use semantic backend buttons.');
+webNotifySurfaceExpect(strpos($notifyView, 'btn btn-primary') === false, 'Web notify popup still depends on Bootstrap buttons.');
+webNotifySurfaceExpect(strpos($notifyView, 'class="d-block sx-trigger-notifies"') === false, 'Web notify trigger still depends on a Bootstrap display utility.');
+webNotifySurfaceExpect(strpos($css, '.sx-notifies .sx-notifies-list .sx-item-inner {') !== false, 'Web notify item layout owner is missing.');
+webNotifySurfaceExpect(strpos($css, '.sx-notifies .sx-notifies-list .sx-item .sx-model {') !== false, 'Web notify model typography owner is missing.');
+webNotifySurfaceExpect(strpos($css, 'overflow-wrap: anywhere;') !== false, 'Long notification titles are not protected from overflow.');
+
+echo "CMS web notify surface contract: OK\n";

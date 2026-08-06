@@ -2,12 +2,15 @@
 /**
  * @var yii\web\View $this
  * @var \skeeks\cms\models\CmsTask $model
+ * @var bool|null $showRelations
  */
 
 use skeeks\cms\backend\helpers\BackendIcon;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\BackendModelHeader;
 use yii\helpers\Html;
+
+$showRelations = isset($showRelations) ? (bool)$showRelations : true;
 
 $image = null;
 if ($model->cmsProject && $model->cmsProject->cmsImage) {
@@ -28,7 +31,7 @@ $imageSrc = $image ? (string)Yii::$app->imaging->thumbnailUrlOnRequest(
 ) : null;
 
 $metaItems = [];
-if ($model->cmsProject) {
+if ($showRelations && $model->cmsProject) {
     $metaItems[] = Html::tag('span',
         BackendIcon::render('tasks', ['size' => 13]).' '.BackendEntityLink::widget([
             'controllerId' => '/cms/admin-cms-project',
@@ -37,7 +40,7 @@ if ($model->cmsProject) {
         ])
     );
 }
-if ($model->cmsCompany) {
+if ($showRelations && $model->cmsCompany) {
     $metaItems[] = Html::tag('span',
         BackendIcon::render('building', ['size' => 13]).' '.BackendEntityLink::widget([
             'controllerId' => '/cms/admin-cms-company',
@@ -46,7 +49,7 @@ if ($model->cmsCompany) {
         ])
     );
 }
-if ($model->cmsUser) {
+if ($showRelations && $model->cmsUser) {
     $metaItems[] = Html::tag('span',
         BackendIcon::render('user', ['size' => 13]).' '.BackendEntityLink::widget([
             'controllerId' => '/cms/admin-user',

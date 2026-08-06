@@ -1,38 +1,74 @@
 .sx-notifies .sx-notifies-btns {
     display: flex;
     justify-content: flex-end;
-    margin-top: 1rem;
 }
 
-.sx-notifies .sx-model .sx-action-trigger {
-    border-bottom: 1px solid;
-    cursor: pointer;
+.sx-notifies .sx-notifies-list .sx-item-inner {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: .2rem;
 }
 
 .sx-notifies .sx-notifies-list .sx-item .sx-time {
     color: var(--sx-color-text-muted);
+    font-size: .75rem;
+    line-height: 1.35;
+}
+
+.sx-notifies .sx-notifies-list .sx-item .sx-name {
+    color: var(--sx-color-text-muted);
+    font-size: .8125rem;
+    line-height: 1.4;
+}
+
+.sx-notifies .sx-notifies-list .sx-item .sx-model {
+    min-width: 0;
+    color: var(--sx-color-text);
+    font-size: .9375rem;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.sx-notifies .sx-notifies-list .sx-model .sx-action-trigger {
+    display: block;
+    min-width: 0;
+    color: inherit;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.sx-notifies .sx-notifies-list .sx-model .sx-action-trigger:hover,
+.sx-notifies .sx-notifies-list .sx-model .sx-action-trigger:focus-visible {
+    color: var(--sx-color-accent);
+    text-decoration: underline;
 }
 
 .sx-notifies .sx-notifies-list .sx-item.sx-not-read {
-    margin-left: 1rem;
+    padding-left: 1rem;
 }
 
 .sx-notifies .sx-notifies-list .sx-item.sx-not-read::before {
     position: absolute;
     top: 50%;
-    left: -1rem;
+    left: .1rem;
     color: var(--sx-color-danger);
-    content: "•";
+    content: "\2022";
     transform: translateY(-50%);
 }
 
 .sx-notifies .sx-notifies-list .sx-item {
     position: relative;
-    margin-bottom: 1rem;
+    margin: 0;
+    padding: .75rem 0;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 
 .sx-notifies .sx-notifies-list .sx-item:last-child {
-    margin-bottom: 0;
+    border-bottom: 0;
 }
 
 .sx-notifies {
@@ -42,12 +78,10 @@
     display: none;
     width: min(25rem, calc(100vw - 2rem));
     min-height: 4rem;
-    padding: .5rem;
-    color: var(--sx-color-text);
-    border: 1px solid var(--sx-color-border);
-    border-radius: var(--sx-radius-panel);
-    background: var(--sx-color-surface-raised) !important;
-    box-shadow: var(--sx-panel-shadow);
+}
+
+.sx-notifies-wrapper .sx-trigger-notifies {
+    display: block;
 }
 
 .sx-notifies-wrapper .sx-notifies-has-items,
@@ -97,13 +131,12 @@
 }
 
 .sx-notifies-wrapper .sx-notifies-list {
-    max-height: 70vh;
+    max-height: min(32rem, calc(100dvh - 12rem));
     overflow-y: auto;
 }
 
-.sx-notifies-wrapper .sx-notifies-list,
-.sx-notifies-wrapper .sx-empty {
-    padding: 1rem;
+.sx-notifies-wrapper .sx-notifies-list {
+    padding-block: .25rem;
 }
 
 .sx-notifies-wrapper .sx-bage-notifies {
