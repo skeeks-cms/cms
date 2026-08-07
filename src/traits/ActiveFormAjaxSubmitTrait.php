@@ -11,6 +11,7 @@ namespace skeeks\cms\traits;
 use skeeks\cms\assets\ActiveFormAjaxSubmitAsset;
 use yii\helpers\Html;
 use yii\helpers\Inflector;
+use yii\web\JsExpression;
 
 /**
  *
@@ -35,7 +36,7 @@ JS
 trait ActiveFormAjaxSubmitTrait
 {
     /**
-     * @var null
+     * @var JsExpression|null
      */
     public $clientCallback = null;
 
