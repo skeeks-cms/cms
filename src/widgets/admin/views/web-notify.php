@@ -48,6 +48,7 @@ $jsData = [
     'stale_modal_id' => "sx-stale-work-modal",
     'sound_src' => \skeeks\cms\assets\CmsAsset::getAssetUrl("sound/sound_telegram.mp3"),
     'browser_icon_src' => \skeeks\cms\assets\CmsAsset::getAssetUrl("favicon.ico"),
+    'enable_work_reminders' => (bool)$widget->enableWorkReminders,
     'last_notify_id' => $lastNotify ? $lastNotify->id : ''
 ];
 $js = \yii\helpers\Json::encode($jsData);
@@ -72,27 +73,30 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         self.jBrowserPermissionEnable = $(".sx-browser-permission-enable", self.getJWrapper());
         self.jBrowserPermissionDenied = $(".sx-browser-permission-denied", self.getJWrapper());
         self.jBtnBrowserPermission = $(".sx-btn-browser-permission", self.getJWrapper());
-        self.jIdleModal = $("#" + self.get("idle_modal_id"));
-        if (self.jIdleModal.parent()[0] !== document.body) {
-            self.jIdleModal.appendTo("body");
+
+        if (self.get("enable_work_reminders")) {
+            self.jIdleModal = $("#" + self.get("idle_modal_id"));
+            if (self.jIdleModal.parent()[0] !== document.body) {
+                self.jIdleModal.appendTo("body");
+            }
+            self.jIdleModalBody = $(".sx-idle-work-body", self.jIdleModal);
+            self.jIdleModalBtnYes = $(".sx-idle-work-yes", self.jIdleModal);
+            self.jIdleModalBtnNo = $(".sx-idle-work-no", self.jIdleModal);
+            self.idleWorkData = null;
+            self.isIdleWorkStopped = false;
+            self.jStaleModal = $("#" + self.get("stale_modal_id"));
+            if (self.jStaleModal.parent()[0] !== document.body) {
+                self.jStaleModal.appendTo("body");
+            }
+            self.jStaleModalBody = $(".sx-stale-work-body", self.jStaleModal);
+            self.jStaleModalInput = $(".sx-stale-work-end-time", self.jStaleModal);
+            self.jStaleModalError = $(".sx-stale-work-error", self.jStaleModal);
+            self.jStaleModalBtnSave = $(".sx-stale-work-save", self.jStaleModal);
+            self.jStaleModalBtnLater = $(".sx-stale-work-later", self.jStaleModal);
+            self.staleWorkData = null;
+            self.isStaleWorkStopped = false;
         }
-        self.jIdleModalBody = $(".sx-idle-work-body", self.jIdleModal);
-        self.jIdleModalBtnYes = $(".sx-idle-work-yes", self.jIdleModal);
-        self.jIdleModalBtnNo = $(".sx-idle-work-no", self.jIdleModal);
-        self.idleWorkData = null;
-        self.isIdleWorkStopped = false;
-        self.jStaleModal = $("#" + self.get("stale_modal_id"));
-        if (self.jStaleModal.parent()[0] !== document.body) {
-            self.jStaleModal.appendTo("body");
-        }
-        self.jStaleModalBody = $(".sx-stale-work-body", self.jStaleModal);
-        self.jStaleModalInput = $(".sx-stale-work-end-time", self.jStaleModal);
-        self.jStaleModalError = $(".sx-stale-work-error", self.jStaleModal);
-        self.jStaleModalBtnSave = $(".sx-stale-work-save", self.jStaleModal);
-        self.jStaleModalBtnLater = $(".sx-stale-work-later", self.jStaleModal);
-        self.staleWorkData = null;
-        self.isStaleWorkStopped = false;
-        
+
         self.jTrigger.on("click", function(e) {
             e.preventDefault();
             self.updateBrowserPermissionPanel();
@@ -106,39 +110,41 @@ sx.classes.WebNotify = sx.classes.Component.extend({
             self.requestBrowserPermission();
         });
 
-        self.jIdleModalBtnYes.on("click", function(e) {
-            e.preventDefault();
-            self.stopIdleWork();
-        });
+        if (self.get("enable_work_reminders")) {
+            self.jIdleModalBtnYes.on("click", function(e) {
+                e.preventDefault();
+                self.stopIdleWork();
+            });
 
-        self.jIdleModalBtnNo.on("click", function(e) {
-            e.preventDefault();
-            self.snoozeIdleWorkReminder();
-            self.jIdleModal.modal("hide");
-        });
-
-        self.jIdleModal.on("hidden.bs.modal", function() {
-            if (self.idleWorkData && !self.isIdleWorkStopped) {
+            self.jIdleModalBtnNo.on("click", function(e) {
+                e.preventDefault();
                 self.snoozeIdleWorkReminder();
-            }
-        });
+                self.jIdleModal.modal("hide");
+            });
 
-        self.jStaleModalBtnSave.on("click", function(e) {
-            e.preventDefault();
-            self.stopStaleWork();
-        });
+            self.jIdleModal.on("hidden.bs.modal", function() {
+                if (self.idleWorkData && !self.isIdleWorkStopped) {
+                    self.snoozeIdleWorkReminder();
+                }
+            });
 
-        self.jStaleModalBtnLater.on("click", function(e) {
-            e.preventDefault();
-            self.snoozeStaleWorkReminder();
-            self.jStaleModal.modal("hide");
-        });
+            self.jStaleModalBtnSave.on("click", function(e) {
+                e.preventDefault();
+                self.stopStaleWork();
+            });
 
-        self.jStaleModal.on("hidden.bs.modal", function() {
-            if (self.staleWorkData && !self.isStaleWorkStopped) {
+            self.jStaleModalBtnLater.on("click", function(e) {
+                e.preventDefault();
                 self.snoozeStaleWorkReminder();
-            }
-        });
+                self.jStaleModal.modal("hide");
+            });
+
+            self.jStaleModal.on("hidden.bs.modal", function() {
+                if (self.staleWorkData && !self.isStaleWorkStopped) {
+                    self.snoozeStaleWorkReminder();
+                }
+            });
+        }
         
         self.jBtnClear.on("click", function() {
             self.jTrigger.attr("aria-expanded", "false");
@@ -167,13 +173,16 @@ sx.classes.WebNotify = sx.classes.Component.extend({
             self.checkNewNotifies();
         }, 10000);
 
-        setInterval(function()
-        {
-            self.checkWorkReminders();
-        }, 60000);
-
         self.updateBrowserPermissionPanel();
-        self.checkWorkReminders();
+
+        if (self.get("enable_work_reminders")) {
+            setInterval(function()
+            {
+                self.checkWorkReminders();
+            }, 60000);
+
+            self.checkWorkReminders();
+        }
     },
 
     getCsrfData: function() {
@@ -758,6 +767,7 @@ JS
     </div>
 </div>
 
+<?php if ($widget->enableWorkReminders): ?>
 <div id="sx-stale-work-modal" class="modal fade sx-stale-work-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -798,3 +808,4 @@ JS
         </div>
     </div>
 </div>
+<?php endif; ?>

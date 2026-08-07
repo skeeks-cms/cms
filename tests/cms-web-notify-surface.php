@@ -8,6 +8,7 @@ function webNotifySurfaceExpect($condition, $message)
 }
 
 $view = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/web-notify.php');
+$widget = file_get_contents(dirname(__DIR__).'/src/widgets/admin/CmsWebNotifyWidget.php');
 $css = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/web-notify/web-notify.css');
 $notifyView = strstr($view, '<div id="sx-stale-work-modal"', true);
 
@@ -24,5 +25,10 @@ webNotifySurfaceExpect(strpos($notifyView, 'class="d-block sx-trigger-notifies"'
 webNotifySurfaceExpect(strpos($css, '.sx-notifies .sx-notifies-list .sx-item-inner {') !== false, 'Web notify item layout owner is missing.');
 webNotifySurfaceExpect(strpos($css, '.sx-notifies .sx-notifies-list .sx-item .sx-model {') !== false, 'Web notify model typography owner is missing.');
 webNotifySurfaceExpect(strpos($css, 'overflow-wrap: anywhere;') !== false, 'Long notification titles are not protected from overflow.');
+webNotifySurfaceExpect(strpos($css, 'width: 100%;') !== false, 'Entity links can collapse to the global icon-action width.');
+webNotifySurfaceExpect(strpos($css, 'text-decoration: underline;') === false, 'Notification entity links should use color, not underlining, for interaction feedback.');
+webNotifySurfaceExpect(strpos($widget, 'public $enableWorkReminders = false;') !== false, 'Work reminders are not opt-in for client cabinets.');
+webNotifySurfaceExpect(strpos($view, "'enable_work_reminders' => (bool)\$widget->enableWorkReminders") !== false, 'Work reminder option is not passed to the client component.');
+webNotifySurfaceExpect(strpos($view, '<?php if ($widget->enableWorkReminders): ?>') !== false, 'Admin-only reminder dialogs are always rendered.');
 
 echo "CMS web notify surface contract: OK\n";

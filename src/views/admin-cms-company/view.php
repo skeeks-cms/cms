@@ -1,5 +1,6 @@
 <?php
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use yii\helpers\Html;
 
 /* @var $model \skeeks\cms\models\CmsUser */
@@ -27,6 +28,26 @@ $makeQuickAccessImageUrl = function ($model) {
     }
 
     return null;
+};
+
+$surfaceConfig = static function (string $title, string $tooltip = ''): array {
+    $config = [
+        'title'      => $title,
+        'raised'     => true,
+        'responsive' => true,
+        'options'    => ['class' => 'sx-surface--compact'],
+    ];
+
+    if ($tooltip !== '') {
+        $config['actions'] = Html::tag('i', '', [
+            'class'       => 'far fa-question-circle sx-hint-icon',
+            'data-toggle' => 'tooltip',
+            'data-html'   => 'true',
+            'title'       => $tooltip,
+        ]);
+    }
+
+    return $config;
 };
 
 $quickAccessItemsJson = \yii\helpers\Json::encode([[
@@ -214,71 +235,59 @@ CSS
     <div class="sx-detail-layout">
 
 
-        <div class="sx-detail-layout__aside">
+        <div class="sx-detail-layout__aside sx-surface-stack">
 
             <?php if ($model->description || $model->categories || $model->cms_company_status_id) : ?>
-                <div class="sx-block">
-                    <div class="sx-block-title">Общая информация <i data-toggle="tooltip" data-html="true"
-                                                                    title=""
-                                                                     class="far fa-question-circle sx-hint-icon"></i>
-                    </div>
-
-
-                    <div class="sx-block-content">
+                <?php BackendSurfaceWidget::begin($surfaceConfig('Общая информация')); ?>
                         <div class="sx-phones-block">
                             <?php if ($model->status) : ?>
-                                <div class="sx-value-row d-flex">
-                                    <div class="w-100">
-                                        <div class="sx-label">
+                                <div class="d-flex mb-2">
+                                    <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                        <div class="sx-collection-cell__secondary">
                                             Статус
                                         </div>
-                                        <div class="sx-value">
+                                        <div class="sx-collection-cell__primary">
                                             <?php echo $model->status->name; ?>
                                         </div>
                                     </div>
                                 </div>
                             <?php endif; ?>
                             <?php if ($model->categories) : ?>
-                                <div class="sx-value-row d-flex">
-                                    <div class="w-100">
-                                        <div class="sx-label">
+                                <div class="d-flex mb-2">
+                                    <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                        <div class="sx-collection-cell__secondary">
                                             Сферы деятельности
                                         </div>
-                                        <div class="sx-value">
+                                        <div class="sx-collection-cell__primary">
                                             <?php echo implode("<br>", \yii\helpers\ArrayHelper::map($model->categories, "id", "name")); ?>
                                         </div>
                                     </div>
                                 </div>
                             <?php endif; ?>
                             <?php if ($model->description) : ?>
-                                <div class="sx-value-row d-flex">
-                                    <div class="w-100">
-                                        <div class="sx-label">
+                                <div class="d-flex mb-2">
+                                    <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                        <div class="sx-collection-cell__secondary">
                                             Описание
                                         </div>
-                                        <div class="sx-value">
+                                        <div class="sx-collection-cell__primary">
                                             <?php echo $model->description; ?>
                                         </div>
                                     </div>
                                 </div>
                             <?php endif; ?>
                         </div>
-                    </div>
-                </div>
+                <?php BackendSurfaceWidget::end(); ?>
             <?php endif; ?>
 
-            <div class="sx-block">
-                <div class="sx-block-title">Контакты <i data-toggle="tooltip" data-html="true"
-                                                        title="Сотрудники или люди связанные с компанией. Они являются полноценными пользователями, которые могут авторизоваться на сайте и смотерть данные по этой компании в личном кабинете."
-                                                        class="far fa-question-circle sx-hint-icon"></i>
-                </div>
-
-
-                <div class="sx-block-content">
+            <?php BackendSurfaceWidget::begin($surfaceConfig(
+                'Контакты',
+                'Сотрудники или люди связанные с компанией. Они являются полноценными пользователями, которые могут авторизоваться на сайте и смотерть данные по этой компании в личном кабинете.'
+            )); ?>
                     <div class="sx-users-block sx-phones-block">
                         <? if ($model->cmsCompany2users) : ?>
                             <? foreach ($model->getCmsCompany2users()->orderBy(['sort' => SORT_ASC])->all() as $cmsCompany2users) : ?>
-                                <div class="sx-value-row d-flex">
+                                <div class="d-flex mb-2">
                                     <div class="w-100">
                                         <div class="my-auto">
                                             <?php echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget([
@@ -298,7 +307,7 @@ CSS
                                             'tag'          => 'div',
                                             'options'      => [
                                                 'title' => 'Редактировать',
-                                                'class' => 'sx-edit-btn btn btn-default',
+                                                'class' => 'sx-icon-action',
                                             ],
                                         ]);
                                         ?>
@@ -436,28 +445,25 @@ JS
                     <?php $widget::end(); ?>
 
 
-                </div>
-            </div>
+            <?php BackendSurfaceWidget::end(); ?>
 
-            <div class="sx-block">
-                <div class="sx-block-title">Телефон <i data-toggle="tooltip" data-html="true"
-                                                       title="У компании может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
-                                                       class="far fa-question-circle sx-hint-icon"></i>
-                </div>
-                <div class="sx-block-content">
+            <?php BackendSurfaceWidget::begin($surfaceConfig(
+                'Телефон',
+                'У компании может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию.'
+            )); ?>
                     <div class="sx-phones-block">
                         <? foreach ($model->phones as $cmsUserPhone) : ?>
                             <?php $phoneUrl = 'tel:'.preg_replace('/[^\d+]/', '', (string) $cmsUserPhone->value); ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                            <div class="d-flex mb-2">
+                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                    <div class="sx-collection-cell__secondary">
                                         <? if ($cmsUserPhone->name) : ?>
                                             <? echo $cmsUserPhone->name; ?>
                                         <? else : ?>
                                             Телефон
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                    <div class="sx-collection-cell__primary">
                                         <?php echo Html::a(Html::encode($cmsUserPhone->value), $phoneUrl, [
                                             'data-pjax' => '0',
                                         ]); ?>
@@ -472,7 +478,7 @@ JS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать телефон',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -513,28 +519,25 @@ JS
 JS
                     ); ?>'>Добавить
                     </button>
-                </div>
-            </div>
+            <?php BackendSurfaceWidget::end(); ?>
 
 
-            <div class="sx-block">
-                <div class="sx-block-title">Email <i data-toggle="tooltip" data-html="true"
-                                                     title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
-                                                     class="far fa-question-circle sx-hint-icon"></i>
-                </div>
-                <div class="sx-block-content">
+            <?php BackendSurfaceWidget::begin($surfaceConfig(
+                'Email',
+                'У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию.'
+            )); ?>
                     <div class="sx-phones-block">
                         <? foreach ($model->emails as $cmsUserEmail) : ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                            <div class="d-flex mb-2">
+                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                    <div class="sx-collection-cell__secondary">
                                         <? if ($cmsUserEmail->name) : ?>
                                             <? echo $cmsUserEmail->name; ?>
                                         <? else : ?>
                                             Email
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                    <div class="sx-collection-cell__primary">
                                         <?php echo Html::a(Html::encode($cmsUserEmail->value), 'mailto:'.(string) $cmsUserEmail->value, [
                                             'data-pjax' => '0',
                                         ]); ?>
@@ -549,7 +552,7 @@ JS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать email',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -584,28 +587,25 @@ JS
 JS
                     ); ?>'>Добавить
                     </button>
-                </div>
-            </div>
+            <?php BackendSurfaceWidget::end(); ?>
 
 
-            <div class="sx-block">
-                <div class="sx-block-title">Адреса <i data-toggle="tooltip" data-html="true"
-                                                      title="У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию."
-                                                      class="far fa-question-circle sx-hint-icon"></i>
-                </div>
-                <div class="sx-block-content">
+            <?php BackendSurfaceWidget::begin($surfaceConfig(
+                'Адреса',
+                'У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию.'
+            )); ?>
                     <div class="sx-phones-block">
                         <? foreach ($model->addresses as $cmsUserAddress) : ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                            <div class="d-flex mb-2">
+                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                    <div class="sx-collection-cell__secondary">
                                         <? if ($cmsUserAddress->name) : ?>
                                             <? echo $cmsUserAddress->name; ?>
                                         <? else : ?>
                                             Адрес
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                    <div class="sx-collection-cell__primary">
                                         <?php echo Html::encode($cmsUserAddress->value); ?>
                                     </div>
                                 </div>
@@ -618,7 +618,7 @@ JS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать адрес',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -648,15 +648,13 @@ JS
 JS
                     ); ?>'>Добавить
                     </button>
-                </div>
-            </div>
+            <?php BackendSurfaceWidget::end(); ?>
 
 
-            <div class="sx-block">
-                <div class="sx-block-title">Реквизиты <i data-toggle="tooltip" data-html="true"
-                                                         title="Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел." class="far fa-question-circle sx-hint-icon"></i></div>
-
-
+            <?php BackendSurfaceWidget::begin($surfaceConfig(
+                'Реквизиты',
+                'Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел.'
+            )); ?>
                 <? foreach ($model->contractors as $cmsContractor) : ?>
                     <?php
                     $contractorContent = Html::tag('span', Html::encode($cmsContractor->asText), [
@@ -668,16 +666,16 @@ JS
                         ]);
                     }
                     ?>
-                    <div class="sx-value-row d-flex">
-                        <div class="w-100">
-                            <div class="sx-label">
+                    <div class="d-flex mb-2">
+                        <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                            <div class="sx-collection-cell__secondary">
                                 <? if ($cmsContractor->contractor_type) : ?>
                                     <? echo $cmsContractor->getTypeAsText(); ?>
                                 <? else : ?>
 
                                 <? endif; ?>
                             </div>
-                            <div class="sx-value">
+                            <div class="sx-collection-cell__primary">
                                 <?php echo BackendEntityLink::widget([
                                     'controllerId' => '/cms/admin-cms-contractor',
                                     'modelId'      => $cmsContractor->id,
@@ -699,7 +697,7 @@ JS
                                 'tag'          => 'div',
                                 'options'      => [
                                     'title' => 'Редактировать юр. лицо',
-                                    'class' => 'sx-edit-btn btn btn-default',
+                                    'class' => 'sx-icon-action',
                                 ],
                             ]);
                             ?>
@@ -717,7 +715,7 @@ JS
                 <? endforeach; ?>
 
 
-                <div class="sx-block-content">
+                <div>
                     <?php $widget = \yii\bootstrap\Modal::begin([
                         'header'       => "Добавление юр. лица",
                         'size'         => \yii\bootstrap\Modal::SIZE_DEFAULT,
@@ -755,48 +753,25 @@ JS
 
                 </div>
 
-                <? /*
-
-            $actionData = \yii\helpers\Json::encode([
-                "isOpenNewWindow" => true,
-                //"size"            => 'small',
-                "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                    "/cms/admin-cms-contractor/create",
-                    'cms_user_id' => $model->id,
-                ])->enableEmptyLayout()->enableNoActions()->url,
-            ]);
-            */ ?><!--
-            
+            <?php BackendSurfaceWidget::end(); ?>
 
 
-            <div class="sx-block-content">
-                <button class="btn btn-default btn-sm" onclick='<? /*= new \yii\web\JsExpression(<<<JS
-           new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
-JS
-            ); */ ?>'>Добавить
-            </button>
-            </div>-->
-            </div>
-
-
-            <div class="sx-block">
-                <div class="sx-block-title">Ссылки <i data-toggle="tooltip" data-html="true"
-                                                      title="Ссылки на социальные сети и сайты компании"
-                                                      class="far fa-question-circle sx-hint-icon"></i>
-                </div>
-                <div class="sx-block-content">
+            <?php BackendSurfaceWidget::begin($surfaceConfig(
+                'Ссылки',
+                'Ссылки на социальные сети и сайты компании'
+            )); ?>
                     <div class="sx-phones-block">
                         <? foreach ($model->links as $cmsLink) : ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                            <div class="d-flex mb-2">
+                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                    <div class="sx-collection-cell__secondary">
                                         <? if ($cmsLink->name) : ?>
                                             <? echo $cmsLink->name; ?>
                                         <? else : ?>
                                             Ссылка
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                    <div class="sx-collection-cell__primary">
                                         <?php echo Html::a(Html::encode($cmsLink->url), $cmsLink->url, [
                                             'target'    => '_blank',
                                             'rel'       => 'noopener noreferrer',
@@ -813,7 +788,7 @@ JS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать ссылку',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -848,15 +823,13 @@ JS
 JS
                     ); ?>'>Добавить
                     </button>
-                </div>
-            </div>
+            <?php BackendSurfaceWidget::end(); ?>
 
             <? if ($model->managers) : ?>
-                <div class="sx-block">
-                    <div class="sx-block-title">Работают с компанией <i data-toggle="tooltip" data-html="true" title="Сотрудники нашей компании, которые работают с этой компанией."
-                                                                        class="far fa-question-circle sx-hint-icon"></i></div>
-
-                    <div class="sx-block-content">
+                <?php BackendSurfaceWidget::begin($surfaceConfig(
+                    'Работают с компанией',
+                    'Сотрудники нашей компании, которые работают с этой компанией.'
+                )); ?>
                         <div class="sx-users-block">
 
                             <? foreach ($model->managers as $manager) : ?>
@@ -872,16 +845,11 @@ JS
                                 ]); */ ?>
                             <? endforeach; ?>
                         </div>
-                    </div>
-                </div>
+                <?php BackendSurfaceWidget::end(); ?>
             <? endif; ?>
-
-            <!--<div class="sx-block-content">
-                <button class="btn btn-default btn-sm">Добавить</button>
-            </div>-->
         </div>
 
-        <div class="sx-detail-layout__main">
+        <div class="sx-detail-layout__main sx-surface-stack">
 
             <?
             $this->registerCss(<<<CSS
@@ -914,17 +882,20 @@ CSS
                 ->all();
             if ($tasks) :
             ?>
-                <div class="sx-expired-tasks">
+                <div class="sx-expired-tasks sx-surface-stack">
                 
                     <? 
                     
                     foreach ($tasks as $task) : ?>
-                        <div class="sx-block">
+                        <?php BackendSurfaceWidget::begin([
+                            'raised'  => true,
+                            'options' => ['class' => 'sx-surface--compact'],
+                        ]); ?>
                             <div class="sx-company-task-row">
                                 <? echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
                                 <? echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task]); ?>
                             </div>
-                        </div>
+                        <?php BackendSurfaceWidget::end(); ?>
                     <? endforeach; ?>
                     
                 </div>
@@ -932,47 +903,38 @@ CSS
 
 
             <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
-                'id' => 'sx-comments',
+                'id'      => 'sx-comments',
+                'options' => ['class' => 'sx-surface-stack'],
             ]); ?>
 
                 <?php $pinnedCompanyCommentsQuery = $model->getCompanyLogs()->comments()->pinned(); ?>
                 <?php if ($pinnedCompanyCommentsQuery->count()) : ?>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="sx-block">
-                                <div class="sx-block-title">Закрепленные комментарии</div>
-                                <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                                    'query'         => $pinnedCompanyCommentsQuery,
-                                    'is_show_model' => false,
-                                    'is_show_pin_controls' => true,
-                                ]); ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <div class="row">
-                    <div class="col-12">
-                        <div class="sx-block">
-                            <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                                'model' => $model,
-                            ]); ?>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-12">
+                    <?php BackendSurfaceWidget::begin($surfaceConfig('Закрепленные комментарии')); ?>
                         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                            'query'         => $model->getCompanyLogs()->logType([
-                                \skeeks\cms\models\CmsLog::LOG_TYPE_PHONE_CALL,
-                                \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT
-                            ]),
-                            'is_show_model' => false,
+                            'query'                => $pinnedCompanyCommentsQuery,
+                            'is_show_model'        => false,
                             'is_show_pin_controls' => true,
                         ]); ?>
-                    </div>
-                </div>
+                    <?php BackendSurfaceWidget::end(); ?>
+                <?php endif; ?>
+
+                <?php BackendSurfaceWidget::begin([
+                    'raised'     => true,
+                    'responsive' => true,
+                ]); ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
+                        'model' => $model,
+                    ]); ?>
+                <?php BackendSurfaceWidget::end(); ?>
+
+                <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                    'query'                => $model->getCompanyLogs()->logType([
+                        \skeeks\cms\models\CmsLog::LOG_TYPE_PHONE_CALL,
+                        \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT,
+                    ]),
+                    'is_show_model'        => false,
+                    'is_show_pin_controls' => true,
+                ]); ?>
 
             <?php $pjax::end(); ?>
 

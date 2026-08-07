@@ -32,19 +32,24 @@
 
 .sx-notifies .sx-notifies-list .sx-model .sx-action-trigger {
     display: block;
+    width: 100%;
+    height: auto;
     min-width: 0;
+    min-height: 0;
+    padding: 0;
     color: inherit;
     border: 0;
     cursor: pointer;
     font: inherit;
     overflow-wrap: anywhere;
+    text-align: left;
     text-decoration: none;
 }
 
 .sx-notifies .sx-notifies-list .sx-model .sx-action-trigger:hover,
 .sx-notifies .sx-notifies-list .sx-model .sx-action-trigger:focus-visible {
     color: var(--sx-color-accent);
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .sx-notifies .sx-notifies-list .sx-item.sx-not-read {

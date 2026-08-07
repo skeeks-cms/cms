@@ -17,6 +17,14 @@ use yii\base\Widget;
 
 class CmsWebNotifyWidget extends Widget
 {
+    /**
+     * Enables admin-only idle and stale work reminders.
+     * Client cabinets normally keep this disabled.
+     *
+     * @var bool
+     */
+    public $enableWorkReminders = false;
+
     public function getUser()
     {
         return \Yii::$app->user->identity;
@@ -26,9 +34,11 @@ class CmsWebNotifyWidget extends Widget
     {
         $error = '';
         
-        $CmsUserSchedule = CmsUserSchedule::find()->user($this->user)->notEnd()->one();
+        $CmsUserSchedule = $this->enableWorkReminders
+            ? CmsUserSchedule::find()->user($this->user)->notEnd()->one()
+            : null;
         
-        if (\Yii::$app->request->post() && \Yii::$app->request->post('action-type')) {
+        if ($this->enableWorkReminders && \Yii::$app->request->post() && \Yii::$app->request->post('action-type')) {
 
             //die;
             try {
