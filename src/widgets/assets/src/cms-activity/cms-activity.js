@@ -12,7 +12,12 @@
     };
 
     var syncEditorTheme = function (editor) {
-        if (!editor || !editor.document || !editor.document.getBody()) {
+        if (!editor || !editor.document) {
+            return;
+        }
+
+        var body = editor.document.getBody();
+        if (!body || !body.$) {
             return;
         }
 
@@ -20,7 +25,6 @@
         var text = readThemeColor("--sx-color-text");
         var muted = readThemeColor("--sx-color-text-muted");
         var accent = readThemeColor("--sx-color-accent");
-        var body = editor.document.getBody();
         var frame = editor.container && editor.container.$
             ? editor.container.$.querySelector("iframe")
             : null;

@@ -35,5 +35,6 @@ activitySurfaceExpect(strpos($itemView, "' sx-surface--raised'") !== false, 'CMS
 activitySurfaceExpect(strpos($itemView, 'sx-button sx-button--secondary sx-button--sm sx-log-pin-toggle') !== false, 'Existing CMS log pin action does not use the standard secondary button.');
 activitySurfaceExpect(strpos($itemView, 'sx-chip sx-chip--compact sx-log-pin-toggle') === false, 'Existing CMS log pin action still uses chip styling.');
 activitySurfaceExpect(strpos($activityJs, 'event.originalEvent.detail > 0') !== false, 'Pointer activation does not release the decorative comment pin focus state.');
+activitySurfaceExpect(strpos($activityJs, 'if (!body || !body.$)') !== false, 'CMS activity theme sync does not guard a destroyed CKEditor body.');
 
 echo "CMS activity surface contract: OK\n";
