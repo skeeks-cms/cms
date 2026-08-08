@@ -105,9 +105,13 @@
             var isActive = !button.hasClass("is-active");
 
             button
-                .toggleClass("is-active", isActive)
+                .toggleClass("is-active active", isActive)
                 .attr("aria-pressed", isActive ? "true" : "false");
             input.val(isActive ? 1 : 0);
+
+            if (event.originalEvent && event.originalEvent.detail > 0) {
+                button.trigger("blur");
+            }
 
             return false;
         });

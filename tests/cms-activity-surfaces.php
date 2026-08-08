@@ -10,6 +10,8 @@ function activitySurfaceExpect($condition, $message)
 $itemView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/_log-list-item.php');
 $listView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/log-list.php');
 $commentView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/comment.php');
+$logListWidget = file_get_contents(dirname(__DIR__).'/src/widgets/admin/CmsLogListWidget.php');
+$activityJs = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/cms-activity/cms-activity.js');
 $activityCss = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/cms-activity/cms-activity.css');
 
 foreach ([$itemView, $listView] as $view) {
@@ -25,5 +27,13 @@ activitySurfaceExpect(strpos($commentView, 'class="row"') === false, 'CMS commen
 activitySurfaceExpect(strpos($listView, 'col-md-12') === false, 'CMS activity list still depends on Bootstrap columns.');
 activitySurfaceExpect(strpos($itemView, 'd-flex') === false, 'CMS activity item still depends on Bootstrap flex utilities.');
 activitySurfaceExpect(strpos($activityCss, '.sx-log-list .sx-log-item__header {') !== false, 'CMS activity header layout owner is missing.');
+activitySurfaceExpect(strpos($commentView, 'sx-button sx-button--secondary sx-button--sm sx-comment-pin-toggle') !== false, 'CMS comment pin action does not use the standard secondary button.');
+activitySurfaceExpect(strpos($commentView, 'sx-chip sx-comment-pin-toggle') === false, 'CMS comment pin action still uses chip styling.');
+activitySurfaceExpect(strpos($activityCss, '.sx-comment-pin-toggle:focus:not(:focus-visible)') !== false, 'CMS comment pin action does not suppress pointer-only focus outline.');
+activitySurfaceExpect(strpos($logListWidget, 'public $is_raised = true;') !== false, 'Standalone CMS activity items are not raised by default.');
+activitySurfaceExpect(strpos($itemView, "' sx-surface--raised'") !== false, 'CMS activity item does not expose the raised surface modifier.');
+activitySurfaceExpect(strpos($itemView, 'sx-button sx-button--secondary sx-button--sm sx-log-pin-toggle') !== false, 'Existing CMS log pin action does not use the standard secondary button.');
+activitySurfaceExpect(strpos($itemView, 'sx-chip sx-chip--compact sx-log-pin-toggle') === false, 'Existing CMS log pin action still uses chip styling.');
+activitySurfaceExpect(strpos($activityJs, 'event.originalEvent.detail > 0') !== false, 'Pointer activation does not release the decorative comment pin focus state.');
 
 echo "CMS activity surface contract: OK\n";

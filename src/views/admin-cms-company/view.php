@@ -43,6 +43,10 @@ $surfaceConfig = static function (string $title, string $tooltip = ''): array {
             'class'       => 'far fa-question-circle sx-hint-icon',
             'data-toggle' => 'tooltip',
             'data-html'   => 'true',
+            'data-container' => 'body',
+            'data-placement' => 'top',
+            'tabindex'    => '0',
+            'aria-label'  => $tooltip,
             'title'       => $tooltip,
         ]);
     }
@@ -914,6 +918,7 @@ CSS
                             'query'                => $pinnedCompanyCommentsQuery,
                             'is_show_model'        => false,
                             'is_show_pin_controls' => true,
+                            'is_raised'             => false,
                         ]); ?>
                     <?php BackendSurfaceWidget::end(); ?>
                 <?php endif; ?>

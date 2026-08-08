@@ -153,7 +153,7 @@ JS
             'value' => 0,
         ]); ?>
         <button type="button"
-                class="sx-chip sx-comment-pin-toggle"
+                class="sx-button sx-button--secondary sx-button--sm sx-comment-pin-toggle"
                 data-input="<?php echo $pinInputId; ?>"
                 aria-pressed="false">
             <i class="fas fa-thumbtack"></i>

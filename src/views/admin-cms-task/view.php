@@ -511,9 +511,10 @@ JS
             <div class="sx-block">
                 <div class="sx-task-related-title">Результат по задаче</div>
                 <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                    'query'         => $taskResultQuery,
-                    'is_show_model' => false,
+                    'query'                => $taskResultQuery,
+                    'is_show_model'        => false,
                     'is_show_pin_controls' => true,
+                    'is_raised'             => false,
                 ]); ?>
             </div>
         </div>

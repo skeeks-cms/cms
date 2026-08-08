@@ -3,9 +3,15 @@
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsLog
  * @var $is_show_pin_controls bool
+ * @var $is_raised bool
  */
 $log = $model;
 $is_show_pin_controls = isset($is_show_pin_controls) ? (bool)$is_show_pin_controls : false;
+$is_raised = isset($is_raised) ? (bool)$is_raised : true;
+$surfaceClass = 'sx-surface sx-surface--padded sx-item sx-log-item';
+if ($is_raised) {
+    $surfaceClass .= ' sx-surface--raised';
+}
 $isTaskLog = $log->model_code == \skeeks\cms\models\CmsTask::class;
 $pinLabel = $isTaskLog ? 'Результат задачи' : 'Закрепить';
 $unpinLabel = $isTaskLog ? 'Убрать из результата' : 'Открепить';
@@ -13,7 +19,7 @@ $togglePinUrl = \yii\helpers\Url::to(['/cms/admin-cms-log/toggle-pin']);
 $shareUrl = \yii\helpers\Url::current(['sx-log-id' => (int)$log->id], true).'#sx-log-'.(int)$log->id;
 $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['model' => $log]);
 ?>
-<div id="sx-log-<?php echo (int)$log->id; ?>" class="sx-surface sx-surface--padded sx-item sx-log-item" data-sx-log-id="<?php echo (int)$log->id; ?>">
+<div id="sx-log-<?php echo (int)$log->id; ?>" class="<?php echo $surfaceClass; ?>" data-sx-log-id="<?php echo (int)$log->id; ?>">
     <header class="sx-log-controls sx-log-item__header">
         <div class="sx-log-meta">
             <div class="sx-log-meta-item"><?php echo \Yii::$app->formatter->asDatetime($log->created_at); ?></div>
@@ -28,7 +34,7 @@ $canUpdateDelete = \Yii::$app->user->can("cms/admin-cms-log/update-delete", ['mo
             </button>
             <?php if ($is_show_pin_controls) : ?>
             <button type="button"
-                    class="sx-chip sx-chip--compact sx-log-pin-toggle <?php echo $log->is_pinned ? 'is-pinned is-active' : ''; ?>"
+                    class="sx-button sx-button--secondary sx-button--sm sx-log-pin-toggle <?php echo $log->is_pinned ? 'is-pinned is-active active' : ''; ?>"
                     data-id="<?php echo (int)$log->id; ?>"
                     data-url="<?php echo $togglePinUrl; ?>"
                     data-value="<?php echo $log->is_pinned ? 0 : 1; ?>"

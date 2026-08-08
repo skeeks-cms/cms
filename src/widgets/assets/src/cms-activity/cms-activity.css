@@ -53,6 +53,10 @@
     margin: 0;
 }
 
+.sx-comment-pin-toggle:focus:not(:focus-visible) {
+    outline: none;
+}
+
 .sx-comment-actions {
     display: flex;
     align-items: center;
