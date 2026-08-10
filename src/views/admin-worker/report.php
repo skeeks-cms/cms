@@ -123,7 +123,7 @@ if ($period) {
 ?>
 
 
-    <div class="sx-block">
+    <div class="sx-surface sx-surface--raised sx-surface--padded">
         <? $form = \yii\bootstrap\ActiveForm::begin([
             'method' => "get",
         ]); ?>
@@ -313,7 +313,7 @@ if ($period) {
 
     ?>
 
-    <div class="sx-block">
+    <div class="sx-surface sx-surface--raised sx-surface--padded">
         <div class="sx-properties-wrapper sx-columns-1">
             <ul class="sx-properties">
                 <li>
@@ -571,7 +571,7 @@ CSS
                         7 => 'вс',
                     ];
                     $weekDayName = \yii\helpers\ArrayHelper::getValue($weekDayNames, (int) (new \DateTime($day, $timeZone))->format("N"));
-                    $dayCardClasses = ['sx-block', 'sx-worker-report-day'];
+                    $dayCardClasses = ['sx-surface', 'sx-surface--raised', 'sx-surface--padded', 'sx-worker-report-day'];
                     if (!$dayFactTime && !$tasksCount) {
                         $dayCardClasses[] = 'sx-worker-report-day-empty';
                     }
@@ -723,7 +723,7 @@ CSS
         </div>
     <?php endif; ?>
 <?php else : ?>
-    <div class="sx-block">
+    <div class="sx-surface sx-surface--raised sx-surface--padded">
         Для построения отчета, укажите период!
     </div>
 <?php endif; ?>

@@ -12,7 +12,7 @@ $data = \yii\helpers\Json::encode([
 ]);
 ?>
 
-    <div class="sx-box g-pa-10 sx-bg-primary">
+    <div class="sx-surface sx-surface--raised sx-surface--padded sx-clear-surface">
         <?= \yii\helpers\Html::a(\Yii::t('skeeks/cms', 'Delete temporary files'), $url, [
             'class'   => 'btn btn-primary',
             'onclick' => 'new sx.classes.Clear('.$data.'); return false;',
@@ -65,7 +65,7 @@ $this->registerJs(<<<JS
                 //new sx.classes.AjaxHandlerNoLoader(ajax);
 
                 new sx.classes.AjaxHandlerBlocker(ajax, {
-                    'wrapper': '.sx-panel .panel-content'
+                    'wrapper': '.sx-clear-surface'
                 });
 
                 /*ajax.onError(function(e, data)

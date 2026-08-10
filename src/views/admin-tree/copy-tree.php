@@ -13,7 +13,7 @@ use yii\helpers\Html;
 $controller = $this->context;
 $action = $controller->action;
 ?>
-<div class="sx-block">
+<div class="sx-surface sx-surface--raised sx-surface--padded">
 <? $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'clientCallback' => new \yii\web\JsExpression(<<<JS
     function (ActiveFormAjaxSubmit) {

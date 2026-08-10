@@ -61,7 +61,7 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
-<div class="col-md-12">
+<div class="sx-surface sx-surface--raised sx-surface--padded sx-tools-tree-surface">
     <?php $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
         "models" => $models,
         "viewNodeContentFile" => '@skeeks/cms/views/admin-tools/_tree-node',
@@ -70,7 +70,7 @@ CSS
         'pjaxOptions' =>
             [
                 'blockPjaxContainer' => false,
-                'blockContainer' => '.sx-panel',
+                'blockContainer' => '.sx-tools-tree-surface',
             ]
     ]); ?>
     <?

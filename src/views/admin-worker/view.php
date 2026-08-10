@@ -121,22 +121,22 @@ CSS
     <div class="sx-detail-layout">
 
 
-        <div class="sx-detail-layout__aside">
+        <div class="sx-detail-layout__aside sx-surface-stack">
 
 
-            <div class="sx-block">
-                <div class="sx-block-title">Сотрудник <i data-toggle="tooltip" data-html="true"
+            <div class="sx-surface sx-surface--raised sx-surface--padded">
+                <div class="sx-surface__title">Сотрудник <i data-toggle="tooltip" data-html="true"
                                                          title="Информация о сотруднике"
                                                          class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                 <div class="sx-phones-block">
                     <?php if ($model->post) : ?>
-                        <div class="sx-value-row d-flex">
-                            <div class="w-100">
-                                <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                     Должность
                                 </div>
-                                <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                     <?= Html::encode($model->post); ?>
                                 </div>
                             </div>
@@ -144,12 +144,12 @@ CSS
                     <?php endif; ?>
 
                     <?php if ($model->work_shedule) : ?>
-                        <div class="sx-value-row d-flex">
-                            <div class="w-100">
-                                <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                     График работы
                                 </div>
-                                <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                     <?php $data = \skeeks\yii2\scheduleInputWidget\ScheduleInputWidget::getWorkingData($model->work_shedule); ?>
                                     <? foreach ($data as $row) : ?>
                                         <div>
@@ -165,12 +165,12 @@ CSS
                         </div>
                     <?php endif; ?>
                     <?php if ($model->departments) : ?>
-                        <div class="sx-value-row d-flex">
-                            <div class="w-100">
-                                <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                     Отделы
                                 </div>
-                                <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                     <? foreach ($model->departments as $department) : ?>
                                         <div>
                                             <?= BackendEntityLink::widget([
@@ -186,12 +186,12 @@ CSS
                         </div>
                     <?php endif; ?>
                     <?php if ($model->subordinates) : ?>
-                        <div class="sx-value-row d-flex">
-                            <div class="w-100">
-                                <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                     Подчиненные
                                 </div>
-                                <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                     <? foreach ($model->subordinates as $subordinate) : ?>
                                         <div><?= BackendEntityLink::widget([
                                             'controllerId' => '/cms/admin-user',
@@ -204,12 +204,12 @@ CSS
                             </div>
                         </div>
                     <?php endif; ?><?php if ($model->leaders) : ?>
-                        <div class="sx-value-row d-flex">
-                            <div class="w-100">
-                                <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                     Руководители
                                 </div>
-                                <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                     <? foreach ($model->leaders as $leader) : ?>
                                         <div><?= BackendEntityLink::widget([
                                             'controllerId' => '/cms/admin-user',
@@ -226,23 +226,23 @@ CSS
                 </div>
             </div>
 
-            <div class="sx-block">
-                <div class="sx-block-title">Телефон <i data-toggle="tooltip" data-html="true"
+            <div class="sx-surface sx-surface--raised sx-surface--padded">
+                <div class="sx-surface__title">Телефон <i data-toggle="tooltip" data-html="true"
                                                        title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."
                                                        class="far fa-question-circle sx-hint-icon"></i>
                 </div>
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserPhones as $cmsUserPhone) : ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                         <? if ($cmsUserPhone->name) : ?>
                                             <? echo $cmsUserPhone->name; ?>
                                         <? else : ?>
                                             Телефон
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                         <?= Html::a(
                                             Html::encode($cmsUserPhone->value),
                                             'tel:' . preg_replace('/[^\d+]/', '', $cmsUserPhone->value)
@@ -264,7 +264,7 @@ CSS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать телефон',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -317,24 +317,24 @@ JS
             </div>
 
 
-            <div class="sx-block">
-                <div class="sx-block-title">Email <i data-toggle="tooltip" data-html="true"
+            <div class="sx-surface sx-surface--raised sx-surface--padded">
+                <div class="sx-surface__title">Email <i data-toggle="tooltip" data-html="true"
                                                      title="У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию."
                                                      class="far fa-question-circle sx-hint-icon"></i>
                 </div>
-                <div class="sx-block-content">
+                <div>
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserEmails as $cmsUserEmail) : ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                         <? if ($cmsUserEmail->name) : ?>
                                             <? echo $cmsUserEmail->name; ?>
                                         <? else : ?>
                                             Email
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                         <?= Html::a(
                                             Html::encode($cmsUserEmail->value),
                                             'mailto:' . $cmsUserEmail->value
@@ -356,7 +356,7 @@ JS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать email',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -400,24 +400,24 @@ JS
             </div>
 
 
-            <div class="sx-block">
-                <div class="sx-block-title">Адреса <i data-toggle="tooltip" data-html="true"
+            <div class="sx-surface sx-surface--raised sx-surface--padded">
+                <div class="sx-surface__title">Адреса <i data-toggle="tooltip" data-html="true"
                                                       title="У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию."
                                                       class="far fa-question-circle sx-hint-icon"></i>
                 </div>
-                <div class="sx-block-content">
+                <div>
                     <div class="sx-phones-block">
                         <? foreach ($model->cmsUserAddresses as $cmsUserAddress) : ?>
-                            <div class="sx-value-row d-flex">
-                                <div class="w-100">
-                                    <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                         <? if ($cmsUserAddress->name) : ?>
                                             <? echo $cmsUserAddress->name; ?>
                                         <? else : ?>
                                             Адрес
                                         <? endif; ?>
                                     </div>
-                                    <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                         <?= Html::encode($cmsUserAddress->value); ?>
                                     </div>
                                 </div>
@@ -430,7 +430,7 @@ JS
                                         'tag'          => 'div',
                                         'options'      => [
                                             'title' => 'Редактировать адрес',
-                                            'class' => 'sx-edit-btn btn btn-default',
+                                            'class' => 'sx-icon-action',
                                         ],
                                     ]);
                                     ?>
@@ -465,10 +465,10 @@ JS
                 </div>
             </div>
 
-            <div class="sx-block">
-                <div class="sx-block-title">Информация <i data-toggle="tooltip" data-html="true"
+            <div class="sx-surface sx-surface--raised sx-surface--padded">
+                <div class="sx-surface__title">Информация <i data-toggle="tooltip" data-html="true"
                                                           title="Общая информация по пользователю, есть возможность создать любое количество полей с данными." class="far fa-question-circle sx-hint-icon"></i></div>
-                <div class="sx-block-content">
+                <div>
                     <?
                     $eav = $model->relatedPropertiesModel;
                     //$eav->initAllProperties();
@@ -478,12 +478,12 @@ JS
                     <? if ($eav->toArray()) : ?>
                         <? foreach ($eav->toArray() as $key => $value) : ?>
                             <? if ($value) : ?>
-                                <div class="sx-value-row d-flex">
-                                    <div class="w-100">
-                                        <div class="sx-label">
+                        <div class="d-flex mb-2">
+                            <div class="sx-collection-cell sx-collection-cell--stack w-100">
+                                <div class="sx-collection-cell__secondary">
                                             <? echo $eav->getAttributeLabel($key); ?>
                                         </div>
-                                        <div class="sx-value">
+                                <div class="sx-collection-cell__primary">
                                             <?php echo $eav->getSmartAttribute($key); ?>
                                         </div>
                                     </div>
@@ -518,7 +518,7 @@ JS
 
         </div>
 
-        <div class="sx-detail-layout__main">
+        <div class="sx-detail-layout__main sx-surface-stack">
             <?
             $isWorkingNow = (bool)$model->isWorkingNow;
             $currentTask = $model->getExecutorTasks()->statusInWork()->one();
@@ -564,7 +564,7 @@ CSS;
             if ($isWorkingNow) :
             ?>
                 <div class="sx-current-worker-task">
-                    <div class="sx-block">
+                    <div class="sx-surface sx-surface--raised sx-surface--padded">
                         <?php if ($currentTask) : ?>
                             <div class="sx-current-worker-state">
                                 <div class="sx-state-title">Сейчас выполняет задачу</div>
@@ -601,7 +601,7 @@ CSS;
 
                 <div class="row">
                     <div class="col-12">
-                        <div class="sx-block">
+                        <div class="sx-surface sx-surface--raised sx-surface--padded">
                             <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
                                 'model' => $model,
                             ]); ?>

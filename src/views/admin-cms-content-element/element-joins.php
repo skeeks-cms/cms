@@ -76,7 +76,7 @@ if ($product_ids = \Yii::$app->request->post("product_ids")) {
     <?php foreach ($contents as $content) : ?>
 
 
-            <div class="sx-block">
+            <div class="sx-surface sx-surface--raised sx-surface--padded">
             <? $form = \yii\widgets\ActiveForm::begin(); ?>
                 <h3><?php echo $content->name; ?></h3>
             <p>Выберите <?php echo $content->name; ?> и нажмите кнопку "Связать"</p>
@@ -149,7 +149,6 @@ if ($model->cms_content_model_id) {
 
     <?php endforeach; ?>
 <?php endif; ?>
-
 
 
 

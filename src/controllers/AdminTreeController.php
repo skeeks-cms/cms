@@ -257,7 +257,7 @@ class AdminTreeController extends BackendModelStandartController
                 "name"           => \Yii::t('skeeks/cms', 'Move'),
                 "icon"           => "fas fa-expand-arrows-alt",
                 "generateAccess" => true,
-                "beforeContent"  => "<div class='sx-block'>Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p></div>",
+                "beforeContent"  => "<div class='sx-surface sx-surface--raised sx-surface--padded'>Механизм перемещения раздела. Укажите новый родительский раздел. <p><b>Внимание!</b> перемещение раздела, повлияет на изменение адресов всех дочерних разделов.</p></div>",
                 "successMessage" => "Раздел успешно перемещен",
 
                 'on initFormModels' => function (Event $e) {

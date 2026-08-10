@@ -20,16 +20,16 @@ $this->registerCss(<<<CSS
     font-size: 12px;
 }
 .sx-not-use {
-    color: gray;
+    color: var(--sx-color-text-muted);
 }
 
 .sx-use {
-    color: green;
+    color: var(--sx-color-success);
     font-weight: bold;
 }
 .sx-card-active {
-    border-color: green;
-    background: #00800012;
+    border-color: var(--sx-color-success);
+    background: var(--sx-color-success-soft);
 }
 
 .sx-item {
@@ -64,7 +64,7 @@ $cmsThemes = \skeeks\cms\models\CmsTheme::find()->cmsSite()->sort()->all();
         <div class="row">
             <?php foreach ($cmsThemes as $cmsTheme) : ?>
                 <div class="col-lg-3 col-md-4 col-sm-6 sx-item-wrapper">
-                    <div class="sx-item sx-block g-pa-15 g-mb-30 sx-bg-secondary <?php echo $cmsTheme->is_active ? "sx-card-active" : ""; ?>"
+                    <div class="sx-item sx-surface sx-surface--raised sx-surface--padded sx-interactive-surface <?php echo $cmsTheme->is_active ? "sx-card-active" : ""; ?>"
                          onclick="location.href='<?php echo \yii\helpers\Url::to(['update', 'code' => $cmsTheme->code]); ?>'; return false;">
 
                         <div class="sx-img-wrapper">

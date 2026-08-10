@@ -179,7 +179,7 @@ class LegalComponent extends Component
                     [
                         'class'   => HtmlBlock::class,
                         'content' => <<<HTML
-<div class="sx-block">
+<div class="sx-surface sx-surface--raised sx-surface--padded">
     <p>Заполнив данные в полях выше, сайт сгенерирует необходимые документы для соблюдейния закона 152-ФЗ и подставит эти данные в эти документы.</p>
     <ul class="list-unstyled sx-col-menu">
         <li><a href="{$url1}" target="_blank" data-pjax="0">Политика конфиденциальности</a></li>

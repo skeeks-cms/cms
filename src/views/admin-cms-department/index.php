@@ -25,11 +25,6 @@ if (!$models) {
         "viewNodeContentFile" => '@skeeks/cms/views/admin-cms-department/_node',
 
         'pjaxClass' => \skeeks\cms\modules\admin\widgets\Pjax::class,
-        /*'pjaxOptions' =>
-            [
-                'blockPjaxContainer' => false,
-                'blockContainer' => '.sx-panel',
-            ]*/
     ]); ?>
     <?
     \yii\jui\Sortable::widget();
