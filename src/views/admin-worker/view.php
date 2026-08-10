@@ -1,5 +1,6 @@
 <?php
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use yii\helpers\Html;
 
 /* @var $model \skeeks\cms\models\CmsUser */
@@ -596,27 +597,25 @@ CSS;
             <? endif; ?>
 
             <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
-                'id' => 'sx-comments',
+                'id'      => 'sx-comments',
+                'options' => ['class' => 'sx-activity-thread'],
             ]); ?>
 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="sx-surface sx-surface--raised sx-surface--padded">
-                            <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                                'model' => $model,
-                            ]); ?>
-                        </div>
-                    </div>
-                </div>
+                <?php BackendSurfaceWidget::begin([
+                    'title'      => 'Добавить комментарий',
+                    'titleTag'   => 'h3',
+                    'raised'     => true,
+                    'responsive' => true,
+                ]); ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
+                        'model' => $model,
+                    ]); ?>
+                <?php BackendSurfaceWidget::end(); ?>
 
-                <div class="row">
-                    <div class="col-12">
-                        <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                            'query'         => $model->getUserLogs()->comments(),
-                            'is_show_model' => false,
-                        ]); ?>
-                    </div>
-                </div>
+                <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                    'query'         => $model->getUserLogs()->comments(),
+                    'is_show_model' => false,
+                ]); ?>
 
             <?php $pjax::end(); ?>
         </div>

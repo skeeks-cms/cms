@@ -13,6 +13,13 @@ $commentView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/comm
 $logListWidget = file_get_contents(dirname(__DIR__).'/src/widgets/admin/CmsLogListWidget.php');
 $activityJs = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/cms-activity/cms-activity.js');
 $activityCss = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/cms-activity/cms-activity.css');
+$activityViews = [
+    file_get_contents(dirname(__DIR__).'/src/views/admin-cms-company/view.php'),
+    file_get_contents(dirname(__DIR__).'/src/views/admin-cms-project/view.php'),
+    file_get_contents(dirname(__DIR__).'/src/views/admin-cms-task/view.php'),
+    file_get_contents(dirname(__DIR__).'/src/views/admin-user/view.php'),
+    file_get_contents(dirname(__DIR__).'/src/views/admin-worker/view.php'),
+];
 
 foreach ([$itemView, $listView] as $view) {
     activitySurfaceExpect(strpos($view, 'sx-block') === false, 'CMS activity view still emits deprecated block markup.');
@@ -36,5 +43,12 @@ activitySurfaceExpect(strpos($itemView, 'sx-button sx-button--secondary sx-butto
 activitySurfaceExpect(strpos($itemView, 'sx-chip sx-chip--compact sx-log-pin-toggle') === false, 'Existing CMS log pin action still uses chip styling.');
 activitySurfaceExpect(strpos($activityJs, 'event.originalEvent.detail > 0') !== false, 'Pointer activation does not release the decorative comment pin focus state.');
 activitySurfaceExpect(strpos($activityJs, 'if (!body || !body.$)') !== false, 'CMS activity theme sync does not guard a destroyed CKEditor body.');
+activitySurfaceExpect(strpos($activityCss, '.sx-activity-thread {') !== false, 'CMS activity has no shared thread layout owner.');
+activitySurfaceExpect(strpos($activityCss, 'gap: 24px;') !== false, 'CMS activity composer and feed are not separated by the standard section gap.');
+foreach ($activityViews as $activityView) {
+    activitySurfaceExpect(strpos($activityView, 'sx-activity-thread') !== false, 'CMS detail activity view does not use the shared thread layout.');
+    activitySurfaceExpect(strpos($activityView, 'Добавить комментарий') !== false, 'CMS detail activity composer has no visible heading.');
+}
+activitySurfaceExpect(strpos($activityViews[4], 'BackendSurfaceWidget::begin') !== false, 'Worker activity composer does not use the shared surface widget.');
 
 echo "CMS activity surface contract: OK\n";

@@ -39,6 +39,12 @@
     border: none !important;
 }
 
+.sx-activity-thread {
+    display: grid;
+    align-content: start;
+    gap: 24px;
+}
+
 .sx-comment-form__layout {
     display: grid;
     gap: 16px;

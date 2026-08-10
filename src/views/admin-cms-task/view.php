@@ -516,7 +516,7 @@ JS
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
     'id'      => 'sx-comments',
-    'options' => ['class' => 'sx-surface-stack'],
+    'options' => ['class' => 'sx-surface-stack sx-activity-thread'],
 ]); ?>
 
 <?php $taskResultQuery = $model->getLogs()->comments()->results(); ?>
@@ -621,6 +621,8 @@ JS
         <?php BackendSurfaceWidget::end(); ?>
 
             <?php BackendSurfaceWidget::begin([
+                'title'      => 'Добавить комментарий',
+                'titleTag'   => 'h3',
                 'raised'     => true,
                 'responsive' => true,
             ]); ?>
