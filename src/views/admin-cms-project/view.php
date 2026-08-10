@@ -128,11 +128,6 @@ JS
 );
 
 $this->registerCss(<<<CSS
-.sx-project-content,
-#sx-comments {
-    display: grid;
-    gap: var(--sx-surface-stack-gap);
-}
 .sx-project-overview {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -180,7 +175,7 @@ CSS
 );
 ?>
 
-<div class="sx-project-content">
+<div class="sx-project-content sx-surface-stack">
     <?php BackendSurfaceWidget::begin([
         'raised'     => true,
         'responsive' => true,
@@ -235,7 +230,8 @@ CSS
     <?php BackendSurfaceWidget::end(); ?>
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
-    'id' => 'sx-comments',
+    'id'      => 'sx-comments',
+    'options' => ['class' => 'sx-surface-stack'],
 ]); ?>
 
     <?php BackendSurfaceWidget::begin([

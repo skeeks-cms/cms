@@ -120,10 +120,6 @@ $this->registerCss(<<<CSS
 .sx-task-report .sx-report-card {
     color: var(--sx-color-text);
 }
-.sx-task-report {
-    display: grid;
-    gap: var(--sx-surface-stack-gap);
-}
 .sx-task-report .sx-report-label {
     display: block;
     color: var(--sx-color-text-muted);
@@ -214,9 +210,7 @@ $this->registerCss(<<<CSS
     overflow: hidden;
 }
 .sx-task-report .sx-report-breakdowns {
-    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sx-surface-stack-gap);
 }
 @media (max-width: 900px) {
     .sx-task-report .sx-report-breakdowns,
@@ -486,7 +480,7 @@ $this->registerJs(<<<JS
 JS);
 ?>
 
-<div class="sx-task-report">
+<div class="sx-task-report sx-surface-stack">
     <div class="sx-report-card sx-surface sx-surface--raised sx-surface--padded">
         <?php $form = \yii\bootstrap\ActiveForm::begin([
             'method' => 'get',
@@ -711,7 +705,7 @@ JS);
     </div>
 
     <?php if (($showData || $showCharts) && ($showExecutorBreakdown || $showStatusBreakdown)) : ?>
-    <div class="sx-report-breakdowns">
+    <div class="sx-report-breakdowns sx-surface-stack">
         <?php if ($showExecutorBreakdown) : ?>
         <div>
             <div class="sx-report-card sx-surface sx-surface--raised sx-surface--padded">

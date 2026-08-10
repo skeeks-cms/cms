@@ -134,17 +134,6 @@ JS
 }
 
 $this->registerCss(<<<CSS
-.sx-task-content,
-#sx-comments {
-    display: grid;
-    gap: var(--sx-surface-stack-gap);
-}
-.sx-task-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-    gap: var(--sx-surface-stack-gap);
-    align-items: stretch;
-}
 .sx-task-layout > * {
     min-width: 0;
 }
@@ -236,9 +225,6 @@ $this->registerCss(<<<CSS
     padding: 0;
 }
 @media (max-width: 900px) {
-    .sx-task-layout {
-        grid-template-columns: 1fr;
-    }
     .sx-task-related-link {
         flex-direction: column;
     }
@@ -318,9 +304,9 @@ JS
 );
 ?>
 
-<div class="sx-task-content">
-<div class="sx-task-layout">
-    <div class="sx-task-layout__main">
+<div class="sx-task-content sx-surface-stack">
+<div class="sx-task-layout sx-detail-layout sx-detail-layout--main-first">
+    <div class="sx-task-layout__main sx-detail-layout__main">
         <?php BackendSurfaceWidget::begin([
             'raised'     => true,
             'responsive' => true,
@@ -389,7 +375,7 @@ JS
             </div>
         <?php BackendSurfaceWidget::end(); ?>
     </div>
-    <div class="sx-task-layout__aside">
+    <div class="sx-task-layout__aside sx-detail-layout__aside">
         <?php BackendSurfaceWidget::begin([
             'raised'      => true,
             'options'     => ['class' => 'sx-task-side'],
