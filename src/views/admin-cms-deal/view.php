@@ -4,15 +4,13 @@
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 
-use skeeks\cms\backend\assets\BackendPanelAsset;
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use yii\helpers\Html;
 
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
-
-BackendPanelAsset::register($this);
 
 $formatValue = static function ($value, $empty = 'Не указано') {
     $value = trim((string)$value);
@@ -71,9 +69,6 @@ if ($model->end_at) {
 $datePeriod = implode(' — ', $periodParts);
 
 $this->registerCss(<<<CSS
-.sx-deal-card {
-    overflow: hidden;
-}
 .sx-deal-section {
     padding: var(--sx-surface-padding);
     border-bottom: 1px solid var(--sx-color-border);
@@ -215,7 +210,12 @@ CSS
 );
 ?>
 
-<div class="sx-panel sx-deal-card">
+<?php BackendSurfaceWidget::begin([
+    'raised'      => true,
+    'clip'        => true,
+    'bodyFlush'   => true,
+    'options'     => ['class' => 'sx-deal-card'],
+]); ?>
     <section class="sx-deal-section">
         <div class="sx-deal-overview">
             <div class="sx-surface sx-deal-overview-item">
@@ -259,4 +259,4 @@ CSS
             <p class="sx-deal-description"><?= Html::encode($model->description); ?></p>
         </section>
     <?php endif; ?>
-</div>
+<?php BackendSurfaceWidget::end(); ?>

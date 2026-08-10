@@ -6,6 +6,7 @@
 /* @var $model \common\models\User */
 
 use skeeks\cms\helpers\CmsScheduleHelper;
+use skeeks\cms\backend\assets\BackendUiAsset;
 use skeeks\cms\models\CmsTask;
 use skeeks\cms\models\CmsTaskSchedule;
 use skeeks\cms\widgets\admin\CmsTaskStatusWidget;
@@ -16,6 +17,7 @@ use yii\helpers\Html;
 
 $controller = $this->context;
 $action = $controller->action;
+BackendUiAsset::register($this);
 if (!isset($model) || !$model) {
     $model = $action->model;
 }
@@ -243,7 +245,7 @@ $this->registerCss(<<<CSS
     overflow-x: auto;
 }
 .sx-worker-calendar-month-title {
-    color: #333;
+    color: var(--sx-color-text);
     font-size: 22px;
     font-weight: 600;
     grid-column: 1 / -1;
@@ -260,7 +262,7 @@ $this->registerCss(<<<CSS
     opacity: .82;
 }
 .sx-worker-calendar-day-off {
-    background: #f6f7f8;
+    background: var(--sx-color-surface-muted);
 }
 .sx-worker-calendar-date-row {
     align-items: baseline;
@@ -270,32 +272,32 @@ $this->registerCss(<<<CSS
     line-height: 1.25;
 }
 .sx-worker-calendar-date-row b {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     font-weight: normal;
 }
 .sx-worker-calendar-weekday {
-    color: var(--color-gray);
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
 }
 .sx-worker-calendar-plan {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     font-size: 14px;
     line-height: 1.25;
     margin-top: 12px;
 }
 .sx-worker-calendar-plan b {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     font-weight: normal;
 }
 .sx-worker-calendar-plan span {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
 }
 .sx-worker-calendar-day-off .sx-worker-calendar-plan b {
-    color: var(--color-gray);
+    color: var(--sx-color-text-muted);
     font-weight: normal;
 }
 .sx-worker-calendar-tasks-count {
-    color: #333;
+    color: var(--sx-color-text);
     font-size: 14px;
     font-weight: 600;
     line-height: 1.25;
@@ -309,7 +311,7 @@ $this->registerCss(<<<CSS
     display: block;
 }
 .sx-worker-calendar-no-tasks {
-    color: var(--color-gray);
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
     line-height: 1.25;
     margin-top: 8px;
@@ -335,7 +337,7 @@ $this->registerCss(<<<CSS
     margin-bottom: 0;
 }
 .sx-worker-calendar-tasks-table tbody tr {
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--sx-color-border);
     position: relative;
 }
 .sx-worker-calendar-tasks-table tbody tr:last-child {
@@ -353,8 +355,8 @@ $this->registerCss(<<<CSS
 }
 .sx-worker-calendar-tasks-table .sx-task-hidden:after {
     align-items: center;
-    background: white;
-    color: silver;
+    background: var(--sx-color-surface);
+    color: var(--sx-color-text-subtle);
     content: "Недоступна";
     display: flex;
     height: 100%;
@@ -383,7 +385,7 @@ CSS
 </div>
 
 <?php if ($days) : ?>
-    <div class="sx-block sx-worker-calendar-summary">
+    <div class="sx-surface sx-surface--raised sx-surface--padded sx-worker-calendar-summary">
         <div class="sx-properties-wrapper sx-columns-1">
             <ul class="sx-properties">
                 <li>
@@ -428,7 +430,7 @@ CSS
             $tasksOnDay = ArrayHelper::getValue($dayData, 'tasks', []);
             $tasksCount = count($tasksOnDay);
             $tasksModalId = 'sx-worker-calendar-tasks-'.md5($model->id.'-'.$day);
-            $dayCardClasses = ['sx-block', 'sx-worker-calendar-day'];
+            $dayCardClasses = ['sx-surface', 'sx-surface--raised', 'sx-worker-calendar-day'];
             if (!$planTime && !$tasksCount) {
                 $dayCardClasses[] = 'sx-worker-calendar-day-off';
             }
@@ -485,5 +487,5 @@ CSS
         <?php endforeach; ?>
     </div>
 <?php else : ?>
-    <div class="sx-block">Для построения календаря укажите период.</div>
+    <div class="sx-surface sx-surface--raised sx-surface--padded">Для построения календаря укажите период.</div>
 <?php endif; ?>

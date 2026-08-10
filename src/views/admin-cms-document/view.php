@@ -3,6 +3,7 @@
 /* @var $model \skeeks\cms\shop\models\ShopDocument */
 
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopDocument;
 use yii\bootstrap\Modal;
@@ -36,14 +37,14 @@ $entityLink = function ($controllerId, $entity, $title, $subtitle = '', $icon = 
     if (!$entity) {
         $value = $entityTitle !== '' ? Html::encode($entityTitle) : '<span class="sx-document-muted">Не указано</span>';
         $subtitleHtml = $subtitle ? '<div class="sx-document-entity-subtitle">'.$formatValue($subtitle).'</div>' : '';
-        return '<div class="sx-document-entity is-empty"><div class="sx-document-entity-icon"><i class="'.$icon.'"></i></div><div><div class="sx-document-entity-label">'.Html::encode($title).'</div><div class="sx-document-entity-title">'.$value.'</div>'.$subtitleHtml.'</div></div>';
+        return '<div class="sx-surface sx-document-entity is-empty"><div class="sx-document-entity-icon"><i class="'.$icon.'"></i></div><div><div class="sx-document-entity-label">'.Html::encode($title).'</div><div class="sx-document-entity-title">'.$value.'</div>'.$subtitleHtml.'</div></div>';
     }
 
     if ($entityTitle === '') {
         $entityTitle = $entity->asText;
     }
 
-    $content = '<div class="sx-document-entity">'
+    $content = '<div class="sx-surface sx-document-entity">'
         . '<div class="sx-document-entity-icon"><i class="'.$icon.'"></i></div>'
         . '<div class="sx-document-entity-body">'
         . '<div class="sx-document-entity-label">'.Html::encode($title).'</div>'
@@ -101,12 +102,6 @@ $this->registerCss(<<<CSS
 .sx-document-actions .btn i {
     margin-right: 5px;
 }
-.sx-document-card {
-    background: var(--sx-color-surface);
-    border: 1px solid var(--sx-color-border);
-    border-radius: 10px;
-    overflow: hidden;
-}
 .sx-document-section {
     padding: 22px 28px;
     border-bottom: 1px solid var(--sx-color-border);
@@ -144,12 +139,9 @@ $this->registerCss(<<<CSS
     height: 100%;
     min-height: 80px;
     padding: 14px;
-    border: 1px solid var(--sx-color-border);
-    border-radius: 8px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: var(--sx-color-surface);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-document-entity-link:hover,
@@ -375,7 +367,12 @@ JS
 ?>
 
 <div class="sx-document-view">
-    <div class="sx-document-card">
+    <?php BackendSurfaceWidget::begin([
+        'raised'    => true,
+        'clip'      => true,
+        'bodyFlush' => true,
+        'options'   => ['class' => 'sx-document-card'],
+    ]); ?>
         <div class="sx-document-actions">
             <div class="sx-document-actions-main">
                 <button type="button" class="btn btn-default" data-sx-document-share>
@@ -514,7 +511,7 @@ JS
         </div>
         <?php endif; ?>
 
-    </div>
+    <?php BackendSurfaceWidget::end(); ?>
 </div>
 
 <?php Modal::begin([

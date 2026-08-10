@@ -3,6 +3,7 @@
 /* @var $model \skeeks\cms\shop\models\ShopBill */
 
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopDocument;
 use yii\helpers\Html;
@@ -29,14 +30,14 @@ $entityLink = function ($controllerId, $entity, $title, $subtitle = '', $icon = 
     if (!$entity) {
         $value = $entityTitle !== '' ? Html::encode($entityTitle) : '<span class="sx-bill-muted">Не указано</span>';
         $subtitleHtml = $subtitle ? '<div class="sx-bill-entity-subtitle">'.$formatValue($subtitle).'</div>' : '';
-        return '<div class="sx-bill-entity is-empty"><div class="sx-bill-entity-icon"><i class="'.$icon.'"></i></div><div><div class="sx-bill-entity-label">'.Html::encode($title).'</div><div class="sx-bill-entity-title">'.$value.'</div>'.$subtitleHtml.'</div></div>';
+        return '<div class="sx-surface sx-bill-entity is-empty"><div class="sx-bill-entity-icon"><i class="'.$icon.'"></i></div><div><div class="sx-bill-entity-label">'.Html::encode($title).'</div><div class="sx-bill-entity-title">'.$value.'</div>'.$subtitleHtml.'</div></div>';
     }
 
     if ($entityTitle === '') {
         $entityTitle = $entity->asText;
     }
 
-    $content = '<div class="sx-bill-entity">'
+    $content = '<div class="sx-surface sx-bill-entity">'
         . '<div class="sx-bill-entity-icon"><i class="'.$icon.'"></i></div>'
         . '<div class="sx-bill-entity-body">'
         . '<div class="sx-bill-entity-label">'.Html::encode($title).'</div>'
@@ -215,12 +216,6 @@ $this->registerCss(<<<CSS
 .sx-bill-action-form {
     margin: 0;
 }
-.sx-bill-card {
-    background: var(--sx-color-surface);
-    border: 1px solid var(--sx-color-border);
-    border-radius: 10px;
-    overflow: hidden;
-}
 .sx-bill-section {
     padding: 22px 28px;
     border-bottom: 1px solid var(--sx-color-border);
@@ -255,12 +250,9 @@ $this->registerCss(<<<CSS
     width: 100%;
     min-height: 80px;
     padding: 14px;
-    border: 1px solid var(--sx-color-border);
-    border-radius: 8px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: var(--sx-color-surface);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-bill-entity-link:hover,
@@ -380,8 +372,6 @@ $this->registerCss(<<<CSS
 }
 .sx-bill-requisite {
     padding: 12px;
-    border-radius: 8px;
-    background: var(--sx-color-surface-muted);
 }
 .sx-bill-requisite-label {
     color: var(--sx-color-text-subtle);
@@ -459,7 +449,12 @@ JS
 ?>
 
 <div class="sx-bill-view">
-    <div class="sx-bill-card">
+    <?php BackendSurfaceWidget::begin([
+        'raised'    => true,
+        'clip'      => true,
+        'bodyFlush' => true,
+        'options'   => ['class' => 'sx-bill-card'],
+    ]); ?>
         <div class="sx-bill-actions">
             <?php if ($payments || $documents) : ?>
                 <div class="sx-bill-related">
@@ -528,19 +523,19 @@ JS
             <div class="sx-bill-section">
                 <h3 class="sx-bill-section-title">Банковские реквизиты</h3>
                 <div class="sx-bill-requisites">
-                    <div class="sx-bill-requisite">
+                    <div class="sx-surface sx-bill-requisite">
                         <div class="sx-bill-requisite-label">Банк</div>
                         <div class="sx-bill-requisite-value"><?= $formatValue($model->billReceiverBankName); ?></div>
                     </div>
-                    <div class="sx-bill-requisite">
+                    <div class="sx-surface sx-bill-requisite">
                         <div class="sx-bill-requisite-label">БИК</div>
                         <div class="sx-bill-requisite-value"><?= $formatValue($model->billReceiverBankBic); ?></div>
                     </div>
-                    <div class="sx-bill-requisite">
+                    <div class="sx-surface sx-bill-requisite">
                         <div class="sx-bill-requisite-label">Корр. счет</div>
                         <div class="sx-bill-requisite-value"><?= $formatValue($model->billReceiverBankCorrespondentAccount); ?></div>
                     </div>
-                    <div class="sx-bill-requisite">
+                    <div class="sx-surface sx-bill-requisite">
                         <div class="sx-bill-requisite-label">Расчетный счет</div>
                         <div class="sx-bill-requisite-value"><?= $formatValue($model->billReceiverBankCheckingAccount); ?></div>
                     </div>
@@ -634,5 +629,5 @@ JS
                 <?= Html::endForm(); ?>
             </div>
         <?php endif; ?>
-    </div>
+    <?php BackendSurfaceWidget::end(); ?>
 </div>

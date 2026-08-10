@@ -5,6 +5,7 @@
  */
 
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use yii\helpers\Html;
 
 $controller = $this->context;
@@ -20,7 +21,7 @@ $formatValue = static function ($value, $empty = 'Не указано') {
 };
 
 $entityCard = static function ($controllerId, $entity, $label, $title, $subtitle, $icon) {
-    $content = '<div class="sx-contractor-entity">'
+    $content = '<div class="sx-surface sx-contractor-entity">'
         .'<div class="sx-contractor-entity-icon"><i class="'.$icon.'"></i></div>'
         .'<div>'
         .'<div class="sx-contractor-label">'.Html::encode($label).'</div>'
@@ -45,12 +46,6 @@ $entityCard = static function ($controllerId, $entity, $label, $title, $subtitle
 $hasPrintAssets = $model->cmsImage || $model->stamp || $model->directorSignature || $model->signatureAccountant;
 
 $this->registerCss(<<<CSS
-.sx-contractor-card {
-    background: var(--sx-color-surface);
-    border: 1px solid var(--sx-color-border);
-    border-radius: .625rem;
-    overflow: hidden;
-}
 .sx-contractor-section {
     padding: 1.4rem 1.75rem;
     border-bottom: 1px solid var(--sx-color-border);
@@ -75,9 +70,6 @@ $this->registerCss(<<<CSS
 .sx-contractor-bank,
 .sx-contractor-media {
     padding: .9rem;
-    border: 1px solid var(--sx-color-border);
-    border-radius: .5rem;
-    background: var(--sx-color-surface);
     min-width: 0;
 }
 .sx-contractor-label {
@@ -130,12 +122,9 @@ $this->registerCss(<<<CSS
     min-height: 5.25rem;
     height: 100%;
     padding: .9rem;
-    border: 1px solid var(--sx-color-border);
-    border-radius: .5rem;
     display: flex;
     align-items: flex-start;
     gap: .75rem;
-    background: var(--sx-color-surface);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-contractor-entity-link:hover .sx-contractor-entity,
@@ -211,48 +200,53 @@ CSS
 );
 ?>
 
-<div class="sx-contractor-card">
+<?php BackendSurfaceWidget::begin([
+    'raised'    => true,
+    'clip'      => true,
+    'bodyFlush' => true,
+    'options'   => ['class' => 'sx-contractor-card'],
+]); ?>
     <section class="sx-contractor-section">
         <div class="sx-contractor-grid">
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Тип</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->typeAsText); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">ИНН</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->inn); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">КПП</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->kpp); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">ОГРН / ОГРНИП</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->ogrn); ?></div>
             </div>
             <?php if ($model->hasAttribute('registration_date')) : ?>
-                <div class="sx-contractor-info">
+                <div class="sx-surface sx-contractor-info">
                     <div class="sx-contractor-label">Дата государственной регистрации</div>
                     <div class="sx-contractor-value"><?= $formatValue($model->registration_date ? date('d.m.Y', strtotime($model->registration_date)) : null); ?></div>
                 </div>
             <?php endif; ?>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Краткое наименование</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->asShortText); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Полное наименование</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->full_name); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Международное наименование</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->international_name); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">ОКПО</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->okpo); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Назначение</div>
                 <div class="sx-contractor-value">
                     <?= $model->is_our ? 'Наши реквизиты' : 'Реквизиты контрагента'; ?>
@@ -264,21 +258,21 @@ CSS
     <section class="sx-contractor-section">
         <h3 class="sx-contractor-section-title">Адреса и контакты</h3>
         <div class="sx-contractor-grid is-two-columns">
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Юридический адрес</div>
                 <div class="sx-contractor-value"><?= $formatValue($model->address); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Почтовый адрес</div>
                 <div class="sx-contractor-value"><?= $formatValue(trim($model->mailing_postcode.' '.$model->mailing_address)); ?></div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Телефон</div>
                 <div class="sx-contractor-value">
                     <?= $model->phone ? Html::a(Html::encode($model->phone), 'tel:'.$model->phone) : $formatValue(''); ?>
                 </div>
             </div>
-            <div class="sx-contractor-info">
+            <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Email</div>
                 <div class="sx-contractor-value">
                     <?= $model->email ? Html::mailto(Html::encode($model->email), $model->email) : $formatValue(''); ?>
@@ -292,7 +286,7 @@ CSS
             <h3 class="sx-contractor-section-title">Банковские реквизиты</h3>
             <div class="sx-contractor-grid is-two-columns">
                 <?php foreach ($model->banks as $bank) : ?>
-                    <div class="sx-contractor-bank">
+                    <div class="sx-surface sx-contractor-bank">
                         <div class="sx-contractor-bank-title">
                             <div class="sx-contractor-value"><?= Html::encode($bank->bank_name); ?></div>
                             <span class="sx-contractor-bank-state<?= $bank->is_active ? '' : ' is-disabled'; ?>">
@@ -367,7 +361,7 @@ CSS
                     'Подпись бухгалтера' => $model->signatureAccountant,
                 ] as $label => $file) : ?>
                     <?php if ($file) : ?>
-                        <div class="sx-contractor-media">
+                        <div class="sx-surface sx-contractor-media">
                             <div class="sx-contractor-label"><?= Html::encode($label); ?></div>
                             <div class="sx-contractor-media-preview">
                                 <a href="<?= Html::encode($file->src); ?>" target="_blank" data-pjax="0">
@@ -387,4 +381,4 @@ CSS
             <p class="sx-contractor-description"><?= Html::encode($model->description); ?></p>
         </section>
     <?php endif; ?>
-</div>
+<?php BackendSurfaceWidget::end(); ?>

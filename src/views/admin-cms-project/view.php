@@ -4,6 +4,10 @@
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 /* @var $model \skeeks\cms\models\CmsProject */
+
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
@@ -122,50 +126,80 @@ $this->registerJs(<<<JS
 })({$quickAccessItemsJson});
 JS
 );
+
+$this->registerCss(<<<CSS
+.sx-project-content,
+#sx-comments {
+    display: grid;
+    gap: var(--sx-surface-stack-gap);
+}
+.sx-project-overview {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+.sx-project-overview-item {
+    min-width: 0;
+    padding: 14px;
+}
+.sx-project-overview-label {
+    margin-bottom: 4px;
+    color: var(--sx-color-text-subtle);
+    font-size: 12px;
+}
+.sx-project-overview-value {
+    color: var(--sx-color-text);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.sx-project-description {
+    margin: 0 0 16px;
+    color: var(--sx-color-text-muted);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.sx-project-users {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+}
+.sx-project-users-label {
+    margin-top: 16px;
+}
+@media (max-width: 1100px) {
+    .sx-project-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 700px) {
+    .sx-project-overview {
+        grid-template-columns: 1fr;
+    }
+}
+CSS
+);
 ?>
 
-
-    <div class="sx-block">
+<div class="sx-project-content">
+    <?php BackendSurfaceWidget::begin([
+        'raised'     => true,
+        'responsive' => true,
+    ]); ?>
         <?php if ($model->description) : ?>
-            <div style="margin-bottom: 1rem;"><?php echo $model->description; ?></div>
+            <div class="sx-project-description"><?php echo $model->description; ?></div>
         <?php endif; ?>
 
+        <div class="sx-project-overview">
+            <div class="sx-surface sx-project-overview-item">
+                <div class="sx-project-overview-label">Тип проекта</div>
+                <div class="sx-project-overview-value"><?php echo $model->is_private ? 'Закрытый' : 'Открытый'; ?></div>
+            </div>
 
-        <div class="sx-properties-wrapper sx-columns-1">
-            <ul class="sx-properties">
-                <!--<li>
-                <span class="sx-properties--name">
-                    Создан
-                </span>
-                    <span class="sx-properties--value">
-                    <?php /*echo \Yii::$app->formatter->asDate($model->created_at) */ ?>
-                </span>
-                </li>-->
-
-
-                <li>
-                <span class="sx-properties--name">
-                    Тип проекта
-                </span>
-                    <span class="sx-properties--value">
-    
-                    <?php if ($model->is_private) : ?>
-                        Закрытый
-                    <?php else : ?>
-                        Открытый
-                    <?php endif; ?>
-    
-                </span>
-                </li>
-
-                <?php if ($model->cms_company_id) : ?>
-                <li>
-                    <span class="sx-properties--name">
-                        Компания
-                    </span>
-                    <span class="sx-properties--value">
-
-                            <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+            <?php if ($model->cms_company_id) : ?>
+                <div class="sx-surface sx-project-overview-item">
+                    <div class="sx-project-overview-label">Компания</div>
+                    <div class="sx-project-overview-value">
+                        <?php echo BackendEntityLink::widget([
                                 'controllerId' => '/cms/admin-cms-company',
                                 'modelId'      => $model->cmsCompany->id,
                                 'label'        => $model->cmsCompany->name,
@@ -174,81 +208,50 @@ JS
                                     'aria-label' => (string)$model->cmsCompany->name,
                                 ],
                             ]); ?>
-                    </span>
-                </li>
-                <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
-                <?php if ($model->managers) : ?>
-                    <li>
-                <span class="sx-properties--name">
-                    Работают с проектом
-                </span>
-                        <span class="sx-properties--value">
-                    <?php foreach ($model->managers as $manager) : ?>
-                        <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $manager, "isSmall" => true]); ?>
-                    <?php endforeach; ?>
-                </span>
-                    </li>
-                <?php endif; ?>
-
-                <?php if ($model->users) : ?>
-                    <li>
-                <span class="sx-properties--name">
-                    Работают с проектом
-                </span>
-                        <span class="sx-properties--value">
-                    <?php foreach ($model->users as $user) : ?>
-                        <?php echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget(['cmsUser' => $user, "isSmall" => true]); ?>
-                    <?php endforeach; ?>
-                </span>
-                    </li>
-                <?php endif; ?>
-
-
-                <li>
-                <span class="sx-properties--name">
-                    Количество задач
-                </span>
-                    <span class="sx-properties--value">
-    
-                    <?php
-                    $count = $model->getTasks()->count();
-                    if ($count) : ?>
-                        <?php echo \Yii::$app->formatter->asInteger($count); ?>
-                    <?php else : ?>
-                        —
-                    <?php endif; ?>
-    
-                </span>
-                </li>
-            </ul>
+            <div class="sx-surface sx-project-overview-item">
+                <div class="sx-project-overview-label">Количество задач</div>
+                <div class="sx-project-overview-value">
+                    <?php $count = $model->getTasks()->count(); ?>
+                    <?php echo $count ? \Yii::$app->formatter->asInteger($count) : '—'; ?>
+                </div>
+            </div>
         </div>
 
-
-    </div>
+        <?php if ($model->managers || $model->users) : ?>
+            <div class="sx-project-overview-label sx-project-users-label">Работают с проектом</div>
+            <div class="sx-project-users">
+                <?php foreach ($model->managers as $manager) : ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $manager, 'isSmall' => true]); ?>
+                <?php endforeach; ?>
+                <?php foreach ($model->users as $user) : ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget(['cmsUser' => $user, 'isSmall' => true]); ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    <?php BackendSurfaceWidget::end(); ?>
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
     'id' => 'sx-comments',
 ]); ?>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="sx-block">
-                <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                    'model' => $model,
-                ]); ?>
-            </div>
-        </div>
-    </div>
+    <?php BackendSurfaceWidget::begin([
+        'raised'     => true,
+        'responsive' => true,
+    ]); ?>
+        <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
+            'model' => $model,
+        ]); ?>
+    <?php BackendSurfaceWidget::end(); ?>
 
-    <div class="row">
-        <div class="col-12">
-            <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                'query'         => $model->getLogs()->comments(),
-                'is_show_model' => false,
-                'is_show_pin_controls' => true,
-            ]); ?>
-        </div>
-    </div>
+    <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+        'query'                => $model->getLogs()->comments(),
+        'is_show_model'        => false,
+        'is_show_pin_controls' => true,
+    ]); ?>
 
 <?php $pjax::end(); ?>
+</div>

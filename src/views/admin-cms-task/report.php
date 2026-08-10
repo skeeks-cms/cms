@@ -13,6 +13,7 @@ use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\Select;
 use skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget;
 use skeeks\cms\backend\widgets\assets\BackendFormAsset;
+use skeeks\cms\backend\assets\BackendUiAsset;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -20,6 +21,7 @@ use yii\helpers\Url;
 
 $controller = $this->context;
 BackendFormAsset::register($this);
+BackendUiAsset::register($this);
 $params = $controller->getTaskReportParams();
 $report = $controller->buildTaskReport($params);
 $columns = $controller->taskReportColumns();
@@ -117,12 +119,10 @@ $this->registerCss(<<<CSS
 }
 .sx-task-report .sx-report-card {
     color: var(--sx-color-text);
-    background: var(--sx-color-surface);
-    border: 1px solid var(--sx-color-border);
-    border-radius: var(--sx-radius-panel);
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: var(--sx-panel-shadow);
+}
+.sx-task-report {
+    display: grid;
+    gap: var(--sx-surface-stack-gap);
 }
 .sx-task-report .sx-report-label {
     display: block;
@@ -138,10 +138,7 @@ $this->registerCss(<<<CSS
 }
 .sx-task-report .sx-report-summary-item {
     padding: 14px 16px;
-    border: 1px solid var(--sx-color-border);
     border-left: 3px solid var(--sx-color-accent);
-    border-radius: var(--sx-radius-sm);
-    background: var(--sx-color-surface-muted);
 }
 .sx-task-report .sx-report-summary-value {
     color: var(--sx-color-text);
@@ -206,7 +203,6 @@ $this->registerCss(<<<CSS
 }
 .sx-task-report .sx-report-table {
     color: var(--sx-color-text);
-    background: var(--sx-color-surface);
 }
 .sx-task-report .sx-report-table th,
 .sx-task-report .sx-report-table td {
@@ -216,6 +212,17 @@ $this->registerCss(<<<CSS
     height: 320px;
     margin-top: 12px;
     overflow: hidden;
+}
+.sx-task-report .sx-report-breakdowns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sx-surface-stack-gap);
+}
+@media (max-width: 900px) {
+    .sx-task-report .sx-report-breakdowns,
+    .sx-task-report .sx-report-summary {
+        grid-template-columns: 1fr;
+    }
 }
 .sx-task-report .sx-report-chart .highcharts-container,
 .sx-task-report .sx-report-chart svg {
@@ -480,7 +487,7 @@ JS);
 ?>
 
 <div class="sx-task-report">
-    <div class="sx-report-card">
+    <div class="sx-report-card sx-surface sx-surface--raised sx-surface--padded">
         <?php $form = \yii\bootstrap\ActiveForm::begin([
             'method' => 'get',
             'action' => Url::to(['report']),
@@ -686,17 +693,17 @@ JS);
         <?php $form::end(); ?>
     </div>
 
-    <div class="sx-report-card sx-report-summary">
-        <div class="sx-report-summary-item">
+    <div class="sx-report-card sx-report-summary sx-surface sx-surface--raised sx-surface--padded">
+        <div class="sx-report-summary-item sx-surface">
             <div class="sx-report-label">Задач в отчете</div>
             <div class="sx-report-summary-value"><?php echo (int)ArrayHelper::getValue($report, 'summary.tasks'); ?></div>
         </div>
         <?php if ($showTime) : ?>
-        <div class="sx-report-summary-item">
+        <div class="sx-report-summary-item sx-surface">
             <div class="sx-report-label">Отработанное время</div>
             <div class="sx-report-summary-value"><?php echo CmsScheduleHelper::durationAsText((int)ArrayHelper::getValue($report, 'summary.duration')); ?></div>
         </div>
-        <div class="sx-report-summary-item">
+        <div class="sx-report-summary-item sx-surface">
             <div class="sx-report-label">Отработано часов</div>
             <div class="sx-report-summary-value"><?php echo \Yii::$app->formatter->asDecimal((float)ArrayHelper::getValue($report, 'summary.hours'), 1); ?></div>
         </div>
@@ -704,10 +711,10 @@ JS);
     </div>
 
     <?php if (($showData || $showCharts) && ($showExecutorBreakdown || $showStatusBreakdown)) : ?>
-    <div class="row">
+    <div class="sx-report-breakdowns">
         <?php if ($showExecutorBreakdown) : ?>
-        <div class="col-md-6">
-            <div class="sx-report-card">
+        <div>
+            <div class="sx-report-card sx-surface sx-surface--raised sx-surface--padded">
                 <h4>По исполнителям</h4>
                 <?php if ($showData) : ?>
                 <table class="table table-striped table-hover">
@@ -744,8 +751,8 @@ JS);
         </div>
         <?php endif; ?>
         <?php if ($showStatusBreakdown) : ?>
-        <div class="col-md-6">
-            <div class="sx-report-card">
+        <div>
+            <div class="sx-report-card sx-surface sx-surface--raised sx-surface--padded">
                 <h4>По статусам</h4>
                 <?php if ($showData) : ?>
                 <table class="table table-striped table-hover">
@@ -786,7 +793,7 @@ JS);
     <?php endif; ?>
 
     <?php if ($showData) : ?>
-    <div class="sx-report-card">
+    <div class="sx-report-card sx-surface sx-surface--raised sx-surface--padded">
         <?php if ($taskView == 'list') : ?>
             <div class="sx-report-task-list">
                 <?php foreach ((array)ArrayHelper::getValue($report, 'rows') as $row) : ?>

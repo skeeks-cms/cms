@@ -4,6 +4,9 @@
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 /* @var $model \skeeks\cms\models\CmsTask */
+
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
@@ -131,19 +134,31 @@ JS
 }
 
 $this->registerCss(<<<CSS
-.sx-task-description {
+.sx-task-content,
+#sx-comments {
+    display: grid;
+    gap: var(--sx-surface-stack-gap);
+}
+.sx-task-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    gap: var(--sx-surface-stack-gap);
+    align-items: stretch;
+}
+.sx-task-layout > * {
+    min-width: 0;
+}
+.sx-task-main-surface,
+.sx-task-side {
     height: 100%;
+}
+.sx-task-description {
+    min-height: 220px;
     display: flex;
     width: 100%;
-    
     overflow: auto;
-    /*align-items: center;
-    justify-content: center;
-    */
     flex-direction: column;
     padding: 1rem;
-    border: 1px solid var(--sx-color-border);
-    border-radius: var(--border-radius);
 }
 .sx-task-description-empty {
     width: 100%;
@@ -154,33 +169,30 @@ $this->registerCss(<<<CSS
     color: var(--sx-color-text-muted);
 }
 
-.sx-block-task div {
+.sx-task-main-surface .sx-task-description > div {
     margin-bottom: 1rem;
 }
-.sx-block-task div:last-child {
+.sx-task-main-surface .sx-task-description > div:last-child {
     margin-bottom: 0;
 }
 
-
-.sx-block-task .sx-files img {
-    border-radius: var(--border-radius);
+.sx-task-main-surface .sx-files img {
+    border-radius: var(--sx-radius-sm);
     max-width: 10rem;
     border: 1px solid var(--sx-color-border);
 }
 
-.sx-block-task .sx-files .sx-file-item {
+.sx-task-main-surface .sx-files .sx-file-item {
     margin-bottom: 0.25rem;
 }
-.sx-block-task .sx-files .sx-title {
+.sx-task-main-surface .sx-files .sx-title {
     color: var(--sx-color-text-muted);
     font-size: 0.85rem;
     margin-bottom: 0.5rem;
     margin-top: 1rem;
 }
-.sx-block-task .sx-files .sx-files-block {
-    background: var(--sx-color-surface-muted);
+.sx-task-main-surface .sx-files .sx-files-block {
     padding: 1rem;
-    border-radius: var(--border-radius);
 }
 .sx-task-actions {
     display: flex;
@@ -191,11 +203,6 @@ $this->registerCss(<<<CSS
 }
 .sx-task-related-create {
     white-space: nowrap;
-}
-.sx-task-related-title {
-    color: var(--sx-color-text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
 }
 .sx-task-related-table {
     margin-bottom: 0;
@@ -224,6 +231,21 @@ $this->registerCss(<<<CSS
 }
 .sx-task-related-link .btn {
     white-space: nowrap;
+}
+.sx-task-side .sx-properties {
+    padding: 0;
+}
+@media (max-width: 900px) {
+    .sx-task-layout {
+        grid-template-columns: 1fr;
+    }
+    .sx-task-related-link {
+        flex-direction: column;
+    }
+    .sx-task-related-link .select2-container,
+    .sx-task-related-link .btn {
+        width: 100% !important;
+    }
 }
 
 CSS
@@ -296,10 +318,15 @@ JS
 );
 ?>
 
-<div class="row">
-    <div class="col-12 col-sm-8">
-        <div class="sx-block sx-block-task" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-            <div class="sx-task-description" style="">
+<div class="sx-task-content">
+<div class="sx-task-layout">
+    <div class="sx-task-layout__main">
+        <?php BackendSurfaceWidget::begin([
+            'raised'     => true,
+            'responsive' => true,
+            'options'    => ['class' => 'sx-task-main-surface'],
+        ]); ?>
+            <div class="sx-surface sx-task-description">
                 <? if ($model->description) : ?>
                     <?php echo $model->description; ?>
                 <? else : ?>
@@ -322,7 +349,7 @@ JS
                     <div class="sx-files">
                         <?php if ($images) : ?>
                             <div class="sx-title">Приложенные изображения:</div>
-                            <div class="sx-files-block">
+                            <div class="sx-surface sx-files-block">
                                 <? foreach ($images as $key => $file) : ?>
                                     <?
                                     /**
@@ -339,7 +366,7 @@ JS
 
                         <?php if ($files) : ?>
                             <div class="sx-title">Приложенные файлы:</div>
-                            <div class="sx-files-block">
+                            <div class="sx-surface sx-files-block">
                                 <? foreach ($files as $key => $file) : ?>
                                 <div class="sx-file-item">
                                     <a href="<?php echo $file->src; ?>" download="<?php echo $file->original_name; ?>" target="_blank" data-pjax="0"><?php echo $file->original_name; ?></a>
@@ -354,20 +381,21 @@ JS
                 <?php endif; ?>
 
             </div>
-            
             <div class="sx-task-actions">
                 <?php echo $status; ?>
-
                 <a href="<?php echo $createRelatedTaskUrl; ?>" class="btn btn-default sx-task-related-create" data-pjax="0" onclick='new sx.classes.backend.widgets.Action(<?php echo $createRelatedTaskActionData; ?>).go(); return false;'>
                     <i class="fas fa-plus"></i> Связанная задача
                 </a>
             </div>
-
-        </div>
+        <?php BackendSurfaceWidget::end(); ?>
     </div>
-    <div class="col-12 col-sm-4">
-        <div class="sx-properties-wrapper sx-columns-1 sx-block" style="height: 100%;">
-            <ul class="sx-properties" style="padding: 10px;">
+    <div class="sx-task-layout__aside">
+        <?php BackendSurfaceWidget::begin([
+            'raised'      => true,
+            'options'     => ['class' => 'sx-task-side'],
+            'bodyOptions' => ['class' => 'sx-properties-wrapper sx-columns-1'],
+        ]); ?>
+            <ul class="sx-properties">
                 <li>
             <span class="sx-properties--name">
                 Статус 
@@ -496,35 +524,39 @@ JS
                     </span>
                 </li>
             </ul>
-        </div>
+        <?php BackendSurfaceWidget::end(); ?>
     </div>
 </div>
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
-    'id' => 'sx-comments',
+    'id'      => 'sx-comments',
+    'options' => ['class' => 'sx-surface-stack'],
 ]); ?>
 
 <?php $taskResultQuery = $model->getLogs()->comments()->results(); ?>
 <?php if ($taskResultQuery->count()) : ?>
-    <div class="row" style="margin-top: 1rem;">
-        <div class="col-12">
-            <div class="sx-block">
-                <div class="sx-task-related-title">Результат по задаче</div>
+            <?php BackendSurfaceWidget::begin([
+                'title'      => 'Результат по задаче',
+                'titleTag'   => 'h3',
+                'raised'     => true,
+                'responsive' => true,
+            ]); ?>
                 <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
                     'query'                => $taskResultQuery,
                     'is_show_model'        => false,
                     'is_show_pin_controls' => true,
                     'is_raised'             => false,
                 ]); ?>
-            </div>
-        </div>
-    </div>
+            <?php BackendSurfaceWidget::end(); ?>
 <?php endif; ?>
 
-<div class="row" style="margin-top: 1rem;">
-    <div class="col-12">
-        <div class="sx-block sx-task-related">
-            <div class="sx-task-related-title">Связанные задачи</div>
+        <?php BackendSurfaceWidget::begin([
+            'title'      => 'Связанные задачи',
+            'titleTag'   => 'h3',
+            'raised'     => true,
+            'responsive' => true,
+            'options'    => ['class' => 'sx-task-related'],
+        ]); ?>
             <div class="sx-task-related-link">
                 <?php echo \skeeks\cms\widgets\AjaxSelectModel::widget([
                     'name' => 'related_task_id',
@@ -600,29 +632,23 @@ JS
                     </table>
                 </div>
             <?php endif; ?>
-        </div>
-    </div>
-</div>
+        <?php BackendSurfaceWidget::end(); ?>
 
-    <div class="row" style="margin-top: 1rem;">
-        <div class="col-12">
-            <div class="sx-block">
+            <?php BackendSurfaceWidget::begin([
+                'raised'     => true,
+                'responsive' => true,
+            ]); ?>
                 <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
                     'model' => $model,
                     'pinnedLabel' => 'Результат по задаче',
                 ]); ?>
-            </div>
-        </div>
-    </div>
+            <?php BackendSurfaceWidget::end(); ?>
 
-    <div class="row">
-        <div class="col-12">
-            <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                'query'         => $model->getLogs()->comments(),
-                'is_show_model' => false,
-                'is_show_pin_controls' => true,
-            ]); ?>
-        </div>
-    </div>
+        <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+            'query'                => $model->getLogs()->comments(),
+            'is_show_model'        => false,
+            'is_show_pin_controls' => true,
+        ]); ?>
 
 <?php $pjax::end(); ?>
+</div>
