@@ -12,7 +12,6 @@ use common\models\User;
 use skeeks\cms\models\CmsTask;
 use skeeks\cms\models\CmsTaskSchedule;
 use skeeks\cms\models\CmsUserSchedule;
-use skeeks\crm\models\CrmSchedule;
 use yii\base\Exception;
 use yii\base\Widget;
 

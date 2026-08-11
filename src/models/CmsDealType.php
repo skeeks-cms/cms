@@ -112,9 +112,18 @@ class CmsDealType extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getDeals()
+    {
+        return $this->hasMany(CmsDeal::class, ['cms_deal_type_id' => 'id']);
+    }
+
+    /**
+     * @deprecated Use {@see getDeals()}.
+     * @return \yii\db\ActiveQuery
+     */
     public function getCrmDeals()
     {
-        return $this->hasMany(CrmDeal::class, ['cms_deal_type_id' => 'id']);
+        return $this->getDeals();
     }
 
     /**

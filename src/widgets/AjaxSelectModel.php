@@ -12,9 +12,9 @@ use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 
 /*
-    'modelClass' => CrmContractor::class,
+    'modelClass' => CmsContractor::class,
     'searchQuery' => function($word = '') {
-        $query = CrmContractor::find()->typeProject();
+        $query = CmsContractor::find()->typeProject();
         if ($word) {
             $query->search($word);
         }

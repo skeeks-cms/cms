@@ -68,9 +68,18 @@ class CmsContractorMap extends \skeeks\cms\base\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCrmContact()
+    public function getCmsContractor()
     {
         return $this->hasOne(CmsContractor::class, ['id' => 'cms_contractor_id']);
+    }
+
+    /**
+     * @deprecated Use {@see getCmsContractor()}.
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCrmContact()
+    {
+        return $this->getCmsContractor();
     }
 
     /**

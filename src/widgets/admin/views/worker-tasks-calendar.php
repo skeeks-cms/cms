@@ -7,7 +7,7 @@
  */
 /* @var $this yii\web\View */
 /* @var $user \common\models\User */
-/* @var $widget \skeeks\crm\widgets\WorkerTasksCalendarWidget */
+/* @var $widget \skeeks\cms\widgets\admin\CmsWorkerTasksCalendarWidget */
 $widget = $this->context;
 $user = $widget->user;
 $model = $user;
@@ -329,7 +329,7 @@ JS
                                 ],
                             ];
 
-                            if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
+                            if ($task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK) {
                                 $tr['class'] = "sx-task-tr sx-row-in-work sx-task-expired";
                             }
                             ?>
@@ -401,7 +401,7 @@ JS
                                 <? elseif (!$timesToday && $date == \Yii::$app->formatter->asDate(time(), "php:Y-m-d")) : ?>
 
                                     <? if ($workedSeconds > $seconds) : ?>
-                                        <small data-toggle="tooltip" title="Сегодня отработал сверх плана: <br /><br /><?= \skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules($user->crmSchedulesByDate); ?>" data-html="true">
+                                        <small data-toggle="tooltip" title="Сегодня отработал сверх плана: <br /><br /><?= \skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules(\skeeks\cms\models\CmsUserSchedule::find()->user($user)->today()->all()); ?>" data-html="true">
                                             (отработал сверх плана: <?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($workedSeconds - $seconds); ?>)
                                         </small>
                                     <? else: ?>
@@ -414,7 +414,7 @@ JS
 
 
                             <? else : ?>
-                                <a href="<?= \yii\helpers\Url::to(['/crm/crm-user/planschedule', 'pk' => $model->id]); ?>" class="sx-task-calendar__header-link" target="_blank">
+                                <a href="<?= \yii\helpers\Url::to(['/cms/admin-user/update', 'pk' => $model->id]); ?>" class="sx-task-calendar__header-link" target="_blank">
                                     <small>(Не работает)</small>
                                 </a>
                             <? endif; ?>
@@ -521,7 +521,7 @@ JS
                                     ],
                                 ];
 
-                                if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
+                                if ($task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK) {
                                     $tr['class'] = "sx-task-tr sx-row-in-work sx-task-planned";
                                 }
                                 ?>
@@ -575,7 +575,7 @@ JS
                                     ],
                                 ];
 
-                                if ($task->status == \skeeks\crm\models\CrmTask::STATUS_IN_WORK) {
+                                if ($task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK) {
                                     $tr['class'] = "sx-task-tr sx-row-in-work" . ($isCan ? "" : " sx-task-hidden");
                                 }
                                 ?>

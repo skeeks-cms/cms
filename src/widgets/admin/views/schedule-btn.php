@@ -132,7 +132,7 @@ if ($cmsSchedulesByDate) : ?>
 
     <!--<div class="my-auto">
         <a href="#" >
-            Сегодня: <? /*= \skeeks\crm\helpers\CrmScheduleHelper::durationAsTextBySchedules($cmsSchedulesByDate); */ ?>
+            Сегодня: <? /*= \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($cmsSchedulesByDate); */ ?>
         </a>
     </div>-->
 <? endif; ?>

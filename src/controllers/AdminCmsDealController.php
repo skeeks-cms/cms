@@ -405,7 +405,7 @@ JS
             /*"properties" => [
                 'class'        => BackendModelMultiDialogEditAction::class,
                 "name"         => "Свойства сделки",
-                "viewDialog"   => "@skeeks/crm/views/crm-deal/_pact-properties",
+                "viewDialog"   => null,
                 "eachCallback" => [$this, 'eachPactProperty'],
                 "eachAccessCallback" => function ($model) {
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);

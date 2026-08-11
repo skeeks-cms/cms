@@ -2454,18 +2454,18 @@ HTML;
 
 
     /**
-     * @param CrmBill $crmBill
+     * @param ShopBill $bill
      * @return bool
      */
-    public function closeBill(CrmBill $crmBill)
+    public function closeBill(ShopBill $bill)
     {
-        if ($crmBill->paid_at) {
+        if ($bill->paid_at) {
             return false;
         }
 
-        if (!$crmBill->closed_at) {
-            $crmBill->closed_at = time();
-            $crmBill->save();
+        if (!$bill->closed_at) {
+            $bill->closed_at = time();
+            $bill->save();
         }
     }
 

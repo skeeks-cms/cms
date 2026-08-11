@@ -35,6 +35,7 @@ use skeeks\cms\models\queries\CmsCompanyQuery;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\widgets\admin\CmsProjectViewWidget;
+use skeeks\cms\widgets\admin\CmsWorkerViewWidget;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\yii2\dadataClient\models\PartyModel;
@@ -277,19 +278,17 @@ HTML
                             'format' => 'raw',
                             'label'  => 'Сотрудники',
                             'value'  => function (CmsProject $model) {
-
                                 $data = [];
-                                /*if ($model->managers) {
-                                    foreach ($model->managers as $manager)
-                                    {
-                                        $data[] = CmsWorkerViewWidget::widget(['user' => $manager]);
+                                if ($model->managers) {
+                                    foreach ($model->managers as $manager) {
+                                        $data[] = CmsWorkerViewWidget::widget([
+                                            'user'    => $manager,
+                                            'isSmall' => true,
+                                        ]);
                                     }
-                                }*/
+                                }
 
-
-                                $info = implode(", ", ArrayHelper::map($model->managers, "id", "shortDisplayName"));
-
-                                return $info;
+                                return implode('', $data);
                             },
                         ],
                         'users'    => [
@@ -398,6 +397,9 @@ HTML
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
+        $companyInputId = Html::getInputId($model, 'cms_company_id');
+        $clientInputId = Html::getInputId($model, 'cms_user_id');
+
         if ($model->isNewRecord) {
             $model->managers = [\Yii::$app->user->id];
         }
@@ -495,6 +497,10 @@ HTML
                                 }
                                 return $query;
                             },
+                            'pluginEvents' => [
+                                'select2:select' => new JsExpression("function() { $('#{$clientInputId}').val(null).trigger('change'); }"),
+                                'select2:clear'  => new JsExpression("function() { $('#{$clientInputId}').val(null).trigger('change'); }"),
+                            ],
                         ],
                     ],
                     'cms_user_id'    => [
@@ -502,13 +508,26 @@ HTML
                         'widgetClass'  => AjaxSelectModel::class,
                         'widgetConfig' => [
                             'modelClass'  => CmsUser::class,
-                            'searchQuery' => function ($word = '') {
+                            'searchQuery' => function ($word = '') use ($model) {
                                 $query = CmsUser::find()->forManager();
+                                $cmsCompanyId = (int) \Yii::$app->request->get('cms_company_id', $model->cms_company_id);
+                                if ($cmsCompanyId) {
+                                    $query->andWhere([
+                                        CmsUser::tableName().'.id' => CmsCompany2user::find()
+                                            ->select('cms_user_id')
+                                            ->andWhere(['cms_company_id' => $cmsCompanyId]),
+                                    ]);
+                                }
                                 if ($word) {
                                     $query->search($word);
                                 }
                                 return $query;
                             },
+                            'pluginOptions' => [
+                                'ajax' => [
+                                    'data' => new JsExpression("function(params) { return {q: params.term, cms_company_id: $('#{$companyInputId}').val() || ''}; }"),
+                                ],
+                            ],
                         ],
                     ],
 

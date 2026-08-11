@@ -4,6 +4,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\CmsScheduleHelper;
+use skeeks\cms\helpers\CmsScheduleInterface;
 use skeeks\cms\models\queries\CmsTaskScheduleQuery;
 use yii\helpers\ArrayHelper;
 /**
@@ -20,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsUser $cmsUser
  * @property CmsTask $cmsTask
  */
-class CmsTaskSchedule extends ActiveRecord
+class CmsTaskSchedule extends ActiveRecord implements CmsScheduleInterface
 {
     /**
      * {@inheritdoc}

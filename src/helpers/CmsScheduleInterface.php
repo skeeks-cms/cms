@@ -8,11 +8,6 @@
 
 namespace skeeks\cms\helpers;
 
-use skeeks\crm\interfaces\CrmScheduleInterface;
-use skeeks\crm\traits\CrmScheduleTrait;
-use yii\base\Model;
-use yii\helpers\ArrayHelper;
-
 /**
  * Промежуток расписания
  *
@@ -20,7 +15,8 @@ use yii\helpers\ArrayHelper;
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-interface CmsScheduleInterface {
+interface CmsScheduleInterface
+{
 
     /**
      * Длина промежутка в секундах

@@ -8,7 +8,7 @@
 /* @var $this yii\web\View */
 /* @var $user \common\models\User */
 /* @var $error string */
-/* @var $widget \skeeks\crm\widgets\TaskBtnsWidget */
+/* @var $widget \skeeks\cms\widgets\admin\CmsTaskBtnsWidget */
 /* @var $crmTaskSchedule \skeeks\cms\models\CmsTaskSchedule */
 
 $widget = $this->context;

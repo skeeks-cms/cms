@@ -11,8 +11,6 @@ namespace skeeks\cms\widgets\admin;
 use common\models\User;
 use skeeks\cms\backend\assets\BackendAsset;
 use skeeks\cms\models\CmsTask;
-use skeeks\crm\models\CrmProject;
-use skeeks\crm\models\CrmTask;
 use yii\base\Widget;
 
 class CmsTaskViewWidget extends Widget

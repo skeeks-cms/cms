@@ -8,8 +8,6 @@
 
 namespace skeeks\cms\helpers;
 
-use skeeks\crm\interfaces\CrmScheduleInterface;
-use skeeks\crm\traits\CrmScheduleTrait;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -45,7 +43,7 @@ class CmsScheduleHelper
     /**
      * Получение суммы всех промежутков
      *
-     * @param CrmScheduleInterface[] $crmSchedules
+     * @param CmsScheduleInterface[] $crmSchedules
      * @return int
      */
     static public function durationBySchedules($crmSchedules)
@@ -60,7 +58,7 @@ class CmsScheduleHelper
     }
 
     /**
-     * @param CrmScheduleInterface[] $crmSchedules
+     * @param CmsScheduleInterface[] $crmSchedules
      * @return string
      */
     static public function durationAsTextBySchedules($crmSchedules)
@@ -104,7 +102,7 @@ class CmsScheduleHelper
     }
 
     /**
-     * @param CrmScheduleTrait[] $crmSchedules
+     * @param CmsScheduleInterface[] $crmSchedules
      * @return string
      * @throws \yii\base\InvalidConfigException
      */

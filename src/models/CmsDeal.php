@@ -12,7 +12,7 @@ use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopPayment;
 use yii\helpers\ArrayHelper;
 /**
- * This is the model class for table "{{%crm_pact}}".
+ * This is the model class for table "{{%cms_deal}}".
  *
  * @property int           $id
  * @property int           $created_by
@@ -124,7 +124,7 @@ class CmsDeal extends ActiveRecord
 
         if ($emails) {
 
-            \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/crm/mail';
+            \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/mail';
 
             \Yii::$app->mailer->compose('pact/created', [
                 'model' => $this,
@@ -362,7 +362,7 @@ class CmsDeal extends ActiveRecord
      */
     public function getCrmPayment2pacts()
     {
-        return $this->hasMany(CrmPayment2pact::class, ['crm_deal_id' => 'id']);
+        return $this->getCmsDeal2payments();
     }
 
     /**
@@ -370,8 +370,7 @@ class CmsDeal extends ActiveRecord
      */
     public function getCrmPayments()
     {
-        return $this->hasMany(CrmPayment::class, ['id' => 'crm_payment_id'])
-            ->viaTable(CrmPayment2pact::tableName(), ['crm_deal_id' => 'id']);
+        return $this->getPayments();
     }
 
     /**
@@ -390,15 +389,17 @@ class CmsDeal extends ActiveRecord
      * Создать счет для оплаты услуги
      *
      * @param null $period
-     * @return CrmBill
+     * @return ShopBill
      */
     public function createBill($period = null, $amount = null)
     {
-        $bill = new CrmBill();
+        $bill = new ShopBill();
 
         //$bill->description = "Оплата по договору: «" . $this->asText . "»";
 
-        $bill->crmDeals = [$this->id];
+        $bill->deals = [$this->id];
+        $bill->description = "Оплата по договору: «{$this->asText}»";
+        $bill->currency_code = $this->currency_code;
         //$bill->sender_crm_contractor_id = $this->cms_company_id;
 
 
@@ -425,18 +426,10 @@ class CmsDeal extends ActiveRecord
                 $period = 1;
             }
 
-            if ($this->period == CrmService::PERIOD_MONTH) {
-                $bill->extend_pact_to = $this->end_at + (60 * 60 * 24 * 30 * $period);
-            }
-            if ($this->period == CrmService::PERIOD_YEAR) {
-                $bill->extend_pact_to = $this->end_at + (60 * 60 * 24 * 365 * $period);
-            }
-
-            $bill->amount = $this->amount * $period;
+            $bill->amount = $amount === null ? $this->amount * $period : $amount;
 
         } else {
-            $bill->extend_pact_to = null;
-            $bill->amount = $this->amount;
+            $bill->amount = $amount === null ? $this->amount : $amount;
         }
 
 
@@ -467,7 +460,7 @@ class CmsDeal extends ActiveRecord
     }
 
     /**
-     * Gets query for [[CrmPayment2deals]].
+     * Gets query for [[CmsDeal2payments]].
      *
      * @return \yii\db\ActiveQuery
      */

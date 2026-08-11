@@ -6,8 +6,8 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 /* @var $this yii\web\View */
-/* @var $project \skeeks\crm\models\CrmProject */
-/* @var $widget \skeeks\crm\widgets\ProjectViewWidget */
+/* @var $project \skeeks\cms\models\CmsProject */
+/* @var $widget \skeeks\cms\widgets\admin\CmsProjectViewWidget */
 $widget = $this->context;
 $project = $widget->project;
 
@@ -76,7 +76,6 @@ JS
         <?= \yii\helpers\Html::tag($widget->tagName, $project->asText, $titleOptions); ?>
 
         <? if ($widget->isShowOnlyName === false) : ?>
-            <br/>
             <div class="sx-employee sx-preview-card__meta sx-collection-cell__secondary">
                 <?= $project->is_private ? "Закрытый" : "Открытый"; ?>
             </div>

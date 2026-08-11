@@ -4,6 +4,7 @@ namespace skeeks\cms\models;
 
 use common\models\User;
 use skeeks\cms\helpers\CmsScheduleHelper;
+use skeeks\cms\helpers\CmsScheduleInterface;
 use skeeks\cms\models\queries\CmsUserScheduleQuery;
 use yii\helpers\ArrayHelper;
 
@@ -20,8 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property int          $duration Продолжительность промежутка в понятном написании
  * @property string       $durationAsText Продолжительность промежутка в понятном написании
  */
-class CmsUserSchedule extends \skeeks\cms\base\ActiveRecord
-    //implements CrmScheduleInterface
+class CmsUserSchedule extends \skeeks\cms\base\ActiveRecord implements CmsScheduleInterface
 {
 
     /**

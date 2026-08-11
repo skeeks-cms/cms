@@ -45,11 +45,11 @@ use yii\helpers\ArrayHelper;
  * @property CmsTask             $parentCmsTask
  * @property CmsTask[]           $childCmsTasks
  *
- * @property CrmTaskSchedule[]   $schedules
+ * @property CmsTaskSchedule[]   $schedules
  *
- * @property CrmSchedule|null    $notEndSchedule Не закрытый временной промежуток
- * @property CrmSchedule|null    $notEndScheduleByDate Не закрытый временной промежуток за сегодня
- * @property CrmSchedules[]|null $schedulesByDate Рабочие промежутки за сегодняшний день
+ * @property CmsTaskSchedule|null $notEndSchedule Не закрытый временной промежуток
+ * @property CmsTaskSchedule|null $notEndScheduleByDate Не закрытый временной промежуток за сегодня
+ * @property CmsTaskSchedule[]    $schedulesByDate Рабочие промежутки за сегодняшний день
  *
  *
  * @property string              $statusAsText
@@ -825,7 +825,7 @@ class CmsTask extends ActiveRecord
     {
         $currentUser = \Yii::$app->user->identity;
         /**
-         * @var $task \skeeks\crm\models\CrmTask
+         * @var $task self
          */
         $scheduleTotalTime = CmsTaskSchedule::find()->select([
             'SUM(end_at - start_at) as total_timestamp',
