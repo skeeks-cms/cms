@@ -9,23 +9,10 @@
 /* @var $widget \skeeks\cms\widgets\SortSelect */
 /* @var $element string */
 $widget = $this->context;
-\yii\jui\Sortable::widget();
 
-$hidden = $widget->items;
-$visible = [];
 $values = (array) $widget->model->{$widget->attribute};
 
 
-\yii\jui\Sortable::widget();
-
-$js = \yii\helpers\Json::encode($widget->jsOptions);
-$this->registerJs(<<<JS
-(function(sx, $, _)
-{
-    //new sx.classes.DualSelect({$js});
-})(sx, sx.$, sx._);
-JS
-);
 ?>
 <?= \yii\helpers\Html::beginTag('div', $widget->wrapperOptions); ?>
 <div style="display: none;"><?= $element; ?></div>

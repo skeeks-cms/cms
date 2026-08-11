@@ -27,11 +27,15 @@ if (!$models) {
         'pjaxClass' => \skeeks\cms\modules\admin\widgets\Pjax::class,
     ]); ?>
     <?
-    \yii\jui\Sortable::widget();
+    $canResort = \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+    if ($canResort) {
+        \skeeks\cms\backend\widgets\sortable\assets\BackendSortableAdapterAsset::register($this);
+    }
 
     $options = \yii\helpers\Json::encode([
         'id' => $widget->id,
         'pjaxid' => $widget->pjax->id,
+        'canResort' => $canResort,
         'backendNewChild' => \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-cms-department/new-children'])->enableAdmin()->toString(),
         'backendResort' => \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-cms-department/resort'])->enableAdmin()->toString()
     ]);
@@ -58,55 +62,59 @@ if (!$models) {
                         $(this).find(".sx-row-action:first").click();
                     });*/
 
-                    $(".sx-tree ul").find("ul").sortable(
-                    {
-                        cursor: "move",
-                        handle: ".sx-tree-move",
-                        forceHelperSize: true,
-                        forcePlaceholderSize: true,
-                        opacity: 0.5,
-                        placeholder: "ui-state-highlight",
-
-                        out: function( event, ui )
-                        {
-                            var Jul = $(ui.item).closest("ul");
-                            var newSort = [];
-                            Jul.children("li").each(function(i, element)
+                    if (this.get('canResort')) {
+                        this.Sortable = sx.backend.sortable.create(
+                            $(".sx-tree ul").find("ul"),
                             {
-                                newSort.push($(this).data("id"));
-                            });
+                                handle: ".sx-tree-move",
+                                itemSelector: "> li",
+                                forceHelperSize: true,
+                                forcePlaceholderSize: true,
+                                opacity: 0.5,
+                                placeholderClass: "ui-state-highlight",
 
-                            var blocker = sx.block(Jul);
-
-                            var ajax = sx.ajax.preparePostQuery(
-                                self.get('backendResort'),
+                                onUpdate: function(event)
                                 {
-                                    "ids" : newSort,
-                                    "changeId" : $(ui.item).data("id")
+                                    var Jul = event.jContainer;
+                                    var newSort = [];
+                                    Jul.children("li").each(function(i, element)
+                                    {
+                                        newSort.push($(this).data("id"));
+                                    });
+
+                                    var blocker = sx.block(Jul);
+
+                                    var ajax = sx.ajax.preparePostQuery(
+                                        self.get('backendResort'),
+                                        {
+                                            "ids" : newSort,
+                                            "changeId" : event.jItem.data("id")
+                                        }
+                                    );
+
+                                    //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+                                    new sx.classes.AjaxHandlerNotify(ajax, {
+                                        'error': "Изменения не сохранились",
+                                        'success': "Изменения сохранены",
+                                    }); //отключение глобального загрузчика
+
+                                    ajax.onError(function(e, data)
+                                    {
+                                        sx.notify.info("Подождите сейчас страница будет перезагружена");
+                                        _.delay(function()
+                                        {
+                                            window.location.reload();
+                                        }, 2000);
+                                    })
+                                    .onSuccess(function(e, data)
+                                    {
+                                        blocker.unblock();
+                                    })
+                                    .execute();
                                 }
-                            );
-
-                            //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
-                            new sx.classes.AjaxHandlerNotify(ajax, {
-                                'error': "Изменения не сохранились",
-                                'success': "Изменения сохранены",
-                            }); //отключение глобального загрузчика
-
-                            ajax.onError(function(e, data)
-                            {
-                                sx.notify.info("Подождите сейчас страница будет перезагружена");
-                                _.delay(function()
-                                {
-                                    window.location.reload();
-                                }, 2000);
-                            })
-                            .onSuccess(function(e, data)
-                            {
-                                blocker.unblock();
-                            })
-                            .execute();
-                        }
-                    });
+                            }
+                        );
+                    }
 
                     var self = this;
 

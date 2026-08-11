@@ -67,7 +67,7 @@ $model = $user;
         <div class="row">
             <div class="col-sm-12">
                 <?
-                \yii\jui\Sortable::widget();
+                \skeeks\cms\backend\widgets\sortable\assets\BackendSortableAdapterAsset::register($this);
                 ?>
                 <?
                 $json = \yii\helpers\Json::encode([
@@ -84,8 +84,10 @@ $model = $user;
         _onDomReady: function()
         {
             var self = this;
+            this.jWrapper = $("#" + this.get('id'));
+            this.jSavePriorityButton = $(".sx-save-priority-btn", this.jWrapper);
             
-            $(".sx-save-priority-btn").on('click', function() {
+            this.jSavePriorityButton.on('click', function() {
                     
                 if ($(this).is('disabled')) {
                     return false;
@@ -93,7 +95,7 @@ $model = $user;
                 
                 var newSort = [];
                 
-                $(".sx-task-tr").each(function(i, element)
+                $(".sx-task-tr", self.jWrapper).each(function(i, element)
                 {
                     newSort.push($(this).data("id"));
                 });
@@ -136,23 +138,28 @@ $model = $user;
                 .execute();
             });
 
-            $(".sx-calendar-day tbody").sortable({
-                connectWith: ".sx-calendar-day tbody",
+            this.Sortable = sx.backend.sortable.create($(".sx-calendar-day tbody", this.jWrapper), {
+                group: "cms-worker-task-calendar-" + this.get('id'),
                 cursor: "n-resize",
-                dropOnEmpty: false,
                 handle: ".sx-move-btn",
+                itemSelector: "> .sx-task-tr",
                 forceHelperSize: true,
                 forcePlaceholderSize: true,
                 opacity: 0.5,
-                placeholder: "ui-state-highlight",
-                
-                out: function( event, ui )
+                placeholderClass: "ui-state-highlight",
+                providerOptions: {
+                    direction: "vertical",
+                    onMove: function(event) {
+                        if (event.from !== event.to && !$(event.to).children(".sx-task-tr").length) {
+                            return false;
+                        }
+                    }
+                },
+                onUpdate: function()
                 {
-                    $(".sx-save-priority-btn").fadeIn();
+                    self.jSavePriorityButton.fadeIn();
                 }
             });
-            
-            //$( ".sx-calendar-day tbody" ).sortable( "option", "handle", "button" );
         }
     });
     

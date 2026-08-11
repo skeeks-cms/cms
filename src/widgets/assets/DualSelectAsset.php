@@ -9,6 +9,7 @@
 namespace skeeks\cms\widgets\assets;
 
 use skeeks\cms\base\AssetBundle;
+use skeeks\cms\backend\widgets\sortable\assets\BackendSortableAdapterAsset;
 
 /**
  * Class DualSelectAsset
@@ -28,5 +29,6 @@ class DualSelectAsset extends AssetBundle
 
     public $depends = [
         'skeeks\sx\assets\Custom',
+        BackendSortableAdapterAsset::class,
     ];
 }

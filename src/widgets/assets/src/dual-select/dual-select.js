@@ -23,26 +23,16 @@
 
             this.jElement = $(".sx-select-element", this.jWrapper);
 
-            this.jHidden.sortable({
-                //items: "li:not(.ui-state-disabled)"
-                connectWith: "." + this.get('id') + "-conncected",
-                /*dropOnEmpty: false,*/
-                out: function() {
-                    self._update();
+            this.Sortable = sx.backend.sortable.create(
+                this.jHidden.add(this.jVisible),
+                {
+                    itemSelector: "> li",
+                    group: "sx-dual-select-" + this.get('id'),
+                    onUpdate: function() {
+                        self._update();
+                    }
                 }
-            });
-
-            this.jVisible.sortable({
-                /*cancel: ".ui-state-disabled",*/
-                connectWith: "." + this.get('id') + "-conncected",
-                /*dropOnEmpty: false,*/
-                out: function() {
-                    self._update();
-                }
-            });
-
-            this.jVisible.disableSelection();
-            this.jHidden.disableSelection();
+            );
 
             if (this.get('ajaxUrl')) {
                 this._loadItems();

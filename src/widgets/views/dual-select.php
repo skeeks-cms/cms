@@ -9,7 +9,6 @@
 /* @var $widget \skeeks\cms\widgets\DualSelect */
 /* @var $element string */
 $widget = $this->context;
-\yii\jui\Sortable::widget();
 
 $hidden = $widget->items;
 $visible = [];
@@ -25,7 +24,6 @@ foreach ($values as $value)
 }
 
 \skeeks\cms\widgets\assets\DualSelectAsset::register($this);
-\yii\jui\Sortable::widget();
 
 $js = \yii\helpers\Json::encode($widget->jsOptions);
 $this->registerJs(<<<JS

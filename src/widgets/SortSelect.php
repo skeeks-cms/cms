@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\widgets;
 
-use skeeks\cms\widgets\assets\DualSelectAsset;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
