@@ -2,7 +2,7 @@
     position: fixed;
     right: 20px;
     bottom: 20px;
-    z-index: 9999;
+    z-index: calc(var(--sx-backend-window-z-index, 100000) + 10);
     width: min(280px, calc(100vw - 40px));
     color: var(--sx-color-text);
     border: 1px solid var(--sx-color-border);

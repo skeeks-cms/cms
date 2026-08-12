@@ -52,8 +52,21 @@ class TelephonyWidget extends Widget
         ]);
 
         $this->view->registerJs(<<<JS
+(function (currentWindow, currentSx) {
+    var mainWindow = currentWindow;
+    if (currentSx.Window && currentSx.Window.getMainWindow) {
+        mainWindow = currentSx.Window.getMainWindow();
+    }
 
-$('body').append(`
+    if (!mainWindow || !mainWindow.sx || !mainWindow.sx.$) {
+        return;
+    }
+
+    var mainSx = mainWindow.sx;
+    var main$ = mainSx.$;
+
+    if (!mainSx.Telephony) {
+        main$('body').append(`
 <div id="telephony-call-panel" class="telephony-panel" style="display:none;">
 
     <div class="telephony-header">
@@ -104,7 +117,18 @@ $('body').append(`
 
 `);
 
-sx.Telephony = new sx.classes.Telephony({$jsConfig});
+        mainSx.Telephony = new mainSx.classes.Telephony({$jsConfig});
+    }
+
+    // Every action iframe can contain call buttons, but polling and the call
+    // panel belong exclusively to the main backend window.
+    currentSx.$(currentWindow.document)
+        .off('click.sxTelephony', '.sx-telephony-btn')
+        .on('click.sxTelephony', '.sx-telephony-btn', function () {
+            mainSx.Telephony.call(currentSx.$(this).data('value'));
+            return false;
+        });
+})(window, sx);
 JS
         );
 

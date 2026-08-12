@@ -98,6 +98,8 @@ class TelephonyController extends Controller
      */
     public function actionStatus()
     {
+        $this->releaseSessionLock();
+
         if (!$callId = \Yii::$app->request->get("callId")) {
             return ['success' => true, 'hasCall' => false];
         }
@@ -169,6 +171,8 @@ class TelephonyController extends Controller
      */
     public function actionIncoming()
     {
+        $this->releaseSessionLock();
+
         $telephonyUser = $this->_getTelephonyUser();
         if (!$telephonyUser) {
             return ['success' => true, 'hasCall' => false];
@@ -236,6 +240,17 @@ class TelephonyController extends Controller
     /**
      * ===== helpers =====
      */
+
+    /**
+     * Polling is read-only and must not hold the PHP session lock while the
+     * rest of the backend performs unrelated AJAX requests.
+     */
+    protected function releaseSessionLock(): void
+    {
+        if (Yii::$app->has('session') && Yii::$app->session->getIsActive()) {
+            Yii::$app->session->close();
+        }
+    }
 
     /**
      * @return CmsTelephonyUser|null

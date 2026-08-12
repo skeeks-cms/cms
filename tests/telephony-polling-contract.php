@@ -1,0 +1,30 @@
+<?php
+
+$widget = file_get_contents(__DIR__.'/../src/telephony/widgets/TelephonyWidget.php');
+$script = file_get_contents(__DIR__.'/../src/telephony/widgets/assets/src/telephony.js');
+$styles = file_get_contents(__DIR__.'/../src/telephony/widgets/assets/src/telephony.css');
+$controller = file_get_contents(__DIR__.'/../src/controllers/TelephonyController.php');
+
+$checks = [
+    'polling uses recursive timeouts' => strpos($script, 'setTimeout(function ()') !== false,
+    'polling does not use intervals' => strpos($script, 'setInterval(') === false,
+    'only one polling request may run' => strpos($script, 'if (self.isPolling)') !== false,
+    'next poll waits for the request chain' => strpos($script, "self.pollingRequest = self._get(self.get('urls').incoming)") !== false,
+    'polling requests stay asynchronous' => strpos($script, 'async: true') !== false,
+    'polling does not trigger global ajax blockers' => strpos($script, 'global: false') !== false,
+    'incoming polling releases the PHP session lock' => preg_match('/actionIncoming\(\).*?releaseSessionLock\(\)/s', $controller) === 1,
+    'status polling releases the PHP session lock' => preg_match('/actionStatus\(\).*?releaseSessionLock\(\)/s', $controller) === 1,
+    'widget resolves the main backend window' => strpos($widget, 'currentSx.Window.getMainWindow()') !== false,
+    'main window owns the telephony instance' => strpos($widget, 'mainSx.Telephony = new mainSx.classes.Telephony') !== false,
+    'child windows only forward call buttons' => strpos($widget, ".off('click.sxTelephony', '.sx-telephony-btn')") !== false,
+    'call panel sits above backend action windows' => strpos($styles, 'var(--sx-backend-window-z-index, 100000) + 10') !== false,
+];
+
+foreach ($checks as $message => $passed) {
+    if (!$passed) {
+        fwrite(STDERR, "FAILED: {$message}\n");
+        exit(1);
+    }
+}
+
+echo "telephony-polling-contract: OK\n";

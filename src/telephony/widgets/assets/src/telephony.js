@@ -6,6 +6,8 @@
         ignoreCurrentCall: false,
         ignoredCallIds: {},
         pollingTimer: null,
+        pollingRequest: null,
+        isPolling: false,
         pollingInterval: 2000,
 
         _onDomReady: function () {
@@ -14,11 +16,6 @@
             this._cacheUI();
             this._bindUI();
             this._startPolling();
-
-            $("body").on("click", ".sx-telephony-btn", function() {
-                self.call($(this).data("value"));
-                return false;
-            });
         },
 
         /* ================= UI ================= */
@@ -118,19 +115,37 @@
 
         _startPolling: function () {
             var self = this;
-            if (self.pollingTimer) return;
+            if (self.pollingTimer || self.isPolling) return;
 
-            self.pollingTimer = setInterval(function () {
+            self._schedulePoll(0);
+        },
+
+        _schedulePoll: function (delay) {
+            var self = this;
+
+            if (self.pollingTimer) {
+                clearTimeout(self.pollingTimer);
+            }
+
+            self.pollingTimer = setTimeout(function () {
+                self.pollingTimer = null;
                 self._poll();
-            }, self.pollingInterval);
+            }, typeof delay === 'number' ? delay : self.pollingInterval);
         },
 
         _poll: function () {
             var self = this;
 
-            // 1️⃣ ВСЕГДА сначала incoming
-            self._get(self.get('urls').incoming)
-                .done(function (res) {
+            if (self.isPolling) {
+                return;
+            }
+
+            self.isPolling = true;
+
+            // The next cycle starts only after incoming and the optional
+            // status request have both finished.
+            self.pollingRequest = self._get(self.get('urls').incoming)
+                .then(function (res) {
 
                     if (res.success && res.hasCall && res.call) {
                         if (self._isIgnoredCall(res.call.provider_call_id)) {
@@ -148,15 +163,20 @@
 
                     // 2️⃣ Если знаем provider_call_id — обновляем статус
                     if (self.provider_call_id) {
-                        self._pollStatus();
+                        return self._pollStatus();
                     }
+                })
+                .always(function () {
+                    self.pollingRequest = null;
+                    self.isPolling = false;
+                    self._schedulePoll(self.pollingInterval);
                 });
         },
 
         _pollStatus: function () {
             var self = this;
 
-            self._get(self.get('urls').status, {
+            return self._get(self.get('urls').status, {
                 callId: self.provider_call_id
             }).done(function (res) {
 
@@ -257,7 +277,14 @@
         /* ================= AJAX ================= */
 
         _get: function (url, data) {
-            return $.getJSON(url, data || {});
+            return $.ajax({
+                url: url,
+                method: 'GET',
+                dataType: 'json',
+                data: data || {},
+                async: true,
+                global: false
+            });
         },
 
         _post: function (url, data) {
