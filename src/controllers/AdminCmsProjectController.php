@@ -398,7 +398,22 @@ HTML
         $model->load(\Yii::$app->request->get());
 
         $companyInputId = Html::getInputId($model, 'cms_company_id');
-        $clientInputId = Html::getInputId($model, 'cms_user_id');
+        $clientInputId = Html::getInputId($model, 'users');
+
+        // Preserve the legacy single client when the project is first edited via the relation field.
+        if (!$model->isNewRecord && !\Yii::$app->request->isPost && $model->cms_user_id) {
+            $clientIds = array_map('intval', ArrayHelper::getColumn($model->users, 'id'));
+            if (!in_array((int) $model->cms_user_id, $clientIds, true)) {
+                $clientIds[] = (int) $model->cms_user_id;
+                $model->users = $clientIds;
+            }
+        }
+
+        $postedModel = \Yii::$app->request->post($model->formName());
+        if (is_array($postedModel) && array_key_exists('users', $postedModel)) {
+            // New edits are stored only in the many-to-many relation.
+            $model->cms_user_id = null;
+        }
 
         if ($model->isNewRecord) {
             $model->managers = [\Yii::$app->user->id];
@@ -422,24 +437,6 @@ HTML
                 /*'class' => WidgetField::class,
                 'widgetClass' => Ckeditor::class*/
                 'class' => TextareaField::class,
-            ],
-
-            'users' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => AjaxSelectModel::class,
-                'widgetConfig' => [
-                    'modelClass'  => CmsUser::class,
-                    'multiple'    => true,
-                    'searchQuery' => function ($word = '') {
-                        $query = CmsUser::find()->forManager();
-                        if ($word) {
-                            if ($word) {
-                                $query->search($word);
-                            }
-                        }
-                        return $query;
-                    },
-                ],
             ],
 
             'managers' => [
@@ -503,11 +500,12 @@ HTML
                             ],
                         ],
                     ],
-                    'cms_user_id'    => [
+                    'users' => [
                         'class'        => WidgetField::class,
                         'widgetClass'  => AjaxSelectModel::class,
                         'widgetConfig' => [
                             'modelClass'  => CmsUser::class,
+                            'multiple'    => true,
                             'searchQuery' => function ($word = '') use ($model) {
                                 $query = CmsUser::find()->forManager();
                                 $cmsCompanyId = (int) \Yii::$app->request->get('cms_company_id', $model->cms_company_id);

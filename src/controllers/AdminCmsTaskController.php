@@ -12,8 +12,10 @@ use kartik\datecontrol\DateControl;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
+use skeeks\cms\backend\actions\BackendModelMultiWindowAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\forms\CmsTaskBulkEditForm;
 use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsLog;
@@ -44,6 +46,7 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Response;
 
 /**
@@ -564,6 +567,78 @@ JS
                 },
             ],
 
+            'change-relation-multi' => [
+                'class' => BackendModelMultiWindowAction::class,
+                'name' => 'Редактирование',
+                'icon' => 'fas fa-edit',
+                'priority' => 100,
+                'size' => 'medium',
+                'buttons' => ['save'],
+                'formModel' => function () {
+                    $form = new CmsTaskBulkEditForm();
+                    $projectId = (int)\Yii::$app->request->get('cms_project_id');
+                    $companyId = (int)\Yii::$app->request->get('cms_company_id');
+                    $clientId = (int)\Yii::$app->request->get('cms_user_id');
+
+                    if ($projectId) {
+                        $project = CmsProject::find()->forManager()->andWhere(['id' => $projectId])->one();
+                        if ($project) {
+                            $form->cms_project_id = (int)$project->id;
+                            if ($project->cms_company_id) {
+                                $form->cms_company_id = (int)$project->cms_company_id;
+                            }
+                        }
+                    } elseif ($companyId && CmsCompany::find()->forManager()->andWhere(['id' => $companyId])->exists()) {
+                        $form->cms_company_id = $companyId;
+                    } elseif ($clientId && CmsUser::find()->forManager()->andWhere(['id' => $clientId])->exists()) {
+                        $form->cms_user_id = $clientId;
+                    }
+                    return $form;
+                },
+                'fields' => [$this, 'bulkEditFields'],
+                'modelsQueryCallback' => function (ActiveQuery $query) {
+                    self::initQuery($query);
+                    return $query;
+                },
+                'eachAccessCallback' => function (CmsTask $model) {
+                    return \Yii::$app->user->can('cms/admin-task/manage', ['model' => $model]);
+                },
+                'applyCallback' => function (CmsTask $model, CmsTaskBulkEditForm $form) {
+                    if ($form->executor_id !== null && $form->executor_id !== '') {
+                        $model->executor_id = (int)$form->executor_id;
+                    }
+                    if ($form->plan_duration !== null && $form->plan_duration !== '') {
+                        $model->plan_duration = (int)$form->plan_duration;
+                    }
+                    if ($form->fact_duration !== null && $form->fact_duration !== '') {
+                        $model->fact_duration = (int)$form->fact_duration;
+                    }
+
+                    if ($form->hasRelationChange()) {
+                        if ($form->cms_company_id) {
+                            $model->cms_company_id = (int)$form->cms_company_id;
+                            $model->cms_project_id = $form->cms_project_id ? (int)$form->cms_project_id : null;
+                            $model->cms_user_id = null;
+                        } elseif ($form->cms_user_id) {
+                            $model->cms_company_id = null;
+                            $model->cms_project_id = null;
+                            $model->cms_user_id = (int)$form->cms_user_id;
+                        } else {
+                            $model->cms_company_id = null;
+                            $model->cms_project_id = (int)$form->cms_project_id;
+                            $model->cms_user_id = null;
+                        }
+                    }
+
+                    if (!$model->save()) {
+                        throw new \RuntimeException(implode(' ', $model->getFirstErrors()));
+                    }
+
+                    return true;
+                },
+                'accessCallback' => true,
+            ],
+
             "log" => [
                 'class' => BackendModelLogAction::class,
                 "accessCallback" => function () {
@@ -606,6 +681,257 @@ JS
     public function view()
     {
         return $this->render($this->action->id);
+    }
+
+    public function bulkEditFields(BackendModelMultiWindowAction $action)
+    {
+        /** @var CmsTaskBulkEditForm $model */
+        $model = $action->getFormModel();
+        $executorInputId = Html::getInputId($model, 'executor_id');
+        $planDurationInputId = Html::getInputId($model, 'plan_duration');
+        $factDurationInputId = Html::getInputId($model, 'fact_duration');
+        $companyInputId = Html::getInputId($model, 'cms_company_id');
+        $clientInputId = Html::getInputId($model, 'cms_user_id');
+        $projectInputId = Html::getInputId($model, 'cms_project_id');
+        $relationRootId = 'sx-task-bulk-relation';
+
+        $this->view->registerCss(<<<CSS
+#{$relationRootId} .field-{$companyInputId},
+#{$relationRootId} .field-{$clientInputId},
+#{$relationRootId} .field-{$projectInputId} {
+    display: none;
+}
+#{$relationRootId} .sx-task-bulk-company-project [data-sx-quick-access-picker="projects"] {
+    display: none !important;
+}
+#{$relationRootId} .sx-task-bulk-relation-tabs {
+    margin-bottom: 15px;
+}
+CSS
+        );
+
+        $this->view->registerJs(<<<JS
+var taskBulkRelationRoot = $('#{$relationRootId}');
+var taskBulkRelationProjectSilent = false;
+
+function clearTaskBulkProject() {
+    taskBulkRelationProjectSilent = true;
+    $('#{$projectInputId}').val('').trigger('change');
+    taskBulkRelationProjectSilent = false;
+}
+
+function showTaskBulkRelation(type) {
+    var companyField = taskBulkRelationRoot.find('.field-{$companyInputId}');
+    var clientField = taskBulkRelationRoot.find('.field-{$clientInputId}');
+    var projectField = taskBulkRelationRoot.find('.field-{$projectInputId}');
+
+    taskBulkRelationRoot.find('.sx-task-bulk-relation-tabs .btn').removeClass('active');
+    taskBulkRelationRoot.find('[data-relation-type="' + type + '"]').addClass('active');
+    companyField.hide();
+    clientField.hide();
+    projectField.hide().removeClass('sx-task-bulk-company-project');
+
+    if (type === 'company') {
+        companyField.show();
+        if ($('#{$companyInputId}').val()) {
+            projectField
+                .addClass('sx-task-bulk-company-project')
+                .children('label').first().text('Проект компании');
+            projectField.show();
+        }
+    } else if (type === 'client') {
+        clientField.show();
+    } else {
+        projectField.children('label').first().text('Проект');
+        projectField.show();
+    }
+}
+
+function currentTaskBulkRelationType() {
+    return taskBulkRelationRoot.find('.sx-task-bulk-relation-tabs .btn.active').data('relation-type') || 'company';
+}
+
+function normalizeTaskBulkRelation() {
+    var type = currentTaskBulkRelationType();
+    if (type === 'company') {
+        $('#{$clientInputId}').val('');
+        if (!$('#{$companyInputId}').val()) {
+            $('#{$projectInputId}').val('');
+        }
+    } else if (type === 'client') {
+        $('#{$companyInputId}, #{$projectInputId}').val('');
+    } else {
+        $('#{$companyInputId}, #{$clientInputId}').val('');
+    }
+}
+
+taskBulkRelationRoot
+    .off('click.sxTaskBulkEdit', '.sx-task-bulk-relation-tabs .btn')
+    .on('click.sxTaskBulkEdit', '.sx-task-bulk-relation-tabs .btn', function() {
+        var previousType = currentTaskBulkRelationType();
+        var nextType = $(this).data('relation-type');
+        if (previousType === 'company' && nextType === 'project') {
+            clearTaskBulkProject();
+        }
+        showTaskBulkRelation(nextType);
+        return false;
+    });
+
+$('body')
+    .off('.sxTaskBulkEdit', '#{$companyInputId}')
+    .on('select2:select.sxTaskBulkEdit select2:unselect.sxTaskBulkEdit', '#{$companyInputId}', function() {
+        $('#{$clientInputId}').val('').trigger('change');
+        clearTaskBulkProject();
+        showTaskBulkRelation('company');
+    })
+    .off('.sxTaskBulkEdit', '#{$clientInputId}')
+    .on('select2:select.sxTaskBulkEdit select2:unselect.sxTaskBulkEdit', '#{$clientInputId}', function() {
+        $('#{$companyInputId}').val('').trigger('change');
+        clearTaskBulkProject();
+    })
+    .off('.sxTaskBulkEdit', '#{$projectInputId}')
+    .on('select2:select.sxTaskBulkEdit select2:unselect.sxTaskBulkEdit', '#{$projectInputId}', function() {
+        if (taskBulkRelationProjectSilent) {
+            return;
+        }
+        $('#{$clientInputId}').val('').trigger('change');
+        if (currentTaskBulkRelationType() !== 'company') {
+            $('#{$companyInputId}').val('').trigger('change');
+        }
+    });
+
+$('body').off('beforeSubmit.sxTaskBulkEdit', 'form').on('beforeSubmit.sxTaskBulkEdit', 'form', function() {
+    if ($(this).find('#{$executorInputId}, #{$planDurationInputId}, #{$factDurationInputId}').length) {
+        normalizeTaskBulkRelation();
+    }
+});
+
+if ($('#{$companyInputId}').val()) {
+    showTaskBulkRelation('company');
+} else if ($('#{$clientInputId}').val()) {
+    showTaskBulkRelation('client');
+} else if ($('#{$projectInputId}').val()) {
+    showTaskBulkRelation('project');
+} else {
+    showTaskBulkRelation('company');
+}
+JS
+        );
+
+        return [
+            'bulk_edit_hint' => [
+                'class' => HtmlBlock::class,
+                'content' => '<div class="col-12 text-muted form-group">Заполняйте только те поля, которые нужно изменить у выбранных задач.</div>',
+            ],
+            'task_relation_open' => [
+                'class' => HtmlBlock::class,
+                'content' => '<div id="' . $relationRootId . '" class="col-12"><div class="sx-task-bulk-relation-tabs btn-group btn-block" role="group" aria-label="Связь задачи">'
+                    . '<button type="button" class="btn btn-default" data-relation-type="company">Компания</button>'
+                    . '<button type="button" class="btn btn-default" data-relation-type="client">Клиент</button>'
+                    . '<button type="button" class="btn btn-default" data-relation-type="project">Проект</button>'
+                    . '</div>',
+            ],
+            'cms_company_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'modelClass' => CmsCompany::class,
+                    'searchQuery' => function ($word = '') {
+                        $query = CmsCompany::find()->forManager();
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+                ],
+            ],
+            'cms_user_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'modelClass' => CmsUser::class,
+                    'searchQuery' => function ($word = '') {
+                        $query = CmsUser::find()->forManager();
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+                ],
+            ],
+            'cms_project_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'id' => 'cmstask-bulk-project-select',
+                    'modelClass' => CmsProject::class,
+                    'searchQuery' => function ($word = '') {
+                        $companyId = (int)\Yii::$app->request->get('cms_company_id');
+                        $query = CmsProject::find()->forManager();
+                        if ($companyId) {
+                            $query->andWhere(['cms_company_id' => $companyId]);
+                        } else {
+                            $query->andWhere([
+                                'or',
+                                ['cms_company_id' => null],
+                                ['cms_company_id' => 0],
+                            ]);
+                        }
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+                    'pluginOptions' => [
+                        'ajax' => [
+                            'data' => new JsExpression('function(params) { return {q: params.term, cms_company_id: $("#' . $relationRootId . ' [data-relation-type=company]").hasClass("active") ? $("#' . $companyInputId . '").val() : ""}; }'),
+                        ],
+                    ],
+                ],
+            ],
+            'task_relation_close' => [
+                'class' => HtmlBlock::class,
+                'content' => '</div>',
+            ],
+            'executor_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'modelClass' => CmsUser::class,
+                    'multiple' => false,
+                    'searchQuery' => function ($word = '') {
+                        $query = CmsUser::find()->isWorker();
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+                ],
+            ],
+            'plan_duration' => [
+                'class' => WidgetField::class,
+                'widgetClass' => SmartDurationInputWidget::class,
+                'widgetConfig' => [
+                    'availableUnits' => [
+                        'min' => 'мин',
+                        'hour' => 'час',
+                    ],
+                    'defaultUnit' => 'min',
+                ],
+            ],
+            'fact_duration' => [
+                'class' => WidgetField::class,
+                'widgetClass' => SmartDurationInputWidget::class,
+                'hint' => 'Если нужно, укажите время, которое увидит клиент в отчете.',
+                'widgetConfig' => [
+                    'availableUnits' => [
+                        'min' => 'мин',
+                        'hour' => 'час',
+                    ],
+                    'defaultUnit' => 'min',
+                ],
+            ],
+        ];
     }
 
     public function actionReportExport($format = 'csv')

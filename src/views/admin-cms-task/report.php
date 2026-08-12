@@ -120,6 +120,13 @@ $this->registerCss(<<<CSS
 .sx-task-report .sx-report-card {
     color: var(--sx-color-text);
 }
+.sx-task-report form.sx-backend-form.sx-task-report-form {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
 .sx-task-report .sx-report-label {
     display: block;
     color: var(--sx-color-text-muted);
@@ -177,9 +184,8 @@ $this->registerCss(<<<CSS
 }
 .sx-task-report .sx-task-report-relation .btn.sx-active {
     color: var(--sx-color-accent) !important;
-    border-color: var(--sx-color-accent) !important;
     background: var(--sx-color-accent-soft) !important;
-    box-shadow: inset 0 -2px 0 var(--sx-color-accent);
+    box-shadow: inset 0 -1px 0 var(--sx-color-accent);
 }
 .sx-task-report .sx-task-report-relation-field {
     display: none;
@@ -486,7 +492,7 @@ JS);
             'method' => 'get',
             'action' => Url::to(['report']),
             'options' => [
-                'class' => 'sx-backend-form',
+                'class' => 'sx-backend-form sx-task-report-form',
             ],
         ]); ?>
 
