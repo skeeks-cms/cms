@@ -199,14 +199,14 @@ class Skeeks extends Component implements BootstrapInterface
                                 $notify->save();
                             }
 
-                            /*if ($status == CmsTask::STATUS_READY) {
+                            if ($status == CmsTask::STATUS_READY) {
                                 $notify = new CmsWebNotify();
                                 $notify->cms_user_id = $model->created_by;
-                                $notify->name = "Ваша задача проверена";
+                                $notify->name = "Ваша задача готова";
                                 $notify->model_id = $sender->model_id;
                                 $notify->model_code = $sender->model_code;
                                 $notify->save();
-                            }*/
+                            }
 
                             if ($status == CmsTask::STATUS_CANCELED) {
                                 $notify = new CmsWebNotify();
