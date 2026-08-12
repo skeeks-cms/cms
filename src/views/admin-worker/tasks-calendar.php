@@ -384,6 +384,8 @@ CSS
     <?php echo $btnCreateTask; ?>
 </div>
 
+<?php echo \skeeks\cms\widgets\admin\CmsUnassignedClientTasksWidget::widget(['user' => $model]); ?>
+
 <?php if ($days) : ?>
     <div class="sx-surface sx-surface--raised sx-surface--padded sx-worker-calendar-summary">
         <div class="sx-properties-wrapper sx-columns-1">

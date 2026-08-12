@@ -8,6 +8,7 @@ use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\queries\CmsTaskQuery;
+use skeeks\cms\rbac\CmsManager;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 /**
@@ -73,6 +74,9 @@ class CmsTask extends ActiveRecord
 
     const STATUS_CANCELED = 'canceled';
     const STATUS_READY = 'ready';
+
+    /** A client request may enter the support triage queue without an executor. */
+    const SCENARIO_CLIENT_SUPPORT = 'client-support';
 
     const READY_RESUME_SECONDS = 86400;
 
@@ -157,6 +161,10 @@ class CmsTask extends ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+        if ($insert && $this->scenario === self::SCENARIO_CLIENT_SUPPORT && !$this->executor_id) {
+            $this->notifyAdminUsersAboutUnassignedClientTask();
+        }
+
         if (static::$_isRecalculatingTasksPriority) {
             return;
         }
@@ -210,6 +218,45 @@ class CmsTask extends ActiveRecord
         }
     }
 
+    /**
+     * Temporary triage policy: notify active administrators about a client task
+     * that could not be assigned from project, company or client context.
+     */
+    protected function notifyAdminUsersAboutUnassignedClientTask(): void
+    {
+        if (!$this->cms_user_id || (int)$this->created_by !== (int)$this->cms_user_id) {
+            return;
+        }
+
+        $adminUserIds = CmsUser::find()
+            ->select(CmsUser::tableName().'.id')
+            ->isWorker()
+            ->andWhere([
+                CmsUser::tableName().'.is_active' => 1,
+            ])
+            ->column();
+
+        foreach ($adminUserIds as $adminUserId) {
+            if (!\Yii::$app->authManager->checkAccess(
+                $adminUserId,
+                CmsManager::PERMISSION_ROLE_ADMIN_ACCESS
+            )) {
+                continue;
+            }
+
+            if ((int)$adminUserId === (int)$this->created_by) {
+                continue;
+            }
+
+            $notify = new CmsWebNotify();
+            $notify->cms_user_id = (int)$adminUserId;
+            $notify->name = 'Новая неразобранная задача от клиента';
+            $notify->model_id = (int)$this->id;
+            $notify->model_code = static::class;
+            $notify->save();
+        }
+    }
+
 
     /**
      * {@inheritdoc}
@@ -223,7 +270,8 @@ class CmsTask extends ActiveRecord
             [['cms_user_id'], 'integer'],
 
             [['executor_end_at'], 'integer'],
-            [['name', 'executor_id'], 'required'],
+            [['name'], 'required'],
+            [['executor_id'], 'required', 'except' => self::SCENARIO_CLIENT_SUPPORT],
 
             [['description'], 'string'],
 

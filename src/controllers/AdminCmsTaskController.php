@@ -201,7 +201,8 @@ class AdminCmsTaskController extends BackendModelStandartController
                                 'items' => [
                                     'my_executor' => 'Сделать мне',
                                     //'my_for_check' => 'Проверить мне',
-                                    'my_created' => 'Я поставил'
+                                    'my_created' => 'Я поставил',
+                                    'unassigned_client' => 'Неразобранные от клиентов',
                                 ],
                                 'on apply'       => function (QueryFiltersEvent $e) {
                                     /**
@@ -217,6 +218,9 @@ class AdminCmsTaskController extends BackendModelStandartController
                                         $query->andWhere([
                                             CmsTask::tableName().'.created_by' => \Yii::$app->user->id,
                                         ]);
+                                    } elseif ($e->field->value == 'unassigned_client') {
+                                        // initQuery() already applies forManager(); this scope only narrows it.
+                                        $query->unassignedFromClients();
                                     }
                                 },
                             ],

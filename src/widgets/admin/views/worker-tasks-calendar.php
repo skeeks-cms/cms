@@ -66,6 +66,7 @@ $model = $user;
 
         <div class="row">
             <div class="col-sm-12">
+                <?= \skeeks\cms\widgets\admin\CmsUnassignedClientTasksWidget::widget(['user' => $model]); ?>
                 <?
                 \skeeks\cms\backend\widgets\sortable\assets\BackendSortableAdapterAsset::register($this);
                 ?>

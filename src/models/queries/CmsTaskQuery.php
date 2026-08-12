@@ -96,6 +96,31 @@ class CmsTaskQuery extends CmsActiveQuery
     }
 
     /**
+     * Client-created tasks that still need an executor to be assigned.
+     *
+     * Access is intentionally not broadened here: callers in the backend must
+     * keep forManager() in the query and add this scope to it.
+     *
+     * @return $this
+     */
+    public function unassignedFromClients()
+    {
+        $taskTable = self::getPrimaryTableName();
+
+        return $this
+            ->andWhere([$taskTable.'.executor_id' => null])
+            ->andWhere(['not', [$taskTable.'.cms_user_id' => null]])
+            ->andWhere(new Expression($taskTable.'.created_by = '.$taskTable.'.cms_user_id'))
+            ->andWhere([$taskTable.'.status' => [
+                CmsTask::STATUS_NEW,
+                CmsTask::STATUS_ACCEPTED,
+                CmsTask::STATUS_IN_WORK,
+                CmsTask::STATUS_ON_PAUSE,
+                CmsTask::STATUS_ON_CHECK,
+            ]]);
+    }
+
+    /**
      * @param string|array $types
      * @return $this
      */

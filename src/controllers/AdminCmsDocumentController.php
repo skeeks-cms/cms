@@ -800,6 +800,14 @@ JS
                             },
                         ],
                     ],
+                    'seller_contractor_address' => [
+                        'class' => TextareaField::class,
+                        'label' => 'Адрес продавца в документе',
+                        'hint' => 'Снимок реквизитов для этого документа. Карточка контрагента и связанный счёт не изменятся.',
+                        'elementOptions' => [
+                            'rows' => 2,
+                        ],
+                    ],
                     'buyer_contractor_id' => [
                         'class' => WidgetField::class,
                         'widgetClass' => AjaxSelectModel::class,
@@ -815,6 +823,14 @@ JS
                                 }
                                 return $query;
                             },
+                        ],
+                    ],
+                    'buyer_contractor_address' => [
+                        'class' => TextareaField::class,
+                        'label' => 'Адрес покупателя в документе',
+                        'hint' => 'Снимок реквизитов для этого документа. Карточка контрагента и связанный счёт не изменятся.',
+                        'elementOptions' => [
+                            'rows' => 2,
                         ],
                     ],
                 ],
