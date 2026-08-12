@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null            $cms_user_id Клиент
  * @property int                 $is_active Активность
  * @property int                 $is_private Закрытый?
+ * @property int                 $is_work_time_visible_for_clients Клиенты видят рабочее время?
  *
  * @property CmsStorageFile|null $cmsImage
  * @property CmsCompany|null     $cmsCompany
@@ -81,6 +82,7 @@ class CmsProject extends ActiveRecord
 
             [['is_active'], 'integer'],
             [['is_private'], 'integer'],
+            [['is_work_time_visible_for_clients'], 'integer'],
 
             [['cms_company_id'], 'integer'],
             [['cms_user_id'], 'integer'],
@@ -127,6 +129,7 @@ class CmsProject extends ActiveRecord
 
             'is_active'    => 'Активность',
             'is_private'   => 'Закрытый?',
+            'is_work_time_visible_for_clients' => 'Клиенты видят рабочее время?',
 
             'managers' => 'Работают с проектом',
             'users'    => 'Клиенты',

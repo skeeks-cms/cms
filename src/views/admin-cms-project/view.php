@@ -190,6 +190,11 @@ CSS
                 <div class="sx-project-overview-value"><?php echo $model->is_private ? 'Закрытый' : 'Открытый'; ?></div>
             </div>
 
+            <div class="sx-surface sx-project-overview-item">
+                <div class="sx-project-overview-label">Клиенты видят рабочее время?</div>
+                <div class="sx-project-overview-value"><?php echo $model->is_work_time_visible_for_clients ? 'Да' : 'Нет'; ?></div>
+            </div>
+
             <?php if ($model->cms_company_id) : ?>
                 <div class="sx-surface sx-project-overview-item">
                     <div class="sx-project-overview-label">Компания</div>

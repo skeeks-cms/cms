@@ -465,6 +465,10 @@ HTML
                 'class' => BoolField::class,
             ],
 
+            'is_work_time_visible_for_clients' => [
+                'class' => BoolField::class,
+            ],
+
 
         ];
 
