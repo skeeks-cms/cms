@@ -19,6 +19,7 @@ $status = \skeeks\cms\widgets\admin\CmsTaskBtnsWidget::widget([
 $model->refresh();
 $planStartAt = $model->plan_start_at;
 $planStartEndAt = $model->executor_end_at ?: $model->plan_end_at;
+$projectClients = $model->cmsProject ? $model->cmsProject->users : [];
 if (!$planStartAt && $planStartEndAt && $model->plan_duration) {
     $planStartAt = max(0, (int)$planStartEndAt - (int)$model->plan_duration);
 }
@@ -509,6 +510,37 @@ JS
                         <?php endif; ?>
                     </span>
                 </li>
+                <?php if ($projectClients) : ?>
+                    <?php
+                    $clientVisibilityHint = 'Эта задача доступна перечисленным клиентам, потому что они добавлены в проект «'.
+                        $model->cmsProject->name.'». Учитывайте это при заполнении описания и комментариев.';
+                    ?>
+                    <li>
+                        <span class="sx-properties--name">
+                            Клиенты
+                            <i
+                                class="far fa-question-circle sx-hint-icon"
+                                data-toggle="tooltip"
+                                title="<?php echo \yii\helpers\Html::encode($clientVisibilityHint); ?>"
+                                aria-label="<?php echo \yii\helpers\Html::encode($clientVisibilityHint); ?>"
+                            ></i>
+                        </span>
+                        <span class="sx-properties--value">
+                            <?php foreach ($projectClients as $index => $client) : ?>
+                                <?php if ($index) : ?><br><?php endif; ?>
+                                <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-user',
+                                    'modelId'      => $client->id,
+                                    'label'        => $client->shortDisplayNameWithAlias,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__related',
+                                        'aria-label' => (string)$client->shortDisplayNameWithAlias,
+                                    ],
+                                ]); ?>
+                            <?php endforeach; ?>
+                        </span>
+                    </li>
+                <?php endif; ?>
             </ul>
         <?php BackendSurfaceWidget::end(); ?>
     </div>

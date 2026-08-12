@@ -20,6 +20,7 @@ use yii\helpers\Html;
 $widget = $this->context;
 $cmsUser = $widget->user;
 $name = (string)$cmsUser->shortDisplayNameWithAlias;
+$entityControllerId = $cmsUser->is_worker ? '/cms/admin-worker' : '/cms/admin-user';
 
 $currentTask = null;
 $isWorkingNow = (bool)$cmsUser->isWorkingNow;
@@ -90,7 +91,7 @@ Html::addCssClass($titleOptions, ['sx-preview-card__title', 'sx-collection-cell_
 <div class="sx-preview-card sx-preview-card--person">
     <div class="sx-preview-card__media">
         <?= BackendEntityLink::widget([
-            'controllerId' => '/cms/admin-worker',
+            'controllerId' => $entityControllerId,
             'modelId'      => $cmsUser->id,
             'content'      => $mediaContent,
             'options'      => [
@@ -104,7 +105,7 @@ Html::addCssClass($titleOptions, ['sx-preview-card__title', 'sx-collection-cell_
 
     <div class="sx-preview-card__content sx-collection-cell sx-collection-cell--stack">
         <?= BackendEntityLink::widget([
-            'controllerId' => '/cms/admin-worker',
+            'controllerId' => $entityControllerId,
             'modelId'      => $cmsUser->id,
             'content'      => $titleContent,
             'tag'          => $widget->tagName,
