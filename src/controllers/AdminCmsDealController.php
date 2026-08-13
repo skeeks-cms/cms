@@ -145,10 +145,16 @@ class AdminCmsDealController extends BackendModelStandartController
                 'grid'    => [
                     'rowOptions' => function (CmsDeal $cmsDeal) {
                         $isExpired = $cmsDeal->end_at && $cmsDeal->end_at < time();
-                        if (!$cmsDeal->is_active || $isExpired) {
+                        if (!$cmsDeal->is_active) {
                             return [
                                 'class' => 'sx-cms-deal-row--inactive',
                                 'style' => 'opacity: 0.5;',
+                            ];
+                        }
+
+                        if ($isExpired) {
+                            return [
+                                'class' => 'sx-collection-item--danger',
                             ];
                         }
 
@@ -199,8 +205,7 @@ class AdminCmsDealController extends BackendModelStandartController
 
                         'amount',
 
-                        'cms_company_id',
-                        'cms_user_id',
+                        'client',
 
                         //'is_periodic',
                         //'is_active',
@@ -210,6 +215,43 @@ class AdminCmsDealController extends BackendModelStandartController
                         //'description',
                     ],
                     'columns'        => [
+
+
+                        'client' => [
+                            'format' => 'raw',
+                            'label'  => 'Клиент',
+                            'headerOptions' => [
+                                'style' => 'min-width: 200px; padding-left: 24px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'min-width: 200px; padding-left: 24px;',
+                            ],
+                            'value'  => function (CmsDeal $cmsDeal) {
+                                $result = [];
+
+                                if ($cmsDeal->company) {
+                                    $result[] = BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-cms-company',
+                                        'modelId'      => $cmsDeal->company->id,
+                                        'content'      => '<i class="fas fa-users"></i> '.Html::encode($cmsDeal->company->asText),
+                                        'options'      => [
+                                            'class' => 'sx-preview-card__related',
+                                        ],
+                                    ]);
+                                } elseif ($cmsDeal->user) {
+                                    $result[] = BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-user',
+                                        'modelId'      => $cmsDeal->user->id,
+                                        'content'      => '<i class="fas fa-user"></i> '.Html::encode($cmsDeal->user->asText),
+                                        'options'      => [
+                                            'class' => 'sx-preview-card__related',
+                                        ],
+                                    ]);
+                                }
+
+                                return implode(', ', $result);
+                            },
+                        ],
 
 
                         'cms_company_id' => [
@@ -289,11 +331,6 @@ class AdminCmsDealController extends BackendModelStandartController
 
                                 $reuslt = "<div>";
                                 if ($cmsDeal->end_at < time() && $cmsDeal->end_at && $cmsDeal->is_active) {
-                                    \Yii::$app->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-red');
-JS
-                                    );
-
                                     $reuslt = "<div class='sx-text--danger'>";
                                 }
 
@@ -311,11 +348,6 @@ JS
                                 $dateName = "Закончится";
                                 if ($cmsDeal->end_at < time() && $cmsDeal->end_at && $cmsDeal->is_active) {
                                     $dateName = "Закончилась";
-                                    \Yii::$app->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-red');
-JS
-                                    );
-
                                     $reuslt = "<div class='sx-collection-cell sx-collection-cell--stack'>";
                                 } elseif (!$cmsDeal->is_active) {
                                     $dateName = "Закончилась";

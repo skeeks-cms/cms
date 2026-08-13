@@ -409,9 +409,7 @@ class AdminCmsBillController extends BackendModelStandartController
 
                         //'receiver_crm_contractor_id',
 
-                        'description',
-
-                        'deals',
+                        'relations',
 
                         //'code',
                     ],
@@ -552,7 +550,6 @@ JS
                                     'label'        => $title,
                                     'options'      => [
                                         'class' => 'sx-collection-cell__primary',
-                                        'style' => 'white-space: nowrap;',
                                     ],
                                 ]);
 
@@ -618,7 +615,7 @@ JS
 
 
                         'client' => [
-                            'label'  => 'Клиент / плательщик',
+                            'label'  => 'Клиент / Плательщик',
                             'format' => 'raw',
                             'value'  => function (ShopBill $shopBill) {
                                 $result = [];
@@ -686,6 +683,44 @@ JS
                                         ['class' => 'sx-collection-cell sx-collection-cell--stack']
                                     );
                                 }
+                            },
+                        ],
+                        'relations' => [
+                            'label'          => 'Связь',
+                            'format'         => 'raw',
+                            'headerOptions'  => [
+                                'style' => 'width: 280px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'width: 280px; max-width: 360px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;',
+                            ],
+                            'value'          => function (ShopBill $shopBill) {
+                                $result = [];
+
+                                foreach ($shopBill->deals as $cmsDeal) {
+                                    $result[] = BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-cms-deal',
+                                        'modelId'      => $cmsDeal->id,
+                                        'content'      => '<i class="far fa-file"></i> '.Html::encode($cmsDeal->asText),
+                                        'options'      => [
+                                            'class' => 'sx-preview-card__related',
+                                        ],
+                                    ]);
+                                }
+
+                                if ($shopBill->description) {
+                                    $result[] = Html::tag(
+                                        'small',
+                                        Html::encode($shopBill->description),
+                                        ['class' => 'sx-collection-cell__secondary']
+                                    );
+                                }
+
+                                return Html::tag(
+                                    'div',
+                                    $result ? implode('', $result) : '<span class="sx-collection-cell__secondary">Нет</span>',
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             },
                         ],
                     ],

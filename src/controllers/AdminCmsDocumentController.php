@@ -194,8 +194,7 @@ class AdminCmsDocumentController extends BackendModelStandartController
                         'actions',
                         'issued_at',
                         'amount',
-                        'cms_company_id',
-                        'buyer_contractor_id',
+                        'client',
                         'bills',
                         'deals',
                         'description',
@@ -254,6 +253,49 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                     'span',
                                     Html::encode((string)$model->money),
                                     ['class' => 'sx-collection-cell__amount']
+                                );
+                            },
+                        ],
+                        'client' => [
+                            'label' => 'Клиент / Плательщик',
+                            'format' => 'raw',
+                            'value' => function (ShopDocument $model) {
+                                $result = [];
+
+                                if ($model->company) {
+                                    $result[] = BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-cms-company',
+                                        'modelId'      => $model->company->id,
+                                        'content'      => '<i class="fas fa-users"></i> '.Html::encode($model->company->asText),
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$model->company->asText,
+                                        ],
+                                    ]);
+                                }
+
+                                if ($model->buyerContractor) {
+                                    $result[] = BackendEntityLink::widget([
+                                        'controllerId' => '/cms/admin-cms-contractor',
+                                        'modelId'      => $model->buyerContractor->id,
+                                        'content'      => '<i class="far fa-user"></i> '.Html::encode($model->buyerContractor->asText),
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$model->buyerContractor->asText,
+                                        ],
+                                    ]);
+                                } elseif ($model->buyerName) {
+                                    $result[] = Html::tag(
+                                        'span',
+                                        Html::encode($model->buyerName),
+                                        ['class' => 'sx-collection-cell__secondary']
+                                    );
+                                }
+
+                                return Html::tag(
+                                    'div',
+                                    $result ? implode('', $result) : '<span class="sx-collection-cell__secondary">Не указан</span>',
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
                                 );
                             },
                         ],
