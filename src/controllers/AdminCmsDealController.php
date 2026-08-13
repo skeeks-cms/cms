@@ -142,6 +142,17 @@ class AdminCmsDealController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
+                    'rowOptions' => function (CmsDeal $cmsDeal) {
+                        $isExpired = $cmsDeal->end_at && $cmsDeal->end_at < time();
+                        if (!$cmsDeal->is_active || $isExpired) {
+                            return [
+                                'class' => 'sx-cms-deal-row--inactive',
+                                'style' => 'opacity: 0.5;',
+                            ];
+                        }
+
+                        return [];
+                    },
                     'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
@@ -283,12 +294,6 @@ JS
                                     );
 
                                     $reuslt = "<div class='sx-text--danger'>";
-                                } elseif (!$cmsDeal->is_active) {
-                                    \Yii::$app->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-gray');
-JS
-                                    );
-
                                 }
 
                                 $reuslt .= \Yii::$app->formatter->asDate($cmsDeal->end_at)."<br /><small>".\Yii::$app->formatter->asRelativeTime($cmsDeal->end_at)."</small>";
@@ -313,11 +318,6 @@ JS
                                     $reuslt = "<div class='sx-collection-cell sx-collection-cell--stack'>";
                                 } elseif (!$cmsDeal->is_active) {
                                     $dateName = "Закончилась";
-                                    \Yii::$app->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-gray');
-JS
-                                    );
-
                                 }
                                 $reuslt .= Html::tag(
                                     'small',

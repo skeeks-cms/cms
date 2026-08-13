@@ -551,6 +551,7 @@ JS
                                     'label'        => $title,
                                     'options'      => [
                                         'class' => 'sx-collection-cell__primary',
+                                        'style' => 'white-space: nowrap;',
                                     ],
                                 ]);
 
@@ -664,7 +665,11 @@ JS
                                         ]);
                                     }
 
-                                    return (string)implode("", $result);
+                                    return Html::tag(
+                                        'div',
+                                        implode('', $result),
+                                        ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                    );
                                 }
                             },
                         ],
