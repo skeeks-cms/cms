@@ -19,7 +19,7 @@ $(".sx-tree-search input").on("change", function() {
     
 });
 
-$(".sx-tree-search .btn").on("click", function() {
+$(".sx-tree-search .btn-search").on("click", function() {
     
     var jTreeSearch = $(this).closest(".sx-tree-search");
     var search = $("input", jTreeSearch).val();
@@ -40,15 +40,14 @@ $(".sx-tree-search .btn").on("click", function() {
 JS
 );
 ?>
-<div class="row">
-    <div class="sx-container-tree">
+<div class="sx-container-tree">
         <?= \yii\helpers\Html::beginTag("div", $widget->options); ?>
 
         <? if ($widget->isSearchEnabled) : ?>
-            <div class="sx-tree-search" style="max-width: 300px; margin-bottom: 10px;">
-                <input type="text" value="<?php echo $widget->searchValue; ?>" name="<?php echo $widget->searchRequestName; ?>" class="form-control" placeholder="Поиск по разделам"/>
-                <button class="btn btn-search">
-                    <i class="fas fa-search"></i>
+            <div class="sx-tree-search">
+                <input type="search" value="<?php echo $widget->searchValue; ?>" name="<?php echo $widget->searchRequestName; ?>" placeholder="Поиск по разделам"/>
+                <button class="btn-search" type="button" aria-label="<?= \Yii::t('skeeks/cms', 'Search'); ?>">
+                    <?= \skeeks\cms\backend\helpers\BackendIcon::render('search', ['size' => 18]); ?>
                 </button>
             </div>
         <? endif; ?>
@@ -57,6 +56,5 @@ JS
         </div>
 
         <?= \yii\helpers\Html::endTag("div"); ?>
-    </div>
 </div>
 

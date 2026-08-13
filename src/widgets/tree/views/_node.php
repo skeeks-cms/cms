@@ -49,21 +49,25 @@ $widget = $this->context;
 
         <? if ($isShowCurrent || $isShowChilds) : ?>
             <div class="row">
-                <?php if ($isExistChildren) : ?>
-                    <div class="sx-node-open-close">
+                <div class="sx-node-open-close" aria-hidden="<?= $isExistChildren ? 'false' : 'true'; ?>">
+                    <?php if ($isExistChildren) : ?>
                         <?php if ($widget->isOpenNode($model)) : ?>
-                            <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
-                                <span class="fa fa-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
+                            <a href="<?= $widget->getOpenCloseLink($model); ?>" class="sx-tree-toggle"
+                               title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"
+                               aria-label="<?= \Yii::t('skeeks/cms', "Minimize"); ?>">
+                                <?= \skeeks\cms\backend\helpers\BackendIcon::render('minus', ['size' => 14]); ?>
                             </a>
                         <?php else
                             : ?>
                             <a href="<?= $widget->getOpenCloseLink($model);
-                            ?>" class="btn btn-sm btn-default">
-                                <span class="fa fa-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
+                            ?>" class="sx-tree-toggle"
+                               title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"
+                               aria-label="<?= \Yii::t('skeeks/cms', "Restore"); ?>">
+                                <?= \skeeks\cms\backend\helpers\BackendIcon::render('plus', ['size' => 14]); ?>
                             </a>
                         <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
                 <?= $widget->renderNodeContent($model); ?>
             </div>
         
@@ -85,21 +89,25 @@ $widget = $this->context;
     <? else : ?>
 
         <div class="row">
-            <?php if ($model->children) : ?>
-                <div class="sx-node-open-close">
+            <div class="sx-node-open-close" aria-hidden="<?= $model->children ? 'false' : 'true'; ?>">
+                <?php if ($model->children) : ?>
                     <?php if ($widget->isOpenNode($model)) : ?>
-                        <a href="<?= $widget->getOpenCloseLink($model); ?>" class="btn btn-sm btn-default">
-                            <span class="fa fa-minus" title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"></span>
+                        <a href="<?= $widget->getOpenCloseLink($model); ?>" class="sx-tree-toggle"
+                           title="<?= \Yii::t('skeeks/cms', "Minimize"); ?>"
+                           aria-label="<?= \Yii::t('skeeks/cms', "Minimize"); ?>">
+                            <?= \skeeks\cms\backend\helpers\BackendIcon::render('minus', ['size' => 14]); ?>
                         </a>
                     <?php else
                         : ?>
                         <a href="<?= $widget->getOpenCloseLink($model);
-                        ?>" class="btn btn-sm btn-default">
-                            <span class="fa fa-plus" title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"></span>
+                        ?>" class="sx-tree-toggle"
+                           title="<?= \Yii::t('skeeks/cms', "Restore"); ?>"
+                           aria-label="<?= \Yii::t('skeeks/cms', "Restore"); ?>">
+                            <?= \skeeks\cms\backend\helpers\BackendIcon::render('plus', ['size' => 14]); ?>
                         </a>
                     <?php endif; ?>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
             <?= $widget->renderNodeContent($model); ?>
         </div>
 

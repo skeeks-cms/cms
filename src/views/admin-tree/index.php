@@ -9,14 +9,70 @@
 
 $this->registerJs(<<<JS
 
-$("body").on("dblclick", ".sx-tree-node", function() {
-    $(".sx-first-action", $(this)).click();
+function sxTreeActionsAnchor(jNode) {
+    return jNode.children('.row').children('.sx-controll-node')
+        .find('.sx-tree-actions-anchor').first();
+}
+
+$("body").on("dblclick", ".sx-tree-node", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    sxTreeActionsAnchor($(event.target).closest('.sx-tree-node')).trigger('firstAction');
     return false;
 });
 
-$("body").on("click", ".sx-first-action-trigger", function() {
-    /*console.log($(".sx-first-action", $(this).closest('.sx-tree-node')));*/
-    $(".sx-first-action", $(this).closest('.sx-tree-node')).first().click();
+$("body").on("click", ".sx-first-action-trigger", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    sxTreeActionsAnchor($(this).closest('.sx-tree-node')).trigger('firstAction');
+    return false;
+});
+
+$("body").on("contextmenu", ".sx-tree-node", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    var jSource = sxTreeActionsAnchor($(event.target).closest('.sx-tree-node'));
+    if (!jSource.length) {
+        return false;
+    }
+
+    $('.sx-tree-context-actions-anchor').each(function() {
+        var jCurrent = $(this);
+        if (jCurrent.data('bs.popover')) {
+            try {
+                jCurrent.popover('dispose');
+            } catch (e) {
+                jCurrent.popover('destroy');
+            }
+        }
+        jCurrent.remove();
+    });
+
+    var jAnchor = jSource.clone();
+    jAnchor
+        .removeClass('sx-tree-actions-anchor')
+        .addClass('sx-grid-context-actions-anchor sx-tree-context-actions-anchor')
+        .attr('aria-hidden', 'true')
+        .css({
+            top: event.clientY,
+            left: event.clientX,
+            position: 'fixed'
+        });
+
+    $('body').append(jAnchor);
+    jAnchor.removeClass('is-rendered');
+    jAnchor.one('hidden.bs.popover', function() {
+        var jCurrent = $(this);
+        try {
+            jCurrent.popover('dispose');
+        } catch (e) {
+            jCurrent.popover('destroy');
+        }
+        jCurrent.remove();
+    });
+    jAnchor.trigger('contextmenu');
+
     return false;
 });
 
@@ -24,7 +80,7 @@ JS
 );
 
 ?>
-<div class="col-md-12">
+<div class="sx-tree-page">
     <?php $widget = \skeeks\cms\widgets\tree\CmsTreeWidget::begin([
         "models" => $models,
         "viewNodeContentFile" => '@skeeks/cms/views/admin-tree/_tree-node',

@@ -53,15 +53,25 @@ if ($model->isCanonical) {
 <div class="sx-label-node level-<?= $model->level; ?> status-<?= $model->active; ?>">
 
     <? if ($model->level == 0) : ?>
-        <i class="fas fa-home"></i>
+        <?= \skeeks\cms\backend\helpers\BackendIcon::render('globe', ['size' => 18, 'class' => 'sx-tree-node__icon']); ?>
     <? elseif ($model->redirectTree) : ?>
-        <i class="fas fa-directions" data-toggle="tooltip" title="<?= $model->redirect_code ?> редирект в раздел: <?= $model->redirectTree->fullName; ?>"></i>
+        <?= \skeeks\cms\backend\helpers\BackendIcon::render('external-link', [
+            'size' => 18,
+            'class' => 'sx-tree-node__icon',
+            'data-toggle' => 'tooltip',
+            'title' => $model->redirect_code.' редирект в раздел: '.$model->redirectTree->fullName,
+        ]); ?>
     <? elseif ($model->redirect) : ?>
-        <i class="fas fa-directions" data-toggle="tooltip" title="<?= $model->redirect_code ?> редирект по url: <?= $model->redirect; ?>"></i>
+        <?= \skeeks\cms\backend\helpers\BackendIcon::render('external-link', [
+            'size' => 18,
+            'class' => 'sx-tree-node__icon',
+            'data-toggle' => 'tooltip',
+            'title' => $model->redirect_code.' редирект по url: '.$model->redirect,
+        ]); ?>
     <? elseif ($widget->isOpenNode($model)) : ?>
-        <i class="far fa-folder-open"></i>
+        <?= \skeeks\cms\backend\helpers\BackendIcon::render('folder-open', ['size' => 18, 'class' => 'sx-tree-node__icon']); ?>
     <? else : ?>
-        <i class="far fa-folder"></i>
+        <?= \skeeks\cms\backend\helpers\BackendIcon::render('folder', ['size' => 18, 'class' => 'sx-tree-node__icon']); ?>
     <? endif; ?>
     
     <a href="<?= $widget->getOpenCloseLink($model); ?>">
@@ -94,32 +104,26 @@ if ($model->isCanonical) {
     <?php if (\Yii::$app->user->can('cms/admin-tree/update', ['model' => $model])) : ?>
         <div class="pull-left sx-controll-act">
 
-            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-first-action-trigger"
+            <a href="#" class="sx-tree-action sx-first-action-trigger"
                data-id="<?= $model->id; ?>"
-
+               aria-label="<?= \Yii::t('skeeks/cms', 'Edit'); ?>"
             >
-        <span
-                class="fa fa-edit"></span>
+                <?= \skeeks\cms\backend\helpers\BackendIcon::render('edit', ['size' => 16]); ?>
             </a>
 
         </div>
     <?php endif; ?>
 
-    <?php $widget = \skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget::begin([
-        'actions'             => $controller->modelActions,
-        'isOpenNewWindow'     => true,
-        'rightClickSelectors' => ['.sx-tree-node-'.$model->id],
-        'button'              => [
-            'class' => 'btn btn-xs btn-default sx-btn-caret-action',
-            'style' => '',
-            'tag'   => 'a',
-            'label' => '<i class="fa fa-caret-down"></i>',
+    <?= \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+        'controllerId' => $controller->uniqueId,
+        'modelId' => $model->id,
+        'content' => '<span></span>',
+        'options' => [
+            'class' => 'sx-tree-actions-anchor',
+            'aria-hidden' => 'true',
+            'tabindex' => '-1',
         ],
     ]); ?>
-
-    <div class="pull-left sx-controll-act" style="<?php echo $widget->actions ? "" : "display: none;"; ?>">
-        <?php $widget::end(); ?>
-    </div>
 
     <? /*= \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
         "actions" => $controller->modelActions,
@@ -132,23 +136,28 @@ if ($model->isCanonical) {
     ]); */ ?>
     <?php if (\Yii::$app->user->can('cms/admin-tree/new-children')) : ?>
         <div class="pull-left sx-controll-act">
-            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm add-tree-child"
-               title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>" data-id="<?= $model->id; ?>"><span
-                        class="fa fa-plus"></span></a>
+            <a href="#" class="sx-tree-action add-tree-child"
+               title="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>"
+               aria-label="<?= \Yii::t('skeeks/cms', 'Create subsection'); ?>"
+               data-id="<?= $model->id; ?>">
+                <?= \skeeks\cms\backend\helpers\BackendIcon::render('plus', ['size' => 16]); ?>
+            </a>
         </div>
     <?php endif; ?>
     <div class="pull-left sx-controll-act">
         <a href="<?= $model->absoluteUrl; ?>" target="_blank"
-           class="btn-tree-node-controll btn btn-default btn-sm show-at-site"
-           title="<?= \Yii::t('skeeks/cms', "Show at site"); ?>">
-            <span class="fas fa-external-link-alt"></span>
+           class="sx-tree-action show-at-site"
+           title="<?= \Yii::t('skeeks/cms', "Show at site"); ?>"
+           aria-label="<?= \Yii::t('skeeks/cms', "Show at site"); ?>">
+            <?= \skeeks\cms\backend\helpers\BackendIcon::render('external-link', ['size' => 16]); ?>
         </a>
     </div>
     <?php if ($model->level > 0 && \Yii::$app->user->can('cms/admin-tree/resort')) : ?>
         <div class="pull-left sx-controll-act">
-            <a href="#" class="btn-tree-node-controll btn btn-default btn-sm sx-tree-move" style="cursor: move;"
-               title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
-                <span class="fas fa-arrows-alt-v"></span>
+            <a href="#" class="sx-tree-action sx-tree-move"
+               title="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>"
+               aria-label="<?= \Yii::t('skeeks/cms', "Change sorting"); ?>">
+                <?= \skeeks\cms\backend\helpers\BackendIcon::render('move-vertical', ['size' => 16]); ?>
             </a>
         </div>
     <?php endif; ?>
@@ -206,7 +215,6 @@ JS
 
 <?php if ($model->treeType) : ?>
     <div class="pull-right sx-tree-type">
-        <i class="fas fa-file"></i>
         <?= $model->treeType->name; ?>
     </div>
 <?php endif; ?>
