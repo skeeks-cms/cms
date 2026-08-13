@@ -14,11 +14,11 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\ImageColumn2;
-use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsCompany2Contractor;
@@ -370,18 +370,15 @@ HTML
                                     $meta = '';
                                 }
 
+                                $mediaContent = BackendEntityMedia::widget([
+                                    'image' => $model->cmsImage,
+                                    'icon'  => 'building',
+                                ]);
+
                                 $media = BackendEntityLink::widget([
                                     'controllerId' => '/cms/admin-cms-company',
                                     'modelId'      => $model->id,
-                                    'content'      => Html::img($model->cmsImage ? \Yii::$app->imaging->thumbnailUrlOnRequest($model->cmsImage->src,
-                                        new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                            'h' => 50,
-                                            'w' => 50,
-                                            'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
-                                        ])) : Image::getCapSrc(), [
-                                        'class' => 'sx-photo sx-img-size-50',
-                                        'alt'   => '',
-                                    ]),
+                                    'content'      => $mediaContent,
                                     'options'      => [
                                         'class'      => 'sx-preview-card__media-link',
                                         'aria-label' => (string)$model->asText,

@@ -17,6 +17,7 @@ use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
@@ -357,8 +358,24 @@ JS
 
 
                                 $reuslt .= "</div>";
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-deal',
+                                    'modelId'      => $cmsDeal->id,
+                                    'content'      => BackendEntityMedia::widget([
+                                        'image' => $cmsDeal->company ? $cmsDeal->company->cmsImage : null,
+                                        'icon'  => 'handshake',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$cmsDeal->asShortText,
+                                    ],
+                                ]);
 
-                                return $reuslt;
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $reuslt, ['class' => 'sx-preview-card__content']),
+                                    ['class' => 'sx-preview-card']
+                                );
                             },
                         ],
 

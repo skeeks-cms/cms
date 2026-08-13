@@ -20,12 +20,12 @@ use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
-use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContentElement;
@@ -307,13 +307,10 @@ class AdminUserController extends BackendModelStandartController
                                     BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-user',
                                         'modelId'      => $cmsUser->id,
-                                        'content'      => Html::img(
-                                            $cmsUser->image ? $cmsUser->avatarSrc : Image::getCapSrc(),
-                                            [
-                                                'class' => 'sx-photo sx-img-size-50',
-                                                'alt'   => '',
-                                            ]
-                                        ),
+                                        'content'      => BackendEntityMedia::widget([
+                                            'imageSrc' => $cmsUser->image ? $cmsUser->avatarSrc : null,
+                                            'icon'     => 'user',
+                                        ]),
                                         'options'      => [
                                             'class'      => 'sx-preview-card__media-link',
                                             'aria-label' => $cmsUser->shortDisplayNameWithAlias,

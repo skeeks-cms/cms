@@ -18,6 +18,7 @@ use skeeks\cms\backend\actions\BackendModelMultiAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\base\InputWidget;
@@ -555,16 +556,30 @@ JS
                                     ],
                                 ]);
 
-                            return Html::tag(
-                                'div',
-                                $titleAction
-                                .Html::tag(
+                            $content = $titleAction.Html::tag(
                                     'small',
                                     Html::encode($ShopBill->shopPaySystem->name),
                                     ['class' => 'sx-collection-cell__secondary']
-                                )
-                                .$last,
-                                ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                ).$last;
+                            $media = BackendEntityLink::widget([
+                                'controllerId' => '/cms/admin-cms-bill',
+                                'modelId'      => $ShopBill->id,
+                                'content'      => BackendEntityMedia::widget([
+                                    'image' => $ShopBill->company ? $ShopBill->company->cmsImage : null,
+                                    'icon'  => 'invoice',
+                                ]),
+                                'options'      => [
+                                    'class'      => 'sx-preview-card__media-link',
+                                    'aria-label' => $title,
+                                ],
+                            ]);
+
+                            return Html::tag('div',
+                                Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                Html::tag('div', $content, [
+                                    'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                ]),
+                                ['class' => 'sx-preview-card']
                             );
                             },
                         ],

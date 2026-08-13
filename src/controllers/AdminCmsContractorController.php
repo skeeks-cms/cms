@@ -14,11 +14,11 @@ use skeeks\cms\backend\actions\BackendModelCreateAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn2;
-use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsContractor;
 use skeeks\cms\models\queries\CmsContractorQuery;
@@ -173,9 +173,9 @@ HTML
                                     BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-contractor',
                                         'modelId'      => $model->id,
-                                        'content'      => Html::img($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc(), [
-                                            'class' => 'sx-photo sx-img-size-50',
-                                            'alt'   => '',
+                                        'content'      => BackendEntityMedia::widget([
+                                            'image' => $model->cmsImage,
+                                            'icon'  => 'building',
                                         ]),
                                         'options'      => [
                                             'class'      => 'sx-preview-card__media-link',
@@ -192,7 +192,7 @@ HTML
                                         $title,
                                         ['class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack']
                                     ),
-                                    ['class' => 'sx-preview-card sx-preview-card--file']
+                                    ['class' => 'sx-preview-card']
                                 );
                             },
                         ],

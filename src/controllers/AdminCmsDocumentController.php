@@ -11,6 +11,7 @@ use kartik\datecontrol\DateControl;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\measure\models\CmsMeasure;
@@ -224,10 +225,25 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                     'class' => trim('sx-status '.$statusClass),
                                 ]);
 
-                                return Html::tag(
-                                    'div',
-                                    $titleAction.$status,
-                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-document',
+                                    'modelId'      => $model->id,
+                                    'content'      => BackendEntityMedia::widget([
+                                        'image' => $model->company ? $model->company->cmsImage : null,
+                                        'icon'  => 'file',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $titleAction.$status, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card']
                                 );
                             },
                         ],
