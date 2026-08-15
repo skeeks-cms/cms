@@ -381,7 +381,21 @@ class AdminCmsBillController extends BackendModelStandartController
 
                 ],
                 'grid'    => [
-                    
+
+                    'rowOptions' => function (ShopBill $ShopBill) {
+                        if ($ShopBill->paid_at || $ShopBill->closed_at) {
+                            return [];
+                        }
+
+                        if ($ShopBill->due_at && $ShopBill->due_at < time()) {
+                            return [
+                                'class' => 'sx-collection-item--danger',
+                            ];
+                        }
+
+                        return [];
+                    },
+
                     'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider

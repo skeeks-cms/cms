@@ -51,6 +51,11 @@ use yii\web\ForbiddenHttpException;
  */
 class AdminCmsDealController extends BackendModelStandartController
 {
+    /**
+     * За сколько до окончания сделка подсвечивается как истекающая.
+     */
+    const EXPIRING_SOON_SECONDS = 7 * 24 * 3600;
+
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Сделки");
@@ -145,6 +150,8 @@ class AdminCmsDealController extends BackendModelStandartController
                 'grid'    => [
                     'rowOptions' => function (CmsDeal $cmsDeal) {
                         $isExpired = $cmsDeal->end_at && $cmsDeal->end_at < time();
+                        $isExpiringSoon = $cmsDeal->end_at && !$isExpired
+                            && $cmsDeal->end_at < time() + self::EXPIRING_SOON_SECONDS;
                         if (!$cmsDeal->is_active) {
                             return [
                                 'class' => 'sx-cms-deal-row--inactive',
@@ -155,6 +162,12 @@ class AdminCmsDealController extends BackendModelStandartController
                         if ($isExpired) {
                             return [
                                 'class' => 'sx-collection-item--danger',
+                            ];
+                        }
+
+                        if ($isExpiringSoon) {
+                            return [
+                                'class' => 'sx-collection-item--warning',
                             ];
                         }
 
