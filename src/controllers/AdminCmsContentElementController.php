@@ -164,7 +164,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                 "filters" => [
                     'class' => ContentElementBackendFiltersWidget::class,
                     'contextData' => [
-                        'content_id' => $this->content->id
+                        'content_id' => $content ? $content->id : null,
                     ],
                     'visibleFilters'     => [
                         'q',
@@ -202,7 +202,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                                         'searchQuery' => function($word = '') use ($content) {
                                             $userIds = CmsContentElement::find()
                                                     ->cmsSite()
-                                                    ->andWhere(['content_id' => $content->id])
+                                                    ->andWhere(['content_id' => $content ? $content->id : null])
                                                     ->groupBy("created_by")
                                                     ->select('created_by')
                                                 ->asArray()
@@ -352,7 +352,7 @@ class AdminCmsContentElementController extends BackendModelStandartController
                     'class' => ContentElementBackendGridView::class,
 
                     'contextData' => [
-                        'content_id' => $this->content->id
+                        'content_id' => $content ? $content->id : null,
                     ],
 
                     'on beforeInit'        => function (Event $event) {

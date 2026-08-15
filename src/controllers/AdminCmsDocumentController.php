@@ -1420,6 +1420,9 @@ JS
     border: 1px solid #dee2e6;
     vertical-align: middle;
 }
+.sx-document-items td {
+    padding: 0;
+}
 .sx-document-items tbody tr {
     position: relative;
 }
@@ -1454,21 +1457,21 @@ JS
     font-weight: 600;
     padding: 10px 12px;
 }
-.sx-document-items input,
-.sx-document-items select {
+.sx-document-items table input,
+.sx-document-items table select {
     width: 100%;
     min-width: 0;
     height: 44px;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    background: transparent;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
     padding: 0 10px;
 }
-.sx-document-items input:focus,
-.sx-document-items select:focus {
-    box-shadow: none;
-    background: #fff;
+.sx-document-items table input:focus,
+.sx-document-items table select:focus {
+    box-shadow: none !important;
+    background-color: #fff !important;
     outline: 0;
 }
 .sx-document-items .sx-document-item-amount {
@@ -1730,6 +1733,14 @@ JS
 }
 .sx-document-discount-modal-control {
     display: flex;
+    overflow: hidden;
+    border: 1px solid #d8dee4;
+    border-radius: 4px;
+    background: #fff;
+}
+.sx-document-discount-modal-control:focus-within {
+    border-color: #f04b78;
+    box-shadow: 0 0 0 3px rgba(240, 75, 120, .14);
 }
 .sx-document-discount-modal input {
     width: 100%;
@@ -1741,15 +1752,18 @@ JS
     box-shadow: none;
 }
 .sx-document-discount-modal-control input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    min-width: 0;
+    height: 44px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 .sx-document-discount-modal-addon {
     min-width: 46px;
-    height: 46px;
-    border: 1px solid #d8dee4;
-    border-left: 0;
-    border-radius: 0 4px 4px 0;
+    height: 44px;
+    border: 0;
+    border-left: 1px solid #d8dee4;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;

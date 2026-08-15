@@ -114,6 +114,18 @@ class AdminCmsBillController extends BackendModelStandartController
                     return true;
                 },
             ],
+            'duplicate' => [
+                'class'          => BackendModelAction::class,
+                'name'           => 'Дублировать',
+                'icon'           => 'fa fa-copy',
+                'priority'       => 15,
+                'callback'       => [$this, 'duplicateBill'],
+                'accessCallback' => function () {
+                    $createAction = $this->createAction('create');
+
+                    return $createAction && $createAction->isAllow;
+                },
+            ],
             'payments' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Платежи',
@@ -800,6 +812,18 @@ HTML
         return $actions;
     }
 
+    public function duplicateBill(BackendModelAction $action)
+    {
+        $createAction = $this->createAction('create');
+        if (!$createAction || !$createAction->isAllow) {
+            throw new ForbiddenHttpException('Нет доступа к созданию счета');
+        }
+
+        return $this->redirect(ArrayHelper::merge($createAction->urlData, [
+            'copy_id' => $action->model->id,
+        ]));
+    }
+
     public function payments()
     {
         if ($controller = \Yii::$app->createController('/shop/admin-payment')) {
@@ -1198,6 +1222,9 @@ HTML
     border: 1px solid #dee2e6;
     vertical-align: middle;
 }
+.sx-bill-items td {
+    padding: 0;
+}
 .sx-bill-items tbody tr {
     position: relative;
 }
@@ -1244,21 +1271,21 @@ HTML
 .sx-bill-items .sx-bill-item-discount-col {
     width: 8%;
 }
-.sx-bill-items input,
-.sx-bill-items select {
+.sx-bill-items table input,
+.sx-bill-items table select {
     width: 100%;
     min-width: 0;
     height: 44px;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    background: transparent;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
     padding: 0 10px;
 }
-.sx-bill-items input:focus,
-.sx-bill-items select:focus {
-    box-shadow: none;
-    background: #fff;
+.sx-bill-items table input:focus,
+.sx-bill-items table select:focus {
+    box-shadow: none !important;
+    background-color: #fff !important;
     outline: 0;
 }
 .sx-bill-items .sx-bill-item-amount {
@@ -1505,6 +1532,14 @@ HTML
 }
 .sx-bill-discount-modal-control {
     display: flex;
+    overflow: hidden;
+    border: 1px solid #d8dee4;
+    border-radius: 4px;
+    background: #fff;
+}
+.sx-bill-discount-modal-control:focus-within {
+    border-color: #f04b78;
+    box-shadow: 0 0 0 3px rgba(240, 75, 120, .14);
 }
 .sx-bill-discount-modal input {
     width: 100%;
@@ -1516,15 +1551,18 @@ HTML
     box-shadow: none;
 }
 .sx-bill-discount-modal-control input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    min-width: 0;
+    height: 44px;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 .sx-bill-discount-modal-addon {
     min-width: 46px;
-    height: 46px;
-    border: 1px solid #d8dee4;
-    border-left: 0;
-    border-radius: 0 4px 4px 0;
+    height: 44px;
+    border: 0;
+    border-left: 1px solid #d8dee4;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2524,6 +2562,49 @@ HTML;
         }
     }
 
+    protected function prefillDuplicateBill(ShopBill $model, $sourceBillId)
+    {
+        $sourceBill = ShopBill::find()
+            ->forManager()
+            ->andWhere([ShopBill::tableName().'.id' => (int)$sourceBillId])
+            ->one();
+
+        if (!$sourceBill) {
+            throw new ForbiddenHttpException('Исходный счет не найден или недоступен');
+        }
+
+        $model->setAttributes($sourceBill->getAttributes([
+            'cms_user_id',
+            'cms_company_id',
+            'sender_contractor_id',
+            'receiver_contractor_id',
+            'receiver_contractor_bank_id',
+            'shop_pay_system_id',
+            'currency_code',
+            'discount_value',
+            'discount_name',
+            'description',
+        ]));
+
+        $model->billItemsData = [];
+        foreach ($sourceBill->printableBillItems as $item) {
+            $model->billItemsData[] = $item->getAttributes([
+                'shop_product_id',
+                'name',
+                'measure_name',
+                'quantity',
+                'price',
+                'discount_amount',
+                'discount_value',
+                'discount_name',
+                'currency_code',
+                'vat_name',
+            ]);
+        }
+
+        $model->deals = ArrayHelper::getColumn($sourceBill->deals, 'id');
+    }
+
     public function updateFields($action)
     {
         if (\Yii::$app->request->get('sx-bill-product-search')) {
@@ -2537,6 +2618,13 @@ HTML;
          * @var $mainContractor CrmContractor
          */
         $model = $action->model;
+        if ($model->isNewRecord && !\Yii::$app->request->post()) {
+            $copyId = (int)\Yii::$app->request->get('copy_id');
+            if ($copyId) {
+                $this->prefillDuplicateBill($model, $copyId);
+            }
+        }
+
         $model->load(\Yii::$app->request->get());
         if ($model->isNewRecord && !$model->due_at) {
             $model->due_at = strtotime('today +30 days');
