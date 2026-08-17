@@ -39,6 +39,8 @@ $taskViewOptions = [
     'table' => 'Таблица',
     'list'  => 'Список',
 ];
+$documentTemplate = (string)ArrayHelper::getValue($params, 'document_template');
+$documentTemplateOptions = $controller->taskReportDocumentTemplateOptions();
 $showExecutorBreakdown = in_array('executor', $selectedColumns);
 $showStatusBreakdown = in_array('status', $selectedColumns);
 $showTime = (bool)array_intersect(['fact_time', 'fact_hours'], $selectedColumns);
@@ -279,7 +281,43 @@ $this->registerCss(<<<CSS
     background: var(--sx-color-surface-muted);
     margin: 0;
     padding: 10px 12px;
-    white-space: pre-line;
+    line-height: 1.4;
+}
+.sx-task-report .sx-report-task-results {
+    display: grid;
+    gap: 12px;
+}
+.sx-task-report .sx-report-result-item {
+    min-width: 0;
+}
+.sx-task-report .sx-report-attachments {
+    display: grid;
+    gap: 8px;
+    margin: 8px 0 0 15px;
+}
+.sx-task-report .sx-report-attachments-title {
+    color: var(--sx-color-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.sx-task-report .sx-report-attachment {
+    color: var(--sx-color-text);
+    display: block;
+    overflow-wrap: anywhere;
+}
+.sx-task-report .sx-report-attachment-image {
+    display: block;
+    max-height: 280px;
+    max-width: 100%;
+    object-fit: contain;
+}
+.sx-task-report .sx-report-attachment-name {
+    color: var(--sx-color-text-muted);
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
 }
 @media (max-width: 1100px) {
     .sx-task-report .sx-report-filter-row,
@@ -655,6 +693,12 @@ JS);
                     'class' => 'form-control',
                 ]); ?>
             </div>
+            <div>
+                <span class="sx-report-label">Шаблон PDF</span>
+                <?php echo Html::dropDownList('document_template', $documentTemplate, $documentTemplateOptions, [
+                    'class' => 'form-control',
+                ]); ?>
+            </div>
         </div>
 
         <div class="sx-report-filter-row">
@@ -687,6 +731,14 @@ JS);
                 'data-pjax' => '0',
                 'data-toggle' => 'tooltip',
                 'title' => 'Скачать PDF',
+            ]); ?>
+            <?php echo Html::a('<i class="fa fa-eye"></i> Предпросмотр PDF', ArrayHelper::merge(['report-export', 'format' => 'pdf', 'preview' => 1], $exportParams), [
+                'class' => 'btn btn-default sx-report-export',
+                'data-pjax' => '0',
+                'target' => '_blank',
+                'rel' => 'noopener',
+                'data-toggle' => 'tooltip',
+                'title' => 'Открыть PDF в новой вкладке',
             ]); ?>
         </div>
 
@@ -797,6 +849,15 @@ JS);
         <?php if ($taskView == 'list') : ?>
             <div class="sx-report-task-list">
                 <?php foreach ((array)ArrayHelper::getValue($report, 'rows') as $row) : ?>
+                    <?php
+                    $resultItems = (array)ArrayHelper::getValue($row, 'result_items', []);
+                    if (!$resultItems && (ArrayHelper::getValue($row, 'result') !== '' || ArrayHelper::getValue($row, 'result_files'))) {
+                        $resultItems[] = [
+                            'text'  => (string)ArrayHelper::getValue($row, 'result', ''),
+                            'files' => (array)ArrayHelper::getValue($row, 'result_files', []),
+                        ];
+                    }
+                    ?>
                     <article class="sx-report-task-item">
                         <h3 class="sx-report-task-title"><?php echo Html::encode(ArrayHelper::getValue($row, 'name')); ?></h3>
                         <div class="sx-report-task-meta">
@@ -811,8 +872,35 @@ JS);
                                 <span><b><?php echo Html::encode(ArrayHelper::getValue($columns, $column, $column)); ?>:</b> <?php echo Html::encode($value); ?></span>
                             <?php endforeach; ?>
                         </div>
-                        <?php if (in_array('result', $selectedColumns) && ArrayHelper::getValue($row, 'result') !== '') : ?>
-                            <blockquote class="sx-report-task-result"><?php echo Html::encode(ArrayHelper::getValue($row, 'result')); ?></blockquote>
+                        <?php if (in_array('result', $selectedColumns) && $resultItems) : ?>
+                            <div class="sx-report-task-results">
+                                <?php foreach ($resultItems as $resultItem) : ?>
+                                    <?php $resultFiles = (array)ArrayHelper::getValue($resultItem, 'files', []); ?>
+                                    <div class="sx-report-result-item">
+                                        <?php if (ArrayHelper::getValue($resultItem, 'text') !== '') : ?>
+                                            <blockquote class="sx-report-task-result"><?php echo nl2br(Html::encode((string)ArrayHelper::getValue($resultItem, 'text')), false); ?></blockquote>
+                                        <?php endif; ?>
+                                        <?php if ($resultFiles) : ?>
+                                            <div class="sx-report-attachments">
+                                                <div class="sx-report-attachments-title">Вложения к результату</div>
+                                                <?php foreach ($resultFiles as $file) : ?>
+                                                    <?php $fileUrl = (string)ArrayHelper::getValue($file, 'url', ''); ?>
+                                                    <?php if (ArrayHelper::getValue($file, 'isImage')) : ?>
+                                                        <?php if ($fileUrl !== '') : ?><a class="sx-report-attachment" href="<?php echo Html::encode($fileUrl); ?>" target="_blank" rel="noopener"><?php endif; ?>
+                                                        <img class="sx-report-attachment-image" src="<?php echo Html::encode($fileUrl); ?>" alt="<?php echo Html::encode(ArrayHelper::getValue($file, 'name', 'Изображение')); ?>">
+                                                        <span class="sx-report-attachment-name"><?php echo Html::encode(ArrayHelper::getValue($file, 'name', 'Изображение')); ?></span>
+                                                        <?php if ($fileUrl !== '') : ?></a><?php endif; ?>
+                                                    <?php elseif ($fileUrl !== '') : ?>
+                                                        <a class="sx-report-attachment" href="<?php echo Html::encode($fileUrl); ?>" target="_blank" rel="noopener">Файл: <?php echo Html::encode(ArrayHelper::getValue($file, 'name', 'Скачать вложение')); ?></a>
+                                                    <?php else : ?>
+                                                        <span class="sx-report-attachment">Файл: <?php echo Html::encode(ArrayHelper::getValue($file, 'name', 'Вложение')); ?></span>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
                         <?php endif; ?>
                     </article>
                 <?php endforeach; ?>

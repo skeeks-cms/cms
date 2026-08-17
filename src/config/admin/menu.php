@@ -405,6 +405,11 @@ return array_merge(dashboardsMenu(), [
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/info.svg'],
                         ],
                         [
+                            'label' => 'Шаблоны документов',
+                            'url'   => ['cms/admin-cms-document-template'],
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/task.svg'],
+                        ],
+                        [
                             'label' => 'Телефоны',
                             'url'   => ['cms/admin-cms-site-phone'],
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/phone.svg'],

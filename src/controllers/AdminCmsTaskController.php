@@ -18,6 +18,7 @@ use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\forms\CmsTaskBulkEditForm;
 use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsDocumentTemplate;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsTask;
@@ -948,7 +949,7 @@ JS
         }
 
         if ($format == 'pdf') {
-            return $this->downloadTaskReportPdf($report);
+            return $this->downloadTaskReportPdf($report, (bool)\Yii::$app->request->get('preview'));
         }
 
         return $this->downloadTaskReportCsv($report);
@@ -983,6 +984,15 @@ JS
             $taskView = 'list';
         }
 
+        $documentTemplate = \Yii::$app->request->get('document_template');
+        if ($documentTemplate === null) {
+            $defaultTemplate = CmsDocumentTemplate::findDefault(
+                \Yii::$app->skeeks->site->id,
+                CmsDocumentTemplate::DOCUMENT_TASK_REPORT
+            );
+            $documentTemplate = $defaultTemplate ? 'id:'.$defaultTemplate->id : '';
+        }
+
         return [
             'period'         => $period,
             'periodStart'    => $this->parseTaskReportPeriod($period, false),
@@ -995,7 +1005,39 @@ JS
             'columns'        => $columns,
             'display'        => $display,
             'task_view'      => $taskView,
+            'document_template' => (string)$documentTemplate,
         ];
+    }
+
+    public function taskReportDocumentTemplateOptions()
+    {
+        $options = [
+            '' => 'Обычный — без фирменного профиля',
+            'preset:'.CmsDocumentTemplate::THEME_DARK => 'SkeekS Dark — готовая основа',
+            'preset:'.CmsDocumentTemplate::THEME_LIGHT => 'SkeekS Light — готовая основа',
+        ];
+
+        $models = CmsDocumentTemplate::find()
+            ->andWhere([
+                'cms_site_id' => \Yii::$app->skeeks->site->id,
+                'is_active' => 1,
+                'document_type' => [
+                    CmsDocumentTemplate::DOCUMENT_ALL,
+                    CmsDocumentTemplate::DOCUMENT_TASK_REPORT,
+                ],
+            ])
+            ->orderBy(['is_default' => SORT_DESC, 'name' => SORT_ASC])
+            ->all();
+
+        foreach ($models as $model) {
+            $label = $model->name;
+            if ($model->is_default) {
+                $label .= ' — по умолчанию';
+            }
+            $options['id:'.$model->id] = $label;
+        }
+
+        return $options;
     }
 
     public function taskReportColumns()
@@ -1119,9 +1161,12 @@ JS
             $byStatus[$statusName]['duration'] += $duration;
 
             $completedAt = $task->status == CmsTask::STATUS_READY ? (int)$taskData['completedAt'] : null;
+            $resultData = (array)ArrayHelper::getValue($results, $taskId, []);
             $rows[] = [
                 'name'         => (string)$task->name,
-                'result'       => (string)ArrayHelper::getValue($results, $taskId, ''),
+                'result'       => (string)ArrayHelper::getValue($resultData, 'text', ''),
+                'result_files' => (array)ArrayHelper::getValue($resultData, 'files', []),
+                'result_items' => (array)ArrayHelper::getValue($resultData, 'items', []),
                 'project'      => $task->cmsProject ? (string)$task->cmsProject->asText : '',
                 'company'      => $task->cmsCompany ? (string)$task->cmsCompany->asText : '',
                 'client'       => $task->cmsUser ? (string)$task->cmsUser->asText : '',
@@ -1243,25 +1288,86 @@ JS
                 'model_code' => CmsTask::class,
                 'model_id'   => $taskIds,
             ])
+            ->with('files')
             ->orderBy(['created_at' => SORT_ASC, 'id' => SORT_ASC])
             ->all();
 
         foreach ($logs as $log) {
-            $comment = trim(strip_tags((string)$log->comment));
-            if (!$comment) {
-                continue;
+            $taskId = (int)$log->model_id;
+            if (!isset($result[$taskId])) {
+                $result[$taskId] = [
+                    'comments' => [],
+                    'files'    => [],
+                    'items'    => [],
+                ];
             }
-            if (!isset($result[$log->model_id])) {
-                $result[$log->model_id] = [];
+
+            $comment = $this->normalizeTaskReportResultComment($log->comment);
+            if ($comment !== '') {
+                $result[$taskId]['comments'][] = $comment;
             }
-            $result[$log->model_id][] = $comment;
+
+            $itemFiles = [];
+            foreach ($log->files as $file) {
+                $rootSrc = (string)$file->rootSrc;
+                $absoluteSrc = (string)$file->absoluteSrc;
+                $fileData = [
+                    'id'       => (int)$file->id,
+                    'name'     => (string)$file->fileName,
+                    'mimeType' => (string)$file->mime_type,
+                    'isImage'  => (bool)$file->isImage(),
+                    'src'      => $rootSrc !== '' && is_file($rootSrc) ? $rootSrc : $absoluteSrc,
+                    'url'      => $absoluteSrc,
+                ];
+                $itemFiles[$file->id] = $fileData;
+                $result[$taskId]['files'][$file->id] = $fileData;
+            }
+
+            if ($comment !== '' || $itemFiles) {
+                $result[$taskId]['items'][] = [
+                    'id'    => (int)$log->id,
+                    'text'  => $comment,
+                    'files' => array_values($itemFiles),
+                ];
+            }
         }
 
-        foreach ($result as $taskId => $comments) {
-            $result[$taskId] = implode("\n", $comments);
+        foreach ($result as $taskId => $resultData) {
+            $result[$taskId] = [
+                'text'  => implode("\n\n", $resultData['comments']),
+                'files' => array_values($resultData['files']),
+                'items' => array_values($resultData['items']),
+            ];
         }
 
         return $result;
+    }
+
+    /**
+     * Converts the HTML produced by the comment editor to readable plain text
+     * without losing paragraph and list-item boundaries in the PDF report.
+     */
+    protected function normalizeTaskReportResultComment($comment)
+    {
+        $comment = (string)$comment;
+        if ($comment === '') {
+            return '';
+        }
+
+        $comment = preg_replace('/<\s*br\s*\/?\s*>/iu', "\n", $comment);
+        $comment = preg_replace('/<\s*li\b[^>]*>/iu', '• ', $comment);
+        $comment = preg_replace('/<\/\s*(?:p|div|li|h[1-6]|tr)\s*>/iu', "\n", $comment);
+        $comment = preg_replace('/<\/\s*(?:td|th)\s*>/iu', "\t", $comment);
+        $comment = strip_tags($comment);
+        $comment = html_entity_decode($comment, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $comment = str_replace(["\r\n", "\r"], "\n", $comment);
+        $comment = preg_replace('/[ \t]+\n/u', "\n", $comment);
+        // The editor may put its own line break around every block element.
+        // After closing tags have also been converted to a line break this
+        // otherwise produces an empty line between each visible row.
+        $comment = preg_replace('/\n{2,}/u', "\n", $comment);
+
+        return trim($comment);
     }
 
     protected function parseTaskReportPeriod($period, $isEnd = false)
@@ -1349,14 +1455,44 @@ JS
         return $response;
     }
 
-    protected function downloadTaskReportPdf(array $report)
+    protected function downloadTaskReportPdf(array $report, $inline = false)
     {
         if (!class_exists('\Mpdf\Mpdf')) {
             return $this->downloadTaskReportCsv($report);
         }
 
+        $site = \Yii::$app->skeeks->site;
+        $theme = CmsDocumentTemplate::resolveTheme(
+            (string)ArrayHelper::getValue($report, 'params.document_template'),
+            $site,
+            CmsDocumentTemplate::DOCUMENT_TASK_REPORT
+        );
+
+        if ($theme) {
+            $templateModel = ArrayHelper::getValue($theme, 'model');
+            $logo = $templateModel && $templateModel->logoStorageFile
+                ? $templateModel->logoStorageFile
+                : null;
+
+            if (!$logo) {
+                $logo = ArrayHelper::getValue($theme, 'theme') == CmsDocumentTemplate::THEME_DARK
+                    ? $site->image
+                    : ($site->logoLightImage ?: $site->image);
+            }
+
+            if ($logo) {
+                $logoPath = $logo->getRootSrc();
+                $theme['logo_src'] = $logoPath && is_file($logoPath) ? $logoPath : $logo->absoluteSrc;
+            } else {
+                $theme['logo_src'] = null;
+            }
+            $theme['company_name'] = $site->name;
+            $theme['company_url'] = $site->url;
+        }
+
         $html = $this->renderPartial('report-pdf', [
             'report' => $report,
+            'theme'  => $theme,
         ]);
 
         $tempDir = \Yii::getAlias('@runtime/mpdf');
@@ -1364,16 +1500,210 @@ JS
             @mkdir($tempDir, 0777, true);
         }
 
+        $orientation = $theme && ArrayHelper::getValue($theme, 'page_orientation') == CmsDocumentTemplate::ORIENTATION_PORTRAIT
+            ? 'P'
+            : 'L';
         $mpdf = new \Mpdf\Mpdf([
             'tempDir' => $tempDir,
-            'format'  => 'A4-L',
+            'format'  => 'A4',
+            'orientation' => $orientation,
+            'margin_top' => $theme ? 26 : 14,
+            'margin_right' => $theme ? 16 : 14,
+            'margin_bottom' => $theme && ArrayHelper::getValue($theme, 'show_footer') ? 20 : 14,
+            'margin_left' => $theme ? 16 : 14,
+            'margin_header' => $theme ? 10 : 9,
         ]);
         $mpdf->SetTitle((string)ArrayHelper::getValue($report, 'title', 'Отчет по задачам'));
+
+        if ($theme) {
+            $backgroundFile = $this->taskReportBackgroundFile($theme, $orientation, $tempDir);
+            if ($backgroundFile) {
+                $mpdf->SetDocTemplate($backgroundFile, true);
+            }
+        }
+
+        if ($theme && ArrayHelper::getValue($theme, 'show_footer')) {
+            $footerText = trim((string)ArrayHelper::getValue($theme, 'footer_text'));
+            if ($footerText === '') {
+                $footerText = trim($site->name.' · '.$site->url, ' ·');
+            }
+            $pageNumber = ArrayHelper::getValue($theme, 'show_page_numbers') ? '{PAGENO} / {nbpg}' : '';
+            $mpdf->SetHTMLFooter(
+                '<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; border: 0; border-top: 1px solid '
+                .Html::encode(ArrayHelper::getValue($theme, 'border_color')).'; color: '
+                .Html::encode(ArrayHelper::getValue($theme, 'muted_color')).'; font-size: 8pt;"><tr>'
+                .'<td width="80%" style="background: transparent; border: 0; padding: 3mm 0 0;">'.Html::encode($footerText).'</td>'
+                .'<td width="20%" align="right" style="background: transparent; border: 0; padding: 3mm 0 0;">'.$pageNumber.'</td>'
+                .'</tr></table>'
+            );
+        }
         $mpdf->WriteHTML($html);
 
-        return \Yii::$app->response->sendContentAsFile($mpdf->Output('', 'S'), $this->taskReportDownloadName($report, 'pdf'), [
+        $response = \Yii::$app->response;
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response->sendContentAsFile($mpdf->Output('', 'S'), $this->taskReportDownloadName($report, 'pdf'), [
             'mimeType' => 'application/pdf',
+            'inline' => (bool)$inline,
         ]);
+    }
+
+    /**
+     * Фирменная подложка страницы: градиент и декоративное кольцо.
+     *
+     * mPDF печатает фоновые градиенты после всех сплошных заливок, поэтому
+     * градиент документа перекрыл бы карточки. Подложка готовится отдельным
+     * документом и подставляется под содержимое каждой страницы.
+     *
+     * @param array  $theme
+     * @param string $orientation P|L
+     * @param string $tempDir
+     *
+     * @return string|null путь к файлу подложки
+     */
+    protected function taskReportBackgroundFile(array $theme, $orientation, $tempDir)
+    {
+        $width = $orientation == 'P' ? 210 : 297;
+        $height = $orientation == 'P' ? 297 : 210;
+        $gradientFrom = (string)ArrayHelper::getValue($theme, 'gradient_from', ArrayHelper::getValue($theme, 'background_color'));
+        $gradientTo = (string)ArrayHelper::getValue($theme, 'gradient_to', ArrayHelper::getValue($theme, 'background_color'));
+        $accent = (string)ArrayHelper::getValue($theme, 'accent_color');
+        $accentAlt = (string)ArrayHelper::getValue($theme, 'accent_alt_color', $accent);
+
+        if (!function_exists('imagecreatetruecolor')) {
+            return null;
+        }
+
+        $dir = $tempDir.DIRECTORY_SEPARATOR.'report-backgrounds';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0777, true);
+        }
+
+        $key = md5(implode('|', [$width, $height, $gradientFrom, $gradientTo, $accent, $accentAlt, 'v2']));
+        $file = $dir.DIRECTORY_SEPARATOR.$key.'.pdf';
+        if (is_file($file)) {
+            return $file;
+        }
+
+        $image = $dir.DIRECTORY_SEPARATOR.$key.'.png';
+
+        try {
+            if (!is_file($image)) {
+                $this->renderTaskReportBackgroundImage($image, $width, $height, $gradientFrom, $gradientTo, $accent, $accentAlt);
+            }
+
+            $background = new \Mpdf\Mpdf([
+                'tempDir'       => $tempDir,
+                'format'        => 'A4',
+                'orientation'   => $orientation,
+                'margin_top'    => 0,
+                'margin_right'  => 0,
+                'margin_bottom' => 0,
+                'margin_left'   => 0,
+            ]);
+            // Прямая вставка по координатам: в потоке документа изображение
+            // подгоняется под область печати и оставляет белые поля.
+            $background->AddPage();
+            $background->Image($image, 0, 0, $width, $height, 'png', '', true, false);
+            $background->Output($file, 'F');
+        } catch (\Exception $e) {
+            \Yii::warning('Не удалось подготовить подложку отчёта: '.$e->getMessage(), self::class);
+
+            return null;
+        }
+
+        return is_file($file) ? $file : null;
+    }
+
+    /**
+     * Изображение подложки: вертикальный градиент и фирменное кольцо в углу.
+     *
+     * @param string $file    куда сохранить PNG
+     * @param int    $width   ширина страницы, мм
+     * @param int    $height  высота страницы, мм
+     * @param string $from    верхний цвет градиента
+     * @param string $to      нижний цвет градиента
+     * @param string $accent
+     * @param string $accentAlt
+     *
+     * @return void
+     */
+    protected function renderTaskReportBackgroundImage($file, $width, $height, $from, $to, $accent, $accentAlt)
+    {
+        $hexToRgb = function ($hex) {
+            $hex = ltrim((string)$hex, '#');
+            if (strlen($hex) == 3) {
+                $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+            }
+            if (strlen($hex) != 6) {
+                $hex = '000000';
+            }
+
+            return [hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2))];
+        };
+
+        $fromRgb = $hexToRgb($from);
+        $toRgb = $hexToRgb($to);
+        $accentRgb = $hexToRgb($accent);
+        $accentAltRgb = $hexToRgb($accentAlt);
+
+        // Рисуем с двукратным запасом и уменьшаем: так сглаживаются края кольца.
+        $scale = 2;
+        $pageWidth = (int)round($width * 96 / 25.4);
+        $pageHeight = (int)round($height * 96 / 25.4);
+        $canvasWidth = $pageWidth * $scale;
+        $canvasHeight = $pageHeight * $scale;
+
+        $canvas = imagecreatetruecolor($canvasWidth, $canvasHeight);
+
+        for ($y = 0; $y < $canvasHeight; $y++) {
+            $ratio = $canvasHeight > 1 ? $y / ($canvasHeight - 1) : 0;
+            $color = imagecolorallocate(
+                $canvas,
+                (int)round($fromRgb[0] + ($toRgb[0] - $fromRgb[0]) * $ratio),
+                (int)round($fromRgb[1] + ($toRgb[1] - $fromRgb[1]) * $ratio),
+                (int)round($fromRgb[2] + ($toRgb[2] - $fromRgb[2]) * $ratio)
+            );
+            imagefilledrectangle($canvas, 0, $y, $canvasWidth, $y, $color);
+        }
+
+        $pixelsPerMm = $canvasWidth / $width;
+        $centerX = ($width - 12) * $pixelsPerMm;
+        $centerY = 4 * $pixelsPerMm;
+        $outerRadius = 34 * $pixelsPerMm;
+        $innerRadius = 19 * $pixelsPerMm;
+
+        $left = max(0, (int)floor($centerX - $outerRadius));
+        $right = min($canvasWidth - 1, (int)ceil($centerX + $outerRadius));
+        $top = max(0, (int)floor($centerY - $outerRadius));
+        $bottom = min($canvasHeight - 1, (int)ceil($centerY + $outerRadius));
+
+        for ($y = $top; $y <= $bottom; $y++) {
+            for ($x = $left; $x <= $right; $x++) {
+                $dx = $x - $centerX;
+                $dy = $y - $centerY;
+                $distance = sqrt($dx * $dx + $dy * $dy);
+                if ($distance > $outerRadius || $distance < $innerRadius) {
+                    continue;
+                }
+
+                $ratio = min(1, max(0, ($dx + $dy + $outerRadius) / (2 * $outerRadius)));
+                imagesetpixel($canvas, $x, $y, imagecolorallocate(
+                    $canvas,
+                    (int)round($accentRgb[0] + ($accentAltRgb[0] - $accentRgb[0]) * $ratio),
+                    (int)round($accentRgb[1] + ($accentAltRgb[1] - $accentRgb[1]) * $ratio),
+                    (int)round($accentRgb[2] + ($accentAltRgb[2] - $accentRgb[2]) * $ratio)
+                ));
+            }
+        }
+
+        $page = imagecreatetruecolor($pageWidth, $pageHeight);
+        imagecopyresampled($page, $canvas, 0, 0, 0, 0, $pageWidth, $pageHeight, $canvasWidth, $canvasHeight);
+        imagepng($page, $file, 6);
+        imagedestroy($canvas);
+        imagedestroy($page);
     }
 
     public function updateFields($action)
