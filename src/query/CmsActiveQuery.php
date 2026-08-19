@@ -10,6 +10,7 @@ namespace skeeks\cms\query;
 
 use http\Exception\InvalidArgumentException;
 use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\User;
 use yii\db\ActiveQuery;
@@ -133,6 +134,53 @@ class CmsActiveQuery extends ActiveQuery
         return $this;
     }
 
+
+    /**
+     * Разбор пользовательского поискового запроса на отдельные слова.
+     *
+     * Телефон пишут как угодно и обязательно с пробелами («+7 495 005-79-26»),
+     * поэтому такой запрос остаётся одним словом. Всё остальное режется на
+     * слова: «Иванов Иван» должен находить клиента, у которого имя и фамилия
+     * лежат в разных колонках.
+     *
+     * @param string|null $word
+     * @param int $limit максимум слов, чтобы длинная фраза не собрала тяжёлый запрос
+     * @return string[]
+     */
+    protected function searchWords($word, $limit = 5)
+    {
+        $word = trim((string)$word);
+
+        if ($word === '') {
+            return [];
+        }
+
+        if (PhoneHelper::isSearchablePhone($word)) {
+            return [$word];
+        }
+
+        $words = preg_split('/\s+/u', $word, -1, PREG_SPLIT_NO_EMPTY);
+        if (!$words) {
+            return [];
+        }
+
+        return array_slice($words, 0, $limit);
+    }
+
+    /**
+     * Условие поиска по идентификатору, если запрос выглядит как идентификатор.
+     *
+     * @param string $word
+     * @return array|null
+     */
+    protected function searchIdCondition($word)
+    {
+        if (!ctype_digit($word) || strlen($word) > 7) {
+            return null;
+        }
+
+        return [$this->getPrimaryTableName().'.id' => (int)$word];
+    }
 
     /**
      * @depricated

@@ -8,6 +8,9 @@
 
 namespace skeeks\cms\models\queries;
 
+use skeeks\cms\helpers\PhoneHelper;
+use skeeks\cms\models\CmsUserEmail;
+use skeeks\cms\models\CmsUserPhone;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
@@ -84,17 +87,27 @@ class CmsCompanyQuery extends CmsActiveQuery
         $this->joinWith("phones as phones");
         $this->groupBy($this->getPrimaryTableName().'.id');
 
+        if ($condition = PhoneHelper::equalCondition('phones.value', $phone)) {
+            return $this->andWhere($condition);
+        }
+
         return $this->andWhere(['phones.value' => $phone]);
     }
 
     /**
-     * @param string $username
+     * Поиск компании по произвольной строке: название, телефон, email, ИНН,
+     * адрес, сайт, контактное лицо.
+     *
+     * @param string $word
      * @return $this
      */
     public function search($word = '')
     {
-        /*$this->joinWith("cmsUserPhones as cmsUserPhones");
-        $this->joinWith("cmsUserEmails as cmsUserEmails");*/
+        $words = $this->searchWords($word);
+        if (!$words) {
+            return $this;
+        }
+
         $this->groupBy($this->getPrimaryTableName().'.id');
 
         $this->joinWith('addresses as addresses');
@@ -104,10 +117,44 @@ class CmsCompanyQuery extends CmsActiveQuery
         $this->joinWith('contractors as contractors');
         $this->joinWith('users as users');
 
-        return $this->andWhere([
+        //Контакты сотрудников компании — это ещё два LEFT JOIN, они заметно
+        //увеличивают соединение, поэтому подключаются только когда их ищут.
+        //Вложенный joinWith тут не годится: он повторно присоединяет cms_user
+        //уже без алиаса.
+        $withContacts = false;
+        foreach ($words as $one) {
+            if (PhoneHelper::isSearchablePhone($one) || strpos($one, '@') !== false) {
+                $withContacts = true;
+                break;
+            }
+        }
+
+        if ($withContacts) {
+            $this->leftJoin(['usersPhones' => CmsUserPhone::tableName()], 'usersPhones.cms_user_id = users.id');
+            $this->leftJoin(['usersEmails' => CmsUserEmail::tableName()], 'usersEmails.cms_user_id = users.id');
+        }
+
+        $conditions = ['and'];
+        foreach ($words as $one) {
+            $conditions[] = $this->searchWordCondition($one, $withContacts);
+        }
+
+        return $this->andWhere($conditions);
+    }
+
+    /**
+     * @param string $word
+     * @param bool $withContacts подключены ли телефоны и email сотрудников компании
+     * @return array
+     */
+    protected function searchWordCondition($word, $withContacts = false)
+    {
+        $table = $this->getPrimaryTableName();
+
+        $condition = [
             'or',
-            ['like', $this->getPrimaryTableName().'.name', $word],
-            ['like', $this->getPrimaryTableName().'.description', $word],
+            ['like', $table.'.name', $word],
+            ['like', $table.'.description', $word],
             ['like', 'emails.value', $word],
             ['like', 'phones.value', $word],
             ['like', 'addresses.name', $word],
@@ -123,6 +170,27 @@ class CmsCompanyQuery extends CmsActiveQuery
             ['like', 'users.first_name', $word],
             ['like', 'users.last_name', $word],
             ['like', 'users.patronymic', $word],
-        ]);
+        ];
+
+        $phoneColumns = ['phones.value'];
+
+        if ($withContacts) {
+            $condition[] = ['like', 'usersPhones.value', $word];
+            $condition[] = ['like', 'usersEmails.value', $word];
+            $phoneColumns[] = 'usersPhones.value';
+        }
+
+        //Телефон в базе лежит в международном формате, а ищут его как придётся
+        foreach ($phoneColumns as $column) {
+            if ($phone = PhoneHelper::likeCondition($column, $word)) {
+                $condition[] = $phone;
+            }
+        }
+
+        if ($id = $this->searchIdCondition($word)) {
+            $condition[] = $id;
+        }
+
+        return $condition;
     }
 }

@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models\queries;
 
+use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
@@ -57,28 +58,67 @@ class CmsUserQuery extends CmsActiveQuery
         $this->joinWith("cmsUserPhones as cmsUserPhones");
         $this->groupBy($this->getPrimaryTableName().'.id');
 
+        if ($condition = PhoneHelper::equalCondition('cmsUserPhones.value', $phone)) {
+            return $this->andWhere($condition);
+        }
+
         return $this->andWhere(['cmsUserPhones.value' => $phone]);
     }
 
     /**
-     * @param string $username
+     * Поиск клиента по произвольной строке: ФИО, телефон, email, логин.
+     *
+     * @param string $word
      * @return $this
      */
     public function search($word = '')
     {
+        $words = $this->searchWords($word);
+        if (!$words) {
+            return $this;
+        }
+
         $this->joinWith("cmsUserPhones as cmsUserPhones");
         $this->joinWith("cmsUserEmails as cmsUserEmails");
         $this->groupBy($this->getPrimaryTableName().'.id');
 
-        return $this->andWhere([
+        $conditions = ['and'];
+        foreach ($words as $one) {
+            $conditions[] = $this->searchWordCondition($one);
+        }
+
+        return $this->andWhere($conditions);
+    }
+
+    /**
+     * @param string $word
+     * @return array
+     */
+    protected function searchWordCondition($word)
+    {
+        $table = $this->getPrimaryTableName();
+
+        $condition = [
             'or',
             ['like', 'cmsUserPhones.value', $word],
             ['like', 'cmsUserEmails.value', $word],
-            ['like', $this->getPrimaryTableName() . '.first_name', $word],
-            ['like', $this->getPrimaryTableName() . '.last_name', $word],
-            ['like', $this->getPrimaryTableName() . '.patronymic', $word],
-            ['like', $this->getPrimaryTableName() . '.company_name', $word],
-        ]);
+            ['like', $table.'.first_name', $word],
+            ['like', $table.'.last_name', $word],
+            ['like', $table.'.patronymic', $word],
+            ['like', $table.'.company_name', $word],
+            ['like', $table.'.username', $word],
+        ];
+
+        //Телефон в базе лежит в международном формате, а ищут его как придётся
+        if ($phone = PhoneHelper::likeCondition('cmsUserPhones.value', $word)) {
+            $condition[] = $phone;
+        }
+
+        if ($id = $this->searchIdCondition($word)) {
+            $condition[] = $id;
+        }
+
+        return $condition;
     }
 
 

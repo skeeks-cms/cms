@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\models\queries;
 
+use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContractor;
 use skeeks\cms\models\CmsUser;
@@ -83,15 +84,33 @@ class CmsContractorQuery extends CmsActiveQuery
      */
     public function search($q = '')
     {
-        return $this->andWhere([
-            'or',
-            ['like', 'first_name', $q],
-            ['like', 'last_name', $q],
-            ['like', 'email', $q],
-            ['like', 'phone', $q],
-            ['like', 'name', $q],
-            ['like', 'inn', $q],
-        ]);
+        $words = $this->searchWords($q);
+        if (!$words) {
+            return $this;
+        }
+
+        $conditions = ['and'];
+        foreach ($words as $word) {
+            $condition = [
+                'or',
+                ['like', 'first_name', $word],
+                ['like', 'last_name', $word],
+                ['like', 'patronymic', $word],
+                ['like', 'email', $word],
+                ['like', 'phone', $word],
+                ['like', 'name', $word],
+                ['like', 'inn', $word],
+            ];
+
+            //Телефон в базе лежит в международном формате, а ищут его как придётся
+            if ($phone = PhoneHelper::likeCondition($this->getPrimaryTableName().'.phone', $word)) {
+                $condition[] = $phone;
+            }
+
+            $conditions[] = $condition;
+        }
+
+        return $this->andWhere($conditions);
     }
 
     /**

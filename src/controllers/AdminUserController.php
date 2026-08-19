@@ -191,27 +191,16 @@ class AdminUserController extends BackendModelStandartController
                             'q' => [
                                 'label'          => 'Поиск',
                                 'elementOptions' => [
-                                    'placeholder' => 'Поиск (ФИО, Email, Телефон)',
+                                    'placeholder' => 'ФИО, телефон, email, логин, ID...',
                                 ],
                                 'on apply'       => function (QueryFiltersEvent $e) {
                                     /**
-                                     * @var $query ActiveQuery
+                                     * @var $query CmsUserQuery
                                      */
                                     $query = $e->dataProvider->query;
 
-                                    $query->joinWith("cmsUserEmails as cmsUserEmails");
-                                    $query->joinWith("cmsUserPhones as cmsUserPhones");
-
                                     if ($e->field->value) {
-                                        $query->andWhere([
-                                            'or',
-                                            ['like', CmsUser::tableName().'.first_name', $e->field->value],
-                                            ['like', CmsUser::tableName().'.last_name', $e->field->value],
-                                            ['like', CmsUser::tableName().'.patronymic', $e->field->value],
-
-                                            ['like', 'cmsUserEmails.value', $e->field->value],
-                                            ['like', 'cmsUserPhones.value', $e->field->value],
-                                        ]);
+                                        $query->search($e->field->value);
                                     }
                                 },
                             ],
