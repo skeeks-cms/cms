@@ -1,0 +1,84 @@
+.sx-upa-task-content {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+}
+
+#sx-upa-task-comments {
+    display: grid;
+    min-width: 0;
+    gap: 16px;
+}
+
+.sx-upa-task-layout {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    gap: 16px;
+}
+
+.sx-upa-task-layout > *,
+.sx-upa-task-section {
+    min-width: 0;
+}
+
+.sx-upa-task-main,
+.sx-upa-task-side {
+    height: 100%;
+}
+
+.sx-upa-task-description {
+    min-height: 250px;
+    padding: 1rem;
+    overflow: auto;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+}
+
+.sx-upa-task-description-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 220px;
+    color: var(--sx-color-text-muted);
+}
+
+.sx-upa-task-files {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-color-surface-muted);
+}
+
+.sx-upa-task-files-title,
+.sx-upa-task-section-title {
+    margin-bottom: .75rem;
+    color: var(--sx-color-text-muted);
+    font-size: .9rem;
+}
+
+.sx-upa-task-files img {
+    max-width: 10rem;
+    margin-right: .5rem;
+    margin-bottom: .5rem;
+    border: 1px solid var(--sx-color-border-strong);
+    border-radius: var(--sx-radius-control);
+}
+
+.sx-upa-task-side .sx-properties {
+    padding: 10px;
+}
+
+.sx-upa-task-side .sx-properties--value {
+    text-align: right;
+}
+
+.sx-upa-task-comment-block .sx-comment-pin-field {
+    display: none;
+}
+
+@media (max-width: 720px) {
+    .sx-upa-task-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
