@@ -41,6 +41,16 @@ foreach ($requiredModelFragments as $fragment) {
         throw new RuntimeException('Missing CmsLead contract: '.$fragment);
     }
 }
+$adminFallbackStart = strpos($model, 'if (!$userIds && $contactUserIds)');
+$adminFallbackEnd = strpos($model, 'return $userIds;', $adminFallbackStart);
+$adminFallback = $adminFallbackStart === false || $adminFallbackEnd === false
+    ? ''
+    : substr($model, $adminFallbackStart, $adminFallbackEnd - $adminFallbackStart);
+foreach (['isWorker()', ".'.is_active' => 1", 'CmsManager::PERMISSION_ROLE_ADMIN_ACCESS', "checkAccess(\$userId, 'cms/admin-lead')"] as $fragment) {
+    if (strpos($adminFallback, $fragment) === false) {
+        throw new RuntimeException('Known leads without an eligible manager must fall back to active administrators: '.$fragment);
+    }
+}
 foreach (['sx-status', 'sx-status--accent', 'sx-status--success', 'sx-status--danger'] as $statusClass) {
     if (strpos($model, $statusClass) === false) {
         throw new RuntimeException('Lead status must use the shared semantic status contract: '.$statusClass);

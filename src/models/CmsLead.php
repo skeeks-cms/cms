@@ -218,8 +218,10 @@ class CmsLead extends Core
 
     /**
      * Notify only employees who own the submitter/partner directly or through
-     * one of their companies. Anonymous leads remain available to the common
-     * queue of employees with lead access.
+     * one of their companies. If a known identity has no eligible responsible
+     * manager, active administrators become the narrow triage fallback.
+     * Anonymous leads remain available to the common queue of employees with
+     * lead access.
      */
     public function availableManagerIds(): array
     {
@@ -260,9 +262,26 @@ class CmsLead extends Core
                 ->column();
         }
 
-        return array_values(array_filter(array_unique(array_map('intval', $userIds)), static function ($userId) {
+        $userIds = array_values(array_filter(array_unique(array_map('intval', $userIds)), static function ($userId) {
             return \Yii::$app->authManager->checkAccess($userId, 'cms/admin-lead');
         }));
+
+        if (!$userIds && $contactUserIds) {
+            $query = CmsUser::find()
+                ->select(CmsUser::tableName().'.id')
+                ->isWorker()
+                ->andWhere([CmsUser::tableName().'.is_active' => 1]);
+            if ($this->cms_site_id) {
+                $query->cmsSite((int)$this->cms_site_id);
+            }
+
+            $userIds = array_values(array_filter(array_map('intval', $query->column()), static function ($userId) {
+                return \Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)
+                    && \Yii::$app->authManager->checkAccess($userId, 'cms/admin-lead');
+            }));
+        }
+
+        return $userIds;
     }
 
     protected function sendWebNotify(
