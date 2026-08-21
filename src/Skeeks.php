@@ -199,6 +199,9 @@ class Skeeks extends Component implements BootstrapInterface
                                 $notify->name = "Вам необходимо проверить задачу";
                                 $notify->model_id = $sender->model_id;
                                 $notify->model_code = $sender->model_code;
+                                if ($model->isClientAuthored()) {
+                                    $notify->url = $model->getClientViewUrl();
+                                }
                                 $notify->save();
                             }
 
@@ -208,6 +211,9 @@ class Skeeks extends Component implements BootstrapInterface
                                 $notify->name = "Ваша задача готова";
                                 $notify->model_id = $sender->model_id;
                                 $notify->model_code = $sender->model_code;
+                                if ($model->isClientAuthored()) {
+                                    $notify->url = $model->getClientViewUrl();
+                                }
                                 $notify->save();
                             }
 
@@ -259,8 +265,6 @@ class Skeeks extends Component implements BootstrapInterface
                     $notify->model_id = $sender->model_id;
                     $notify->model_code = $sender->model_code;
 
-                    $notify2 = clone $notify;
-
                     $user_ids = [];
 
                     if ($model->executor_id) {
@@ -273,11 +277,16 @@ class Skeeks extends Component implements BootstrapInterface
 
                     $user_ids = array_unique($user_ids);
                     if ($user_ids) {
-                        foreach ($user_ids as $id)
-                        {
-                            if ($id != \Yii::$app->user->id) {
+                        $currentUserId = \Yii::$app->has('user') && !\Yii::$app->user->isGuest
+                            ? (int)\Yii::$app->user->id
+                            : null;
+                        foreach ($user_ids as $id) {
+                            if ($currentUserId === null || (int)$id !== $currentUserId) {
                                 $notifyTmp = clone $notify;
                                 $notifyTmp->cms_user_id = $id;
+                                if ((int)$id === (int)$model->created_by && $model->isClientAuthored()) {
+                                    $notifyTmp->url = $model->getClientViewUrl((int)$sender->id);
+                                }
                                 $notifyTmp->save();
                             }
                         }

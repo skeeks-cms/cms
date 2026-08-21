@@ -219,6 +219,41 @@ class CmsTask extends ActiveRecord
     }
 
     /**
+     * A client-authored support task must open in the customer cabinet for its
+     * author, not through the employee backend controller.
+     */
+    public function isClientAuthored(): bool
+    {
+        return $this->cms_user_id
+            && $this->created_by
+            && (int)$this->cms_user_id === (int)$this->created_by;
+    }
+
+    public function getClientViewUrl(?int $logId = null): string
+    {
+        $urlPrefix = '~upa';
+        if (\Yii::$app->has('upa')) {
+            $urlPrefix = (string)ArrayHelper::getValue(
+                \Yii::$app->upa->urlRule,
+                'urlPrefix',
+                $urlPrefix
+            );
+        }
+
+        $baseUrl = \Yii::$app->has('request') && \Yii::$app->request instanceof \yii\web\Request
+            ? (string)\Yii::$app->request->baseUrl
+            : '';
+        $url = rtrim($baseUrl, '/').'/'.trim($urlPrefix, '/')
+            .'/cms/upa-support/view?'.http_build_query(['pk' => (int)$this->id]);
+
+        if ($logId) {
+            $url .= '&'.http_build_query(['sx-log-id' => $logId]).'#sx-log-'.$logId;
+        }
+
+        return $url;
+    }
+
+    /**
      * Temporary triage policy: notify active administrators about a client task
      * that could not be assigned from project, company or client context.
      */

@@ -176,6 +176,14 @@ HTML;
             return $model->getPartnerViewUrl();
         }
 
+        if ($model instanceof CmsTask
+            && \Yii::$app->has('user')
+            && !\Yii::$app->user->isGuest
+            && (int)$model->created_by === (int)\Yii::$app->user->id
+            && $model->isClientAuthored()
+        ) {
+            return $model->getClientViewUrl();
+        }
 
         return null;
     }
