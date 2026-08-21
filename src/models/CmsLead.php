@@ -7,12 +7,17 @@ use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\queries\CmsLeadQuery;
 use skeeks\cms\rbac\CmsManager;
+use yii\behaviors\BlameableBehavior;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 class CmsLead extends Core
 {
     use HasLogTrait;
     public const EVENT_PARTNER_SUCCESS = 'partnerSuccess';
+
+    /** @var CmsLog|null Guarantees exactly one creation entry per lead instance. */
+    private $_creationActivityLog = null;
 
     /** @var float|null Passed to the installed partner-finance extension on success. */
     public $partner_reward_value;
@@ -140,6 +145,12 @@ class CmsLead extends Core
         }
 
         if ($insert) {
+            // A Form2 lead still has no contacts here: its creation entry is
+            // recorded by the ingestion service once phones and emails exist.
+            if ($this->source_type !== self::SOURCE_FORM) {
+                $this->recordCreationActivity();
+            }
+
             if ($this->executor_id) {
                 $currentUserId = \Yii::$app->has('user') && !\Yii::$app->user->isGuest
                     ? (int)\Yii::$app->user->id
@@ -183,6 +194,135 @@ class CmsLead extends Core
         }
 
         return true;
+    }
+
+    /**
+     * Readable creation entry of the lead activity stream. It is written
+     * exactly once per lead: directly from the lifecycle for sources that
+     * persist a complete lead in one save, and explicitly from the ingestion
+     * service for Form2 leads whose contacts are stored after the lead row.
+     */
+    public function recordCreationActivity(): CmsLog
+    {
+        if ($this->_creationActivityLog !== null) {
+            return $this->_creationActivityLog;
+        }
+
+        return $this->_creationActivityLog = $this->addSystemActivity(
+            $this->creationActivityMessage(),
+            $this->creationActivityActorId()
+        );
+    }
+
+    /**
+     * Stores one system entry in the shared lead activity stream. The caller
+     * owns the surrounding transaction: a rejected entry aborts it instead of
+     * leaving the activity stream out of sync with the domain change.
+     */
+    public function addSystemActivity(string $message, ?int $actorId = null): CmsLog
+    {
+        $log = new CmsLog([
+            'log_type' => CmsLog::LOG_TYPE_COMMENT,
+            'model_code' => $this->skeeksModelCode,
+            'model_id' => (int)$this->id,
+            'model_as_text' => $this->asText,
+            'cms_company_id' => $this->cms_company_id ? (int)$this->cms_company_id : null,
+            'cms_user_id' => $this->cms_user_id ? (int)$this->cms_user_id : null,
+            'comment' => $message,
+        ]);
+
+        if ($actorId) {
+            // BlameableBehavior evaluates the author on insert and would
+            // replace an explicit value with the current session user.
+            $blameable = $log->getBehavior(BlameableBehavior::class);
+            if ($blameable instanceof BlameableBehavior) {
+                $blameable->value = $actorId;
+            }
+            $log->created_by = $actorId;
+        }
+
+        if (!$log->save()) {
+            throw new \RuntimeException('Не удалось сохранить запись активности лида: '.implode('; ', $log->getFirstErrors()));
+        }
+
+        return $log;
+    }
+
+    protected function creationActivityMessage(): string
+    {
+        $name = Html::encode((string)$this->name);
+
+        if ($this->source_type === self::SOURCE_FORM) {
+            return $this->formCreationActivityMessage($name);
+        }
+
+        $actor = $this->creationActivityActorName();
+
+        if ($this->source_type === self::SOURCE_PARTNER) {
+            return $actor === null
+                ? 'Добавлен лид «'.$name.'»'
+                : $actor.' добавил лид «'.$name.'»';
+        }
+
+        return $actor === null
+            ? 'Создан лид «'.$name.'»'
+            : $actor.' создал лид «'.$name.'»';
+    }
+
+    /**
+     * The Form2 entry names the submitted form, its submission number and the
+     * contact identity that the ingestion service has just persisted.
+     */
+    private function formCreationActivityMessage(string $encodedName): string
+    {
+        $message = 'Отправлена форма';
+
+        $formName = trim((string)$this->source_name);
+        if ($formName !== '') {
+            $message .= ' «'.Html::encode($formName).'»';
+        }
+
+        $sourceData = is_array($this->source_data) ? $this->source_data : [];
+        $sendId = (int)ArrayHelper::getValue($sourceData, 'form_send_id', 0);
+        if ($sendId <= 0) {
+            $sendId = (int)$this->source_ref;
+        }
+        if ($sendId > 0) {
+            $message .= ' №'.$sendId;
+        }
+
+        $mainPhone = $this->mainPhone;
+        $contacts = array_values(array_filter([
+            $encodedName,
+            $mainPhone ? Html::encode((string)$mainPhone->value) : '',
+        ], static function ($part) {
+            return $part !== '';
+        }));
+
+        return $contacts ? $message.': '.implode(', ', $contacts) : $message;
+    }
+
+    private function creationActivityActorId(): ?int
+    {
+        foreach ([$this->created_by, $this->submitted_by_id, $this->partner_id] as $candidate) {
+            if ((int)$candidate > 0) {
+                return (int)$candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function creationActivityActorName(): ?string
+    {
+        $actorId = $this->creationActivityActorId();
+        if (!$actorId) {
+            return null;
+        }
+
+        $actor = CmsUser::findOne($actorId);
+
+        return $actor ? Html::encode((string)$actor->shortDisplayName) : null;
     }
 
     public function notifyPartnerAboutComment(?int $logId = null): void

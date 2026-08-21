@@ -260,6 +260,77 @@ foreach (['Взять в работу', 'Создать компанию', 'Со
     }
 }
 
+foreach ([
+    'public function recordCreationActivity(): CmsLog',
+    'public function addSystemActivity(string $message, ?int $actorId = null): CmsLog',
+    "'log_type' => CmsLog::LOG_TYPE_COMMENT,",
+    'if ($this->_creationActivityLog !== null)',
+    'return $this->_creationActivityLog = $this->addSystemActivity(',
+    'throw new \\RuntimeException(\'Не удалось сохранить запись активности лида: \'',
+] as $activityContract) {
+    if (strpos($model, $activityContract) === false) {
+        throw new RuntimeException('Lead system activity contract is incomplete: '.$activityContract);
+    }
+}
+if (strpos($model, '$blameable = $log->getBehavior(BlameableBehavior::class);') === false
+    || strpos($model, '$blameable->value = $actorId;') === false
+    || strpos($model, '$log->created_by = $actorId;') === false
+) {
+    throw new RuntimeException('An explicit activity author must survive BlameableBehavior.');
+}
+$creationLifecyclePosition = strpos($model, 'if ($this->source_type !== self::SOURCE_FORM) {');
+$creationCallPosition = strpos($model, '$this->recordCreationActivity();');
+if ($creationLifecyclePosition === false || $creationCallPosition === false
+    || $creationCallPosition < $creationLifecyclePosition
+) {
+    throw new RuntimeException('Direct manual/partner inserts must record their creation activity behind the Form2 guard.');
+}
+foreach ([
+    "\$message = 'Отправлена форма';",
+    "ArrayHelper::getValue(\$sourceData, 'form_send_id', 0)",
+    '$sendId = (int)$this->source_ref;',
+    'Html::encode($formName)',
+    '$mainPhone = $this->mainPhone;',
+    'Html::encode((string)$mainPhone->value)',
+] as $formActivityContract) {
+    if (strpos($model, $formActivityContract) === false) {
+        throw new RuntimeException('Form2 creation entry must name the form, its submission and the stored contact: '.$formActivityContract);
+    }
+}
+foreach ([
+    "\$actor.' добавил лид «'.\$name.'»'",
+    "\$actor.' создал лид «'.\$name.'»'",
+    'CmsUser::findOne($actorId)',
+    'Html::encode((string)$actor->shortDisplayName)',
+    'Html::encode((string)$this->name)',
+] as $actorContract) {
+    if (strpos($model, $actorContract) === false) {
+        throw new RuntimeException('Lead creation entry must name its author and escape dynamic text: '.$actorContract);
+    }
+}
+if (substr_count($service, 'recordCreationActivity()') !== 1
+    || strpos($service, 'if ($sourceType === CmsLead::SOURCE_FORM) {') === false
+) {
+    throw new RuntimeException('Only a newly ingested Form2 lead may receive the creation entry, exactly once.');
+}
+$serviceEmailsPosition = strpos($service, 'saveContacts($lead, CmsLeadEmail::class, $emails);');
+$serviceActivityPosition = strpos($service, '$lead->recordCreationActivity();');
+$serviceCommitPosition = strpos($service, '$transaction->commit();');
+if ($serviceEmailsPosition === false || $serviceActivityPosition === false || $serviceCommitPosition === false
+    || $serviceActivityPosition < $serviceEmailsPosition
+    || $serviceActivityPosition > $serviceCommitPosition
+) {
+    throw new RuntimeException('The Form2 creation entry must be written after contacts and inside the ingestion transaction.');
+}
+$existingReturnPosition = strpos($service, 'return $existing;');
+if ($existingReturnPosition === false || $existingReturnPosition > $serviceActivityPosition) {
+    throw new RuntimeException('A lead reused through source_ref must not receive a second creation entry.');
+}
+$syncContactsPosition = strpos($service, 'public function syncContacts');
+if ($syncContactsPosition === false || $serviceActivityPosition > $syncContactsPosition) {
+    throw new RuntimeException('Contact synchronization of an existing lead must not create activity entries.');
+}
+
 echo "CMS lead contract: ok\n";
 
 final class CmsLeadUtmContract

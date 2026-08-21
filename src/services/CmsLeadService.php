@@ -47,6 +47,12 @@ class CmsLeadService
             }
             $this->saveContacts($lead, CmsLeadPhone::class, $phones);
             $this->saveContacts($lead, CmsLeadEmail::class, $emails);
+            if ($sourceType === CmsLead::SOURCE_FORM) {
+                // The lead lifecycle deliberately skips this source: only here
+                // are the submitted contacts already part of the same
+                // transaction, so the entry can name them.
+                $lead->recordCreationActivity();
+            }
             if ($transaction) {
                 $transaction->commit();
             }
