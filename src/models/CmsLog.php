@@ -3,6 +3,7 @@
 namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\queries\CmsLogQuery;
@@ -310,6 +311,48 @@ class CmsLog extends ActiveRecord
         return $value;
     }
 
+    protected function getRenderableDataValues(): array
+    {
+        $dataValues = (array)$this->data;
+        ArrayHelper::remove($dataValues, 'lock_version');
+
+        $logBehavior = $this->getLogBehaviorForRendering();
+        if ($logBehavior) {
+            foreach ($dataValues as $attribute => &$data) {
+                if (!is_array($data) || !$logBehavior->hasAttributeValueMap((string) $attribute)) {
+                    continue;
+                }
+
+                if (array_key_exists('value', $data)) {
+                    $data['as_text'] = $logBehavior->formatMappedAttributeValueForLog((string) $attribute, $data['value']);
+                }
+
+                if (array_key_exists('old_value', $data)) {
+                    $data['old_as_text'] = $logBehavior->formatMappedAttributeValueForLog((string) $attribute, $data['old_value']);
+                }
+            }
+            unset($data);
+        }
+
+        return $dataValues;
+    }
+
+    protected function getLogBehaviorForRendering(): ?CmsLogBehavior
+    {
+        $model = $this->subModel ?: $this->model;
+        if (!$model) {
+            return null;
+        }
+
+        foreach ($model->getBehaviors() as $behavior) {
+            if ($behavior instanceof CmsLogBehavior) {
+                return $behavior;
+            }
+        }
+
+        return null;
+    }
+
     protected function formatRelationLogValue($key, $value)
     {
         if (!is_numeric($value) || !preg_match('/_id$/', (string)$key)) {
@@ -414,7 +457,7 @@ class CmsLog extends ActiveRecord
                 $res[] = "<span title='ID:{$this->model_id}' data-toggle='tooltip'>{$name} «{$this->model_as_text}»</span>";
             }
 
-            $dataValues = (array)$this->data;
+            $dataValues = $this->getRenderableDataValues();
 
             if ($dataValues) {
                 foreach ($dataValues as $key => $data) {
@@ -480,7 +523,7 @@ class CmsLog extends ActiveRecord
             if ($this->model) {
                 $res = [];
 
-                $dataValues = (array)$this->data;
+                $dataValues = $this->getRenderableDataValues();
 
                 if ($dataValues) {
                     foreach ($dataValues as $key => $data) {
@@ -534,7 +577,7 @@ class CmsLog extends ActiveRecord
 
                 $res = [];
 
-                $dataValues = (array)$this->data;
+                $dataValues = $this->getRenderableDataValues();
 
                 if ($dataValues) {
                     foreach ($dataValues as $key => $data) {

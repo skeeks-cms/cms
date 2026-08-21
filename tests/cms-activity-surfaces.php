@@ -10,6 +10,7 @@ function activitySurfaceExpect($condition, $message)
 $itemView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/_log-list-item.php');
 $listView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/log-list.php');
 $commentView = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/comment.php');
+$commentWidget = file_get_contents(dirname(__DIR__).'/src/widgets/admin/CmsCommentWidget.php');
 $logListWidget = file_get_contents(dirname(__DIR__).'/src/widgets/admin/CmsLogListWidget.php');
 $activityJs = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/cms-activity/cms-activity.js');
 $activityCss = file_get_contents(dirname(__DIR__).'/src/widgets/assets/src/cms-activity/cms-activity.css');
@@ -31,6 +32,10 @@ activitySurfaceExpect(strpos($activityCss, 'margin-bottom: 1rem;') !== false, 'C
 activitySurfaceExpect(substr_count($commentView, 'activeHiddenInput($log') === 3, 'CMS comment context is not rendered as hidden inputs.');
 activitySurfaceExpect(strpos($commentView, 'class="d-none"') === false, 'CMS comment context still depends on Bootstrap visibility utilities.');
 activitySurfaceExpect(strpos($commentView, 'class="row"') === false, 'CMS comment form still depends on the Bootstrap grid.');
+activitySurfaceExpect(strpos($commentWidget, 'public $isShowAttachments = true;') !== false, 'CMS comment form cannot disable untrusted attachments per consumer.');
+activitySurfaceExpect(strpos($commentWidget, 'public $isShowPin = true;') !== false, 'CMS comment form cannot disable pinning per consumer.');
+activitySurfaceExpect(strpos($commentView, 'if ($widget->isShowAttachments)') !== false, 'CMS comment attachment control ignores the widget contract.');
+activitySurfaceExpect(strpos($commentView, 'if ($widget->isShowPin)') !== false, 'CMS comment pin control ignores the widget contract.');
 activitySurfaceExpect(strpos($listView, 'col-md-12') === false, 'CMS activity list still depends on Bootstrap columns.');
 activitySurfaceExpect(strpos($itemView, 'd-flex') === false, 'CMS activity item still depends on Bootstrap flex utilities.');
 activitySurfaceExpect(strpos($activityCss, '.sx-log-list .sx-log-item__header {') !== false, 'CMS activity header layout owner is missing.');

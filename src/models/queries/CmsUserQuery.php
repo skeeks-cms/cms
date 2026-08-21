@@ -152,7 +152,7 @@ class CmsUserQuery extends CmsActiveQuery
                 $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
             }
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id');
+            $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
             $this->joinWith("companiesAll as companies");
             $this->joinWith("managers as managers");
 

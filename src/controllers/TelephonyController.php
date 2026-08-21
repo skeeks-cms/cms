@@ -16,6 +16,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsTelephonyCall;
 use skeeks\cms\models\CmsTelephonyUser;
+use skeeks\cms\services\CmsLeadTelephonyService;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use Yii;
@@ -58,6 +59,20 @@ class TelephonyController extends Controller
         }
 
         $result = $telephonyUser->provider->handler->call($phone, $telephonyUser);
+
+        $leadId = (int)Yii::$app->request->post('lead_id');
+        if ($leadId && !empty($result['success']) && !empty($result['provider_call_id'])) {
+            try {
+                (new CmsLeadTelephonyService())->registerOutgoingCall(
+                    $telephonyUser,
+                    (string)$result['provider_call_id'],
+                    (string)$phone,
+                    $leadId
+                );
+            } catch (\Throwable $e) {
+                Yii::error($e, 'telephony');
+            }
+        }
 
         return $result;
     }

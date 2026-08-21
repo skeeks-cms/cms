@@ -312,14 +312,14 @@ return array_merge(dashboardsMenu(), [
         'items' => [
             [
                 'label'    => \Yii::t('skeeks/cms', 'Компании'),
-                'priority' => 190,
+                'priority' => 100,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/company.svg'],
                 "url"      => ["cms/admin-cms-company"],
             ],
 
             [
                 'label'    => \Yii::t('skeeks/cms', 'Клиенты'),
-                'priority' => 200,
+                'priority' => 110,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                 "url"      => ["cms/admin-user"],
 
@@ -331,6 +331,12 @@ return array_merge(dashboardsMenu(), [
                         'priority' => 0,
                     ],
                 ],*/
+            ],
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Лиды'),
+                'priority' => 120,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
+                "url"      => ["cms/admin-cms-lead"],
             ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Сделки'),

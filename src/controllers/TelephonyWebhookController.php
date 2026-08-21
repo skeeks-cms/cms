@@ -17,6 +17,7 @@ use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsTelephonyCall;
 use skeeks\cms\models\CmsTelephonyUser;
+use skeeks\cms\services\CmsLeadTelephonyService;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use Yii;
@@ -192,6 +193,8 @@ class TelephonyWebhookController extends Controller
                 Yii::error(print_r($call->errors, true), 'telephony');
                 return ['success' => false, 'error' => 'DB save error additional'];
             }
+
+            (new CmsLeadTelephonyService())->attachToLead($call);
 
 
             if ($call->status == CmsTelephonyCall::STATUS_ANSWERED && $call->record_url) {

@@ -125,7 +125,12 @@ class TelephonyWidget extends Widget
     currentSx.$(currentWindow.document)
         .off('click.sxTelephony', '.sx-telephony-btn')
         .on('click.sxTelephony', '.sx-telephony-btn', function () {
-            mainSx.Telephony.call(currentSx.$(this).data('value'));
+            var button = currentSx.$(this);
+            var context = {};
+            if (button.data('lead-id')) {
+                context.lead_id = button.data('lead-id');
+            }
+            mainSx.Telephony.call(button.data('value'), context);
             return false;
         });
 })(window, sx);

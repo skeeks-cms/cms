@@ -41,12 +41,46 @@ class CmsLogBehavior extends Behavior
         'updated_by',
         'created_by',
         'cms_site_id',
+        'lock_version',
     ];
 
     /**
      * @var array
      */
     public $relation_map = [];
+
+    /**
+     * Maps technical attribute values to readable values in activity logs.
+     *
+     * @var array<string, array|callable>
+     */
+    public $attribute_value_maps = [];
+
+    public function hasAttributeValueMap(string $attribute): bool
+    {
+        return array_key_exists($attribute, (array) $this->attribute_value_maps);
+    }
+
+    public function formatMappedAttributeValueForLog(string $attribute, $value)
+    {
+        if (!$this->hasAttributeValueMap($attribute) || $value === null || $value === '') {
+            return $value;
+        }
+
+        $map = $this->attribute_value_maps[$attribute];
+
+        if (is_callable($map)) {
+            return call_user_func($map, $value, $this->owner, $attribute);
+        }
+
+        if (!is_scalar($value)) {
+            return $value;
+        }
+
+        $map = (array) $map;
+
+        return array_key_exists($value, $map) ? $map[$value] : $value;
+    }
 
     protected function guessRelationNameByAttribute($attribute)
     {
@@ -76,6 +110,10 @@ class CmsLogBehavior extends Behavior
     {
         if ($value === null || $value === '') {
             return $value;
+        }
+
+        if ($this->hasAttributeValueMap((string) $attribute)) {
+            return $this->formatMappedAttributeValueForLog((string) $attribute, $value);
         }
 
         $relationName = $this->getRelationNameByAttribute($attribute);

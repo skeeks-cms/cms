@@ -58,7 +58,7 @@
 
         /* ================= OUTGOING ================= */
 
-        call: function (phone) {
+        call: function (phone, context) {
             var self = this;
 
             self.ignoreCurrentCall = false;
@@ -71,7 +71,7 @@
             self._clearEntities();
             self._showPanel();
 
-            self._post(this.get('urls').call, { phone: phone })
+            self._post(this.get('urls').call, $.extend({ phone: phone }, context || {}))
                 .done(function (res) {
                     if (res.success && res.provider_call_id) {
                         self.provider_call_id = res.provider_call_id;

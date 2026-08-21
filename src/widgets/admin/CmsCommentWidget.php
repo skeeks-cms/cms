@@ -29,6 +29,16 @@ class CmsCommentWidget extends Widget
      * @var string|null
      */
     public $pinnedLabel = null;
+
+    /**
+     * @var bool Показывать загрузку файлов.
+     */
+    public $isShowAttachments = true;
+
+    /**
+     * @var bool Показывать управление закреплением комментария.
+     */
+    public $isShowPin = true;
     
     public $backend_url = ['/cms/admin-cms-log/add-comment'];
 

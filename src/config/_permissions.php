@@ -167,6 +167,7 @@ return [
 
                     "cms/admin-company",
                     "cms/admin-company/manage/own",
+                    "cms/admin-lead",
                 ],
             ],
         ],
@@ -182,6 +183,7 @@ return [
                     \skeeks\cms\rbac\CmsManager::ROLE_WORKER,
 
                     "shop/admin-bonus-transaction",
+                    "cms/admin-lead",
                     "shop/admin-discount",
                     "shop/admin-discount-coupon",
                     "shop/admin-shop-feedback",
@@ -230,6 +232,8 @@ return [
                     "cms/admin-company/manage",
 
                     "cms/admin-cms-log/update-delete",
+
+                    "cms/admin-lead",
 
                 ],
             ],
@@ -313,6 +317,11 @@ return [
                 ],
             ],
             'ruleName' => \skeeks\cms\rbac\CmsCompanyRule::NAME
+        ],
+
+        [
+            'name'        => 'cms/admin-lead',
+            'description' => ['skeeks/cms', 'Лиды'],
         ],
         
         

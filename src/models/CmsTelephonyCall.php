@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property int                  $id
  *
  * @property int                  $cms_company_id
+ * @property int|null             $cms_lead_id
  * @property int                  $cms_telephony_provider_id
  *
  * @property int|null             $cms_worker_user_id
@@ -54,6 +55,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsStorageFile               $cmsRecordFile
  * @property string               $statusAsText
  * @property CmsCompany           $company
+ * @property CmsLead|null         $lead
  * @property CmsTelephonyProvider $provider
  * @property CmsUser|null         $workerUser
  * @property CmsUser|null         $user
@@ -121,6 +123,7 @@ class CmsTelephonyCall extends \skeeks\cms\models\Core
             [
                 [
                     'cms_company_id',
+                    'cms_lead_id',
                     'cms_telephony_provider_id',
                     'cms_worker_user_id',
                     'cms_user_id',
@@ -178,6 +181,7 @@ class CmsTelephonyCall extends \skeeks\cms\models\Core
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_company_id' => 'Компания',
+            'cms_lead_id' => 'Лид',
 
             'cms_telephony_provider_id' => 'Провайдер телефонии',
 
@@ -236,6 +240,11 @@ class CmsTelephonyCall extends \skeeks\cms\models\Core
             CmsUser::class,
             ['id' => 'cms_user_id']
         );
+    }
+
+    public function getLead()
+    {
+        return $this->hasOne(CmsLead::class, ['id' => 'cms_lead_id']);
     }
 
 

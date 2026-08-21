@@ -18,6 +18,9 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsFaq;
 use skeeks\cms\models\CmsLog;
+use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadEmail;
+use skeeks\cms\models\CmsLeadPhone;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsSiteDomain;
@@ -288,6 +291,22 @@ class Skeeks extends Component implements BootstrapInterface
 
 
     public $modelsConfig = [
+
+        CmsLead::class          => [
+            'name'       => 'Лиды',
+            'name_one'   => 'Лид',
+            'controller' => 'cms/admin-cms-lead',
+        ],
+        CmsLeadPhone::class     => [
+            'name'       => 'Телефоны лидов',
+            'name_one'   => 'Телефон лида',
+            'controller' => 'cms/admin-cms-lead-phone',
+        ],
+        CmsLeadEmail::class     => [
+            'name'       => 'Email-ы лидов',
+            'name_one'   => 'Email лида',
+            'controller' => 'cms/admin-cms-lead-email',
+        ],
 
         CmsFaq::class           => [
             'name'       => 'Вопросы/Ответы',
