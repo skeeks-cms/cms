@@ -67,7 +67,7 @@ $logListClass = $widget->is_show_model
         'is_show_pin_controls' => (bool)$widget->is_show_pin_controls,
         'is_raised'            => (bool)$widget->is_raised,
     ],
-    'emptyText'    => '<div class="sx-surface sx-surface--padded'.($widget->is_raised ? ' sx-surface--raised' : '').'">Записей нет</div>',
+    'emptyText'    => false,
     'options'      => [
         'class' => 'sx-log-list-view',
         'tag'   => 'div',
