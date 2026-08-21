@@ -42,8 +42,10 @@ $checks = [
     'matching javascript is shipped through an asset' => strpos($asset, "'lead-matches.js'") !== false,
 ];
 
-if (substr_count($service, 'CmsCompany::find()->forManager()->cmsSite()') < 3) {
-    throw new RuntimeException('Lead company matching and linking must be site scoped.');
+if (strpos($service, 'CmsCompany::find()->forManager()->cmsSite()') !== false
+    || substr_count($service, 'CmsCompany::find()->forManager()') < 5
+) {
+    throw new RuntimeException('Lead company matching must use manager scope without a nonexistent company site column.');
 }
 
 foreach ($checks as $message => $passed) {

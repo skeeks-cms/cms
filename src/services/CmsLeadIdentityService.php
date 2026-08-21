@@ -45,7 +45,7 @@ class CmsLeadIdentityService
         if (!$lead->cms_company_id) {
             foreach ($lead->phones as $phone) {
                 $this->collectIds(
-                    CmsCompany::find()->forManager()->cmsSite()->phone($phone->value)
+                    CmsCompany::find()->forManager()->phone($phone->value)
                         ->select(CmsCompany::tableName().'.id')->limit($limit)->column(),
                     $companyReasons,
                     'Совпал телефон '.$phone->value
@@ -58,7 +58,7 @@ class CmsLeadIdentityService
                     ->limit($limit)
                     ->column();
                 $allowedCompanyIds = $emailCompanyIds
-                    ? CmsCompany::find()->forManager()->cmsSite()->select(CmsCompany::tableName().'.id')
+                    ? CmsCompany::find()->forManager()->select(CmsCompany::tableName().'.id')
                         ->andWhere([CmsCompany::tableName().'.id' => $emailCompanyIds])->column()
                     : [];
                 $this->collectIds($allowedCompanyIds, $companyReasons, 'Совпал email '.$email->value);
@@ -115,7 +115,7 @@ class CmsLeadIdentityService
         }
 
         $company = $companyId
-            ? CmsCompany::find()->forManager()->cmsSite()->andWhere([CmsCompany::tableName().'.id' => $companyId])->one()
+            ? CmsCompany::find()->forManager()->andWhere([CmsCompany::tableName().'.id' => $companyId])->one()
             : null;
         $client = $clientId
             ? $this->clientQuery()->andWhere([CmsUser::tableName().'.id' => $clientId])->one()
@@ -207,7 +207,7 @@ class CmsLeadIdentityService
         if (!$ids) {
             return [];
         }
-        return CmsCompany::find()->forManager()->cmsSite()
+        return CmsCompany::find()->forManager()
             ->andWhere([CmsCompany::tableName().'.id' => $ids])
             ->with(['phones', 'emails'])
             ->indexBy('id')
@@ -225,7 +225,7 @@ class CmsLeadIdentityService
             ->all();
         $companyIds = array_values(array_unique(array_map(static fn(CmsCompany2user $link) => (int)$link->cms_company_id, $links)));
         $companies = $companyIds
-            ? CmsCompany::find()->forManager()->cmsSite()
+            ? CmsCompany::find()->forManager()
                 ->andWhere([CmsCompany::tableName().'.id' => $companyIds])
                 ->with(['phones', 'emails'])
                 ->indexBy('id')
