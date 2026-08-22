@@ -341,20 +341,21 @@ if ($syncContactsPosition === false || $serviceActivityPosition > $syncContactsP
 
 $displayNameContracts = [
     'public function getDisplayName(): string',
-    "\$label = 'Форма на сайте «'.\$this->sourceNameAsText.'»'",
-    "ArrayHelper::getValue(\$sourceData, 'form_send_id', \$this->source_ref)",
-    '$mainPhone = $this->mainPhone;',
+    'return (string)$this->name;',
     "'value' => static fn(CmsLead \$model) => \$model->displayName",
     "'title' => \$model->displayName",
 ];
 foreach ($displayNameContracts as $fragment) {
     if (strpos($model.$controller.$header, $fragment) === false) {
-        throw new RuntimeException('Form lead display name is incomplete: '.$fragment);
+        throw new RuntimeException('Lead display name must use the persisted name: '.$fragment);
     }
+}
+if (strpos($model, "\$label = 'Форма на сайте «'.\$this->sourceNameAsText.'»'") !== false) {
+    throw new RuntimeException('CmsLead must not rebuild a Form2 title around an editable persisted name.');
 }
 if (strpos($header, "'CmsCompany' => ['name' => \$model->name") === false
     || strpos($header, "'CmsUser' => ['first_name' => \$model->name") === false) {
-    throw new RuntimeException('CRM creation forms must keep the short contact name.');
+    throw new RuntimeException('CRM creation forms must receive the persisted lead name explicitly.');
 }
 
 echo "CMS lead contract: ok\n";

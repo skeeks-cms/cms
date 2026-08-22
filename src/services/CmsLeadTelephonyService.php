@@ -6,10 +6,8 @@ use RuntimeException;
 use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsLeadPhone;
-use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsTelephonyCall;
 use skeeks\cms\models\CmsTelephonyUser;
-use Yii;
 use yii\db\IntegrityException;
 
 /**
@@ -85,14 +83,7 @@ class CmsLeadTelephonyService
             return null;
         }
 
-        if (!(int)$call->cms_lead_id) {
-            $call->cms_lead_id = (int)$lead->id;
-            if (!$call->save(false, ['cms_lead_id'])) {
-                throw new RuntimeException('Unable to attach telephony call to lead #'.$lead->id);
-            }
-        }
-
-        $this->ensureLog($call, $lead);
+        (new CmsTelephonyCallLinkService())->attachLead($call, $lead);
 
         return $lead;
     }
@@ -115,49 +106,6 @@ class CmsLeadTelephonyService
             ->all();
 
         return count($leads) === 1 ? $leads[0] : null;
-    }
-
-    protected function ensureLog(CmsTelephonyCall $call, CmsLead $lead): void
-    {
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            Yii::$app->db->createCommand(
-                'SELECT id FROM '.CmsTelephonyCall::tableName().' WHERE id = :id FOR UPDATE',
-                [':id' => (int)$call->id]
-            )->queryScalar();
-
-            $logs = CmsLog::find()
-                ->andWhere([
-                    'model_code' => $lead->skeeksModelCode,
-                    'model_id' => $lead->id,
-                    'log_type' => CmsLog::LOG_TYPE_PHONE_CALL,
-                ])
-                ->all();
-
-            foreach ($logs as $log) {
-                if ((int)($log->data['id'] ?? 0) === (int)$call->id) {
-                    $transaction->commit();
-                    return;
-                }
-            }
-
-            $log = new CmsLog();
-            $log->model_code = $lead->skeeksModelCode;
-            $log->model_id = (int)$lead->id;
-            $log->log_type = CmsLog::LOG_TYPE_PHONE_CALL;
-            $log->data = $call->toArray(['id', 'direction', 'client_phone']);
-            $log->created_by = $call->cms_worker_user_id ?: null;
-            $log->updated_by = $call->cms_worker_user_id ?: null;
-            if (!$log->save()) {
-                throw new RuntimeException('Unable to save lead call log: '.json_encode($log->errors, JSON_UNESCAPED_UNICODE));
-            }
-            $transaction->commit();
-        } catch (\Throwable $e) {
-            if ($transaction->isActive) {
-                $transaction->rollBack();
-            }
-            throw $e;
-        }
     }
 
     protected function isSamePhone(?string $first, ?string $second): bool

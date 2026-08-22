@@ -6,21 +6,26 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\assets\CmsTelephonyCallAdminAsset;
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\actions\BackendModelViewAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\forms\CmsTelephonyCallLinksForm;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsTelephonyCall;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\services\CmsTelephonyCallLinkService;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\admin\CmsWorkerViewWidget;
 use skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
-use yii\bootstrap\Alert;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -33,6 +38,12 @@ class AdminCmsTelephonyCallController extends BackendModelStandartController
         $this->name = \Yii::t('skeeks/cms', "Телефонные звонки");
         $this->modelShowAttribute = 'provider_call_id';
         $this->modelClassName = CmsTelephonyCall::class;
+        $this->modelDefaultAction = 'view';
+        $this->modelHeader = function () {
+            return $this->renderPartial('@skeeks/cms/views/admin-cms-telephony-call/_model_header', [
+                'model' => $this->model,
+            ]);
+        };
 
         $this->generateAccessActions = false;
         $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
@@ -48,6 +59,40 @@ class AdminCmsTelephonyCallController extends BackendModelStandartController
             'update' => new UnsetArrayValue(),
             'delete' => new UnsetArrayValue(),
             'delete-multi' => new UnsetArrayValue(),
+
+            'view' => [
+                'class' => BackendModelViewAction::class,
+                'name' => 'Карточка звонка',
+                'priority' => 10,
+                'callback' => fn() => $this->render('view', ['model' => $this->model]),
+            ],
+            'links' => [
+                'class' => BackendModelUpdateAction::class,
+                'name' => 'Привязки',
+                'icon' => 'fa fa-link',
+                'priority' => 20,
+                'fields' => [$this, 'linkFields'],
+                'on '.BackendModelUpdateAction::EVENT_INIT_FORM_MODELS => static function (Event $event) {
+                    $event->sender->formModels['links'] = CmsTelephonyCallLinksForm::fromCall(
+                        $event->sender->model
+                    );
+                },
+                'on '.BackendModelUpdateAction::EVENT_BEFORE_SAVE => function (Event $event) {
+                    /** @var BackendModelUpdateAction $action */
+                    $action = $event->sender;
+                    /** @var CmsTelephonyCallLinksForm $form */
+                    $form = $action->formModels['links'];
+                    $action->isSaveFormModels = false;
+
+                    (new CmsTelephonyCallLinkService())->updateLinks(
+                        $action->model,
+                        $form->cms_lead_id !== null ? (int)$form->cms_lead_id : null,
+                        $form->cms_company_id !== null ? (int)$form->cms_company_id : null,
+                        $form->cms_user_id !== null ? (int)$form->cms_user_id : null
+                    );
+                    $action->afterSaveUrl = ['view', 'pk' => $action->model->id];
+                },
+            ],
 
             'index' => [
                 'on beforeRender' => function (Event $e) {
@@ -365,6 +410,55 @@ HTML
         ]);
 
         return $actions;
+    }
+
+    public function linkFields(): array
+    {
+        return [
+            'links.cms_lead_id' => $this->entityLinkField(
+                CmsLead::class,
+                static function ($word = '') {
+                    $query = (new CmsTelephonyCallLinkService())->availableLeadQuery();
+                    if ($word !== '') {
+                        $query->search($word);
+                    }
+                    return $query;
+                }
+            ),
+            'links.cms_company_id' => $this->entityLinkField(
+                CmsCompany::class,
+                static function ($word = '') {
+                    $query = (new CmsTelephonyCallLinkService())->availableCompanyQuery();
+                    if ($word !== '') {
+                        $query->search($word);
+                    }
+                    return $query;
+                }
+            ),
+            'links.cms_user_id' => $this->entityLinkField(
+                CmsUser::class,
+                static function ($word = '') {
+                    $query = (new CmsTelephonyCallLinkService())->availableUserQuery();
+                    if ($word !== '') {
+                        $query->search($word);
+                    }
+                    return $query;
+                }
+            ),
+        ];
+    }
+
+    private function entityLinkField(string $modelClass, callable $searchQuery): array
+    {
+        return [
+            'class' => WidgetField::class,
+            'widgetClass' => AjaxSelectModel::class,
+            'widgetConfig' => [
+                'modelClass' => $modelClass,
+                'multiple' => false,
+                'searchQuery' => $searchQuery,
+            ],
+        ];
     }
 
     private function renderClientPrimary(CmsTelephonyCall $call)
