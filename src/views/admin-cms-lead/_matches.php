@@ -10,7 +10,7 @@ use yii\helpers\Html;
 
 /** @var CmsLead $model */
 /** @var array $matches */
-/** @var bool $canWork */
+/** @var bool $canLink */
 
 $linkButton = static function (?int $companyId, ?int $clientId, string $label, string $confirm) use ($model): string {
     return Html::beginForm(['/cms/admin-cms-lead/link-identity', 'pk' => $model->id], 'post', [
@@ -44,7 +44,7 @@ BackendSurfaceWidget::begin([
                     <?= CmsUserViewWidget::widget(['cmsUser' => $client, 'isSmall' => true]); ?>
                     <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
                 </div>
-                <?php if ($canWork && !$model->cms_user_id) : ?>
+                <?php if ($canLink && !$model->cms_user_id) : ?>
                     <?= $linkButton(null, (int)$client->id, 'Привязать клиента', 'Привязать этого клиента к лиду?'); ?>
                 <?php endif; ?>
 
@@ -61,7 +61,7 @@ BackendSurfaceWidget::begin([
                                 ]); ?>
                                 <?php if ((int)$model->cms_company_id === (int)$company->id) : ?>
                                     <span class="sx-lead-match__reason">Уже привязана к лиду</span>
-                                <?php elseif ($canWork && !$model->cms_company_id) : ?>
+                                <?php elseif ($canLink && !$model->cms_company_id) : ?>
                                     <?= $linkButton(
                                         (int)$company->id,
                                         (int)$client->id,
@@ -88,13 +88,13 @@ BackendSurfaceWidget::begin([
                     ]); ?>
                     <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
                 </div>
-                <?php if ($canWork && !$model->cms_company_id) : ?>
+                <?php if ($canLink && !$model->cms_company_id) : ?>
                     <?= $linkButton((int)$company->id, null, 'Привязать компанию', 'Привязать эту компанию к лиду?'); ?>
                 <?php endif; ?>
             </article>
         <?php endforeach; ?>
 
-        <?php if (!$canWork) : ?>
+        <?php if (!$canLink) : ?>
             <p class="sx-lead-matches__notice">Возьмите лид в работу, чтобы привязать найденную запись.</p>
         <?php endif; ?>
     </div>

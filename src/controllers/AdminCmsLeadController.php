@@ -100,6 +100,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                             'controllerId' => '/cms/admin-cms-lead',
                             'action' => 'view',
                             'attribute' => 'name',
+                            'value' => static fn(CmsLead $model) => $model->displayName,
                         ],
                         'status' => [
                             'format' => 'raw',
@@ -178,7 +179,7 @@ class AdminCmsLeadController extends BackendModelStandartController
             'edit' => [
                 'class' => BackendModelUpdateAction::class,
                 'name' => 'Редактирование',
-                'icon' => 'fa fa-pencil',
+                'icon' => 'fa fa-edit',
                 'priority' => 30,
                 'fields' => [$this, 'editFields'],
                 'accessCallback' => fn() => $this->canWorkWithModel(),
@@ -221,9 +222,11 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendModelAction::class,
                 'isVisible' => false,
                 'callback' => [$this, 'linkIdentity'],
-                'accessCallback' => fn() => $this->canWorkWithModel(),
+                'accessCallback' => fn() => $this->canLinkIdentity(),
             ],
-            'delete' => new UnsetArrayValue(),
+            'delete' => [
+                'accessCallback' => fn() => $this->canDeleteLead(),
+            ],
             'delete-multi' => new UnsetArrayValue(),
             'update' => new UnsetArrayValue(),
         ]);
@@ -338,7 +341,7 @@ class AdminCmsLeadController extends BackendModelStandartController
         return $this->renderPartial('@skeeks/cms/views/admin-cms-lead/_matches', [
             'model' => $this->model,
             'matches' => $matches,
-            'canWork' => $this->canWorkWithModel(),
+            'canLink' => $this->canLinkIdentity(),
         ]);
     }
 
@@ -389,9 +392,9 @@ class AdminCmsLeadController extends BackendModelStandartController
                 ? 'Существующие записи CRM привязаны к лиду.'
                 : 'Эти записи уже привязаны к лиду.');
         } catch (StaleObjectException $e) {
-            throw new ConflictHttpException('Лид изменился в другой вкладке. Обновите карточку.', 0, $e);
+            \Yii::$app->session->setFlash('error', 'Лид изменился в другой вкладке. Обновите карточку.');
         } catch (\DomainException $e) {
-            throw new BadRequestHttpException($e->getMessage(), 0, $e);
+            \Yii::$app->session->setFlash('error', $e->getMessage());
         }
 
         return $this->redirect(['view', 'pk' => $this->model->id]);
@@ -515,6 +518,17 @@ class AdminCmsLeadController extends BackendModelStandartController
         if (!$this->model || $this->model->isTerminal) { return false; }
         if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) { return true; }
         return $this->model->isManagedBy((int)\Yii::$app->user->id);
+    }
+
+    private function canLinkIdentity(): bool
+    {
+        return $this->canWorkWithModel()
+            && $this->model->status === CmsLead::STATUS_IN_WORK;
+    }
+
+    private function canDeleteLead(): bool
+    {
+        return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
     }
 
     private function restoreAttributes(CmsLead $model, array $attributes): void

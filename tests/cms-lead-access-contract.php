@@ -41,6 +41,11 @@ $contracts = [
     'lead actions restore server-owned attributes' => strpos($controller, 'private function restoreAttributes') !== false
         && substr_count($controller, '$this->restoreAttributes(') >= 2
         && strpos($controller, "'cms_site_id', 'submitted_by_id'") !== false,
+    'only administrators can delete one lead at a time' => strpos($controller, 'private function canDeleteLead(): bool') !== false
+        && strpos($controller, "'accessCallback' => fn() => \$this->canDeleteLead()") !== false
+        && strpos($controller, 'CmsManager::PERMISSION_ROLE_ADMIN_ACCESS') !== false
+        && strpos($controller, "'delete' => new UnsetArrayValue()") === false
+        && strpos($controller, "'delete-multi' => new UnsetArrayValue()") !== false,
     'lead identity conversion is atomic' => strpos($companyController, 'EVENT_BEFORE_SAVE') !== false
         && strpos($companyController, 'beginTransaction()') !== false
         && strpos($companyController, '_conversionTransaction->commit()') !== false

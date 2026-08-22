@@ -88,7 +88,7 @@ if ($model->canBeClaimed) {
 
 echo BackendModelHeader::widget([
     'model' => $model,
-    'title' => $model->name,
+    'title' => $model->displayName,
     'status' => $status,
     'toolbar' => implode('', $toolbar),
     'actions' => false,

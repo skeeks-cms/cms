@@ -557,6 +557,27 @@ class CmsLead extends Core
         return $this->source_name ?: (self::sources()[$this->source_type] ?? $this->source_type);
     }
 
+    public function getDisplayName(): string
+    {
+        if ($this->source_type !== self::SOURCE_FORM) {
+            return (string)$this->name;
+        }
+
+        $mainPhone = $this->mainPhone;
+        $contacts = array_values(array_filter([
+            trim((string)$this->name),
+            $mainPhone ? trim((string)$mainPhone->value) : '',
+        ], static fn(string $part): bool => $part !== ''));
+        $label = 'Форма на сайте «'.$this->sourceNameAsText.'»';
+        $sourceData = is_array($this->source_data) ? $this->source_data : [];
+        $sendId = (int)ArrayHelper::getValue($sourceData, 'form_send_id', $this->source_ref);
+        if ($sendId > 0) {
+            $label .= ' №'.$sendId;
+        }
+
+        return $contacts ? $label.': '.implode(', ', $contacts) : $label;
+    }
+
     public function getCanBeClaimed(): bool
     {
         return $this->status === self::STATUS_NEW && !$this->executor_id;

@@ -67,6 +67,14 @@ foreach (["'priority' => 10", "'priority' => 20", "'priority' => 30", "'priority
         throw new RuntimeException('Missing lead-card action priority: '.$priority);
     }
 }
+$editActionStart = strpos($controller, "'edit' => [");
+$editActionEnd = strpos($controller, "'log' => [", $editActionStart);
+$editAction = $editActionStart === false || $editActionEnd === false
+    ? ''
+    : substr($controller, $editActionStart, $editActionEnd - $editActionStart);
+if (strpos($editAction, "'icon' => 'fa fa-edit'") === false) {
+    throw new RuntimeException('The dedicated lead edit action must use an available backend icon.');
+}
 if (strpos($controller, "'visibleFilters' => ['q', 'status', 'source_type']") === false) {
     if (strpos($controller, "array_merge(['q', 'status', 'source_type'], \$utmAttributes)") === false) {
         throw new RuntimeException('Lead filters must include source and canonical UTM attribution fields.');
@@ -329,6 +337,24 @@ if ($existingReturnPosition === false || $existingReturnPosition > $serviceActiv
 $syncContactsPosition = strpos($service, 'public function syncContacts');
 if ($syncContactsPosition === false || $serviceActivityPosition > $syncContactsPosition) {
     throw new RuntimeException('Contact synchronization of an existing lead must not create activity entries.');
+}
+
+$displayNameContracts = [
+    'public function getDisplayName(): string',
+    "\$label = 'Форма на сайте «'.\$this->sourceNameAsText.'»'",
+    "ArrayHelper::getValue(\$sourceData, 'form_send_id', \$this->source_ref)",
+    '$mainPhone = $this->mainPhone;',
+    "'value' => static fn(CmsLead \$model) => \$model->displayName",
+    "'title' => \$model->displayName",
+];
+foreach ($displayNameContracts as $fragment) {
+    if (strpos($model.$controller.$header, $fragment) === false) {
+        throw new RuntimeException('Form lead display name is incomplete: '.$fragment);
+    }
+}
+if (strpos($header, "'CmsCompany' => ['name' => \$model->name") === false
+    || strpos($header, "'CmsUser' => ['first_name' => \$model->name") === false) {
+    throw new RuntimeException('CRM creation forms must keep the short contact name.');
 }
 
 echo "CMS lead contract: ok\n";

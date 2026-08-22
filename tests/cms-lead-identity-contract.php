@@ -15,8 +15,14 @@ $checks = [
         && strpos($controller, 'request->isAjax') !== false,
     'link endpoint requires explicit post' => strpos($controller, 'public function linkIdentity()') !== false
         && strpos($controller, 'request->isPost') !== false,
-    'linking is limited to a workable lead' => strpos($controller, "'accessCallback' => fn() => \$this->canWorkWithModel()") !== false
+    'linking is limited to a workable lead' => strpos($controller, "'accessCallback' => fn() => \$this->canLinkIdentity()") !== false
         && strpos($service, 'CmsLead::STATUS_IN_WORK') !== false,
+    'link controls use the same in-work rule as the service' => strpos($controller, "'canLink' => \$this->canLinkIdentity()") !== false
+        && strpos($controller, '$this->model->status === CmsLead::STATUS_IN_WORK') !== false
+        && strpos($partial, 'if ($canLink && !$model->cms_company_id)') !== false
+        && strpos($partial, 'if (!$canLink)') !== false,
+    'expected link failures return to the card' => substr_count($controller, "session->setFlash('error'") >= 2
+        && strpos($controller, "return \$this->redirect(['view', 'pk' => \$this->model->id]);") !== false,
     'phone matching uses every lead phone' => strpos($service, 'foreach ($lead->phones as $phone)') !== false
         && strpos($service, '->phone($phone->value)') !== false,
     'email matching uses every lead email' => strpos($service, 'foreach ($lead->emails as $email)') !== false
