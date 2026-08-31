@@ -50,6 +50,9 @@ class TimestampPublishedBehavior extends AttributeBehavior
      */
     protected function getValue($event)
     {
+        if($event->sender->attributes[$this->publishedAtAttribute]){
+            return $event->sender->attributes[$this->publishedAtAttribute];
+        }
         if ($this->value instanceof Expression) {
             return $this->value;
         } else {
