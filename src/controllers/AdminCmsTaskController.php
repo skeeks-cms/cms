@@ -1537,7 +1537,7 @@ JS
                 .'</tr></table>'
             );
         }
-        $mpdf->WriteHTML($html);
+        $this->writeTaskReportPdfHtml($mpdf, $html);
 
         $response = \Yii::$app->response;
         $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
@@ -1548,6 +1548,25 @@ JS
             'mimeType' => 'application/pdf',
             'inline' => (bool)$inline,
         ]);
+    }
+
+    /**
+     * Передаёт отчёт в mPDF частями по явным границам PDF-шаблона.
+     *
+     * mPDF отклоняет одиночный вызов WriteHTML(), если размер HTML превышает
+     * pcre.backtrack_limit. Маркеры находятся между законченными блоками и не
+     * попадают в PDF, поэтому потоковая запись не меняет разметку документа.
+     *
+     * @param \Mpdf\Mpdf $mpdf
+     * @param string      $html
+     */
+    protected function writeTaskReportPdfHtml($mpdf, $html)
+    {
+        foreach (explode('<!-- skeeks-mpdf-chunk -->', (string)$html) as $chunk) {
+            if ($chunk !== '') {
+                $mpdf->WriteHTML($chunk);
+            }
+        }
     }
 
     /**

@@ -355,6 +355,7 @@ $renderResultText = function ($value, $bulletColor) {
         </div>
     </section>
     <pagebreak />
+    <!-- skeeks-mpdf-chunk -->
 <?php endif; ?>
 
 <?php if ($isBranded) : ?><sethtmlpageheader name="brand" value="on" show-this-page="1" /><?php endif; ?>
@@ -374,6 +375,7 @@ $renderResultText = function ($value, $bulletColor) {
     <span class="summary-label">Отработанное время:</span> <span class="summary-value"><?php echo Html::encode(CmsScheduleHelper::durationAsText((int)ArrayHelper::getValue($report, 'summary.duration'))); ?></span><br>
     <span class="summary-label">Отработано часов:</span> <span class="summary-value"><?php echo Html::encode(\Yii::$app->formatter->asDecimal($hours, 1)); ?></span><?php endif; ?>
 </div>
+<!-- skeeks-mpdf-chunk --><?php // Безопасная граница потоковой записи mPDF. ?>
 
 <?php if ($taskView == 'list') : ?>
     <div class="task-list">
@@ -478,9 +480,11 @@ $renderResultText = function ($value, $bulletColor) {
             <?php if ($hasSplittableResult) : ?>
                 <?php foreach ($sections as $sectionIndex => $sectionHtml) : ?>
                     <div class="task-section<?php echo $sectionIndex == 0 ? ' task-section-first' : ''; ?><?php echo $sectionIndex == $lastSection ? ' task-section-last' : ''; ?>" style="background:<?php echo Html::encode($surface); ?>;background-color:<?php echo Html::encode($surface); ?>;"><?php echo $sectionHtml; ?></div>
+                    <!-- skeeks-mpdf-chunk -->
                 <?php endforeach; ?>
             <?php else : ?>
                 <div class="task-item" style="background:<?php echo Html::encode($surface); ?>;background-color:<?php echo Html::encode($surface); ?>;padding:14px 16px;"><?php echo implode('', $sections); ?></div>
+                <!-- skeeks-mpdf-chunk -->
             <?php endif; ?>
         <?php endforeach; ?>
         <div class="clear"></div>
@@ -498,6 +502,7 @@ $renderResultText = function ($value, $bulletColor) {
                     <td class="<?php echo $column == 'result' ? 'result' : ''; ?>" bgcolor="<?php echo Html::encode($surface); ?>"><?php echo Html::encode(ArrayHelper::getValue($row, $column)); ?></td>
                 <?php endforeach; ?>
             </tr>
+            <!-- skeeks-mpdf-chunk -->
         <?php endforeach; ?>
         <?php if (!$report['rows']) : ?><tr><td colspan="<?php echo max(1, count($columns)); ?>">По выбранным условиям данных нет.</td></tr><?php endif; ?>
         </tbody>
