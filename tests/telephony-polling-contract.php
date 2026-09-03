@@ -14,6 +14,12 @@ $checks = [
     'polling does not trigger global ajax blockers' => strpos($script, 'global: false') !== false,
     'incoming polling releases the PHP session lock' => preg_match('/actionIncoming\(\).*?releaseSessionLock\(\)/s', $controller) === 1,
     'status polling releases the PHP session lock' => preg_match('/actionStatus\(\).*?releaseSessionLock\(\)/s', $controller) === 1,
+    'incoming polling is scoped to the current telephony user' => preg_match('/actionIncoming\(\).*?scopeCallsForTelephonyUser\(/s', $controller) === 1,
+    'status polling is scoped to the current telephony user' => preg_match('/actionStatus\(\).*?scopeCallsForTelephonyUser\(/s', $controller) === 1,
+    'call cancellation is scoped before the provider request' => preg_match('/actionCancel\(\).*?scopeCallsForTelephonyUser\(.*?if \(!\$call\).*?->cancel\(/s', $controller) === 1,
+    'telephony scope accepts only the employee or their extension' => strpos($controller, "'.cms_worker_user_id' => Yii::\$app->user->id") !== false
+        && strpos($controller, "'.provider_user_num' => \$providerUserNum") !== false,
+    'incoming polling has no provider-wide fallback' => strpos($controller, '$callQuery()->one()') === false,
     'widget resolves the main backend window' => strpos($widget, 'currentSx.Window.getMainWindow()') !== false,
     'main window owns the telephony instance' => strpos($widget, 'mainSx.Telephony = new mainSx.classes.Telephony') !== false,
     'child windows only forward call buttons' => strpos($widget, ".off('click.sxTelephony', '.sx-telephony-btn')") !== false,

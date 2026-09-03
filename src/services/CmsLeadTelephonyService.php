@@ -19,17 +19,8 @@ class CmsLeadTelephonyService
         CmsTelephonyUser $telephonyUser,
         string $providerCallId,
         string $phone,
-        int $leadId
+        ?int $leadId = null
     ): ?CmsTelephonyCall {
-        $lead = CmsLead::find()
-            ->forManager()
-            ->cmsSite()
-            ->andWhere([CmsLead::tableName().'.id' => $leadId])
-            ->one();
-        if (!$lead || !$this->leadHasPhone($lead, $phone)) {
-            return null;
-        }
-
         $call = CmsTelephonyCall::find()
             ->andWhere([
                 'cms_telephony_provider_id' => $telephonyUser->cms_telephony_provider_id,
@@ -63,7 +54,19 @@ class CmsLeadTelephonyService
             }
         }
 
-        return $this->attachToLead($call, $lead) ? $call : null;
+        if ($leadId) {
+            $lead = CmsLead::find()
+                ->forManager()
+                ->cmsSite()
+                ->andWhere([CmsLead::tableName().'.id' => $leadId])
+                ->one();
+
+            if ($lead && $this->leadHasPhone($lead, $phone)) {
+                $this->attachToLead($call, $lead);
+            }
+        }
+
+        return $call;
     }
 
     /**

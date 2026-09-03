@@ -61,13 +61,13 @@ class TelephonyController extends Controller
         $result = $telephonyUser->provider->handler->call($phone, $telephonyUser);
 
         $leadId = (int)Yii::$app->request->post('lead_id');
-        if ($leadId && !empty($result['success']) && !empty($result['provider_call_id'])) {
+        if (!empty($result['success']) && !empty($result['provider_call_id'])) {
             try {
                 (new CmsLeadTelephonyService())->registerOutgoingCall(
                     $telephonyUser,
                     (string)$result['provider_call_id'],
                     (string)$phone,
-                    $leadId
+                    $leadId ?: null
                 );
             } catch (\Throwable $e) {
                 Yii::error($e, 'telephony');
@@ -86,19 +86,20 @@ class TelephonyController extends Controller
             return ['success' => false];
         }
 
+        $call = $this->scopeCallsForTelephonyUser(CmsTelephonyCall::find(), $telephonyUser)
+            ->andWhere(['provider_call_id' => $providerCallId])
+            ->one();
+
+        if (!$call) {
+            return ['success' => false];
+        }
+
         $telephonyUser
             ->provider
             ->handler
             ->cancel($providerCallId);
 
-        $call = CmsTelephonyCall::find()
-            ->where([
-                'cms_telephony_provider_id' => $telephonyUser->provider->id,
-                'provider_call_id' => $providerCallId,
-            ])
-            ->one();
-
-        if ($call && !$call->isFinished) {
+        if (!$call->isFinished) {
             $call->status = CmsTelephonyCall::STATUS_FAILED;
             $call->failed_reason = CmsTelephonyCall::FAILED_CANCEL;
             $call->ended_at = time();
@@ -129,11 +130,8 @@ class TelephonyController extends Controller
          * @var $call CmsTelephonyCall
          */
         /** @var CmsTelephonyCall|null $call */
-        $call = CmsTelephonyCall::find()
-            ->where([
-                'cms_telephony_provider_id' => $telephonyUser->provider->id,
-                'provider_call_id' => $callId,
-            ])
+        $call = $this->scopeCallsForTelephonyUser(CmsTelephonyCall::find(), $telephonyUser)
+            ->andWhere(['provider_call_id' => $callId])
             ->one();
 
         if (!$call) {
@@ -199,28 +197,10 @@ class TelephonyController extends Controller
             CmsTelephonyCall::STATUS_NEW,
         ];
 
-        $callQuery = function () use ($telephonyUser, $activeStatuses) {
-            return CmsTelephonyCall::find()
-                ->where([
-                    'cms_telephony_provider_id' => $telephonyUser->provider->id,
-                ])
-                ->andWhere(['status' => $activeStatuses])
-                ->orderBy(['id' => SORT_DESC]);
-        };
-
-        $call = $callQuery()
-            ->andWhere(['provider_user_num' => $telephonyUser->provider_user_num])
+        $call = $this->scopeCallsForTelephonyUser(CmsTelephonyCall::find(), $telephonyUser)
+            ->andWhere(['status' => $activeStatuses])
+            ->orderBy(['id' => SORT_DESC])
             ->one();
-
-        if (!$call) {
-            $call = $callQuery()
-                ->andWhere(['cms_worker_user_id' => Yii::$app->user->id])
-                ->one();
-        }
-
-        if (!$call) {
-            $call = $callQuery()->one();
-        }
 
         if (!$call) {
             return ['success' => true, 'hasCall' => false];
@@ -265,6 +245,28 @@ class TelephonyController extends Controller
         if (Yii::$app->has('session') && Yii::$app->session->getIsActive()) {
             Yii::$app->session->close();
         }
+    }
+
+    /**
+     * The live-call widget must only access calls assigned to the current
+     * employee or to their unique extension at the configured provider.
+     */
+    protected function scopeCallsForTelephonyUser($query, CmsTelephonyUser $telephonyUser)
+    {
+        $tableName = CmsTelephonyCall::tableName();
+        $ownershipCondition = [
+            'or',
+            [$tableName.'.cms_worker_user_id' => Yii::$app->user->id],
+        ];
+
+        $providerUserNum = trim((string)$telephonyUser->provider_user_num);
+        if ($providerUserNum !== '') {
+            $ownershipCondition[] = [$tableName.'.provider_user_num' => $providerUserNum];
+        }
+
+        return $query
+            ->andWhere([$tableName.'.cms_telephony_provider_id' => $telephonyUser->cms_telephony_provider_id])
+            ->andWhere($ownershipCondition);
     }
 
     /**

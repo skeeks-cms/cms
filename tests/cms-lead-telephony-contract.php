@@ -13,7 +13,10 @@ $migration = file_get_contents($root.'/migrations/m260819_160000__add_cms_lead_i
 
 $checks = [
     'call stores its lead relation' => strpos($call, "'cms_lead_id'") !== false && strpos($call, 'function getLead()') !== false,
-    'outgoing call accepts explicit lead context' => strpos($controller, "post('lead_id')") !== false && strpos($controller, 'registerOutgoingCall(') !== false,
+    'every outgoing call is registered for its employee' => strpos($controller, "if (!empty(\$result['success']) && !empty(\$result['provider_call_id']))") !== false
+        && strpos($controller, 'registerOutgoingCall(') !== false,
+    'outgoing call accepts optional explicit lead context' => strpos($controller, "post('lead_id')") !== false
+        && strpos($service, '?int $leadId = null') !== false,
     'explicit lead context is employee and site scoped' => strpos($service, '->forManager()') !== false
         && substr_count($service, '->cmsSite()') >= 2,
     'lead button sends its id' => strpos($view, 'data-lead-id=') !== false,
