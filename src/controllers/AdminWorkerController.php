@@ -20,6 +20,8 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\base\DynamicModel;
+use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\forms\CmsWorkerAddForm;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
@@ -386,7 +388,19 @@ class AdminWorkerController extends BackendModelStandartController
                 'callback'  => [$this, 'sendSms'],
             ],
 
+            'add-existing' => [
+                'class'           => ViewBackendAction::class,
+                'name'            => 'Добавить из пользователей',
+                'icon'            => 'fa fa-user-plus',
+                'isOpenNewWindow' => true,
+                'size'            => BackendAction::SIZE_SMALL,
+                'generateAccess'  => false,
+                'permissionName'  => 'cms/admin-worker/create',
+                'callback'        => [$this, 'addExisting'],
+            ],
+
             'create' => [
+                'name'           => 'Создать нового',
                 //"callback"       => [$this, 'create'],
                 'size'           => BackendAction::SIZE_SMALL,
                 'generateAccess' => true,
@@ -610,6 +624,42 @@ class AdminWorkerController extends BackendModelStandartController
 
 
         return $actions;
+    }
+
+    /**
+     * Adds an existing site user to the employees collection.
+     *
+     * @return RequestResponse|string
+     */
+    public function addExisting()
+    {
+        $model = new CmsWorkerAddForm();
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            $model->load(\Yii::$app->request->post());
+
+            if ($model->validate() && $model->addWorker()) {
+                $rr->success = true;
+                $rr->message = 'Сотрудник добавлен';
+                $rr->data = [
+                    'afterSaveUrl' => $this->url,
+                    'type'         => 'create',
+                    'submitBtn'    => \Yii::$app->request->post('submit-btn'),
+                ];
+            } else {
+                $rr->success = false;
+                $rr->data = [
+                    'validation' => ActiveForm::validate($model),
+                ];
+            }
+
+            return $rr;
+        }
+
+        return $this->render('add-existing', [
+            'model' => $model,
+        ]);
     }
 
 
