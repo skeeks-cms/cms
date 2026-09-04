@@ -12,6 +12,8 @@ $header = file_get_contents($root.'/views/admin-cms-lead/_model_header.php');
 $statusWidget = file_get_contents($root.'/widgets/admin/CmsLeadStatusWidget.php');
 $phoneModel = file_get_contents($root.'/models/CmsLeadPhone.php');
 $emailModel = file_get_contents($root.'/models/CmsLeadEmail.php');
+$companyController = file_get_contents($root.'/controllers/AdminCmsCompanyController.php');
+$userController = file_get_contents($root.'/controllers/AdminUserController.php');
 
 $requiredModelFragments = [
     "[['name', 'source_type', 'status'], 'required']",
@@ -23,6 +25,9 @@ $requiredModelFragments = [
     'public function allowedNextStatuses(): array',
     'self::STATUS_NEW => [self::STATUS_NEW, self::STATUS_IN_WORK]',
     'self::STATUS_IN_WORK => [self::STATUS_IN_WORK, self::STATUS_SUCCESS, self::STATUS_REJECTED]',
+    'self::STATUS_SUCCESS => [self::STATUS_SUCCESS, self::STATUS_IN_WORK]',
+    'self::STATUS_REJECTED => [self::STATUS_REJECTED, self::STATUS_IN_WORK]',
+    'public function canBeReopenedBy(int $userId): bool',
     'notifyAvailableManagers()',
     'notifyPartnerAboutComment(?int $logId = null)',
     'getPartnerViewUrl(?int $logId = null)',
@@ -244,6 +249,26 @@ foreach (['Взять в работу', 'Создать компанию', 'Со
         throw new RuntimeException('Lead model header is incomplete: '.$headerFragment);
     }
 }
+foreach (['Вернуть в работу', '/cms/admin-cms-lead/reopen', 'canBeReopenedBy'] as $reopenFragment) {
+    if (strpos($controller.$header, $reopenFragment) === false) {
+        throw new RuntimeException('A completed lead must expose an explicit return-to-work action: '.$reopenFragment);
+    }
+}
+foreach (['$this->model->status = CmsLead::STATUS_IN_WORK', '$this->model->processed_at = null'] as $reopenContract) {
+    if (strpos($controller, $reopenContract) === false) {
+        throw new RuntimeException('Returning a lead to work must restore its active lifecycle state: '.$reopenContract);
+    }
+}
+foreach (['if (!$this->model || $this->model->isTerminal)', 'return false;'] as $terminalAccessContract) {
+    if (strpos($controller, $terminalAccessContract) === false) {
+        throw new RuntimeException('Completed leads must remain read-only in controller actions: '.$terminalAccessContract);
+    }
+}
+if (substr_count($view, '<?php if ($canWork) : ?>') < 4
+    || strpos($view, '$canWork = $model->canBeWorkedBy') === false
+) {
+    throw new RuntimeException('Completed lead contact controls must remain behind the shared work-access predicate.');
+}
 foreach (['CmsWorkerViewWidget::widget', "'Ответственный'", 'sx-lead-header__status-row', "'status' => \$status"] as $headerFragment) {
     if (strpos($header, $headerFragment) === false) {
         throw new RuntimeException('Lead owner must be rendered in the model header: '.$headerFragment);
@@ -266,6 +291,30 @@ foreach (['Взять в работу', 'Создать компанию', 'Со
     if (strpos($view, $movedAction) !== false) {
         throw new RuntimeException('Lead workflow action must not be duplicated inside the card: '.$movedAction);
     }
+}
+
+foreach ([
+    [$companyController, "'relation'        => ['cms_company_id' => 'id']", 'company'],
+    [$userController, "'relation'        => ['cms_user_id' => 'id']", 'client'],
+] as [$relatedController, $relation, $owner]) {
+    foreach ([
+        "'leads' => [",
+        "'name'     => 'Лиды'",
+        "'controllerRoute' => '/cms/admin-cms-lead'",
+        $relation,
+        "'isStandartBeforeRender' => false",
+        "can('cms/admin-lead')",
+        "relatedIndexAction->grid['emptyState']",
+    ] as $fragment) {
+        if (strpos($relatedController, $fragment) === false) {
+            throw new RuntimeException('The '.$owner.' card lead tab is incomplete: '.$fragment);
+        }
+    }
+}
+if (strpos($controller, 'if (\\Yii::$app->controller !== $this)') === false
+    || strpos($controller, 'return null;', strpos($controller, 'public function getModel()')) === false
+) {
+    throw new RuntimeException('The lead controller must not resolve a parent pk while initializing a related grid.');
 }
 
 foreach ([

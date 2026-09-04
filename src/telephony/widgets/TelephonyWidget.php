@@ -30,6 +30,21 @@ class TelephonyWidget extends Widget
             ->one();
 
         if (!$telephonyUser) {
+            $message = Json::htmlEncode('Телефония не настроена. Обратитесь к администратору.');
+            $this->view->registerJs(<<<JS
+(function (currentWindow, currentSx) {
+    currentSx.$(currentWindow.document)
+        .off('click.sxTelephony', '.sx-telephony-btn')
+        .on('click.sxTelephony', '.sx-telephony-btn', function () {
+            if (currentSx.notify && currentSx.notify.info) {
+                currentSx.notify.info({$message});
+            }
+            return false;
+        });
+})(window, sx);
+JS
+            );
+
             return '';
         }
 

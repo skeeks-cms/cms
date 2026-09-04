@@ -479,6 +479,7 @@ class CmsLead extends Core
 
     /**
      * A lead is first explicitly claimed and only then completed or rejected.
+     * A completed lead may be explicitly returned to work from its card.
      */
     public function allowedNextStatuses(): array
     {
@@ -486,8 +487,8 @@ class CmsLead extends Core
         return match ($oldStatus) {
             self::STATUS_NEW => [self::STATUS_NEW, self::STATUS_IN_WORK],
             self::STATUS_IN_WORK => [self::STATUS_IN_WORK, self::STATUS_SUCCESS, self::STATUS_REJECTED],
-            self::STATUS_SUCCESS => [self::STATUS_SUCCESS],
-            self::STATUS_REJECTED => [self::STATUS_REJECTED],
+            self::STATUS_SUCCESS => [self::STATUS_SUCCESS, self::STATUS_IN_WORK],
+            self::STATUS_REJECTED => [self::STATUS_REJECTED, self::STATUS_IN_WORK],
             default => array_keys(self::statuses()),
         };
     }
@@ -575,6 +576,17 @@ class CmsLead extends Core
     public function canBeWorkedBy(int $userId): bool
     {
         if ($this->isTerminal) {
+            return false;
+        }
+        if (\Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+            return true;
+        }
+        return $this->isManagedBy($userId);
+    }
+
+    public function canBeReopenedBy(int $userId): bool
+    {
+        if (!$this->isTerminal) {
             return false;
         }
         if (\Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {

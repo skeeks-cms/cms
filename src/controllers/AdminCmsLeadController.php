@@ -207,6 +207,14 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'callback' => [$this, 'claim'],
                 'accessCallback' => fn() => $this->model && $this->model->canBeClaimed,
             ],
+            'reopen' => [
+                'class' => BackendModelAction::class,
+                'name' => 'Вернуть в работу',
+                'isVisible' => false,
+                'callback' => [$this, 'reopen'],
+                'accessCallback' => fn() => $this->model
+                    && $this->model->canBeReopenedBy((int)\Yii::$app->user->id),
+            ],
             'add-comment' => [
                 'class' => BackendModelAction::class,
                 'isVisible' => false,
@@ -257,6 +265,12 @@ class AdminCmsLeadController extends BackendModelStandartController
 
     public function getModel()
     {
+        // A related lead grid is initialized inside a company or client
+        // controller request, where `pk` belongs to that parent record.
+        if (\Yii::$app->controller !== $this) {
+            return null;
+        }
+
         if ($this->_model === null) {
             $pk = \Yii::$app->request->get($this->requestPkParamName);
             if ($pk) {
@@ -292,6 +306,28 @@ class AdminCmsLeadController extends BackendModelStandartController
         } catch (StaleObjectException $e) {
             throw new ConflictHttpException('Лид уже закреплён другим менеджером.', 0, $e);
         }
+        return $this->redirect(['view', 'pk' => $this->model->id]);
+    }
+
+    public function reopen()
+    {
+        if (!\Yii::$app->request->isPost) {
+            throw new BadRequestHttpException('Вернуть лид в работу можно только кнопкой из карточки.');
+        }
+        try {
+            if (!$this->model->canBeReopenedBy((int)\Yii::$app->user->id)) {
+                throw new ConflictHttpException('Лид уже возвращён в работу или недоступен вам. Обновите карточку.');
+            }
+            $this->model->status = CmsLead::STATUS_IN_WORK;
+            $this->model->processed_at = null;
+            if (!$this->model->save()) {
+                throw new \RuntimeException(implode('; ', $this->model->getFirstErrors()));
+            }
+            \Yii::$app->session->setFlash('success', 'Лид возвращён в работу.');
+        } catch (StaleObjectException $e) {
+            throw new ConflictHttpException('Лид уже изменён в другой вкладке. Обновите карточку.', 0, $e);
+        }
+
         return $this->redirect(['view', 'pk' => $this->model->id]);
     }
 

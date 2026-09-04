@@ -57,6 +57,15 @@ if ($model->canBeClaimed) {
             'data-confirm' => 'Закрепить лид за вами?',
         ])
         .Html::endForm();
+} elseif ($model->canBeReopenedBy((int)Yii::$app->user->id)) {
+    $toolbar[] = Html::beginForm(['/cms/admin-cms-lead/reopen', 'pk' => $model->id], 'post', [
+        'class' => 'sx-model-header__toolbar-form',
+    ])
+        .Html::submitButton('<i class="fas fa-undo" aria-hidden="true"></i> Вернуть в работу', [
+            'class' => 'sx-button sx-button--secondary sx-button--sm',
+            'data-confirm' => 'Вернуть лид в работу?',
+        ])
+        .Html::endForm();
 } elseif ($canWork && $model->status === CmsLead::STATUS_IN_WORK) {
     $currentPanelLink = static function (string $label, string $url): string {
         $action = Json::encode(['isOpenNewWindow' => true, 'url' => $url]);

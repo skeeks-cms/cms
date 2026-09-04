@@ -777,6 +777,30 @@ HTML
                 },
             ],
 
+            'leads' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'priority' => 575,
+                'name'     => 'Лиды',
+                'icon'     => 'fas fa-user-plus',
+                'controllerRoute' => '/cms/admin-cms-lead',
+                'relation'        => ['cms_company_id' => 'id'],
+                'isStandartBeforeRender' => false,
+                'accessCallback' => function () {
+                    return \Yii::$app->user->can('cms/admin-company/manage', ['model' => $this->model])
+                        && \Yii::$app->user->can('cms/admin-lead');
+                },
+                'on gridInit' => function ($event) {
+                    /** @var BackendGridModelRelatedAction $action */
+                    $action = $event->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->grid['emptyState'] = [
+                        'title' => 'У компании пока нет лидов',
+                        'description' => 'Связанные с компанией лиды появятся здесь.',
+                        'icon' => 'fas fa-user-plus',
+                    ];
+                },
+            ],
+
 
             'telephony' => [
                 'class'    => BackendGridModelRelatedAction::class,

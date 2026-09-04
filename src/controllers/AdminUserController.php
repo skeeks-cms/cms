@@ -679,6 +679,34 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
+            'leads' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'priority' => 950,
+                'name'     => 'Лиды',
+                'icon'     => 'fas fa-user-plus',
+                'controllerRoute' => '/cms/admin-cms-lead',
+                'relation'        => ['cms_user_id' => 'id'],
+                'isStandartBeforeRender' => false,
+                'accessCallback' => function () {
+                    if (!$this->_checkIsRoot($this->model)) {
+                        return false;
+                    }
+
+                    return \Yii::$app->user->can('cms/admin-user/manage', ['model' => $this->model])
+                        && \Yii::$app->user->can('cms/admin-lead');
+                },
+                'on gridInit' => function ($event) {
+                    /** @var BackendGridModelRelatedAction $action */
+                    $action = $event->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->grid['emptyState'] = [
+                        'title' => 'У клиента пока нет лидов',
+                        'description' => 'Связанные с клиентом лиды появятся здесь.',
+                        'icon' => 'fas fa-user-plus',
+                    ];
+                },
+            ],
+
             "log" => [
                 'class' => BackendModelLogAction::class,
                 "accessCallback" => function () {
