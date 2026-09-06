@@ -3,112 +3,153 @@
  * @link https://cms.skeeks.com/
  * @copyright Copyright (c) 2010 SkeekS
  * @license https://cms.skeeks.com/license/
- * @author Semenov Alexander <semenov@skeeks.com>
  */
 
 namespace skeeks\cms\console\controllers;
 
-use skeeks\cms\models\User;
-use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\rbac\AuthorRule;
 use Yii;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Console;
-use yii\helpers\FileHelper;
+use yii\base\InvalidConfigException;
 
 /**
- * Working with the mysql database
- *
- * @package skeeks\cms\controllers
+ * Yii migration runner with compatibility discovery for older CMS packages.
+ * Files stay at their original paths; migration history is owned by Yii.
  */
 class MigrateController extends \yii\console\controllers\MigrateController
 {
-    protected $_runtimeMigrationPath = '@runtime/db-migrate';
+    /** @var string|array|null Project migrations come first, also for create. */
+    public $migrationPath = ['@console/migrations'];
 
-    /**
-     * This method is invoked right before an action is to be executed (after all possible filters.)
-     * It checks the existence of the [[migrationPath]].
-     * @param \yii\base\Action $action the action to be executed.
-     * @return boolean whether the action should continue to be executed.
-     */
+    /** @var bool Discover <extension alias>/migrations for legacy packages. */
+    public $autoDiscoverMigrations = false;
+
+    /** @var bool Read package registrations from the application's migrate config. */
+    public $useApplicationMigrationConfig = true;
+
+    public function options($actionID)
+    {
+        return array_merge(parent::options($actionID), ['autoDiscoverMigrations', 'useApplicationMigrationConfig']);
+    }
+
     public function beforeAction($action)
     {
-        $this->migrationPath = \Yii::getAlias($this->_runtimeMigrationPath);
-        $this->_copyMigrations();
+        if ($action->id !== 'create' && is_string($this->migrationPath) && !is_dir(Yii::getAlias($this->migrationPath))) {
+            throw new InvalidConfigException("Migration directory does not exist: {$this->migrationPath}");
+        }
+        $selected = array_intersect(['migrationPath', 'migrationNamespaces'], $this->getPassedOptions());
+        // Do not instantiate the other controller: its config may point here.
+        // An explicit CLI selection must not unexpectedly include every package.
+        $config = Yii::$app->controllerMap['migrate'] ?? [];
+        if (!$selected && $this->useApplicationMigrationConfig && $this->module !== Yii::$app && is_array($config)) {
+            if ($this->migrationPath !== null) {
+                $this->migrationPath = array_merge((array) $this->migrationPath, (array) ($config['migrationPath'] ?? []));
+            }
+            $this->migrationNamespaces = array_merge((array) $this->migrationNamespaces, (array) ($config['migrationNamespaces'] ?? []));
+        }
+
+        // Creation uses the configured destination, never a discovered vendor path.
+        if ($action->id !== 'create') {
+            $paths = (array) $this->migrationPath;
+            $namespaces = [];
+            foreach ((array) $this->migrationNamespaces as $namespace) {
+                $namespace = trim($namespace, '\\');
+                $namespaces[$namespace] = $this->canonicalPath('@'.str_replace('\\', '/', $namespace));
+            }
+            $this->migrationNamespaces = array_keys($namespaces);
+
+            if ($this->autoDiscoverMigrations && !$selected && $this->migrationPath !== null) {
+                foreach (Yii::$app->extensions as $extension) {
+                    foreach ($extension['alias'] ?? [] as $path) {
+                        $path = $this->canonicalPath($path.'/migrations');
+                        if (is_dir($path) && !in_array($path, $namespaces, true)) {
+                            $paths[] = $path;
+                        }
+                    }
+                }
+            }
+
+            $resolved = [];
+            foreach ($paths as $path) {
+                $resolved[] = $this->canonicalPath($path);
+            }
+            $this->migrationPath = $this->migrationPath === null ? null : array_values(array_unique($resolved));
+            $this->validateMigrationSources($namespaces);
+        }
 
         return parent::beforeAction($action);
     }
 
-    /**
-     * @throws \Exception
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\Exception
-     */
-    protected function _copyMigrations()
+    private function canonicalPath($path)
     {
-        $this->stdout("Copy the migration files in a single directory\n", Console::FG_YELLOW);
-
-        $tmpMigrateDir = \Yii::getAlias($this->_runtimeMigrationPath);
-
-        FileHelper::removeDirectory($tmpMigrateDir);
-        FileHelper::createDirectory($tmpMigrateDir);
-
-        if (!is_dir($tmpMigrateDir)) {
-            $this->stdout("Could not create a temporary directory migration\n");
-            die;
-        }
-
-        $this->stdout("\tCreated a directory migration\n");
-
-        if ($dirs = $this->_findMigrationDirs()) {
-            foreach ($dirs as $path) {
-                FileHelper::copyDirectory($path, $tmpMigrateDir);
-            }
-        }
-
-        $this->stdout("\tThe copied files modules migrations\n");
-
-        $appMigrateDir = \Yii::getAlias("@console/migrations");
-        if (is_dir($appMigrateDir)) {
-            FileHelper::copyDirectory($appMigrateDir, $tmpMigrateDir);
-        }
-
-        $this->stdout("\tThe copied files app migrations\n\n");
+        $path = Yii::getAlias($path);
+        $path = realpath($path) ?: $path;
+        return rtrim(str_replace('\\', '/', $path), '/');
     }
 
-
-    /**
-     * @return array
-     */
-    private function _findMigrationDirs()
+    /** Fail before any SQL rather than silently selecting an ambiguous class. */
+    private function validateMigrationSources(array $namespaces)
     {
-        $result = [];
-
-        foreach ($this->_findMigrationPossibleDirs() as $migrationPath) {
-            if (is_dir($migrationPath)) {
-                $result[] = $migrationPath;
+        $sources = [];
+        foreach ((array) $this->migrationPath as $path) {
+            $sources[] = [$path, ''];
+        }
+        foreach ($namespaces as $namespace => $path) {
+            $sources[] = [$path, $namespace];
+        }
+        $classes = [];
+        foreach ($sources as [$path, $namespace]) {
+            // Yii permits missing array paths (e.g. a new site's project migrations).
+            if (!is_dir($path)) {
+                if ($namespace !== '') {
+                    throw new InvalidConfigException("Migration namespace '{$namespace}' directory does not exist: {$path}");
+                }
+                continue;
+            }
+            foreach (scandir($path) as $file) {
+                if (!preg_match('/^(m\\d{6}_?\\d{6}\\D.*?)\\.php$/is', $file, $match) || !is_file($path.'/'.$file)) {
+                    continue;
+                }
+                $source = $path.'/'.$file;
+                $declared = $this->readNamespace($source);
+                if ($declared !== $namespace) {
+                    throw new InvalidConfigException("Migration {$source} declares namespace '{$declared}', expected '{$namespace}'. "
+                        .'Register namespaced migrations in migrationNamespaces, not migrationPath; '
+                        .'disable autoDiscoverMigrations and register required sources explicitly.');
+                }
+                $class = ltrim($namespace.'\\'.$match[1], '\\');
+                $key = strtolower($class); // PHP class names are case-insensitive.
+                if (isset($classes[$key]) && $classes[$key] !== $source) {
+                    throw new InvalidConfigException("Duplicate migration {$class}: {$classes[$key]} and {$source}. "
+                        .'Select one source explicitly; do not rename an already applied migration.');
+                }
+                $classes[$key] = $source;
             }
         }
-
-        return $result;
     }
 
-    /**
-     * @return array
-     */
-    private function _findMigrationPossibleDirs()
+    /** Tokenize without including the file or executing migration code. */
+    private function readNamespace($file)
     {
-        $result = [];
-
-        foreach (\Yii::$app->extensions as $code => $data) {
-            if ($data['alias']) {
-                foreach ($data['alias'] as $code => $path) {
-                    $migrationsPath = $path . '/migrations';
-                    $result[] = $migrationsPath;
+        $tokens = token_get_all(file_get_contents($file));
+        foreach ($tokens as $i => $token) {
+            if (!is_array($token) || $token[0] !== T_NAMESPACE) {
+                continue;
+            }
+            // PHP 7 tokenizes namespace\function() as T_NAMESPACE + separator.
+            $next = $tokens[$i + 1] ?? null;
+            if (is_array($next) && $next[0] === T_NS_SEPARATOR) {
+                continue;
+            }
+            $namespace = '';
+            for ($j = $i + 1, $count = count($tokens); $j < $count; $j++) {
+                $part = $tokens[$j];
+                if ($part === ';' || $part === '{') {
+                    return trim($namespace, '\\');
+                }
+                if (is_array($part) && !in_array($part[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                    $namespace .= $part[1];
                 }
             }
         }
-
-        return $result;
+        return '';
     }
 }
