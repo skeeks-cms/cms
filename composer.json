@@ -49,11 +49,11 @@
         "skeeks/cms-rbac": "^3.0 || dev-master@dev",
         "skeeks/cms-marketplace": "^3.0 || dev-master@dev",
         "skeeks/cms-toolbar": "^2.0 || dev-master@dev",
-        "skeeks/cms-agent": "^3.0 || dev-master@dev",
+        "skeeks/cms-agent": "^3.2.4 || dev-master@dev",
         "skeeks/cms-ya-map": "^2.0 || dev-master@dev",
         "skeeks/cms-measure": "^3.0 || dev-master",
 
-        "skeeks/yii2-ajax-file-upload": "^2.0",
+        "skeeks/yii2-ajax-file-upload": "^2.0.2 || dev-master",
         "skeeks/yii2-imagine": "^2.0 || dev-master@dev",
         "skeeks/yii2-sx": "^1.4 || dev-master@dev",
         "skeeks/yii2-ckeditor": "^1.1 || dev-master@dev",
@@ -81,6 +81,9 @@
         "kartik-v/yii2-mpdf": "1.0.6",
 
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
+    },
+    "conflict": {
+        "skeeks/cms-job": "<1.0.6"
     },
     "repositories": [
         {

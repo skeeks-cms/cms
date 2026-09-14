@@ -125,3 +125,30 @@ Before finishing a change:
 5. Stage only intended files; never stage `.idea/`.
 
 Keep durable agent knowledge in this root `AGENTS.md`. Do not add auxiliary Markdown documentation directories unless the user explicitly changes this convention.
+
+## Native scheduled maintenance
+
+The existing cms/cache/flush-all and ajaxfileupload/cleanup route keys now
+resolve to cms.flush-cache and cms.cleanup-temporary-files native job types.
+Keep their schedule identities, intervals, activation and execution dates.
+Manual execution uses the existing CMS admin permission.
+
+CacheFlusher is shared with the CLI. It discovers configured CacheInterface
+components using the Yii console cache rules, skips APC under CLI and raises
+an error when flush returns false. Native runs report skipped caches as warnings.
+It flushes cache components only; runtime directories and published assets are
+not part of this operation.
+
+The upload handler delegates to yii2-ajax-file-upload's TemporaryFileCleanup
+service (release 2.0.2 or newer), which the upload CLI also uses. No console
+subprocess is involved. CMS owns job registration; the upload library owns file
+expiry behavior and has no cms-job dependency.
+
+Keep cms-job optional at the CMS core dependency boundary to avoid a cycle.
+Queued maintenance requires cms-job and its migrations/workers at installation
+level. Both jobs fail closed without that runtime. Deploy new services/classes
+before configuration and restart maintenance consumers. This change adds no
+schema migration.
+
+tests/native-cache-smoke.php uses only in-memory caches; the upload package's
+tests/temporary-cleanup-smoke.php uses its own disposable filesystem directory.

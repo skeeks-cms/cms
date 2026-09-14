@@ -42,6 +42,13 @@ use yii\helpers\Console;
  */
 class CacheController extends \yii\console\controllers\CacheController
 {
+    public function actionFlushAll()
+    {
+        $result = (new \skeeks\cms\services\CacheFlusher())->run();
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
+    }
+
     /**
      * Clear rintimes directories
      */

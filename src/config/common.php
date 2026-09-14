@@ -16,6 +16,38 @@ return [
     ],
 
     'components' => [
+        'jobRegistry' => [
+            'types' => [
+                'cms.flush-cache' => [
+                    'type' => 'cms.flush-cache',
+                    'title' => 'Очистка кэша',
+                    'handler' => \skeeks\cms\jobs\FlushCacheJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'cms:cache'; },
+                    'dedupKey' => static function () { return 'cms:flush-cache'; },
+                ],
+                'cms.cleanup-temporary-files' => [
+                    'type' => 'cms.cleanup-temporary-files',
+                    'title' => 'Чистка временных файлов',
+                    'handler' => \skeeks\cms\jobs\CleanupTemporaryFilesJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'cms:temporary-files'; },
+                    'dedupKey' => static function () { return 'cms:cleanup-temporary-files'; },
+                ],
+            ],
+        ],
 
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -107,12 +139,14 @@ return [
             'commands' => [
 
                 'cms/cache/flush-all' => [
+                    'jobType' => 'cms.flush-cache',
                     'class' => \skeeks\cms\agent\CmsAgent::class,
                     'name' => ['skeeks/cms', 'Clearing the cache'],
                     'interval' => 3600 * 24,
                 ],
 
                 'ajaxfileupload/cleanup' => [
+                    'jobType' => 'cms.cleanup-temporary-files',
                     'class' => \skeeks\cms\agent\CmsAgent::class,
                     'name' => ['skeeks/cms', 'Cleaning temporarily downloaded files'],
                     'interval' => 3600 * 24,
