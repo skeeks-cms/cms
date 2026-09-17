@@ -381,6 +381,7 @@ class CmsTask extends ActiveRecord
                 },
             ],
 
+            ['status', 'in', 'range' => array_keys(self::statuses()), 'strict' => true],
             [
                 'status',
                 function () {
@@ -704,7 +705,7 @@ class CmsTask extends ActiveRecord
      */
     public function getStatusAsFeatureHint()
     {
-        return (string)self::statusesFeatureHints($this->status);
+        return (string)(self::statusesFeatureHints()[$this->status] ?? 'Неизвестный статус');
     }
 
     /**
@@ -712,7 +713,7 @@ class CmsTask extends ActiveRecord
      */
     public function getStatusAsHint()
     {
-        return (string)self::statusesHints($this->status);
+        return (string)(self::statusesHints()[$this->status] ?? 'Неизвестный статус');
     }
 
     /**

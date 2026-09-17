@@ -60,91 +60,22 @@ class CmsTaskBtnsWidget extends Widget
 
         if (\Yii::$app->request->post() && \Yii::$app->request->post($this->id)) {
 
-            $t = \Yii::$app->db->beginTransaction();
-            //die;
             try {
-
-//                $task = clone $this->task;
-                $task = CmsTask::findOne($task->id);
-
-                //var_dump($task);die;
-
-                if ($task->load(\Yii::$app->request->post())) {
-                    if ($task->status == CmsTask::STATUS_IN_WORK && !\Yii::$app->user->identity->isWorkingNow) {
-                        $CmsUserSchedule = new CmsUserSchedule();
-                        $CmsUserSchedule->cms_user_id = \Yii::$app->user->id;
-                        $CmsUserSchedule->start_at = time();
-                        $CmsUserSchedule->end_at = null;
-
-                        if (!$CmsUserSchedule->save()) {
-                            $task->addError('status', 'Не удалось автоматически включить рабочее время: ' . print_r($CmsUserSchedule->errors, true));
-                            throw new Exception("Не удалось автоматически включить рабочее время");
-                        }
-
-                        \Yii::$app->user->identity->refresh();
-                        $isUserScheduleStarted = true;
-                    }
-
-                    if (!$task->validate()) {
-                        throw new Exception('Не сохранился статус задачи');
-                    }
-
-                    $oldAttributeStatus = $task->getOldAttribute('status');
-
-                    if ($task->save()) {
-
-                        if ($task->status == CmsTask::STATUS_IN_WORK) {
-                            $CmsTaskSchedule = new CmsTaskSchedule();
-                            $CmsTaskSchedule->cms_user_id = \Yii::$app->user->id;
-                            $CmsTaskSchedule->cms_task_id = $task->id;
-                            $CmsTaskSchedule->start_at = time();
-                            $CmsTaskSchedule->end_at = null;
-
-                            if (!$CmsTaskSchedule->save()) {
-                                $task->addError('end_at', 'Не удалось сохранить лог начала работы: ' . print_r($CmsTaskSchedule->errors, true));
-                                throw new Exception("Не удалось сохранить лог начала работы");
-                            }
-                        }
-
-                        if (in_array($task->status, [CmsTask::STATUS_ON_PAUSE, CmsTask::STATUS_ON_CHECK, CmsTask::STATUS_READY]) && $oldAttributeStatus == CmsTask::STATUS_IN_WORK) {
-
-                            $CmsTaskSchedule->load(\Yii::$app->request->post());
-
-                            if (!$CmsTaskSchedule) {
-                                $task->addError('end_at', 'Нет начального промежутка времени. Обратитесь к программисту!');
-                                throw new Exception("Нет начального промежутка времени. Обратитесь к программисту!");
-                            }
-
-
-                            if (!$CmsTaskSchedule->end_at) {
-                                $CmsTaskSchedule->end_at = time();
-                            }
-
-                            if (!$CmsTaskSchedule->save()) {
-                                $task->addError('end_at', 'Не удалось сохранить лог завершения работы: ' . print_r($CmsTaskSchedule->errors, true));
-                                throw new Exception("Не удалось сохранить лог завершения работы");
-                            }
-                        } elseif (in_array($task->status, [CmsTask::STATUS_ON_PAUSE]) && $oldAttributeStatus == CmsTask::STATUS_ON_CHECK) {
-
-                        }
-
-                        $this->task = $task;
-                    } else {
-                        throw new Exception('Не сохранился статус задачи');
-                    }
-                } else {
-                    throw new Exception('Не сохранился статус задачи');
-                }
-
-                $t->commit();
+                $attributes = (array)\Yii::$app->request->post('CmsTask', []);
+                $scheduleAttributes = (array)\Yii::$app->request->post('CmsTaskSchedule', []);
+                $result = (new \skeeks\cms\services\TaskWorkflow())->transition(
+                    $task,
+                    (string)($attributes['status'] ?? ''),
+                    !empty($scheduleAttributes['end_at']) ? (int)$scheduleAttributes['end_at'] : null
+                );
+                $this->task = $task;
+                $CmsTaskSchedule = $result['schedule'];
+                $isUserScheduleStarted = $result['work_time_started'];
                 $isSaved = true;
-
-            } catch (\Exception $e) {
-                $t->rollBack();
+            } catch (\Throwable $e) {
+                $task->refresh();
                 $error = $e->getMessage();
-
-                $task->addError('end_at', $e->getMessage());
-                //throw $e;
+                $task->addError('status', $error);
             }
         }
 
