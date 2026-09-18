@@ -375,6 +375,23 @@ class PropertyTypeList extends PropertyType
             $relatedPropertiesModel->addRule($this->property->code, 'integer');
         }
 
+        $property = $this->property;
+        $relatedPropertiesModel->addRule($property->code, function ($attribute) use ($relatedPropertiesModel, $property) {
+            $value = $relatedPropertiesModel->$attribute;
+            $ids = is_array($value) ? $value : [$value];
+            $selected = [];
+            foreach ($ids as $id) {
+                if ($id === null || $id === '' || $id === 0 || $id === '0') continue;
+                if ((!is_int($id) && !is_string($id)) || !preg_match('/^[1-9][0-9]*$/D', (string)$id)) {
+                    $relatedPropertiesModel->addError($attribute, 'Некорректное значение списка.');
+                    return;
+                }
+                $selected[(int)$id] = (int)$id;
+            }
+            if ($selected && (int)$property->getEnums()->andWhere(['id'=>array_values($selected)])->count() !== count($selected)) {
+                $relatedPropertiesModel->addError($attribute, 'Значение не существует или принадлежит другой характеристике (#'.$property->id.').');
+            }
+        });
         if ($this->property->isRequired) {
             $relatedPropertiesModel->addRule($this->property->code, 'required');
         }

@@ -28,6 +28,10 @@ $action = $controller->action;
                 'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
                 'value'   => \skeeks\cms\components\Cms::BOOL_Y,
             ]); ?>
+            <?php if ($model->sx_id) : ?>
+                <?= $form->field($model, 'is_sx_info_update')->checkbox()
+                    ->hint('Обновлять данные и изображения категории из SkeekS GPD. Отключите, чтобы сохранить свои изменения.'); ?>
+            <?php endif; ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
 

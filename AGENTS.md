@@ -152,3 +152,15 @@ schema migration.
 
 tests/native-cache-smoke.php uses only in-memory caches; the upload package's
 tests/temporary-cleanup-smoke.php uses its own disposable filesystem directory.
+
+## Category synchronization protection
+
+Tree/CmsTree owns `is_sx_info_update` (boolean, default 1), exposed in the existing
+admin-tree form for records linked by sx_id. Migration m260917_210000 protects
+pre-existing GPD categories (`sx_id > 0`) by setting it to 0 once, across all sites.
+Do not repeat this backfill at runtime or reset a user's later choice. Import
+writers in cms-shop must honor the flag before preparing media or modifying data.
+The migration intentionally refuses automatic rollback to avoid removing protection.
+`tests/tree-gpd-sync-migration.php` verifies old/new and prefixed-table behavior.
+## List value ownership
+PropertyTypeList adds an ownership validator through the property's getEnums relation. It validates single and multiple selections before RelatedPropertiesModel saves/replaces rows; empty optional selections remain allowed. This is validation, not a database constraint: save(false) and SQL can bypass it. tests/property-list-ownership.php covers cross-property, missing, empty and duplicate selections.
