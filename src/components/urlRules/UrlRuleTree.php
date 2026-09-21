@@ -152,6 +152,14 @@ class UrlRuleTree
         }
 
         if ($id) {
+            // В веб-запросе текущий раздел уже загружен. Не накапливаем модели
+            // в статическом массиве при разборе URL; консольный путь не меняем.
+            if (\Yii::$app instanceof \yii\web\Application && \Yii::$app->has('cms', true)) {
+                $currentTree = \Yii::$app->cms->currentTree;
+                if ($currentTree instanceof CmsTree && (int)$currentTree->id === $id) {
+                    return $currentTree;
+                }
+            }
             $tree = ArrayHelper::getValue(self::$models, $id);
 
             if ($tree) {

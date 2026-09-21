@@ -272,7 +272,17 @@ class CmsSite extends ActiveRecord
     public static function getById($id)
     {
         if (!array_key_exists($id, static::$sites)) {
-            static::$sites[$id] = static::find()->where(['id' => (integer)$id])->one();
+            $query = static::find()->where(['id' => (integer)$id]);
+            $cache = static::getDb()->queryCache;
+            $cache = is_string($cache) ? Yii::$app->get($cache, false) : $cache;
+            if ($cache !== null && $cache === Yii::$app->get('cache', false)) {
+                $site = new static();
+                $site->id = (integer)$id;
+                $query->cache(8 * 3600, new \yii\caching\TagDependency([
+                    'tags' => [$site->getTableCacheTag(), $site->getCacheTag()],
+                ]));
+            }
+            static::$sites[$id] = $query->one();
         }
 
         return static::$sites[$id];
@@ -370,6 +380,14 @@ class CmsSite extends ActiveRecord
     {
         $q = $this->getCmsSiteAddresses()->limit(1);
         $q->multiple = false;
+        // Основной адрес: тот же контракт ручного и автоматического сброса, что у домена.
+        $cache = CmsSiteAddress::getDb()->queryCache;
+        $cache = is_string($cache) ? Yii::$app->get($cache, false) : $cache;
+        if ($this->id !== null && $cache !== null && $cache === Yii::$app->get('cache', false)) {
+            $q->cache(8 * 3600, new \yii\caching\TagDependency([
+                'tags' => [(new CmsSiteAddress())->getTableCacheTag(), $this->getCacheTag()],
+            ]));
+        }
         return $q;
     }
 

@@ -179,3 +179,19 @@ object lifetime and need refresh/reload to observe later changes.
 Test: tests/site-main-domain-cache.php with Composer autoload; isolated SQLite
 checks cache hits, empty results, site isolation, manual invalidation, actual
 model save/delete/main-domain changes, moves and a separate queryCache.
+
+## Scoped site and address reads
+
+CmsSite::getById caches its SQL for eight hours with the site table tag and
+record/site cache tag. Its existing public static sites array remains a
+per-process snapshot; resetting a persistent cache does not refresh already
+loaded objects in that array. CmsSite::getCmsSiteAddress caches only the first
+address query with the address table tag and owning site tag, retaining its
+priority order and limit. Other address queries are unchanged. Both opt-ins
+require queryCache to resolve to the cache used by HasTableCache.
+UrlRuleTree URL creation reuses an already loaded matching cms.currentTree only
+in web applications. Parsing URLs must not add models to the static map: that
+would retain trees and relations across long-running console work. Console
+lookup follows its previous path. The web test also checks 1000 replacements
+of currentTree without growing the static map.
+Tests: site-settings-cache.php and tree-route-reuse.php (Composer autoload).
