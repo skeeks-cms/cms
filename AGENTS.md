@@ -164,3 +164,18 @@ The migration intentionally refuses automatic rollback to avoid removing protect
 `tests/tree-gpd-sync-migration.php` verifies old/new and prefixed-table behavior.
 ## List value ownership
 PropertyTypeList adds an ownership validator through the property's getEnums relation. It validates single and multiple selections before RelatedPropertiesModel saves/replaces rows; empty optional selections remain allowed. This is validation, not a database constraint: save(false) and SQL can bypass it. tests/property-list-ownership.php covers cross-property, missing, empty and duplicate selections.
+
+## Main domain query cache
+
+CmsSite::getCmsSiteMainDomain keeps its ActiveQuery relation contract. For a
+concrete site ID it caches SQL for 28800 seconds using the CmsSiteDomain table
+tag (HasTableCache) and the site's getCacheTag() (AdminCacheController button).
+The global table tag covers a domain moving between sites. Eager loading from
+an unpopulated site model remains uncached. Opt in only when the DB queryCache
+resolves to the application's cache used by HasTableCache; callers can use
+noCache() explicitly. Direct SQL/updateAll writers must invalidate the tags,
+as they bypass model events. Loaded AR relations still follow Yii's normal
+object lifetime and need refresh/reload to observe later changes.
+Test: tests/site-main-domain-cache.php with Composer autoload; isolated SQLite
+checks cache hits, empty results, site isolation, manual invalidation, actual
+model save/delete/main-domain changes, moves and a separate queryCache.

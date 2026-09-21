@@ -399,9 +399,18 @@ class CmsSite extends ActiveRecord
      */
     public function getCmsSiteMainDomain()
     {
-        //return null;
         $query = $this->getCmsSiteDomains()->andWhere(['is_main' => 1]);
         $query->multiple = false;
+        // Общий тег покрывает смену основного домена и перенос между сайтами.
+        // HasTableCache инвалидирует его при сохранении/удалении домена.
+        $cache = CmsSiteDomain::getDb()->queryCache;
+        $cache = is_string($cache) ? Yii::$app->get($cache, false) : $cache;
+        // Тег должен читаться из того же кеша, который очищает HasTableCache.
+        if ($this->id !== null && $cache !== null && $cache === Yii::$app->get('cache', false)) {
+            $query->cache(8 * 3600, new \yii\caching\TagDependency([
+                'tags' => [(new CmsSiteDomain())->getTableCacheTag(), $this->getCacheTag()],
+            ]));
+        }
         return $query;
     }
 
