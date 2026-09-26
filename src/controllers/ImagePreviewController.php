@@ -165,22 +165,10 @@ class ImagePreviewController extends Controller
                     : '?sx-refresh');*/
             /*echo $url;die;*/
 
-            $showOptions = [];
-            //TODO:обратиться к фильтру и получить эти данные из него
-            if ($q = ArrayHelper::getValue($params, "q")) {
-                $showOptions = [
-                    'jpeg_quality' => $q,
-                    'webp_quality' => $q,
-                ];
-            }
-            
-            Header("HTTP/1.0 200 OK");
-            Image::getImagine()->open($newFileRootDefault)->show($newExtension, $showOptions);
-            die;
-            return '';
-
-            \Yii::$app->response->redirect($url, 302);
-            \Yii::$app->end();
+            // Send the encoded bytes unchanged: show() would encode a second time.
+            return \Yii::$app->response->sendFile($newFileRootDefault, $newFile->getBaseName(), [
+                'inline' => true,
+            ]);
 
         } catch (\Exception $e) {
             throw $e;
