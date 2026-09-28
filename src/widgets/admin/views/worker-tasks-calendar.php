@@ -87,7 +87,9 @@ $model = $user;
             var self = this;
             this.jWrapper = $("#" + this.get('id'));
             this.jSavePriorityButton = $(".sx-save-priority-btn", this.jWrapper);
-            
+
+            this._initScrollPosition();
+
             this.jSavePriorityButton.on('click', function() {
                     
                 if ($(this).is('disabled')) {
@@ -161,6 +163,61 @@ $model = $user;
                     self.jSavePriorityButton.fadeIn();
                 }
             });
+        },
+
+        /**
+         * При перезагрузке (закрытие окна задачи, сохранение порядка, F5) возвращаем прежнюю позицию,
+         * при обычном открытии страницы — показываем текущий день, а не начало списка просроченных задач.
+         * Штатное восстановление скролла браузером на длинном списке срабатывает ненадежно.
+         */
+        _initScrollPosition: function()
+        {
+            var self = this;
+            var storageKey = "sx-task-calendar-scroll:" + window.location.pathname + window.location.search;
+
+            var navigationType = "navigate";
+            try {
+                var navigation = window.performance.getEntriesByType("navigation")[0];
+                if (navigation) {
+                    navigationType = navigation.type;
+                } else if (window.performance.navigation) {
+                    navigationType = {1: "reload", 2: "back_forward"}[window.performance.navigation.type] || "navigate";
+                }
+            } catch (e) {}
+
+            var savedTop = null;
+            try {
+                savedTop = window.sessionStorage.getItem(storageKey);
+                window.sessionStorage.removeItem(storageKey);
+            } catch (e) {}
+
+            if ("scrollRestoration" in window.history) {
+                window.history.scrollRestoration = "manual";
+            }
+
+            $(window).on("pagehide beforeunload", function() {
+                try {
+                    window.sessionStorage.setItem(storageKey, String(Math.round(window.pageYOffset)));
+                } catch (e) {}
+            });
+
+            if (savedTop !== null && navigationType !== "navigate") {
+                window.scrollTo(0, parseInt(savedTop, 10) || 0);
+                return;
+            }
+
+            var jToday = $(".sx-today-day", this.jWrapper).first();
+            if (!jToday.length) {
+                return;
+            }
+
+            var headerHeight = 0;
+            var jHeader = $(".sx-shell-header").first();
+            if (jHeader.length && jHeader.css("position") === "fixed") {
+                headerHeight = jHeader.outerHeight();
+            }
+
+            window.scrollTo(0, Math.max(0, jToday.offset().top - headerHeight - 10));
         }
     });
     
@@ -385,7 +442,7 @@ JS
                 ?>
 
 
-                <table class="table sx-table sx-calendar-day <?= !$times  ? "sx-not-work-day" : ""; ?> <?= $date != \Yii::$app->formatter->asDate(time(), "php:Y-m-d") ? "sx-not-today-day" : ""; ?>">
+                <table class="table sx-table sx-calendar-day <?= !$times  ? "sx-not-work-day" : ""; ?> <?= $isToday ? "sx-today-day" : "sx-not-today-day"; ?>">
                     <thead>
                     <tr>
                         <th class="text-center" colspan="4"><?= \Yii::$app->formatter->asDate($date, 'full'); ?>
