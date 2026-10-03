@@ -277,7 +277,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                 $this->_model = CmsLead::find()
                     ->forManager()
                     ->cmsSite()
-                    ->andWhere([$this->modelPkAttribute => $pk])
+                    ->andWhere([CmsLead::tableName().'.'.$this->modelPkAttribute => $pk])
                     ->limit(1)
                     ->one();
                 if (!$this->_model) {

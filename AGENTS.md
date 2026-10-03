@@ -114,6 +114,20 @@ $env:PATH='C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencie
 & 'C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback\pnpm.cmd' dlx @ast-index/cli update
 ```
 
+## Lead visibility and recipients
+
+Unassigned leads without company evidence are administrator triage. Ordinary
+employees see a lead through an available company: an explicit company link,
+a linked client/submitter/partner in CmsCompany2user, or an exact normalized
+phone/email shared with that company or its contact. Names and short phone
+fragments do not grant access. Explicit executors and their superiors retain
+the assigned-work scope. Never automatically link CRM records while reading.
+New-lead recipients are active site workers with cms/admin-lead permission
+whose explicit-identity CmsLeadQuery::forManager() contains the lead. Source
+ingestion selects recipients after saving contacts; repeated contact sync
+checks existing new-lead notifications before emitting another one.
+Test: tests/cms-lead-company-access.php with Composer autoload, isolated SQLite.
+
 ## Verification
 
 Before finishing a change:

@@ -46,12 +46,12 @@ foreach ($requiredModelFragments as $fragment) {
         throw new RuntimeException('Missing CmsLead contract: '.$fragment);
     }
 }
-$adminFallbackStart = strpos($model, 'if (!$userIds && $contactUserIds)');
-$adminFallbackEnd = strpos($model, 'return $userIds;', $adminFallbackStart);
+$adminFallbackStart = strpos($model, 'public function availableManagerIds()');
+$adminFallbackEnd = strpos($model, 'return array_values(array_unique($userIds));', $adminFallbackStart);
 $adminFallback = $adminFallbackStart === false || $adminFallbackEnd === false
     ? ''
     : substr($model, $adminFallbackStart, $adminFallbackEnd - $adminFallbackStart);
-foreach (['isWorker()', ".'.is_active' => 1", 'CmsManager::PERMISSION_ROLE_ADMIN_ACCESS', "checkAccess(\$userId, 'cms/admin-lead')"] as $fragment) {
+foreach (['isWorker()', ".'.is_active' => 1", 'self::find()->forManager($worker)', "checkAccess(\$worker->id, 'cms/admin-lead')"] as $fragment) {
     if (strpos($adminFallback, $fragment) === false) {
         throw new RuntimeException('Known leads without an eligible manager must fall back to active administrators: '.$fragment);
     }

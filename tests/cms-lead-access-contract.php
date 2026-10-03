@@ -11,21 +11,18 @@ $emailController = file_get_contents($root.'/controllers/AdminCmsLeadEmailContro
 
 $contracts = [
     'lead query has employee CRM scope' => strpos($query, 'function forManager') !== false
-        && strpos($query, 'CmsUser::find()') !== false
         && strpos($query, 'CmsCompany::find()') !== false,
     'worker identity does not expose own partner submissions' => strpos(
         $query,
-        "->andWhere(['<>', CmsUser::tableName().'.id', (int)\$user->id])"
+        "->andWhere(['<>', 'leadCompanyUser.cms_user_id', \$viewerId])"
     ) !== false,
-    'unassigned anonymous leads retain a common queue' => strpos($query, ".executor_id' => null") !== false
-        && strpos($query, ".submitted_by_id' => null") !== false
-        && strpos($query, ".partner_id' => null") !== false,
+    'anonymous leads do not retain a common queue' => strpos($query, ".executor_id' => null") === false
+        && strpos($query, 'companyEvidenceCondition') !== false,
     'lead grid applies employee and site scope' => strpos($controller, 'dataProvider->query->forManager()->cmsSite()') !== false,
     'direct lead load applies employee scope' => strpos($controller, 'CmsLead::find()') !== false
         && strpos($controller, '->forManager()') !== false
         && strpos($controller, "throw new NotFoundHttpException('Лид не найден.')") !== false,
-    'partner leads do not fall back to every worker' => strpos($lead, 'if (!$userIds)') === false
-        && strpos($lead, 'CmsUser2manager::find()') !== false,
+    'recipients use the same scope as the grid' => strpos($lead, 'self::find()->forManager($worker)') !== false,
     'company creation uses scoped lead' => strpos($companyController, 'CmsLead::find()') !== false
         && strpos($companyController, '->forManager()') !== false
         && strpos($companyController, '->cmsSite()') !== false,

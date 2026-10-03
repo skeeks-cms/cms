@@ -20,6 +20,7 @@ class CmsLeadService
 
         $lead = new CmsLead();
         $lead->setAttributes($attributes);
+        $lead->deferManagerNotifications = true;
 
         if ($lead->cms_site_id === null
             && \Yii::$app->has('skeeks')
@@ -47,6 +48,10 @@ class CmsLeadService
             }
             $this->saveContacts($lead, CmsLeadPhone::class, $phones);
             $this->saveContacts($lead, CmsLeadEmail::class, $emails);
+            if (!$lead->executor_id) {
+                $lead->notifyAvailableManagers();
+            }
+            $lead->deferManagerNotifications = false;
             if ($sourceType === CmsLead::SOURCE_FORM) {
                 // The lead lifecycle deliberately skips this source: only here
                 // are the submitted contacts already part of the same
@@ -84,6 +89,11 @@ class CmsLeadService
         try {
             $this->saveContacts($lead, CmsLeadPhone::class, $this->normalizeContacts($phones));
             $this->saveContacts($lead, CmsLeadEmail::class, $this->normalizeContacts($emails));
+            // Some consumers create the row through backend actions and then
+            // synchronize contacts. Re-evaluate evidence without duplicate notices.
+            if ($lead->status === CmsLead::STATUS_NEW && !$lead->executor_id) {
+                $lead->notifyAvailableManagers();
+            }
             if ($transaction) {
                 $transaction->commit();
             }

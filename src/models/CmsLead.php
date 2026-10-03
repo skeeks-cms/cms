@@ -21,6 +21,8 @@ class CmsLead extends Core
 
     /** @var float|null Passed to the installed partner-finance extension on success. */
     public $partner_reward_value;
+    /** Source ingestion persists contacts before selecting notification recipients. */
+    public $deferManagerNotifications = false;
     public const STATUS_NEW = 'new';
     public const STATUS_IN_WORK = 'in_work';
     public const STATUS_SUCCESS = 'success';
@@ -162,7 +164,7 @@ class CmsLead extends Core
                         $this->sourceNameAsText
                     );
                 }
-            } else {
+            } elseif (!$this->deferManagerNotifications) {
                 $this->notifyAvailableManagers();
             }
         }
@@ -349,79 +351,41 @@ class CmsLead extends Core
         }
     }
 
-    protected function notifyAvailableManagers(): void
+    public function notifyAvailableManagers(): void
     {
         foreach ($this->availableManagerIds() as $userId) {
+            if (CmsWebNotify::find()->andWhere([
+                'cms_user_id' => $userId,
+                'model_code' => $this->skeeksModelCode,
+                'model_id' => (int)$this->id,
+                'name' => 'Появился новый лид',
+            ])->exists()) {
+                continue;
+            }
             $this->sendWebNotify($userId, 'Появился новый лид', $this->sourceNameAsText);
         }
     }
 
-    /**
-     * Notify only employees who own the submitter/partner directly or through
-     * one of their companies. If a known identity has no eligible responsible
-     * manager, active administrators become the narrow triage fallback.
-     * Anonymous leads remain available to the common queue of employees with
-     * lead access.
-     */
+    /** Active employees with lead permission and the same scope as the lead grid. */
     public function availableManagerIds(): array
     {
-        $contactUserIds = array_filter([(int)$this->submitted_by_id, (int)$this->partner_id]);
+        $query = CmsUser::find()->isWorker()
+            ->andWhere([CmsUser::tableName().'.is_active' => 1]);
+        if ($this->cms_site_id) {
+            $query->cmsSite((int)$this->cms_site_id);
+        }
+
         $userIds = [];
-        if ($contactUserIds) {
-            $contactUserIds = array_values(array_unique($contactUserIds));
-            $userIds = CmsUser2manager::find()
-                ->select('worker_id')
-                ->andWhere(['client_id' => $contactUserIds])
-                ->column();
-            $companyIds = CmsCompany2user::find()
-                ->select('cms_company_id')
-                ->andWhere(['cms_user_id' => $contactUserIds])
-                ->column();
-            if ($companyIds) {
-                $userIds = array_merge($userIds, CmsCompany2manager::find()
-                    ->select('cms_user_id')
-                    ->andWhere(['cms_company_id' => array_values(array_unique(array_map('intval', $companyIds)))])
-                    ->column());
+        foreach ($query->all() as $worker) {
+            if (!\Yii::$app->authManager->checkAccess($worker->id, 'cms/admin-lead')) {
+                continue;
             }
-        } else {
-            $query = CmsUser::find()
-                ->select(CmsUser::tableName().'.id')
-                ->isWorker()
-                ->andWhere([CmsUser::tableName().'.is_active' => 1]);
-            if ($this->cms_site_id) {
-                $query->cmsSite((int)$this->cms_site_id);
+            if (self::find()->forManager($worker)
+                ->andWhere([self::tableName().'.id' => (int)$this->id])->exists()) {
+                $userIds[] = (int)$worker->id;
             }
-            $userIds = $query->column();
         }
-
-        if ($this->cms_site_id && $userIds) {
-            $userIds = CmsUser::find()
-                ->cmsSite((int)$this->cms_site_id)
-                ->andWhere([CmsUser::tableName().'.id' => array_values(array_unique(array_map('intval', $userIds)))])
-                ->select(CmsUser::tableName().'.id')
-                ->column();
-        }
-
-        $userIds = array_values(array_filter(array_unique(array_map('intval', $userIds)), static function ($userId) {
-            return \Yii::$app->authManager->checkAccess($userId, 'cms/admin-lead');
-        }));
-
-        if (!$userIds && $contactUserIds) {
-            $query = CmsUser::find()
-                ->select(CmsUser::tableName().'.id')
-                ->isWorker()
-                ->andWhere([CmsUser::tableName().'.is_active' => 1]);
-            if ($this->cms_site_id) {
-                $query->cmsSite((int)$this->cms_site_id);
-            }
-
-            $userIds = array_values(array_filter(array_map('intval', $query->column()), static function ($userId) {
-                return \Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)
-                    && \Yii::$app->authManager->checkAccess($userId, 'cms/admin-lead');
-            }));
-        }
-
-        return $userIds;
+        return array_values(array_unique($userIds));
     }
 
     protected function sendWebNotify(
