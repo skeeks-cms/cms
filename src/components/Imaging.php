@@ -35,6 +35,7 @@ class Imaging extends Component
             "jpg",
             "png",
             "jpeg",
+            "jfif",
             "webp",
             "gif"
         ];
@@ -161,7 +162,8 @@ class Imaging extends Component
         }
 
         if ($outExtension === null) {
-            $outExtension = $extension;
+            // JFIF is a JPEG source; encoders expect the canonical jpg extension.
+            $outExtension = strtolower($extension) === "jfif" ? "jpg" : $extension;
         }
 
 
