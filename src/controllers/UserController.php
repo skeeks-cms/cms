@@ -41,6 +41,8 @@ class UserController extends Controller
 
     public function init()
     {
+        parent::init();
+        
         if (\Yii::$app->request->get(static::REQUEST_PARAM_USERNAME) && !$this->user) {
             throw new NotFoundHttpException("User not found or inactive");
         } else {
