@@ -25,6 +25,7 @@ use yii\widgets\ActiveForm;
  */
 class UpaPersonalController extends BackendController
 {
+    use \skeeks\cms\controllers\traits\UserDevicesActions;
     public $defaultAction = 'view';
 
     public function init()
@@ -136,7 +137,7 @@ class UpaPersonalController extends BackendController
             $actions[$key]['accessCallback'] = true;
         }
 
-        return $actions;
+        return ArrayHelper::merge($actions, $this->deviceActions());
     }
 
 

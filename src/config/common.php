@@ -16,6 +16,7 @@ return [
     ],
 
     'components' => [
+        'userSessions' => ['class' => \skeeks\cms\components\UserSessions::class],
         'jobRegistry' => [
             'types' => [
                 'cms.flush-cache' => [

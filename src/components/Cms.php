@@ -156,6 +156,10 @@ class Cms extends \skeeks\cms\base\Component
 
     public $auth_submit_code_always = 0;
 
+    /** Shared browser/WebView policy, in days; snapshotted at the next login. */
+    public $auth_session_idle_days = 0;
+    public $auth_session_max_days = 365;
+
     /**
      * @var int
      */
@@ -354,6 +358,20 @@ class Cms extends \skeeks\cms\base\Component
                     \Yii::$app->user->identity->updateLastAdminActivity();
                 }
             });
+            if (Yii::$app->user instanceof \skeeks\cms\web\SessionUser) {
+                // Load site policy without per-user overrides. Cms initialization itself
+                // reads user identity, so SessionUser must never load Cms recursively.
+                $path = $this->overridePath;
+                try {
+                    $this->overridePath = array_values(array_diff($path, [self::OVERRIDE_USER]));
+                    $settings = $this->getSettings();
+                } finally { $this->overridePath = $path; }
+                $max = (int)($settings['auth_session_max_days'] ?? $this->_callAttributes['auth_session_max_days']);
+                $idle = (int)($settings['auth_session_idle_days'] ?? $this->_callAttributes['auth_session_idle_days']);
+                Yii::$app->user->sessionLifetime = max(1, min(365, $max)) * 86400;
+                Yii::$app->user->sessionIdleTimeout = max(0, min($max, $idle)) * 86400;
+                if (Yii::$app->user->trackSessions) { Yii::$app->user->autoRenewCookie = true; }
+            }
         }
     }
     public function rules()
@@ -372,6 +390,10 @@ class Cms extends \skeeks\cms\base\Component
             [['pass_is_need_change'], 'integer'],
             [['is_allow_auth_by_email'], 'integer'],
             [['auth_submit_code_always'], 'integer'],
+            [['auth_session_idle_days', 'auth_session_max_days'], 'required'],
+            [['auth_session_max_days'], 'integer', 'min' => 1, 'max' => 365],
+            [['auth_session_idle_days'], 'integer', 'min' => 0, 'max' => 365],
+            ['auth_session_idle_days', 'compare', 'compareAttribute' => 'auth_session_max_days', 'operator' => '<=', 'type' => 'number'],
             [['pass_required_length'], 'integer'],
             [['pass_required_need_number'], 'integer'],
             [['pass_required_need_uppercase'], 'integer'],
@@ -391,6 +413,8 @@ class Cms extends \skeeks\cms\base\Component
             'approved_key_is_letter'      => 'Проверочный код содержит буквы?',
 
             'auth_submit_code_always'      => 'Всегда отправлять проверочный код на email или телефон',
+            'auth_session_idle_days' => 'Выход после бездействия, дней',
+            'auth_session_max_days' => 'Максимальный срок входа, дней',
             'is_allow_auth_by_email'      => 'Разрешить авторизацию по Email',
             'pass_is_need_change'      => 'Требовать установки постоянного пароля?',
             'is_need_user_data'      => 'Требовать от пользователя заполнения этих данных.',
@@ -411,6 +435,8 @@ class Cms extends \skeeks\cms\base\Component
             'pass_is_need_change' => 'Если авторизация произошла через код подтверждения (телефон, email), то после авторизации будет предолжено установить постоянный пароль.',
             'is_need_user_data' => 'После авторизации будет предолжено указать эти данные.',
             'auth_submit_code_always'      => 'Постоянный пароль не спрашивается, всегда отправляется сообщение на email или телефон.',
+            'auth_session_idle_days' => '0 — не выходить по бездействию. Посещение сайта или приложения продлевает этот срок. Получение push не считается активностью. Не больше максимального срока входа.',
+            'auth_session_max_days' => 'От 1 до 365 дней с момента входа, независимо от активности. Единые сроки для сайта и приложения применяются при следующем входе, если включён учёт сеансов. Для немедленного выхода завершите сеансы в профиле.',
         ]);
     }
     /**
@@ -470,6 +496,8 @@ class Cms extends \skeeks\cms\base\Component
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
+                    'auth_session_idle_days' => ['class' => NumberField::class],
+                    'auth_session_max_days' => ['class' => NumberField::class],
                     'is_allow_auth_by_email'      => [
                         'class'     => BoolField::class,
                         'allowNull' => false,

@@ -36,6 +36,7 @@ use yii\widgets\ActiveForm;
  */
 class AdminProfileController extends BackendController
 {
+    use \skeeks\cms\controllers\traits\UserDevicesActions;
     public $defaultAction = "update";
     /**
      * @return string
@@ -75,7 +76,7 @@ class AdminProfileController extends BackendController
         ]);
 
 
-        return $actions;
+        return ArrayHelper::merge($actions, $this->deviceActions());
     }
 
     public function actionPassword()

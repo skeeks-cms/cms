@@ -23,7 +23,7 @@ $config = [
         ],
 
         'user' => [
-            'class'           => '\yii\web\User',
+            'class'           => \skeeks\cms\web\SessionUser::class,
             'identityClass'   => 'skeeks\cms\models\CmsUser',
             'enableAutoLogin' => true,
             'loginUrl'        => ['cms/auth/login'],
@@ -110,6 +110,14 @@ $config = [
                             [
                                 'name' => 'Смена пароля',
                                 'url'  => ['/cms/upa-personal/password'],
+                            ],
+                            [
+                                'name' => 'Устройства и сеансы',
+                                'url' => ['/cms/upa-personal/devices'],
+                                'visible' => static function () {
+                                    return \Yii::$app->user instanceof \skeeks\cms\web\SessionUser
+                                        && \Yii::$app->user->trackSessions;
+                                },
                             ],
                         ],
 
