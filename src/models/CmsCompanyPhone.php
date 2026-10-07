@@ -53,13 +53,6 @@ class CmsCompanyPhone extends ActiveRecord
             [['cms_company_id', 'value'], 'required'],
             [['value', 'name'], 'string', 'max' => 255],
 
-            [
-                ['cms_company_id', 'value'],
-                'unique',
-                'targetAttribute' => ['cms_company_id', 'value'],
-                //'message' => 'Этот email уже занят'
-            ],
-
             [['name'], 'default', 'value' => null],
 
             [['value'], "filter", 'filter' => 'trim'],
@@ -71,6 +64,12 @@ class CmsCompanyPhone extends ActiveRecord
                 },
             ],
             [['value'], PhoneValidator::class],
+            [
+                ['value'],
+                'unique',
+                'targetAttribute' => ['cms_company_id', 'value'],
+                'message' => 'Этот номер телефона уже добавлен в компанию.',
+            ],
         ]);
     }
 

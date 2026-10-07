@@ -168,7 +168,7 @@ JS
                 'class' => HtmlBlock::class,
                 'content' => '<div style="display: none;">'
             ],
-            'cms_user_id',
+            'cms_company_id',
             [
                 'class' => HtmlBlock::class,
                 'content' => '</div>'
