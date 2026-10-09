@@ -315,7 +315,7 @@ JS
         ]); ?>
             <div class="sx-surface sx-task-description">
                 <? if ($model->description) : ?>
-                    <?php echo $model->description; ?>
+                    <?php echo \skeeks\cms\helpers\TaskContentHelper::render($model->description); ?>
                 <? else : ?>
                     <div class="sx-task-description-empty">Нет описания задачи...</div>
                 <? endif; ?>
