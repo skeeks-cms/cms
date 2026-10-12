@@ -595,6 +595,8 @@ class CmsLead extends Core
     public function getClient() { return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']); }
     public function getPhones() { return $this->hasMany(CmsLeadPhone::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     public function getEmails() { return $this->hasMany(CmsLeadEmail::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
+    /** @return \skeeks\cms\models\queries\CmsTaskQuery */
+    public function getTasks() { return $this->hasMany(CmsTask::class, ['cms_lead_id' => 'id']); }
 
     public function getMainPhone(): ?CmsLeadPhone
     {

@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property int|null            $cms_project_id Проект
  * @property int|null            $cms_company_id Компания
  * @property int|null            $cms_user_id Клиент
+ * @property int|null            $cms_lead_id Лид
  * @property int|null            $parent_cms_task_id Связанная задача
  *
  * @property int|null            $plan_start_at Планируемое начало
@@ -135,6 +136,7 @@ class CmsTask extends ActiveRecord
                     'cms_project_id' => 'cmsProject',
                     'cms_company_id' => 'cmsCompany',
                     'cms_user_id'    => 'cmsUser',
+                    'cms_lead_id'    => 'cmsLead',
                     'executor_id'    => 'executor',
                     'status'         => 'statusAsText',
                 ],
@@ -303,6 +305,9 @@ class CmsTask extends ActiveRecord
             [['executor_sort'], 'integer'],
             [['cms_company_id'], 'integer'],
             [['cms_user_id'], 'integer'],
+            [['cms_lead_id'], 'integer'],
+            [['cms_lead_id'], 'default', 'value' => null],
+            [['cms_lead_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLead::class, 'targetAttribute' => 'id'],
 
             [['executor_end_at'], 'integer'],
             [['name'], 'required'],
@@ -547,6 +552,7 @@ class CmsTask extends ActiveRecord
 
             'cms_company_id' => 'Компания',
             'cms_user_id'    => 'Клиент',
+            'cms_lead_id'    => 'Лид',
             'parent_cms_task_id' => 'Связанная задача',
 
             'plan_start_at' => 'Планируемое начало',
@@ -801,6 +807,14 @@ class CmsTask extends ActiveRecord
     public function getCmsUser()
     {
         return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsLead()
+    {
+        return $this->hasOne(CmsLead::class, ['id' => 'cms_lead_id']);
     }
 
     /**

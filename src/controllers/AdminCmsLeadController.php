@@ -3,6 +3,7 @@
 namespace skeeks\cms\controllers;
 
 use skeeks\cms\assets\admin\LeadProcessAsset;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
@@ -193,6 +194,17 @@ class AdminCmsLeadController extends BackendModelStandartController
                         $protected[] = 'executor_id';
                     }
                     $this->restoreAttributes($event->sender->model, $protected);
+                },
+            ],
+            'tasks' => [
+                'class' => BackendGridModelRelatedAction::class,
+                'name' => 'Задачи',
+                'icon' => 'fas fa-list',
+                'priority' => 35,
+                'controllerRoute' => '/cms/admin-cms-task',
+                'relation' => ['cms_lead_id' => 'id'],
+                'on gridInit' => function ($e) {
+                    $e->sender->relatedIndexAction->backendShowings = false;
                 },
             ],
             'log' => [

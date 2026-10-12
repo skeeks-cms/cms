@@ -59,6 +59,17 @@ if ($showRelations && $model->cmsUser) {
     );
 }
 
+if ($showRelations && $model->cmsLead) {
+    $metaItems[] = Html::tag('span',
+        BackendIcon::render('handshake', ['size' => 13]).' '.BackendEntityLink::widget([
+            'controllerId' => '/cms/admin-cms-lead',
+            'action'       => 'view',
+            'modelId'      => $model->cmsLead->id,
+            'label'        => 'Лид: '.$model->cmsLead->displayName,
+        ])
+    );
+}
+
 echo BackendModelHeader::widget([
     'model'        => $model,
     'title'        => $model->asText,

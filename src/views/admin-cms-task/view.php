@@ -490,6 +490,25 @@ JS
                         <?php endif; ?>
                     </span>
                 </li>
+                <?php if ($model->cmsLead) : ?>
+                <li>
+                    <span class="sx-properties--name">
+                        Лид
+                    </span>
+                    <span class="sx-properties--value">
+                        <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-lead',
+                            'action'       => 'view',
+                            'modelId'      => $model->cmsLead->id,
+                            'label'        => $model->cmsLead->displayName,
+                            'options'      => [
+                                'class'      => 'sx-preview-card__related',
+                                'aria-label' => (string)$model->cmsLead->displayName,
+                            ],
+                        ]); ?>
+                    </span>
+                </li>
+                <?php endif; ?>
                 <li>
                     <span class="sx-properties--name">
                         Проект

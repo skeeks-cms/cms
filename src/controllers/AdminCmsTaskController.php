@@ -18,6 +18,7 @@ use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\forms\CmsTaskBulkEditForm;
 use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsDocumentTemplate;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsProject;
@@ -1742,6 +1743,9 @@ JS
         }
 
         $model->load(\Yii::$app->request->get());
+        if ($model->isNewRecord && $model->cms_lead_id) {
+            $this->applyLeadToNewTask($model);
+        }
         $isExecutorLocked = !$model->isNewRecord && CmsTaskSchedule::find()->task($model)->exists();
 
         $projectAjaxUrl = \yii\helpers\Json::encode(\yii\helpers\Url::current([
@@ -2174,6 +2178,22 @@ JS
                 'content' => '<div class="col-12 sx-task-auto-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-auto-start-btn"><i class="fas fa-magic"></i> Рассчитать время выполнения автоматически</button></div>',
             ],
 
+            'cms_lead_id' => [
+                'class' => HtmlBlock::class,
+                'content' => $model->cms_lead_id && $model->cmsLead
+                    ? '<div class="col-12 form-group sx-task-lead">'
+                        .Html::activeHiddenInput($model, 'cms_lead_id')
+                        .'<span class="text-muted">Лид:</span> '
+                        .\skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-lead',
+                            'action'       => 'view',
+                            'modelId'      => $model->cmsLead->id,
+                            'label'        => $model->cmsLead->displayName,
+                        ])
+                        .'</div>'
+                    : '',
+            ],
+
             'task_relation' => [
                 'class' => HtmlBlock::class,
                 'content' => '<div class="col-12 sx-choose-task-relation form-group"><div class="btn-group btn-block" role="group" aria-label="Task relation">
@@ -2457,7 +2477,29 @@ JS
         $model->cms_project_id = $parentTask->cms_project_id;
         $model->cms_company_id = $parentTask->cms_company_id;
         $model->cms_user_id = $parentTask->cms_user_id;
+        $model->cms_lead_id = $parentTask->cms_lead_id;
         $model->plan_duration = $parentTask->plan_duration ?: $model->plan_duration;
+    }
+
+    /**
+     * Новая задача из карточки лида: лид должен быть доступен сотруднику,
+     * а компания или клиент лида подставляются, если связь ещё не выбрана.
+     */
+    protected function applyLeadToNewTask(CmsTask $model): void
+    {
+        $lead = CmsLead::find()->forManager()->andWhere([CmsLead::tableName().'.id' => (int)$model->cms_lead_id])->one();
+        if (!$lead) {
+            $model->cms_lead_id = null;
+            return;
+        }
+
+        if (!$model->cms_company_id && !$model->cms_user_id && !$model->cms_project_id) {
+            if ($lead->cms_company_id) {
+                $model->cms_company_id = (int)$lead->cms_company_id;
+            } elseif ($lead->cms_user_id) {
+                $model->cms_user_id = (int)$lead->cms_user_id;
+            }
+        }
     }
 
     /**

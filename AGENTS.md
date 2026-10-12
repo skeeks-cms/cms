@@ -222,3 +222,14 @@ The isolated tests/webp-quality.php accepts Composer vendor directory,
 controller source path and a JPEG fixture path. It checks real WebP quality,
 site-default equivalence, first-response byte identity and JPEG/PNG output,
 using temporary files without bootstrapping the site or connecting to its DB.
+
+## Lead tasks
+
+CmsTask.cms_lead_id (migration m261012_230000, FK SET NULL) links a task to a
+lead independently of the exclusive company/client/project relation. The lead
+card shows open tasks above the comment form and a "Задачи" related tab; its
+"Поставить задачу" button opens task create with CmsTask[cms_lead_id]. The task
+form keeps the lead only if CmsLeadQuery::forManager() returns it, and fills
+the lead's company (else client) when no relation was chosen. Subtasks copy
+the lead. cms-mcp task create/update/list accept cms_lead_id with the same
+lead-access check.
