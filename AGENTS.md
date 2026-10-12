@@ -233,3 +233,12 @@ form keeps the lead only if CmsLeadQuery::forManager() returns it, and fills
 the lead's company (else client) when no relation was chosen. Subtasks copy
 the lead. cms-mcp task create/update/list accept cms_lead_id with the same
 lead-access check.
+Next step: an open task is one in CmsTask::activeStatuses() (new, accepted,
+in work, paused; on-check is done from the executor's side). A lead in work
+without one is "next step missing"; CmsLeadQuery::nextStep() backs the list
+filter and CmsLead::nextTask the list column and card surface. "Не дозвонились"
+(no-answer action, CmsLeadNoAnswerForm + CmsLeadNoAnswerService) increments
+cms_lead.no_answer_count (m261013_100000), moves the actor's nearest open task
+on the lead or creates "Перезвонить: …", writes a lead comment; closing as
+unreachable rejects the lead and cancels the actor's open lead tasks through
+TaskWorkflow.

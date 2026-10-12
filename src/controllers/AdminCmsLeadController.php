@@ -9,6 +9,10 @@ use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\forms\CmsLeadNoAnswerForm;
+use skeeks\cms\models\queries\CmsLeadQuery;
+use skeeks\cms\services\CmsLeadNoAnswerService;
+use kartik\datecontrol\DateControl;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsLead;
@@ -61,7 +65,8 @@ class AdminCmsLeadController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'name' => 'Лиды',
-                'configKey' => 'cms/leads-v1',
+                // v2: the "next step" column and filter are part of the defaults.
+                'configKey' => 'cms/leads-v2',
                 'emptyState' => [
                     'title' => 'Лидов пока нет',
                     'description' => 'Лиды появятся из форм, партнёрской программы, телефонии или после ручного добавления.',
@@ -69,11 +74,22 @@ class AdminCmsLeadController extends BackendModelStandartController
                     'action' => ['backendAction' => 'create', 'label' => 'Добавить лид'],
                 ],
                 'filters' => [
-                    'visibleFilters' => array_merge(['q', 'status', 'source_type'], $utmAttributes),
+                    'visibleFilters' => array_merge(['q', 'status', 'next_step', 'source_type'], $utmAttributes),
                     'filtersModel' => [
-                        'rules' => [[array_merge(['q'], $utmAttributes), 'safe']],
-                        'attributeDefines' => array_merge(['q'], $utmAttributes),
+                        'rules' => [[array_merge(['q', 'next_step'], $utmAttributes), 'safe']],
+                        'attributeDefines' => array_merge(['q', 'next_step'], $utmAttributes),
+                        'attributeLabels' => ['next_step' => 'Следующий шаг'],
                         'fields' => ArrayHelper::merge([
+                            'next_step' => [
+                                'label' => 'Следующий шаг',
+                                'class' => SelectField::class,
+                                'items' => CmsLeadQuery::nextStepFilters(),
+                                'on apply' => static function (QueryFiltersEvent $event) {
+                                    $value = (string)$event->field->value;
+                                    if (!array_key_exists($value, CmsLeadQuery::nextStepFilters())) { return; }
+                                    $event->dataProvider->query->nextStep($value);
+                                },
+                            ],
                             'q' => [
                                 'label' => 'Поиск',
                                 'elementOptions' => ['placeholder' => 'Название, телефон, email или описание'],
@@ -90,11 +106,11 @@ class AdminCmsLeadController extends BackendModelStandartController
                 ],
                 'grid' => [
                     'on init' => static function (Event $event) {
-                        $event->sender->dataProvider->query->forManager()->cmsSite();
+                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(['activeTasks']);
                     },
                     'defaultPageSize' => 50,
                     'defaultOrder' => ['created_at' => SORT_DESC],
-                    'visibleColumns' => ['actions', 'name', 'status', 'source_type', 'contacts', 'executor_id', 'partner_id', 'created_at'],
+                    'visibleColumns' => ['actions', 'name', 'status', 'next_step', 'source_type', 'contacts', 'executor_id', 'partner_id', 'created_at'],
                     'columns' => [
                         'name' => [
                             'class' => BackendEntityLinkColumn::class,
@@ -106,6 +122,11 @@ class AdminCmsLeadController extends BackendModelStandartController
                         'status' => [
                             'format' => 'raw',
                             'value' => static fn(CmsLead $model) => CmsLeadStatusWidget::widget(['lead' => $model]),
+                        ],
+                        'next_step' => [
+                            'label' => 'Следующий шаг',
+                            'format' => 'raw',
+                            'value' => static fn(CmsLead $model) => self::renderNextStepCell($model),
                         ],
                         'source_type' => ['value' => static fn(CmsLead $model) => $model->sourceNameAsText],
                         'contacts' => [
@@ -196,6 +217,30 @@ class AdminCmsLeadController extends BackendModelStandartController
                     $this->restoreAttributes($event->sender->model, $protected);
                 },
             ],
+            'no-answer' => [
+                'class' => BackendModelUpdateAction::class,
+                'name' => 'Не дозвонились',
+                'icon' => 'fas fa-phone-slash',
+                'isVisible' => false,
+                'size' => BackendModelUpdateAction::SIZE_SMALL,
+                'buttons' => ['save'],
+                'successMessage' => 'Звонок отмечен',
+                'fields' => [$this, 'noAnswerFields'],
+                'accessCallback' => fn() => $this->canWorkWithModel() && $this->model->status === CmsLead::STATUS_IN_WORK,
+                'on initFormModels' => function (Event $event) {
+                    /** @var BackendModelUpdateAction $action */
+                    $action = $event->sender;
+                    // Only the form is validated: the call outcome must not
+                    // depend on unrelated lead fields.
+                    $action->formModels = ['noAnswer' => new CmsLeadNoAnswerForm(['lead' => $this->model])];
+                },
+                'on beforeSave' => function (Event $event) {
+                    /** @var BackendModelUpdateAction $action */
+                    $action = $event->sender;
+                    $action->isSaveFormModels = false;
+                    (new CmsLeadNoAnswerService())->apply($this->model, $action->formModels['noAnswer']);
+                },
+            ],
             'tasks' => [
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Задачи',
@@ -250,6 +295,86 @@ class AdminCmsLeadController extends BackendModelStandartController
             'delete-multi' => new UnsetArrayValue(),
             'update' => new UnsetArrayValue(),
         ]);
+    }
+
+    /** Compact next-step cell: nearest open task, overdue or missing state. */
+    public static function renderNextStepCell(CmsLead $model): string
+    {
+        $task = $model->nextTask;
+        if (!$task) {
+            return $model->isNextStepMissing
+                ? Html::tag('span', 'Не запланирован', ['class' => 'sx-status sx-status--warning'])
+                : '—';
+        }
+
+        $secondary = $task->plan_start_at
+            ? \Yii::$app->formatter->asDatetime($task->plan_start_at, 'd MMM, HH:mm')
+            : 'Без срока';
+        if ($model->isNextStepOverdue) {
+            $secondary = Html::tag('span', 'Просрочен', ['class' => 'sx-status sx-status--danger']).' '.$secondary;
+        }
+
+        return Html::tag('div',
+            Html::tag('span', \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                'controllerId' => '/cms/admin-cms-task',
+                'modelId' => $task->id,
+                'label' => $task->name,
+            ]), ['class' => 'sx-collection-cell__primary'])
+            .Html::tag('span', $secondary, ['class' => 'sx-collection-cell__secondary']),
+            ['class' => 'sx-collection-cell sx-collection-cell--stack']
+        );
+    }
+
+    public function noAnswerFields(BackendModelUpdateAction $action): array
+    {
+        /** @var CmsLeadNoAnswerForm $form */
+        $form = $action->formModels['noAnswer'];
+        $attempt = (int)$this->model->no_answer_count + 1;
+        $nextTask = $this->model->getActiveTasks()
+            ->andWhere([\skeeks\cms\models\CmsTask::tableName().'.executor_id' => (int)\Yii::$app->user->id])
+            ->limit(1)
+            ->one();
+        $taskHint = $nextTask
+            // Field hints are rendered as HTML.
+            ? 'При переносе звонка ваша задача «'.Html::encode($nextTask->name).'» сдвинется на выбранное время.'
+            : 'При переносе звонка будет поставлена задача «Перезвонить» на выбранное время.';
+
+        $nextId = Html::getInputId($form, 'next');
+        $timeFieldClass = 'field-'.Html::getInputId($form, 'callback_at');
+        $this->view->registerJs(<<<JS
+(function() {
+    var toggle = function() {
+        $('.{$timeFieldClass}').toggle($('#{$nextId}').val() === 'custom');
+    };
+    $('body').off('change.sxLeadNoAnswer').on('change.sxLeadNoAnswer', '#{$nextId}', toggle);
+    toggle();
+})();
+JS
+        );
+
+        return [
+            'noAnswer.next' => [
+                'class' => SelectField::class,
+                'items' => CmsLeadNoAnswerForm::nextOptions(),
+                'allowNull' => false,
+                'hint' => 'Это '.$attempt.'-я попытка дозвониться. '.$taskHint,
+            ],
+            'noAnswer.callback_at' => [
+                'class' => WidgetField::class,
+                'widgetClass' => DateControl::class,
+                'widgetConfig' => [
+                    'type' => DateControl::FORMAT_DATETIME,
+                    'displayFormat' => 'php:d-m-Y H:i',
+                    'saveFormat' => 'php:U',
+                    'options' => ['autocomplete' => 'off'],
+                    'widgetOptions' => ['pluginOptions' => ['minuteStep' => 5]],
+                ],
+            ],
+            'noAnswer.comment' => [
+                'class' => TextareaField::class,
+                'elementOptions' => ['rows' => 3, 'placeholder' => 'Необязательно: что удалось выяснить'],
+            ],
+        ];
     }
 
     private function selectFilter(array $items): array

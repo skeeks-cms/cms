@@ -468,59 +468,83 @@ CSS
             <?php BackendSurfaceWidget::end(); ?>
         </aside>
 
-        <main class="sx-detail-layout__main">
+        <main class="sx-detail-layout__main sx-surface-stack">
             <?php
-            $leadTasks = $model->getTasks()
-                ->andWhere(['not in', 'status', [
-                    \skeeks\cms\models\CmsTask::STATUS_READY,
-                    \skeeks\cms\models\CmsTask::STATUS_CANCELED,
-                ]])
-                ->orderPlanStartAt()
-                ->limit(5)
-                ->all();
-            $canCreateLeadTask = $canWork && \Yii::$app->user->can('cms/admin-task');
+            $leadTasks = $model->getActiveTasks()->limit(5)->all();
+            $isInWork = $model->status === CmsLead::STATUS_IN_WORK;
+            $nextStepActions = [];
+            $openActionLink = static function (string $label, string $url, string $variant, array $actionData = []): string {
+                $action = \yii\helpers\Json::encode(array_merge(['isOpenNewWindow' => true, 'url' => $url], $actionData));
+
+                return Html::a($label, $url, [
+                    'class' => 'sx-button sx-button--'.$variant.' sx-button--sm',
+                    'data-pjax' => '0',
+                    'onclick' => 'new sx.classes.backend.widgets.Action('.$action.').go(); return false;',
+                ]);
+            };
+            if ($canWork && $isInWork) {
+                $nextStepActions[] = $openActionLink(
+                    '<i class="fas fa-phone-slash" aria-hidden="true"></i> Не дозвонились',
+                    (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        '/cms/admin-cms-lead/no-answer',
+                        'pk' => $model->id,
+                    ])->enableEmptyLayout()->enableNoActions()->url,
+                    'secondary',
+                    ['size' => 'small']
+                );
+            }
+            if ($canWork && \Yii::$app->user->can('cms/admin-task')) {
+                $nextStepActions[] = $openActionLink(
+                    '<i class="fas fa-plus" aria-hidden="true"></i> Поставить задачу',
+                    (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        '/cms/admin-cms-task/create',
+                        'CmsTask' => ['cms_lead_id' => $model->id],
+                    ])->enableEmptyLayout()->enableNoActions()->url,
+                    $leadTasks ? 'secondary' : 'primary'
+                );
+            }
             ?>
-            <?php if ($leadTasks || $canCreateLeadTask) : ?>
+            <?php if ($leadTasks || $isInWork) : ?>
                 <?php
                 $this->registerCss(<<<CSS
-.sx-lead-task-row {
+.sx-lead-next-step__task {
     display: flex;
-    width: 100%;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
 }
-.sx-lead-task-row .sx-preview-card {
+.sx-lead-next-step__task .sx-preview-card {
     flex-grow: 1;
+    min-width: 0;
 }
 CSS
                 );
-                $createLeadTaskUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                    '/cms/admin-cms-task/create',
-                    'CmsTask' => ['cms_lead_id' => $model->id],
-                ])->enableEmptyLayout()->enableNoActions()->url;
-                $createLeadTaskActionData = \yii\helpers\Json::encode([
-                    'isOpenNewWindow' => true,
-                    'url'             => $createLeadTaskUrl,
-                ]);
                 ?>
-                <div class="sx-surface-stack sx-lead-tasks" style="margin-bottom: var(--sx-space-4, 16px);">
-                    <?php foreach ($leadTasks as $leadTask) : ?>
-                        <?php BackendSurfaceWidget::begin(['raised' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
-                            <div class="sx-lead-task-row">
-                                <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $leadTask]); ?>
-                                <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $leadTask]); ?>
-                            </div>
-                        <?php BackendSurfaceWidget::end(); ?>
-                    <?php endforeach; ?>
-                    <?php if ($canCreateLeadTask) : ?>
-                        <div>
-                            <a href="<?= Html::encode($createLeadTaskUrl); ?>" class="btn btn-default" data-pjax="0" onclick='new sx.classes.backend.widgets.Action(<?= $createLeadTaskActionData; ?>).go(); return false;'>
-                                <i class="fas fa-plus"></i> Поставить задачу
-                            </a>
+                <?php BackendSurfaceWidget::begin([
+                    'title' => 'Следующий шаг',
+                    'titleTag' => 'h2',
+                    'hint' => $model->no_answer_count ? 'Неудачных попыток дозвониться: '.(int)$model->no_answer_count : null,
+                    'actions' => $nextStepActions,
+                    'raised' => true,
+                    'responsive' => true,
+                    'options' => ['class' => 'sx-lead-next-step'],
+                ]); ?>
+                    <?php if (!$leadTasks) : ?>
+                        <p>
+                            <span class="sx-status sx-status--warning">Не запланирован</span>
+                            Поставьте задачу, чтобы не забыть про лид: когда перезвонить или что сделать дальше.
+                        </p>
+                    <?php else : ?>
+                        <div class="sx-surface-stack">
+                            <?php foreach ($leadTasks as $leadTask) : ?>
+                                <div class="sx-lead-next-step__task">
+                                    <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $leadTask]); ?>
+                                    <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $leadTask]); ?>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
-                </div>
+                <?php BackendSurfaceWidget::end(); ?>
             <?php endif; ?>
             <?php $pjax = Pjax::begin(['id' => 'cms-lead-comments', 'options' => ['class' => 'sx-surface-stack sx-activity-thread']]); ?>
                 <?php if ($canWork) : ?>

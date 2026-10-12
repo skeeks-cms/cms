@@ -4,6 +4,8 @@ namespace skeeks\cms\models\queries;
 
 use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsTask;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
@@ -101,6 +103,55 @@ class CmsLeadQuery extends CmsActiveQuery
     {
         $digits = PhoneHelper::sqlDigits($column);
         return "CASE WHEN LENGTH($digits) = 11 AND SUBSTR($digits, 1, 1) IN ('7', '8') THEN SUBSTR($digits, 2) ELSE $digits END";
+    }
+
+    public const NEXT_STEP_MISSING = 'missing';
+    public const NEXT_STEP_OVERDUE = 'overdue';
+    public const NEXT_STEP_PLANNED = 'planned';
+
+    public static function nextStepFilters(): array
+    {
+        return [
+            self::NEXT_STEP_MISSING => 'Не запланирован',
+            self::NEXT_STEP_OVERDUE => 'Просрочен',
+            self::NEXT_STEP_PLANNED => 'Запланирован',
+        ];
+    }
+
+    /**
+     * Filters leads by their next step: an open task linked to the lead.
+     * "Missing" applies only to leads in work; the other states follow the
+     * nearest open task, so an overdue lead is never also "planned".
+     */
+    public function nextStep(string $state)
+    {
+        $table = $this->getPrimaryTableName();
+        $active = static function () use ($table) {
+            return CmsTask::find()
+                ->select(new \yii\db\Expression('1'))
+                ->andWhere(CmsTask::tableName().'.cms_lead_id = '.$table.'.id')
+                ->andWhere([CmsTask::tableName().'.status' => CmsTask::activeStatuses()]);
+        };
+        $overdue = static function () use ($active) {
+            return $active()
+                ->andWhere(['is not', CmsTask::tableName().'.plan_start_at', null])
+                ->andWhere(['<', CmsTask::tableName().'.plan_start_at', time()]);
+        };
+
+        switch ($state) {
+            case self::NEXT_STEP_MISSING:
+                return $this
+                    ->andWhere([$table.'.status' => CmsLead::STATUS_IN_WORK])
+                    ->andWhere(['not exists', $active()]);
+            case self::NEXT_STEP_OVERDUE:
+                return $this->andWhere(['exists', $overdue()]);
+            case self::NEXT_STEP_PLANNED:
+                return $this
+                    ->andWhere(['exists', $active()])
+                    ->andWhere(['not exists', $overdue()]);
+        }
+
+        return $this;
     }
 
     public function fromSource(string $type, string $reference, ?int $siteId = null)

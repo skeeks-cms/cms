@@ -82,6 +82,20 @@ class CmsTask extends ActiveRecord
     const READY_RESUME_SECONDS = 86400;
 
     /**
+     * Statuses in which the executor still owes an action. A task on check is
+     * done from the executor's side and is not a planned next step.
+     */
+    public static function activeStatuses(): array
+    {
+        return [
+            self::STATUS_NEW,
+            self::STATUS_ACCEPTED,
+            self::STATUS_IN_WORK,
+            self::STATUS_ON_PAUSE,
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()

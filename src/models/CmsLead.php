@@ -585,6 +585,7 @@ class CmsLead extends Core
             'partner_reward_value' => 'Вознаграждение партнёру, бонусов',
             'result_comment' => 'Результат обработки',
             'reject_reason' => 'Причина отклонения',
+            'no_answer_count' => 'Неудачных попыток дозвониться',
         ]);
     }
 
@@ -597,6 +598,39 @@ class CmsLead extends Core
     public function getEmails() { return $this->hasMany(CmsLeadEmail::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     /** @return \skeeks\cms\models\queries\CmsTaskQuery */
     public function getTasks() { return $this->hasMany(CmsTask::class, ['cms_lead_id' => 'id']); }
+
+    /**
+     * Open tasks, nearest first; tasks without a fixed start come last.
+     *
+     * @return \skeeks\cms\models\queries\CmsTaskQuery
+     */
+    public function getActiveTasks()
+    {
+        $table = CmsTask::tableName();
+
+        return $this->getTasks()
+            ->andWhere([$table.'.status' => CmsTask::activeStatuses()])
+            ->orderBy(new \yii\db\Expression("{$table}.plan_start_at IS NULL, {$table}.plan_start_at ASC, {$table}.id ASC"));
+    }
+
+    /** The planned next step of a lead in work, if any. */
+    public function getNextTask(): ?CmsTask
+    {
+        return $this->activeTasks[0] ?? null;
+    }
+
+    /** A lead in work must have an open task that says when to act next. */
+    public function getIsNextStepMissing(): bool
+    {
+        return $this->status === self::STATUS_IN_WORK && !$this->nextTask;
+    }
+
+    public function getIsNextStepOverdue(): bool
+    {
+        $task = $this->nextTask;
+
+        return $task && $task->plan_start_at && (int)$task->plan_start_at < time();
+    }
 
     public function getMainPhone(): ?CmsLeadPhone
     {
