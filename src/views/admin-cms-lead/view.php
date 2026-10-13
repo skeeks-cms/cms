@@ -283,6 +283,13 @@ CSS
 ?>
 
 <div class="sx-surface-stack">
+    <?php BackendSurfaceWidget::begin(['raised' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
+        <?= $this->render('_stage-bar', [
+            'model' => $model,
+            'steps' => (new \skeeks\cms\services\CmsLeadBoardService())->steps($model, (int)\Yii::$app->user->id),
+        ]); ?>
+    <?php BackendSurfaceWidget::end(); ?>
+
     <?php if (!$model->cms_company_id || !$model->cms_user_id) : ?>
         <div
             class="sx-lead-matches-slot"

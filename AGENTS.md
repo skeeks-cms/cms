@@ -242,3 +242,33 @@ cms_lead.no_answer_count (m261013_100000), moves the actor's nearest open task
 on the lead or creates "Перезвонить: …", writes a lead comment; closing as
 unreachable rejects the lead and cancels the actor's open lead tasks through
 TaskWorkflow.
+
+## Lead stages and kanban
+
+CmsLeadStage (m261013_120000, per site, unique name, sort, optional #rrggbb
+color) labels steps inside the system status "in work"; cms_lead.cms_lead_stage_id
+is nullable (FK SET NULL, deletion refused while leads use the stage). The four
+system statuses stay authoritative for access, notifications, partner rewards
+and validation. CmsLeadStatusWidget shows the stage only with showStage=true:
+the UPA partner cabinet uses the widget and must not see internal stages.
+The admin "Канбан" action (CmsLeadBoardService) has columns new, "in work"
+without stage, one per stage, success, rejected (last 30 days). A drop into a
+stage claims a new lead or reopens a terminal one through normal validation;
+a drop into a terminal column only returns the process form URL with ?status=
+preselected, because a result or reason is required; a drop into "new" is
+refused. The board lives in skeeks/cms until a second consumer justifies a
+shared cms-backend renderer. Stages are managed by administrators in
+"Этапы лидов" (AdminCmsLeadStageController).
+The lead card shows the same moves as a stage bar (_stage-bar.php,
+CmsLeadBoardService::steps() and denyReason()); both post to kanban-move.
+The process form receives a target status as ?status= and only preselects the
+control (data-sx-lead-status-preselect): never assign it to the model, the
+window header is rendered from the same instance.
+A lead that enters "in work" without a stage (claim, creation with a manager,
+reopening) gets the first stage of its site in CmsLead::beforeSave; a lead
+already in work and sites without stages are untouched. The stage is kept when
+a lead is closed, so reopening returns it to its previous stage.
+With stages configured, the kanban hides the empty "in work without stage"
+column: it only holds leads taken into work before stages existed.
+AdminCmsLeadController::$defaultAction is "kanban" (tabs: Канбан, Таблица,
+Новый лид); related lead tabs in company/client cards still render the table.

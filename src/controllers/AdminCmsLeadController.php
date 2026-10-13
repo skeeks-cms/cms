@@ -9,6 +9,9 @@ use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\models\CmsLeadStage;
+use skeeks\cms\services\CmsLeadBoardService;
 use skeeks\cms\forms\CmsLeadNoAnswerForm;
 use skeeks\cms\models\queries\CmsLeadQuery;
 use skeeks\cms\services\CmsLeadNoAnswerService;
@@ -42,6 +45,9 @@ use yii\web\NotFoundHttpException;
 
 class AdminCmsLeadController extends BackendModelStandartController
 {
+    /** The section opens on the kanban; the table stays one tab away. */
+    public $defaultAction = 'kanban';
+
     public function init()
     {
         $this->name = 'Лиды';
@@ -64,7 +70,8 @@ class AdminCmsLeadController extends BackendModelStandartController
 
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
-                'name' => 'Лиды',
+                'name' => 'Таблица',
+                'priority' => 20,
                 // v2: the "next step" column and filter are part of the defaults.
                 'configKey' => 'cms/leads-v2',
                 'emptyState' => [
@@ -74,7 +81,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                     'action' => ['backendAction' => 'create', 'label' => 'Добавить лид'],
                 ],
                 'filters' => [
-                    'visibleFilters' => array_merge(['q', 'status', 'next_step', 'source_type'], $utmAttributes),
+                    'visibleFilters' => array_merge(['q', 'status', 'cms_lead_stage_id', 'next_step', 'source_type'], $utmAttributes),
                     'filtersModel' => [
                         'rules' => [[array_merge(['q', 'next_step'], $utmAttributes), 'safe']],
                         'attributeDefines' => array_merge(['q', 'next_step'], $utmAttributes),
@@ -100,13 +107,14 @@ class AdminCmsLeadController extends BackendModelStandartController
                                 },
                             ],
                             'status' => $this->selectFilter(CmsLead::statuses()),
+                            'cms_lead_stage_id' => $this->selectFilter($this->stageItems()),
                             'source_type' => $this->selectFilter(CmsLead::sources()),
                         ], $this->utmFilters()),
                     ],
                 ],
                 'grid' => [
                     'on init' => static function (Event $event) {
-                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(['activeTasks']);
+                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(['activeTasks', 'stage']);
                     },
                     'defaultPageSize' => 50,
                     'defaultOrder' => ['created_at' => SORT_DESC],
@@ -121,7 +129,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                         ],
                         'status' => [
                             'format' => 'raw',
-                            'value' => static fn(CmsLead $model) => CmsLeadStatusWidget::widget(['lead' => $model]),
+                            'value' => static fn(CmsLead $model) => CmsLeadStatusWidget::widget(['lead' => $model, 'showStage' => true]),
                         ],
                         'next_step' => [
                             'label' => 'Следующий шаг',
@@ -149,8 +157,21 @@ class AdminCmsLeadController extends BackendModelStandartController
                     ],
                 ],
             ],
+            'kanban' => [
+                'class' => ViewBackendAction::class,
+                'name' => 'Канбан',
+                'icon' => 'fas fa-columns',
+                'priority' => 10,
+                'callback' => [$this, 'kanban'],
+            ],
+            'kanban-move' => [
+                'class' => ViewBackendAction::class,
+                'isVisible' => false,
+                'callback' => [$this, 'kanbanMove'],
+            ],
             'create' => [
                 'name' => 'Новый лид',
+                'priority' => 30,
                 'fields' => [$this, 'editFields'],
                 'on beforeValidate' => static function (Event $event) {
                     /** @var CmsLead $model */
@@ -158,7 +179,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                     $model->cms_site_id = (int)\Yii::$app->skeeks->site->id;
                     foreach (['submitted_by_id', 'cms_company_id', 'cms_user_id', 'source_ref', 'source_url', 'source_data',
                         'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'processed_at',
-                        'reject_reason', 'result_comment'] as $attribute) {
+                        'reject_reason', 'result_comment', 'cms_lead_stage_id'] as $attribute) {
                         $model->{$attribute} = null;
                     }
                     $model->status = $model->executor_id
@@ -209,7 +230,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                     $protected = [
                         'cms_site_id', 'submitted_by_id', 'cms_company_id', 'cms_user_id', 'source_ref', 'source_url',
                         'source_data', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
-                        'status', 'reject_reason', 'result_comment', 'processed_at',
+                        'status', 'reject_reason', 'result_comment', 'processed_at', 'cms_lead_stage_id',
                     ];
                     if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         $protected[] = 'executor_id';
@@ -375,6 +396,62 @@ JS
                 'elementOptions' => ['rows' => 3, 'placeholder' => 'Необязательно: что удалось выяснить'],
             ],
         ];
+    }
+
+    public function kanban()
+    {
+        $mine = (bool)\Yii::$app->request->get('mine');
+
+        return $this->render('kanban', [
+            'columns' => (new CmsLeadBoardService())->columns($mine ? (int)\Yii::$app->user->id : null),
+            'mine' => $mine,
+        ]);
+    }
+
+    public function kanbanMove()
+    {
+        $response = new RequestResponse();
+        if (!$response->isRequestAjaxPost()) {
+            throw new BadRequestHttpException('Лид переносится только на канбане.');
+        }
+
+        try {
+            $lead = CmsLead::find()->forManager()->cmsSite()
+                ->andWhere([CmsLead::tableName().'.id' => (int)\Yii::$app->request->post('pk')])
+                ->one();
+            if (!$lead) {
+                throw new \RuntimeException('Лид не найден или недоступен вам.');
+            }
+
+            $column = (string)\Yii::$app->request->post('column');
+            if ((new CmsLeadBoardService())->move($lead, $column, (int)\Yii::$app->user->id)) {
+                $lead = CmsLead::find()->with(['activeTasks', 'stage', 'executor'])->andWhere(['id' => $lead->id])->one();
+                $response->data = ['card' => $this->renderPartial('_kanban-card', ['model' => $lead])];
+            } else {
+                $status = $column === CmsLeadBoardService::COLUMN_SUCCESS ? CmsLead::STATUS_SUCCESS : CmsLead::STATUS_REJECTED;
+                $response->data = ['openUrl' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    '/cms/admin-cms-lead/process',
+                    'pk' => $lead->id,
+                    'status' => $status,
+                ])->enableEmptyLayout()->enableNoActions()->url];
+            }
+            $response->success = true;
+        } catch (\RuntimeException $e) {
+            $response->success = false;
+            $response->message = $e->getMessage();
+        }
+
+        return $response;
+    }
+
+    /** Stage choices of the current site; empty until the stage table exists. */
+    private function stageItems(): array
+    {
+        try {
+            return ArrayHelper::map(CmsLeadStage::forCurrentSite(), 'id', 'name');
+        } catch (\yii\db\Exception $e) {
+            return [];
+        }
     }
 
     private function selectFilter(array $items): array
@@ -606,14 +683,32 @@ JS
     public function processFields($action = null): array
     {
         LeadProcessAsset::register(\Yii::$app->view);
+        // The kanban and the stage bar open this form with a target status.
+        // Only the control is preselected: the model (and the card header
+        // rendered from it) keeps the saved status until the form is saved.
+        $statusOptions = ['data-sx-lead-status' => '1'];
+        $requestedStatus = (string)\Yii::$app->request->get('status');
+        if ($this->model && !\Yii::$app->request->isPost && $requestedStatus !== ''
+            && in_array($requestedStatus, $this->model->allowedNextStatuses(), true)) {
+            $statusOptions['data-sx-lead-status-preselect'] = $requestedStatus;
+        }
         $fields = [
             'status' => [
                 'class' => SelectField::class,
                 'items' => $this->model ? array_intersect_key(CmsLead::statuses(), array_flip($this->model->allowedNextStatuses())) : CmsLead::statuses(),
                 'allowNull' => false,
-                'elementOptions' => ['data-sx-lead-status' => '1'],
+                'elementOptions' => $statusOptions,
             ],
         ];
+        $stageItems = $this->stageItems();
+        if ($stageItems) {
+            $fields['cms_lead_stage_id'] = [
+                'class' => SelectField::class,
+                'items' => $stageItems,
+                'nullLabel' => 'Без этапа',
+                'options' => $this->statusFieldOptions([CmsLead::STATUS_IN_WORK]),
+            ];
+        }
         if ($this->model && $this->model->partner_id) {
             $fields['partner_reward_value'] = [
                 'class' => NumberField::class,

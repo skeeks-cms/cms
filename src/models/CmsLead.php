@@ -73,6 +73,9 @@ class CmsLead extends Core
                     'status' => self::statuses(),
                     'source_type' => self::sources(),
                 ],
+                'relation_map' => [
+                    'cms_lead_stage_id' => 'stage',
+                ],
             ],
         ]);
     }
@@ -100,6 +103,13 @@ class CmsLead extends Core
             [['source_type'], 'in', 'range' => array_keys(self::sources())],
             [['status'], 'in', 'range' => array_keys(self::statuses())],
             [['cms_company_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsCompany::class, 'targetAttribute' => 'id'],
+            [['cms_lead_stage_id'], 'filter', 'filter' => static function ($value) {
+                return $value === '' ? null : $value;
+            }],
+            [['cms_lead_stage_id'], 'integer'],
+            [['cms_lead_stage_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLeadStage::class,
+                'targetAttribute' => ['cms_lead_stage_id' => 'id', 'cms_site_id' => 'cms_site_id'],
+                'message' => 'Этап не найден на этом сайте.'],
             [['cms_user_id', 'submitted_by_id', 'partner_id', 'executor_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsUser::class, 'targetAttribute' => 'id'],
             [['executor_id'], 'required', 'when' => static function (self $model) {
                 return $model->status !== self::STATUS_NEW;
@@ -194,8 +204,37 @@ class CmsLead extends Core
         if ($this->status !== self::STATUS_SUCCESS) {
             $this->result_comment = null;
         }
+        $this->assignFirstStageOnStart($insert);
 
         return true;
+    }
+
+    /**
+     * A lead entering "in work" (claim, manual creation with a manager,
+     * reopening) without a stage starts at the first stage of its site.
+     * Sites without stages keep the plain "in work" status.
+     */
+    protected function assignFirstStageOnStart(bool $insert): void
+    {
+        if ($this->status !== self::STATUS_IN_WORK || $this->cms_lead_stage_id) {
+            return;
+        }
+        if (!$insert && $this->getOldAttribute('status') === self::STATUS_IN_WORK) {
+            return;
+        }
+        try {
+            $stageId = CmsLeadStage::find()
+                ->cmsSite((int)$this->cms_site_id)
+                ->select(['id'])
+                ->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC])
+                ->scalar();
+        } catch (\yii\db\Exception $e) {
+            // The stage table appears with a migration that may run after the code update.
+            return;
+        }
+        if ($stageId) {
+            $this->cms_lead_stage_id = (int)$stageId;
+        }
     }
 
     /**
@@ -586,6 +625,7 @@ class CmsLead extends Core
             'result_comment' => 'Результат обработки',
             'reject_reason' => 'Причина отклонения',
             'no_answer_count' => 'Неудачных попыток дозвониться',
+            'cms_lead_stage_id' => 'Этап',
         ]);
     }
 
@@ -594,6 +634,7 @@ class CmsLead extends Core
     public function getSubmittedBy() { return $this->hasOne(CmsUser::class, ['id' => 'submitted_by_id']); }
     public function getCompany() { return $this->hasOne(CmsCompany::class, ['id' => 'cms_company_id']); }
     public function getClient() { return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']); }
+    public function getStage() { return $this->hasOne(CmsLeadStage::class, ['id' => 'cms_lead_stage_id']); }
     public function getPhones() { return $this->hasMany(CmsLeadPhone::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     public function getEmails() { return $this->hasMany(CmsLeadEmail::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     /** @return \skeeks\cms\models\queries\CmsTaskQuery */

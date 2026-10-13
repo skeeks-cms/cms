@@ -81,7 +81,7 @@ if (strpos($editAction, "'icon' => 'fa fa-edit'") === false) {
     throw new RuntimeException('The dedicated lead edit action must use an available backend icon.');
 }
 if (strpos($controller, "'visibleFilters' => ['q', 'status', 'source_type']") === false) {
-    if (strpos($controller, "array_merge(['q', 'status', 'source_type'], \$utmAttributes)") === false) {
+    if (strpos($controller, "array_merge(['q', 'status', 'cms_lead_stage_id', 'next_step', 'source_type'], \$utmAttributes)") === false) {
         throw new RuntimeException('Lead filters must include source and canonical UTM attribution fields.');
     }
 }

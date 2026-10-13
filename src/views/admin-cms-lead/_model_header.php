@@ -20,7 +20,7 @@ if ($model->executor) {
         ['class' => 'sx-lead-header__responsible']
     );
 }
-$statusContent .= CmsLeadStatusWidget::widget(['lead' => $model]);
+$statusContent .= CmsLeadStatusWidget::widget(['lead' => $model, 'showStage' => true, 'stageInline' => true]);
 $status = Html::tag('div', $statusContent, ['class' => 'sx-lead-header__status-row']);
 
 $this->registerCss(<<<CSS

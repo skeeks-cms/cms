@@ -17,5 +17,14 @@
     }
 
     $(document).on('change', statusSelector, function () { update(this); });
-    $(function () { $(statusSelector).each(function () { update(this); }); });
+    $(function () {
+        $(statusSelector).each(function () {
+            // The kanban and the stage bar open the form with a target status.
+            var preselect = $(this).attr('data-sx-lead-status-preselect');
+            if (preselect && $(this).find('option[value="' + preselect + '"]').length) {
+                $(this).val(preselect).trigger('change');
+            }
+            update(this);
+        });
+    });
 }(jQuery));

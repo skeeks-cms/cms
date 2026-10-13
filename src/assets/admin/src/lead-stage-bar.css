@@ -1,0 +1,138 @@
+.sx-lead-stage-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px 16px;
+}
+
+.sx-lead-stage-bar__path,
+.sx-lead-stage-bar__outcomes {
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sx-lead-stage-bar__path {
+    flex: 1 1 480px;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.sx-lead-stage-bar__path > li {
+    flex: 1 1 0;
+    min-width: 120px;
+}
+
+.sx-lead-stage-bar__outcomes > li {
+    flex: 0 0 auto;
+}
+
+.sx-lead-stage-bar__step {
+    --sx-lead-stage-tone: var(--sx-lead-stage-color, var(--sx-color-accent));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-color-surface-raised);
+    color: var(--sx-color-text-muted);
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.sx-lead-stage-bar__step:hover:not(:disabled) {
+    border-color: var(--sx-lead-stage-tone);
+    color: var(--sx-color-text);
+}
+
+/* No ring after a mouse click; keyboard focus keeps the visible ring. */
+.sx-lead-stage-bar__step:focus {
+    outline: none;
+}
+
+.sx-lead-stage-bar__step:focus-visible {
+    outline: 2px solid var(--sx-color-focus-ring);
+    outline-offset: 2px;
+}
+
+.sx-lead-stage-bar__check {
+    flex: 0 0 auto;
+    color: var(--sx-lead-stage-tone);
+    font-size: 12px;
+}
+
+.sx-lead-stage-bar__pulse {
+    position: relative;
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--sx-lead-stage-tone);
+}
+
+.sx-lead-stage-bar__pulse::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--sx-lead-stage-tone);
+    animation: sx-lead-stage-pulse 1.8s ease-out infinite;
+}
+
+@keyframes sx-lead-stage-pulse {
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2.8);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sx-lead-stage-bar__pulse::after {
+        animation: none;
+    }
+}
+
+.sx-lead-stage-bar__step--done {
+    border-color: color-mix(in srgb, var(--sx-lead-stage-tone) 35%, var(--sx-color-border));
+    background: color-mix(in srgb, var(--sx-lead-stage-tone) 12%, var(--sx-color-surface-raised));
+    color: var(--sx-color-text);
+}
+
+.sx-lead-stage-bar__step--current {
+    border-color: var(--sx-lead-stage-tone);
+    background: color-mix(in srgb, var(--sx-lead-stage-tone) 28%, var(--sx-color-surface-raised));
+    color: var(--sx-color-text);
+}
+
+.sx-lead-stage-bar__step--success {
+    --sx-lead-stage-tone: var(--sx-color-success);
+}
+
+.sx-lead-stage-bar__step--danger {
+    --sx-lead-stage-tone: var(--sx-color-danger);
+}
+
+.sx-lead-stage-bar__step:disabled {
+    cursor: default;
+}
+
+.sx-lead-stage-bar__step--future:disabled {
+    opacity: 0.55;
+}
+
+.sx-lead-stage-bar.is-busy .sx-lead-stage-bar__step {
+    cursor: progress;
+}
