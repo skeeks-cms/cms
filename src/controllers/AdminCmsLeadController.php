@@ -271,6 +271,47 @@ class AdminCmsLeadController extends BackendModelStandartController
                     (new CmsLeadNoAnswerService())->apply($this->model, $action->formModels['noAnswer']);
                 },
             ],
+            'deal-amount' => [
+                'class' => BackendModelUpdateAction::class,
+                'name' => 'Сумма сделки',
+                'isVisible' => false,
+                'size' => BackendModelUpdateAction::SIZE_SMALL,
+                'buttons' => ['save'],
+                'successMessage' => 'Сумма сделки сохранена',
+                'fields' => static fn() => [
+                    'amount.deal_amount' => [
+                        'class' => NumberField::class,
+                        'step' => 0.01,
+                        'elementOptions' => ['min' => 0.01],
+                        'hint' => 'Разовая сумма, на которую договорились с клиентом. Статус лида и начисление партнёру не меняются.',
+                    ],
+                ],
+                'accessCallback' => fn() => $this->model
+                    && $this->model->status === CmsLead::STATUS_SUCCESS
+                    && $this->model->canBeReopenedBy((int)\Yii::$app->user->id),
+                'on initFormModels' => function (Event $event) {
+                    /** @var BackendModelUpdateAction $action */
+                    $action = $event->sender;
+                    // Only the amount is edited; the rest of the closed lead stays as it is.
+                    $form = new \yii\base\DynamicModel(['deal_amount' => $this->model->deal_amount]);
+                    $form->setAttributeLabels(['deal_amount' => 'Сумма сделки, ₽']);
+                    $form->addRule(['deal_amount'], 'filter', ['filter' => static function ($value) {
+                        return is_string($value) ? (trim(str_replace([' ', ','], ['', '.'], $value)) ?: null) : $value;
+                    }]);
+                    $form->addRule(['deal_amount'], 'required', ['message' => 'Укажите сумму сделки']);
+                    $form->addRule(['deal_amount'], 'number', ['min' => 0.01]);
+                    $action->formModels = ['amount' => $form];
+                },
+                'on beforeSave' => function (Event $event) {
+                    /** @var BackendModelUpdateAction $action */
+                    $action = $event->sender;
+                    $action->isSaveFormModels = false;
+                    $this->model->deal_amount = $action->formModels['amount']->deal_amount;
+                    if (!$this->model->save()) {
+                        throw new \RuntimeException(implode(' ', $this->model->getFirstErrors()));
+                    }
+                },
+            ],
             'tasks' => [
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Задачи',

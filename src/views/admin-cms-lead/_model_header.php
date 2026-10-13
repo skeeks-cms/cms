@@ -66,6 +66,17 @@ if ($model->canBeClaimed) {
             'data-confirm' => 'Вернуть лид в работу?',
         ])
         .Html::endForm();
+    if ($model->status === CmsLead::STATUS_SUCCESS) {
+        // Correcting the amount keeps the status and never re-runs the partner reward.
+        $amountUrl = (string)BackendUrlHelper::createByParams([
+            '/cms/admin-cms-lead/deal-amount',
+            'pk' => $model->id,
+        ])->enableEmptyLayout()->enableNoActions()->url;
+        $toolbar[] = Html::a('<i class="fas fa-ruble-sign" aria-hidden="true"></i> Сумма сделки', $amountUrl, [
+            'class' => 'sx-button sx-button--secondary sx-button--sm',
+            'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode(['isOpenNewWindow' => true, 'url' => $amountUrl, 'size' => 'small']).').go(); return false;',
+        ]);
+    }
 } elseif ($canWork && $model->status === CmsLead::STATUS_IN_WORK) {
     $currentPanelLink = static function (string $label, string $url): string {
         $action = Json::encode(['isOpenNewWindow' => true, 'url' => $url]);

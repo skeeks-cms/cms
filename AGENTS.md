@@ -303,3 +303,7 @@ target. Deal sum and average check use successful leads with deal_amount; the
 partner share uses only leads that have both an amount and a reward. Partner
 rewards come from EVENT_PARTNER_REWARDS (LeadReportPartnerRewardsEvent), which
 skeeks/cms-shop answers from shop_partner_lead: the core does not depend on it.
+A successful lead's amount is corrected through the hidden deal-amount action
+(header button "Сумма сделки", executor or administrator, DynamicModel form).
+It saves only deal_amount: the status does not change, so EVENT_PARTNER_SUCCESS
+and the partner reward are not triggered again.
