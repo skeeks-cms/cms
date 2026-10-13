@@ -292,3 +292,14 @@ when it leaves "success". It is employee data: shown only through
 CmsLeadStatusWidget(showStage) and the kanban card. The process form offers
 10/20/30% shortcuts that fill partner_reward_value from it; the reward stays
 editable. Net profit (contractor costs) belongs to deals/projects, not leads.
+
+## Lead report
+
+The "Отчёт" tab (CmsLeadReportService, views/admin-cms-lead/report.php) counts
+leads created in the period (a cohort) in their current state, within
+forManager()->cmsSite(). Conversion = successful / target leads; rejections
+with a reason marked is_not_target (m261013_180000: spam, duplicates) are not
+target. Deal sum and average check use successful leads with deal_amount; the
+partner share uses only leads that have both an amount and a reward. Partner
+rewards come from EVENT_PARTNER_REWARDS (LeadReportPartnerRewardsEvent), which
+skeeks/cms-shop answers from shop_partner_lead: the core does not depend on it.

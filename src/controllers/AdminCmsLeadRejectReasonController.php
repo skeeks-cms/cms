@@ -58,7 +58,7 @@ class AdminCmsLeadRejectReasonController extends BackendModelStandartController
                         ]);
                     },
                     'defaultOrder' => ['sort' => SORT_ASC],
-                    'visibleColumns' => ['checkbox', 'actions', 'name', 'sort', 'is_no_answer', 'countLeads'],
+                    'visibleColumns' => ['checkbox', 'actions', 'name', 'sort', 'is_no_answer', 'is_not_target', 'countLeads'],
                     'columns' => [
                         'name' => [
                             'class' => BackendEntityLinkColumn::class,
@@ -72,6 +72,12 @@ class AdminCmsLeadRejectReasonController extends BackendModelStandartController
                             'format' => 'raw',
                             'value' => static fn(CmsLeadRejectReason $model) => $model->is_no_answer
                                 ? Html::tag('span', 'Да', ['class' => 'sx-status sx-status--info'])
+                                : '',
+                        ],
+                        'is_not_target' => [
+                            'format' => 'raw',
+                            'value' => static fn(CmsLeadRejectReason $model) => $model->is_not_target
+                                ? Html::tag('span', 'Нецелевая', ['class' => 'sx-status'])
                                 : '',
                         ],
                         'countLeads' => [
@@ -96,6 +102,7 @@ class AdminCmsLeadRejectReasonController extends BackendModelStandartController
             'name',
             'sort' => ['class' => NumberField::class],
             'is_no_answer' => ['class' => BoolField::class, 'allowNull' => false],
+            'is_not_target' => ['class' => BoolField::class, 'allowNull' => false],
         ];
     }
 }

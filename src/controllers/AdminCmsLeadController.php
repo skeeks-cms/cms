@@ -166,6 +166,13 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'priority' => 10,
                 'callback' => [$this, 'kanban'],
             ],
+            'report' => [
+                'class' => ViewBackendAction::class,
+                'name' => 'Отчёт',
+                'icon' => 'fa fa-chart-bar',
+                'priority' => 25,
+                'callback' => [$this, 'report'],
+            ],
             'kanban-move' => [
                 'class' => ViewBackendAction::class,
                 'isVisible' => false,
@@ -420,6 +427,48 @@ JS
             'columns' => (new CmsLeadBoardService())->columns($mine ? (int)\Yii::$app->user->id : null),
             'mine' => $mine,
         ]);
+    }
+
+    public function report()
+    {
+        $request = \Yii::$app->request;
+        $period = trim((string)$request->get('period'));
+        if ($period === '') {
+            $period = date('01.m.Y').' - '.date('t.m.Y');
+        }
+        $from = $this->parseReportDate($period, false);
+        $to = $this->parseReportDate($period, true);
+        if (!$from || !$to || $from > $to) {
+            $period = date('01.m.Y').' - '.date('t.m.Y');
+            $from = $this->parseReportDate($period, false);
+            $to = $this->parseReportDate($period, true);
+        }
+        $source = (string)$request->get('source_type');
+        if (!array_key_exists($source, CmsLead::sources())) {
+            $source = '';
+        }
+
+        return $this->render('report', [
+            'period' => $period,
+            'source' => $source,
+            'report' => (new \skeeks\cms\services\CmsLeadReportService())->build($from, $to, $source ?: null),
+        ]);
+    }
+
+    /** Start or end of a "dd.mm.yyyy - dd.mm.yyyy" period in the site time zone. */
+    private function parseReportDate(string $period, bool $isEnd): ?int
+    {
+        $parts = preg_split('/\s+-\s+/', $period);
+        $date = trim((string)($parts[$isEnd ? 1 : 0] ?? $parts[0] ?? ''));
+        $timeZone = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+        foreach (['d.m.Y', 'd/m/Y', 'Y-m-d'] as $format) {
+            $dateTime = \DateTime::createFromFormat($format.' H:i:s', $date.' '.($isEnd ? '23:59:59' : '00:00:00'), $timeZone);
+            if ($dateTime instanceof \DateTime && $dateTime->format($format) === $date) {
+                return $dateTime->getTimestamp();
+            }
+        }
+
+        return null;
     }
 
     public function kanbanMove()

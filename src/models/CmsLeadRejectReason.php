@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property string      $name
  * @property int         $sort
  * @property int         $is_no_answer Preselected by the "no answer" closing form
+ * @property int         $is_not_target Spam, duplicates: excluded from conversion
  *
  * @property CmsLead[]   $leads
  */
@@ -40,9 +41,10 @@ class CmsLeadRejectReason extends ActiveRecord
             [['name'], 'filter', 'filter' => 'trim'],
             [['sort'], 'default', 'value' => 100],
             [['is_no_answer'], 'default', 'value' => 0],
+            [['is_not_target'], 'default', 'value' => 0],
             [['name', 'cms_site_id'], 'required'],
             [['cms_site_id', 'sort'], 'integer'],
-            [['is_no_answer'], 'boolean'],
+            [['is_no_answer', 'is_not_target'], 'boolean'],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique', 'targetAttribute' => ['cms_site_id', 'name'], 'message' => 'Такая причина уже есть.'],
         ]);
@@ -54,6 +56,7 @@ class CmsLeadRejectReason extends ActiveRecord
             'name' => 'Название',
             'sort' => 'Порядок',
             'is_no_answer' => 'Для кнопки «Не дозвонились»',
+            'is_not_target' => 'Нецелевая заявка',
         ]);
     }
 
@@ -63,6 +66,7 @@ class CmsLeadRejectReason extends ActiveRecord
             'name' => 'Например: «Дорого», «Не дозвонились», «Не наш профиль», «Ушли к конкурентам».',
             'sort' => 'Причины идут в списке по возрастанию числа.',
             'is_no_answer' => 'Эта причина будет выбрана, когда лид закрывают из окна «Не дозвонились».',
+            'is_not_target' => 'Спам, дубли, ошибочные заявки: такие лиды не учитываются в конверсии отчёта.',
         ]);
     }
 

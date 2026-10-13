@@ -1,0 +1,100 @@
+.sx-lead-report__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 16px;
+}
+
+.sx-lead-report__filter {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 220px;
+}
+
+.sx-lead-report__filter-label {
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-lead-report__note {
+    margin: 0;
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-lead-report__columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sx-surface-stack-gap, 16px);
+}
+
+/* Horizontal single-series bars: one hue, value at the tip, table-like rows. */
+.sx-lead-report-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sx-lead-report-bars__row {
+    display: grid;
+    grid-template-columns: minmax(0, 38%) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.sx-lead-report-bars__label {
+    overflow-wrap: anywhere;
+    color: var(--sx-color-text);
+}
+
+.sx-lead-report-bars__hint {
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+}
+
+.sx-lead-report-bars__track {
+    display: block;
+    min-height: 12px;
+}
+
+.sx-lead-report-bars__bar {
+    display: block;
+    height: 12px;
+    min-width: 2px;
+    border-radius: 0 4px 4px 0;
+    background: var(--sx-color-accent);
+}
+
+.sx-lead-report-bars__row--muted .sx-lead-report-bars__bar {
+    background: var(--sx-color-border-strong);
+}
+
+.sx-lead-report-bars__value {
+    min-width: 2.5em;
+    color: var(--sx-color-text);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Names read from the left, numbers line up on the right. */
+html[data-sx-theme] .sx-lead-report table.sx-data-table > * > tr > th,
+html[data-sx-theme] .sx-lead-report table.sx-data-table > * > tr > td {
+    text-align: left;
+}
+
+html[data-sx-theme] .sx-lead-report table.sx-data-table > * > tr > .sx-lead-report__num {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .sx-lead-report__columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
