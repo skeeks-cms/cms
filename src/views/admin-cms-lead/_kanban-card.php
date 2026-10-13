@@ -36,6 +36,8 @@ if ($model->executor) {
         <?php if ($model->status === \skeeks\cms\models\CmsLead::STATUS_REJECTED && $model->rejectReasonItem) : ?>
             <span class="sx-status"><?= Html::encode($model->rejectReasonItem->name); ?></span>
             <?php if ($result === $model->rejectReasonItem->name) { $result = null; } ?>
+        <?php elseif ($model->status === \skeeks\cms\models\CmsLead::STATUS_SUCCESS && $model->dealAmountAsText !== '') : ?>
+            <span class="sx-status" title="Сумма сделки"><?= Html::encode($model->dealAmountAsText); ?></span>
         <?php endif; ?>
         <?php if ($result) : ?>
             <div class="sx-lead-kanban__meta"><?= Html::encode(\yii\helpers\StringHelper::truncate($result, 120)); ?></div>

@@ -21,9 +21,9 @@ class CmsLeadStatusWidget extends Widget
     public $options = [];
 
     /**
-     * Also show internal details: the work stage of a lead in work and the
-     * reject reason of a rejected lead. They are employee tools: keep it off
-     * for partner and customer cabinets.
+     * Also show internal details: the work stage of a lead in work, the
+     * reject reason of a rejected lead and the deal amount of a successful
+     * one. They are employee data: keep it off for partner and customer cabinets.
      *
      * @var bool
      */
@@ -65,6 +65,11 @@ class CmsLeadStatusWidget extends Widget
             $detail = Html::tag('span', Html::encode($this->lead->rejectReasonItem->name), [
                 'class' => 'sx-status',
                 'title' => 'Причина отказа',
+            ]);
+        } elseif ($this->showStage && $this->lead->status === CmsLead::STATUS_SUCCESS && $this->lead->dealAmountAsText !== '') {
+            $detail = Html::tag('span', Html::encode($this->lead->dealAmountAsText), [
+                'class' => 'sx-status',
+                'title' => 'Сумма сделки',
             ]);
         }
         if ($detail === '') {

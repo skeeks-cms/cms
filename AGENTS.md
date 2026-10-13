@@ -283,3 +283,12 @@ required as before. beforeSave copies the reason name into an empty
 reject_reason, because the UPA partner cabinet, notifications and API read the
 text. The no-answer form preselects the is_no_answer reason when closing.
 CmsLeadStatusWidget(showStage) also shows the reason of a rejected lead.
+
+## Lead deal amount
+
+cms_lead.deal_amount (m261013_160000, decimal 18.2, RUB, one-off) is required
+when a lead becomes successful (earlier successes are not forced) and cleared
+when it leaves "success". It is employee data: shown only through
+CmsLeadStatusWidget(showStage) and the kanban card. The process form offers
+10/20/30% shortcuts that fill partner_reward_value from it; the reward stays
+editable. Net profit (contractor costs) belongs to deals/projects, not leads.

@@ -733,12 +733,28 @@ JS
                 'options' => $this->statusFieldOptions([CmsLead::STATUS_IN_WORK]),
             ];
         }
+        $fields['deal_amount'] = [
+            'class' => NumberField::class,
+            'step' => 0.01,
+            'elementOptions' => ['min' => 0.01, 'data-sx-lead-deal-amount' => '1'],
+            'hint' => 'Разовая сумма, на которую договорились с клиентом.',
+            'options' => $this->statusFieldOptions([CmsLead::STATUS_SUCCESS]),
+        ];
         if ($this->model && $this->model->partner_id) {
+            $percentButtons = '';
+            foreach ([10, 20, 30] as $percent) {
+                $percentButtons .= Html::button($percent.'%', [
+                    'class' => 'sx-button sx-button--secondary sx-button--sm',
+                    'data-sx-lead-reward-percent' => $percent,
+                    'title' => $percent.'% от суммы сделки',
+                ]).' ';
+            }
             $fields['partner_reward_value'] = [
                 'class' => NumberField::class,
                 'step' => 0.01,
-                'elementOptions' => ['min' => 0.01],
-                'hint' => 'Обязательно при успешном завершении. Бонусы начисляются атомарно при сохранении.',
+                'elementOptions' => ['min' => 0.01, 'data-sx-lead-partner-reward' => '1'],
+                'hint' => 'Обязательно при успешном завершении. Бонусы начисляются атомарно при сохранении.'
+                    .'<div class="sx-lead-reward-percents">От суммы сделки: '.$percentButtons.'</div>',
                 'options' => $this->statusFieldOptions([CmsLead::STATUS_SUCCESS]),
             ];
         }

@@ -96,6 +96,17 @@ class CmsLead extends Core
             [['cms_site_id', 'submitted_by_id', 'partner_id', 'executor_id', 'cms_company_id', 'cms_user_id', 'processed_at', 'lock_version'], 'integer'],
             [['description', 'reject_reason', 'result_comment'], 'string'],
             [['partner_reward_value'], 'number', 'min' => 0.01, 'skipOnEmpty' => true],
+            [['deal_amount'], 'filter', 'filter' => static function ($value) {
+                return is_string($value) ? (trim(str_replace([' ', ','], ['', '.'], $value)) ?: null) : $value;
+            }],
+            [['deal_amount'], 'number', 'min' => 0.01, 'max' => 9999999999999999, 'skipOnEmpty' => true],
+            // Required when a lead becomes successful; earlier successes stay as they were.
+            [['deal_amount'], 'required', 'message' => 'Укажите сумму сделки',
+                'when' => static function (self $model) {
+                    return $model->status === self::STATUS_SUCCESS && $model->getOldAttribute('status') !== self::STATUS_SUCCESS;
+                },
+                'whenClient' => 'function (attribute, value) { return $("[data-sx-lead-status]").val() === "'.self::STATUS_SUCCESS.'"; }',
+            ],
             [['source_data'], 'safe'],
             [['name', 'source_name', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'], 'string', 'max' => 255],
             [['source_type', 'status'], 'string', 'max' => 32],
@@ -223,6 +234,7 @@ class CmsLead extends Core
         }
         if ($this->status !== self::STATUS_SUCCESS) {
             $this->result_comment = null;
+            $this->deal_amount = null;
         }
         $this->assignFirstStageOnStart($insert);
 
@@ -581,6 +593,17 @@ class CmsLead extends Core
         return $this->source_name ?: (self::sources()[$this->source_type] ?? $this->source_type);
     }
 
+    /** Deal amount for employees, e.g. «50 000 ₽»; empty when not set. */
+    public function getDealAmountAsText(): string
+    {
+        if ($this->deal_amount === null || $this->deal_amount === '') {
+            return '';
+        }
+        $amount = (float)$this->deal_amount;
+
+        return \Yii::$app->formatter->asDecimal($amount, floor($amount) == $amount ? 0 : 2).' ₽';
+    }
+
     public function getDisplayName(): string
     {
         return (string)$this->name;
@@ -643,6 +666,7 @@ class CmsLead extends Core
             'cms_user_id' => 'Клиент',
             'partner_reward_value' => 'Вознаграждение партнёру, бонусов',
             'result_comment' => 'Результат обработки',
+            'deal_amount' => 'Сумма сделки, ₽',
             'reject_reason' => 'Причина отклонения',
             'no_answer_count' => 'Неудачных попыток дозвониться',
             'cms_lead_stage_id' => 'Этап',
