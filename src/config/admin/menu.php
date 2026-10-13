@@ -497,6 +497,12 @@ return array_merge(dashboardsMenu(), [
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                         ],
                         [
+                            "label" => \Yii::t('skeeks/cms', "Причины отказа лидов"),
+                            "url"   => ["cms/admin-cms-lead-reject-reason"],
+                            'priority' => 900,
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
+                        ],
+                        [
                             "label" => \Yii::t('skeeks/cms', "Категории компаний"),
                             "url"   => ["cms/admin-cms-company-category"],
                             'priority' => 900,

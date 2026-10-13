@@ -21,6 +21,7 @@ use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsLeadEmail;
 use skeeks\cms\models\CmsLeadPhone;
+use skeeks\cms\models\CmsLeadRejectReason;
 use skeeks\cms\models\CmsLeadStage;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsSite;
@@ -311,6 +312,11 @@ class Skeeks extends Component implements BootstrapInterface
             'name'       => 'Этапы лидов',
             'name_one'   => 'Этап лида',
             'controller' => 'cms/admin-cms-lead-stage',
+        ],
+        CmsLeadRejectReason::class => [
+            'name'       => 'Причины отказа лидов',
+            'name_one'   => 'Причина отказа',
+            'controller' => 'cms/admin-cms-lead-reject-reason',
         ],
         CmsLeadPhone::class     => [
             'name'       => 'Телефоны лидов',

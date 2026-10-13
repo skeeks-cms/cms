@@ -41,7 +41,7 @@ class CmsLeadNoAnswerService
             $attempt = (int)$lead->no_answer_count;
 
             $decision = $form->isReject
-                ? $this->reject($lead, $attempt, $actorId)
+                ? $this->reject($lead, $attempt, $actorId, $form->reject_reason_id ? (int)$form->reject_reason_id : null)
                 : $this->planCall($lead, (int)$form->callbackTime, $actorId);
 
             $comment = Html::tag('p', 'Не дозвонились, попытка '.$attempt.'.').Html::tag('p', $decision);
@@ -104,9 +104,10 @@ class CmsLeadNoAnswerService
         return 'Поставлена задача «'.Html::encode($task->name).'» на '.$when.'.';
     }
 
-    private function reject(CmsLead $lead, int $attempt, int $actorId): string
+    private function reject(CmsLead $lead, int $attempt, int $actorId, ?int $reasonId): string
     {
         $lead->status = CmsLead::STATUS_REJECTED;
+        $lead->cms_lead_reject_reason_id = $reasonId;
         $lead->reject_reason = 'Не удалось дозвониться (попыток: '.$attempt.')';
         $lead->processed_at = time();
         if (!$lead->save()) {

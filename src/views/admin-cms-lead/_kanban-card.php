@@ -33,6 +33,10 @@ if ($model->executor) {
     <div class="sx-lead-kanban__meta"><?= Html::encode(implode(' · ', array_filter($meta))); ?></div>
     <?php if ($model->isTerminal) : ?>
         <?php $result = $model->status === \skeeks\cms\models\CmsLead::STATUS_REJECTED ? $model->reject_reason : $model->result_comment; ?>
+        <?php if ($model->status === \skeeks\cms\models\CmsLead::STATUS_REJECTED && $model->rejectReasonItem) : ?>
+            <span class="sx-status"><?= Html::encode($model->rejectReasonItem->name); ?></span>
+            <?php if ($result === $model->rejectReasonItem->name) { $result = null; } ?>
+        <?php endif; ?>
         <?php if ($result) : ?>
             <div class="sx-lead-kanban__meta"><?= Html::encode(\yii\helpers\StringHelper::truncate($result, 120)); ?></div>
         <?php endif; ?>

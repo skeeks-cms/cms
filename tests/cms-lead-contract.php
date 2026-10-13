@@ -81,14 +81,15 @@ if (strpos($editAction, "'icon' => 'fa fa-edit'") === false) {
     throw new RuntimeException('The dedicated lead edit action must use an available backend icon.');
 }
 if (strpos($controller, "'visibleFilters' => ['q', 'status', 'source_type']") === false) {
-    if (strpos($controller, "array_merge(['q', 'status', 'cms_lead_stage_id', 'next_step', 'source_type'], \$utmAttributes)") === false) {
+    if (strpos($controller, "array_merge(['q', 'status', 'cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], \$utmAttributes)") === false) {
         throw new RuntimeException('Lead filters must include source and canonical UTM attribution fields.');
     }
 }
 if (strpos($controller, "'update' => new UnsetArrayValue()") === false) {
     throw new RuntimeException('The inherited update action must not duplicate the dedicated lead edit action.');
 }
-foreach (["'label' => 'Результат обработки'", "'label' => 'Причина отклонения'"] as $label) {
+// The reject text label depends on whether the site uses a reason list.
+foreach (["'label' => 'Результат обработки'", "'Причина отклонения'", "'Комментарий к отказу'"] as $label) {
     if (strpos($controller, $label) === false) {
         throw new RuntimeException('Lead process fields must have Russian labels: '.$label);
     }

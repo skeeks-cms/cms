@@ -204,7 +204,7 @@ class CmsLeadBoardService
 
     private function query(?int $executorId): CmsLeadQuery
     {
-        $query = CmsLead::find()->forManager()->cmsSite()->with(['activeTasks', 'stage', 'executor']);
+        $query = CmsLead::find()->forManager()->cmsSite()->with(['activeTasks', 'stage', 'executor', 'rejectReasonItem']);
         if ($executorId) {
             $query->forExecutor($executorId);
         }

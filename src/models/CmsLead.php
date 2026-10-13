@@ -75,6 +75,7 @@ class CmsLead extends Core
                 ],
                 'relation_map' => [
                     'cms_lead_stage_id' => 'stage',
+                    'cms_lead_reject_reason_id' => 'rejectReasonItem',
                 ],
             ],
         ]);
@@ -114,9 +115,23 @@ class CmsLead extends Core
             [['executor_id'], 'required', 'when' => static function (self $model) {
                 return $model->status !== self::STATUS_NEW;
             }],
+            // With a site reason list the reason is chosen from it and the text is an optional comment.
             [['reject_reason'], 'required', 'message' => 'Укажите причину отклонения', 'when' => static function (self $model) {
-                return $model->status === self::STATUS_REJECTED;
+                return $model->status === self::STATUS_REJECTED && !CmsLeadRejectReason::siteHasReasons($model->cms_site_id);
             }],
+            [['cms_lead_reject_reason_id'], 'filter', 'filter' => static function ($value) {
+                return $value === '' ? null : $value;
+            }],
+            [['cms_lead_reject_reason_id'], 'integer'],
+            [['cms_lead_reject_reason_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLeadRejectReason::class,
+                'targetAttribute' => ['cms_lead_reject_reason_id' => 'id', 'cms_site_id' => 'cms_site_id'],
+                'message' => 'Причина не найдена на этом сайте.'],
+            [['cms_lead_reject_reason_id'], 'required', 'message' => 'Выберите причину отказа',
+                'when' => static function (self $model) {
+                    return $model->status === self::STATUS_REJECTED && CmsLeadRejectReason::siteHasReasons($model->cms_site_id);
+                },
+                'whenClient' => 'function (attribute, value) { return $("[data-sx-lead-status]").val() === "'.self::STATUS_REJECTED.'"; }',
+            ],
             [['result_comment'], 'required', 'message' => 'Укажите результат обработки лида', 'when' => static function (self $model) {
                 return $model->status === self::STATUS_SUCCESS;
             }],
@@ -200,6 +215,11 @@ class CmsLead extends Core
         }
         if ($this->status !== self::STATUS_REJECTED) {
             $this->reject_reason = null;
+            $this->cms_lead_reject_reason_id = null;
+        } elseif ($this->cms_lead_reject_reason_id && trim((string)$this->reject_reason) === '') {
+            // Partner cabinets, notifications and API read the text: keep it filled.
+            $reason = CmsLeadRejectReason::findOne((int)$this->cms_lead_reject_reason_id);
+            $this->reject_reason = $reason ? $reason->name : $this->reject_reason;
         }
         if ($this->status !== self::STATUS_SUCCESS) {
             $this->result_comment = null;
@@ -626,6 +646,7 @@ class CmsLead extends Core
             'reject_reason' => 'Причина отклонения',
             'no_answer_count' => 'Неудачных попыток дозвониться',
             'cms_lead_stage_id' => 'Этап',
+            'cms_lead_reject_reason_id' => 'Причина отказа',
         ]);
     }
 
@@ -635,6 +656,7 @@ class CmsLead extends Core
     public function getCompany() { return $this->hasOne(CmsCompany::class, ['id' => 'cms_company_id']); }
     public function getClient() { return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']); }
     public function getStage() { return $this->hasOne(CmsLeadStage::class, ['id' => 'cms_lead_stage_id']); }
+    public function getRejectReasonItem() { return $this->hasOne(CmsLeadRejectReason::class, ['id' => 'cms_lead_reject_reason_id']); }
     public function getPhones() { return $this->hasMany(CmsLeadPhone::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     public function getEmails() { return $this->hasMany(CmsLeadEmail::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     /** @return \skeeks\cms\models\queries\CmsTaskQuery */

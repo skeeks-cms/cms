@@ -272,3 +272,14 @@ With stages configured, the kanban hides the empty "in work without stage"
 column: it only holds leads taken into work before stages existed.
 AdminCmsLeadController::$defaultAction is "kanban" (tabs: Канбан, Таблица,
 Новый лид); related lead tabs in company/client cards still render the table.
+
+## Lead reject reasons
+
+CmsLeadRejectReason (m261013_140000, per site, unique name, sort, one
+is_no_answer default) is managed by administrators in "Причины отказа лидов".
+Once a site has reasons, a rejected lead must have cms_lead_reject_reason_id
+and reject_reason becomes an optional comment; without reasons the text stays
+required as before. beforeSave copies the reason name into an empty
+reject_reason, because the UPA partner cabinet, notifications and API read the
+text. The no-answer form preselects the is_no_answer reason when closing.
+CmsLeadStatusWidget(showStage) also shows the reason of a rejected lead.

@@ -8,6 +8,7 @@
 namespace skeeks\cms\forms;
 
 use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadRejectReason;
 use yii\base\Model;
 
 /**
@@ -35,6 +36,29 @@ class CmsLeadNoAnswerForm extends Model
     /** @var int|string|null Unix time from the date control. */
     public $callback_at;
     public $comment;
+    /** @var int|string|null Reason from the site list when the lead is closed. */
+    public $reject_reason_id;
+
+    public function init()
+    {
+        parent::init();
+        if ($this->reject_reason_id === null && $this->lead instanceof CmsLead) {
+            $this->reject_reason_id = $this->noAnswerReasonId();
+        }
+    }
+
+    /** The site reason marked for this form, if any. */
+    private function noAnswerReasonId(): ?int
+    {
+        try {
+            $id = CmsLeadRejectReason::find()->cmsSite((int)$this->lead->cms_site_id)
+                ->andWhere(['is_no_answer' => 1])->select(['id'])->scalar();
+        } catch (\yii\db\Exception $e) {
+            return null;
+        }
+
+        return $id ? (int)$id : null;
+    }
 
     public static function nextOptions(): array
     {
@@ -65,7 +89,26 @@ class CmsLeadNoAnswerForm extends Model
                 'when' => fn() => $this->next === self::NEXT_CUSTOM, 'whenClient' => $isCustomClient,
                 'message' => 'Время звонка уже прошло.'],
             [['comment'], 'string', 'max' => 5000],
+            [['reject_reason_id'], 'filter', 'filter' => static function ($value) {
+                return $value === '' ? null : $value;
+            }],
+            [['reject_reason_id'], 'integer'],
+            [['reject_reason_id'], 'required', 'message' => 'Выберите причину отказа.',
+                'when' => fn() => $this->next === self::NEXT_REJECT && $this->lead instanceof CmsLead
+                    && CmsLeadRejectReason::siteHasReasons($this->lead->cms_site_id),
+                'whenClient' => 'function () { return $("#'.\yii\helpers\Html::getInputId($this, 'next').'").val() === "'.self::NEXT_REJECT.'"; }'],
+            [['reject_reason_id'], 'validateReason'],
         ];
+    }
+
+    public function validateReason($attribute)
+    {
+        if ($this->next !== self::NEXT_REJECT || !$this->reject_reason_id || !$this->lead instanceof CmsLead) {
+            return;
+        }
+        if (!CmsLeadRejectReason::find()->cmsSite((int)$this->lead->cms_site_id)->andWhere(['id' => (int)$this->reject_reason_id])->exists()) {
+            $this->addError($attribute, 'Причина не найдена на этом сайте.');
+        }
     }
 
     public function attributeLabels()
@@ -74,6 +117,7 @@ class CmsLeadNoAnswerForm extends Model
             'next' => 'Что дальше',
             'callback_at' => 'Когда перезвонить',
             'comment' => 'Комментарий',
+            'reject_reason_id' => 'Причина отказа',
         ];
     }
 

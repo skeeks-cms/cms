@@ -21,8 +21,9 @@ class CmsLeadStatusWidget extends Widget
     public $options = [];
 
     /**
-     * Also show the internal work stage of a lead in work. Stages are an
-     * employee tool: keep it off for partner and customer cabinets.
+     * Also show internal details: the work stage of a lead in work and the
+     * reject reason of a rejected lead. They are employee tools: keep it off
+     * for partner and customer cabinets.
      *
      * @var bool
      */
@@ -57,12 +58,20 @@ class CmsLeadStatusWidget extends Widget
             $options
         );
 
-        $stage = $this->showStage && $this->lead->status === CmsLead::STATUS_IN_WORK ? $this->lead->stage : null;
-        if (!$stage) {
+        $detail = '';
+        if ($this->showStage && $this->lead->status === CmsLead::STATUS_IN_WORK && $this->lead->stage) {
+            $detail = self::renderStage($this->lead->stage);
+        } elseif ($this->showStage && $this->lead->status === CmsLead::STATUS_REJECTED && $this->lead->rejectReasonItem) {
+            $detail = Html::tag('span', Html::encode($this->lead->rejectReasonItem->name), [
+                'class' => 'sx-status',
+                'title' => 'Причина отказа',
+            ]);
+        }
+        if ($detail === '') {
             return $status;
         }
 
-        return Html::tag('span', $status.self::renderStage($stage), [
+        return Html::tag('span', $status.$detail, [
             'class' => 'sx-collection-cell '.($this->stageInline ? 'sx-collection-cell--inline' : 'sx-collection-cell--stack'),
         ]);
     }

@@ -10,6 +10,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\models\CmsLeadRejectReason;
 use skeeks\cms\models\CmsLeadStage;
 use skeeks\cms\services\CmsLeadBoardService;
 use skeeks\cms\forms\CmsLeadNoAnswerForm;
@@ -81,7 +82,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                     'action' => ['backendAction' => 'create', 'label' => 'Добавить лид'],
                 ],
                 'filters' => [
-                    'visibleFilters' => array_merge(['q', 'status', 'cms_lead_stage_id', 'next_step', 'source_type'], $utmAttributes),
+                    'visibleFilters' => array_merge(['q', 'status', 'cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], $utmAttributes),
                     'filtersModel' => [
                         'rules' => [[array_merge(['q', 'next_step'], $utmAttributes), 'safe']],
                         'attributeDefines' => array_merge(['q', 'next_step'], $utmAttributes),
@@ -108,13 +109,14 @@ class AdminCmsLeadController extends BackendModelStandartController
                             ],
                             'status' => $this->selectFilter(CmsLead::statuses()),
                             'cms_lead_stage_id' => $this->selectFilter($this->stageItems()),
+                            'cms_lead_reject_reason_id' => $this->selectFilter($this->rejectReasonItems()),
                             'source_type' => $this->selectFilter(CmsLead::sources()),
                         ], $this->utmFilters()),
                     ],
                 ],
                 'grid' => [
                     'on init' => static function (Event $event) {
-                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(['activeTasks', 'stage']);
+                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(['activeTasks', 'stage', 'rejectReasonItem']);
                     },
                     'defaultPageSize' => 50,
                     'defaultOrder' => ['created_at' => SORT_DESC],
@@ -179,7 +181,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                     $model->cms_site_id = (int)\Yii::$app->skeeks->site->id;
                     foreach (['submitted_by_id', 'cms_company_id', 'cms_user_id', 'source_ref', 'source_url', 'source_data',
                         'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'processed_at',
-                        'reject_reason', 'result_comment', 'cms_lead_stage_id'] as $attribute) {
+                        'reject_reason', 'result_comment', 'cms_lead_stage_id', 'cms_lead_reject_reason_id'] as $attribute) {
                         $model->{$attribute} = null;
                     }
                     $model->status = $model->executor_id
@@ -230,7 +232,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                     $protected = [
                         'cms_site_id', 'submitted_by_id', 'cms_company_id', 'cms_user_id', 'source_ref', 'source_url',
                         'source_data', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
-                        'status', 'reject_reason', 'result_comment', 'processed_at', 'cms_lead_stage_id',
+                        'status', 'reject_reason', 'result_comment', 'processed_at', 'cms_lead_stage_id', 'cms_lead_reject_reason_id',
                     ];
                     if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         $protected[] = 'executor_id';
@@ -362,10 +364,12 @@ class AdminCmsLeadController extends BackendModelStandartController
 
         $nextId = Html::getInputId($form, 'next');
         $timeFieldClass = 'field-'.Html::getInputId($form, 'callback_at');
+        $reasonFieldClass = 'field-'.Html::getInputId($form, 'reject_reason_id');
         $this->view->registerJs(<<<JS
 (function() {
     var toggle = function() {
         $('.{$timeFieldClass}').toggle($('#{$nextId}').val() === 'custom');
+        $('.{$reasonFieldClass}').toggle($('#{$nextId}').val() === 'reject');
     };
     $('body').off('change.sxLeadNoAnswer').on('change.sxLeadNoAnswer', '#{$nextId}', toggle);
     toggle();
@@ -373,13 +377,23 @@ class AdminCmsLeadController extends BackendModelStandartController
 JS
         );
 
-        return [
+        $fields = [
             'noAnswer.next' => [
                 'class' => SelectField::class,
                 'items' => CmsLeadNoAnswerForm::nextOptions(),
                 'allowNull' => false,
                 'hint' => 'Это '.$attempt.'-я попытка дозвониться. '.$taskHint,
             ],
+        ];
+        $reasonItems = $this->rejectReasonItems();
+        if ($reasonItems) {
+            $fields['noAnswer.reject_reason_id'] = [
+                'class' => SelectField::class,
+                'items' => $reasonItems,
+            ];
+        }
+
+        return $fields + [
             'noAnswer.callback_at' => [
                 'class' => WidgetField::class,
                 'widgetClass' => DateControl::class,
@@ -425,7 +439,7 @@ JS
 
             $column = (string)\Yii::$app->request->post('column');
             if ((new CmsLeadBoardService())->move($lead, $column, (int)\Yii::$app->user->id)) {
-                $lead = CmsLead::find()->with(['activeTasks', 'stage', 'executor'])->andWhere(['id' => $lead->id])->one();
+                $lead = CmsLead::find()->with(['activeTasks', 'stage', 'executor', 'rejectReasonItem'])->andWhere(['id' => $lead->id])->one();
                 $response->data = ['card' => $this->renderPartial('_kanban-card', ['model' => $lead])];
             } else {
                 $status = $column === CmsLeadBoardService::COLUMN_SUCCESS ? CmsLead::STATUS_SUCCESS : CmsLead::STATUS_REJECTED;
@@ -442,6 +456,16 @@ JS
         }
 
         return $response;
+    }
+
+    /** Reject reason choices of the current site; empty until the table exists. */
+    private function rejectReasonItems(): array
+    {
+        try {
+            return ArrayHelper::map(CmsLeadRejectReason::forSite(), 'id', 'name');
+        } catch (\yii\db\Exception $e) {
+            return [];
+        }
     }
 
     /** Stage choices of the current site; empty until the stage table exists. */
@@ -724,10 +748,19 @@ JS
             'elementOptions' => ['rows' => 5],
             'options' => $this->statusFieldOptions([CmsLead::STATUS_SUCCESS]),
         ];
+        $reasonItems = $this->rejectReasonItems();
+        if ($reasonItems) {
+            $fields['cms_lead_reject_reason_id'] = [
+                'class' => SelectField::class,
+                'items' => $reasonItems,
+                'options' => $this->statusFieldOptions([CmsLead::STATUS_REJECTED]),
+            ];
+        }
         $fields['reject_reason'] = [
             'class' => TextareaField::class,
-            'label' => 'Причина отклонения',
-            'elementOptions' => ['rows' => 5],
+            'label' => $reasonItems ? 'Комментарий к отказу' : 'Причина отклонения',
+            'hint' => $reasonItems ? 'Необязательно. Если не заполнить, сохранится название причины.' : null,
+            'elementOptions' => ['rows' => $reasonItems ? 3 : 5],
             'options' => $this->statusFieldOptions([CmsLead::STATUS_REJECTED]),
         ];
 
