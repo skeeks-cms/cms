@@ -10,7 +10,9 @@ namespace skeeks\cms\models\queries;
 
 use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsCompany2contractor;
 use skeeks\cms\models\CmsContractor;
+use skeeks\cms\models\CmsContractorMap;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
@@ -161,16 +163,17 @@ class CmsContractorQuery extends CmsActiveQuery
             $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
             $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
 
-            $this->joinWith("users as users");
-            $this->joinWith("companies as companies");
-
-            //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
+            //Подзапросы вместо join: join по связям размножал строки контрагента
             $this->andWhere([
                 'or',
-                //Связь клиентов с менеджерами
-                ["companies.id" => $cmsCompanyQuery],
-                //Искать конткты по всем доступным компаниям
-                ["users.id" => $cmsUserQuery],
+                //Контрагенты доступных компаний
+                [$this->getPrimaryTableName() . ".id" => CmsCompany2contractor::find()
+                    ->select(CmsCompany2contractor::tableName() . '.cms_contractor_id')
+                    ->andWhere([CmsCompany2contractor::tableName() . '.cms_company_id' => $cmsCompanyQuery])],
+                //Контрагенты доступных клиентов
+                [$this->getPrimaryTableName() . ".id" => CmsContractorMap::find()
+                    ->select(CmsContractorMap::tableName() . '.cms_contractor_id')
+                    ->andWhere([CmsContractorMap::tableName() . '.cms_user_id' => $cmsUserQuery])],
             ]);
         }
 
