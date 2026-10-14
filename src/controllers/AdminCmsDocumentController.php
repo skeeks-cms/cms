@@ -1286,7 +1286,12 @@ JS
                 $renderRowsField('Авансовые счета-фактуры', ['upd', 'advance_documents'], $advanceColumns, $advanceRows('upd'), ['number' => '', 'date' => '']).
                 '<div class="row">'.
                 '<div class="col-md-6">'.$control('Грузоотправитель и адрес', ['upd', 'shipper']).'</div>'.
-                '<div class="col-md-6">'.$control('Грузополучатель и адрес', ['upd', 'consignee']).'</div>'.
+                '</div>'.
+                '<div class="row">'.
+                '<div class="col-md-6">'.$control('Грузополучатель', ['upd', 'consignee']).'</div>'.
+                '<div class="col-md-6">'.$control('Адрес грузополучателя', ['upd', 'consignee_address'], [
+                    'inputOptions' => ['placeholder' => 'Если не указан — адрес покупателя'],
+                ]).'</div>'.
                 '</div>'.
                 '<div class="row">'.
                 '<div class="col-md-4">'.$control('Вид документа-основания', ['upd', 'base_document_name'], ['default' => 'Счет']).'</div>'.
