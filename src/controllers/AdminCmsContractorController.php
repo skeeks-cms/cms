@@ -469,6 +469,14 @@ JS
 
         ];
 
+        if ($model->hasAttribute('delivery_address')) {
+            //Адрес грузополучателя в документах — сразу после почтового индекса
+            $position = array_search('mailing_postcode', array_keys($fieldSet2), true) + 1;
+            $fieldSet2 = array_slice($fieldSet2, 0, $position, true)
+                + ['delivery_address' => ['class' => TextareaField::class]]
+                + array_slice($fieldSet2, $position, null, true);
+        }
+
         $fieldSet3 = [
 
 

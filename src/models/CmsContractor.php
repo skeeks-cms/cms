@@ -36,6 +36,7 @@ use yii\validators\EmailValidator;
  * @property string|null         $address Адрес организации
  * @property string|null         $mailing_address Почтовый адрес (для отправки писем)
  * @property string|null         $mailing_postcode Почтовый индекс
+ * @property string|null         $delivery_address Адрес доставки (адрес грузополучателя в документах)
  * @property int|null            $cms_image_id Фото
  * @property int|null            $stamp_id Печать
  * @property int|null            $director_signature_id Подпись директора
@@ -240,6 +241,12 @@ class CmsContractor extends ActiveRecord
             $rules[] = [['registration_date'], 'default', 'value' => null];
         }
 
+        if ($this->hasAttribute('delivery_address')) {
+            $rules[] = [['delivery_address'], 'string', 'max' => 255];
+            $rules[] = [['delivery_address'], 'trim'];
+            $rules[] = [['delivery_address'], 'default', 'value' => null];
+        }
+
         return $rules;
     }
 
@@ -265,6 +272,7 @@ class CmsContractor extends ActiveRecord
             'address'                 => 'Адрес',
             'mailing_address'         => 'Почтовый адрес',
             'mailing_postcode'        => 'Индекс',
+            'delivery_address'        => 'Адрес доставки',
             'cms_image_id'            => 'Фото или логотип',
             'stamp_id'                => 'Печать',
             'director_signature_id'   => 'Подпись директора',
@@ -286,6 +294,7 @@ class CmsContractor extends ActiveRecord
             'stamp_id'                => 'Используется при формировании счетов',
             'director_signature_id'   => 'Используется при формировании счетов',
             'signature_accountant_id' => 'Используется при формировании счетов',
+            'delivery_address'        => 'Подставляется адресом грузополучателя в УПД, накладную и счёт-фактуру. Если не заполнен — юридический адрес.',
         ]);
     }
 

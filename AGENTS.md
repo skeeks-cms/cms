@@ -307,3 +307,13 @@ A successful lead's amount is corrected through the hidden deal-amount action
 (header button "Сумма сделки", executor or administrator, DynamicModel form).
 It saves only deal_amount: the status does not change, so EVENT_PARTNER_SUCCESS
 and the partner reward are not triggered again.
+
+## Contractor delivery address
+
+cms_contractor.delivery_address (m261015_020000, varchar 255, null) is the
+consignee address used in documents. It is edited in the client contractor
+form after the postcode and shown in the card; "our" contractors do not have
+it. skeeks/cms-shop ShopDocument::createFromBill fills consignee_address of
+UPD, waybill and invoice-facture from it, falling back to the buyer address.
+Model rules, form and card access it through hasAttribute(), so code works
+before the migration is applied. The API writes it through safeAttributes.

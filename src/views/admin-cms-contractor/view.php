@@ -266,6 +266,12 @@ CSS
                 <div class="sx-contractor-label">Почтовый адрес</div>
                 <div class="sx-contractor-value"><?= $formatValue(trim($model->mailing_postcode.' '.$model->mailing_address)); ?></div>
             </div>
+            <?php if ($model->hasAttribute('delivery_address')) : ?>
+                <div class="sx-surface sx-contractor-info">
+                    <div class="sx-contractor-label">Адрес доставки</div>
+                    <div class="sx-contractor-value"><?= $formatValue($model->delivery_address); ?></div>
+                </div>
+            <?php endif; ?>
             <div class="sx-surface sx-contractor-info">
                 <div class="sx-contractor-label">Телефон</div>
                 <div class="sx-contractor-value">
