@@ -12,6 +12,7 @@ use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContractor;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
 /**
@@ -157,8 +158,8 @@ class CmsContractorQuery extends CmsActiveQuery
         //Если нет прав админа, нужно показать только доступные сделки
         if (!$isCanAdmin) {
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id');
-            $cmsUserQuery = CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id');
+            $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
+            $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
 
             $this->joinWith("users as users");
             $this->joinWith("companies as companies");
