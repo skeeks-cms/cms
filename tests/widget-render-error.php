@@ -1,5 +1,6 @@
 <?php
 define('YII_ENABLE_ERROR_HANDLER', false);
+define('YII_DEBUG', in_array('--debug', $argv, true));
 $vendor = (getenv('SKEEKS_APP_ROOT') ?: '/app').'/vendor';
 require $vendor.'/autoload.php';
 require $vendor.'/yiisoft/yii2/Yii.php';
@@ -31,6 +32,17 @@ foreach ([new RuntimeException('private SQL /var/www/site'), new Error('private 
     $app->cache->flush();
     $widget = new FailingRenderableWidget(['is_cache' => true]);
     $widget->failure = $failure;
+    if (YII_DEBUG) {
+        try {
+            $widget->run();
+            throw new RuntimeException('Debug failure swallowed');
+        } catch (Throwable $caught) {
+            if ($caught !== $failure) { throw $caught; }
+        }
+        $widget->failure = null;
+        if ($widget->run() !== 'recovered') { throw new RuntimeException('Debug failure cached'); }
+        continue;
+    }
     $result = $widget->run();
     if (strpos($result, 'Не удалось загрузить блок') === false || strpos($result, 'private') !== false) {
         throw new RuntimeException('Failure details exposed');
@@ -47,4 +59,6 @@ foreach ([new RuntimeException('private SQL /var/www/site'), new Error('private 
         throw new RuntimeException('Successful widget cache regressed');
     }
 }
-echo "PASS: exceptions and PHP errors stay private, are logged, are not cached; successful rendering is cached\n";
+echo YII_DEBUG
+    ? "PASS: debug mode propagates original exceptions and PHP errors without caching\n"
+    : "PASS: exceptions and PHP errors stay private, are logged, are not cached; successful rendering is cached\n";
