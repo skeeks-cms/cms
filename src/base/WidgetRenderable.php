@@ -182,12 +182,11 @@ class WidgetRenderable extends Widget
                         'widget' => $this,
                     ]));
                 } catch (\Throwable $e) {
-                    if (YII_DEBUG) {
-                        throw $e;
-                    }
                     \Yii::error($e, __METHOD__);
                     // Do not expose internals or cache a transient rendering failure.
-                    return \Yii::t('skeeks/cms', 'Не удалось загрузить блок. Попробуйте обновить страницу позже.');
+                    return YII_DEBUG
+                        ? $e->getTraceAsString()
+                        : \Yii::t('skeeks/cms', 'Не удалось загрузить блок. Попробуйте обновить страницу позже.');
                 }
                 
             } else {
