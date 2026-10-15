@@ -33,12 +33,7 @@ foreach ([new RuntimeException('private SQL /var/www/site'), new Error('private 
     $widget = new FailingRenderableWidget(['is_cache' => true]);
     $widget->failure = $failure;
     if (YII_DEBUG) {
-        try {
-            $widget->run();
-            throw new RuntimeException('Debug failure swallowed');
-        } catch (Throwable $caught) {
-            if ($caught !== $failure) { throw $caught; }
-        }
+        if ($widget->run() !== $failure->getTraceAsString()) { throw new RuntimeException('Debug trace missing'); }
         $widget->failure = null;
         if ($widget->run() !== 'recovered') { throw new RuntimeException('Debug failure cached'); }
         continue;
@@ -60,5 +55,5 @@ foreach ([new RuntimeException('private SQL /var/www/site'), new Error('private 
     }
 }
 echo YII_DEBUG
-    ? "PASS: debug mode propagates original exceptions and PHP errors without caching\n"
+    ? "PASS: debug mode renders original exception and PHP error traces without caching\n"
     : "PASS: exceptions and PHP errors stay private, are logged, are not cached; successful rendering is cached\n";
