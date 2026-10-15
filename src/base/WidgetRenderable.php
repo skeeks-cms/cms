@@ -181,8 +181,10 @@ class WidgetRenderable extends Widget
                     $result = $this->render($this->viewFile, ArrayHelper::merge($this->params, [
                         'widget' => $this,
                     ]));
-                } catch (\Exception $e) {
-                    $result = $e->getTraceAsString();
+                } catch (\Throwable $e) {
+                    \Yii::error($e, __METHOD__);
+                    // Do not expose internals or cache a transient rendering failure.
+                    return \Yii::t('skeeks/cms', 'Не удалось загрузить блок. Попробуйте обновить страницу позже.');
                 }
                 
             } else {
