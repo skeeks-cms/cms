@@ -534,7 +534,7 @@ class CmsSavedFilter extends ActiveRecord
                 if ($this->_brand || $this->_country) {
                     $this->_seoName = $this->cmsTree->seoName." ".$this->propertyValueNameInflected;
                 } else {
-                   $this->_seoName = $this->cmsTree->seoName." ".StringHelper::lcfirst($this->propertyValueNameInflected);
+                   $this->_seoName = $this->cmsTree->seoName." ".static::lcfirstWord($this->propertyValueNameInflected);
                 }
 
             }
@@ -557,12 +557,29 @@ class CmsSavedFilter extends ActiveRecord
         if ($this->_brand || $this->_country) {
             $this->_shortSeoName = $this->cmsTree->name." ".$this->propertyValueNameInflected;
         } else {
-           $this->_shortSeoName = $this->cmsTree->name." ".StringHelper::lcfirst($this->propertyValueNameInflected);
+           $this->_shortSeoName = $this->cmsTree->name." ".static::lcfirstWord($this->propertyValueNameInflected);
         }
 
-
-
         return $this->_shortSeoName;
+    }
+
+    /**
+     * Значение фильтра в середине названия «раздел + значение»: обычное русское слово пишется со строчной
+     * («Датчики тока компенсационные»), а аббревиатуры, маркировки и латинские названия сохраняют регистр
+     * («Датчики тока ДТК», «Датчики тока LEM», «Микросхемы Allegro»), иначе получалось «дТК», «lEM», «allegro».
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function lcfirstWord($value)
+    {
+        $value = (string)$value;
+        // the first word with its hyphenated parts must be an ordinary Russian word: «Компенсационный», not «ДТК», «LEM», «Горизонт-Плюс»
+        if (preg_match('/^[\p{L}\-]+/u', $value, $m) && preg_match('/^[А-ЯЁ][а-яё]+(-[а-яё]+)*$/u', $m[0])) {
+            return StringHelper::lcfirst($value);
+        }
+
+        return $value;
     }
 
 
