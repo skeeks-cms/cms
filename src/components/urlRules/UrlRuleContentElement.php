@@ -10,8 +10,10 @@ namespace skeeks\cms\components\urlRules;
 
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\Tree;
 use \yii\base\InvalidConfigException;
+use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Application;
@@ -180,6 +182,11 @@ class UrlRuleContentElement
         }
 
         if (preg_match('/\/(?<code>\S+)\-(?<id>\d+)$/i', "/" . $pathInfo, $matches)) {
+            //Раздел с кодом вида «vypusk-1» — адрес раздела, а не элемента: уступаем UrlRuleTree
+            if ($this->isTreeDir($pathInfo)) {
+                return false;
+            }
+
             return [
                 'cms/content-element/view', [
                     'id' => $matches['id'],
@@ -192,6 +199,10 @@ class UrlRuleContentElement
          * @deprecated 
          */
         if (preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
+            if ($this->isTreeDir($pathInfo)) {
+                return false;
+            }
+
             return [
                 'cms/content-element/view', [
                     'id' => $matches['id'],
@@ -206,7 +217,36 @@ class UrlRuleContentElement
         }*/
 
 
-        
+
+    }
+
+    /**
+     * Есть ли у текущего сайта раздел ровно с таким путем (dir).
+     * Запрос кешируется по тому же тегу, что и в UrlRuleTree.
+     *
+     * @param string $dir
+     * @return bool
+     */
+    protected function isTreeDir($dir)
+    {
+        $dir = trim((string)$dir, '/');
+        if ($dir === '' || !isset(\Yii::$app->skeeks) || !\Yii::$app->skeeks->site) {
+            return false;
+        }
+
+        $siteId = \Yii::$app->skeeks->site->id;
+        $dependency = new TagDependency([
+            'tags' => [
+                (new CmsTree())->getTableCacheTagCmsSite(),
+            ],
+        ]);
+
+        return (bool)CmsTree::getDb()->cache(function ($db) use ($dir, $siteId) {
+            return CmsTree::find()->where([
+                "dir"         => $dir,
+                "cms_site_id" => $siteId,
+            ])->exists();
+        }, null, $dependency);
     }
 
 
