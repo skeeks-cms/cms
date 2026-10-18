@@ -109,6 +109,18 @@ For dynamic content fields, start with the compact
 `cms_content_property_enum_list`. Do not request every component setting or
 enum value when only field names and codes are needed.
 
+To add or change content properties (administration «Характеристики»), use
+the administrator-only `cms_content_property_*` mutation tools (cms-mcp 1.0.13
+or newer) instead of server scripts or migrations for site data. Search for an
+existing property first (`cms_content_property_list` with `q`), read
+`cms_content_property_component_list`, then call `cms_content_property_create`
+with `name`, `code`, `component` and `content_ids` (for products — the product
+content); optional `tree_ids` limit it to sections. For list properties add
+values with `cms_content_property_enum_create_batch` (up to 100, existing values
+are returned, not duplicated) and edit them with
+`cms_content_property_enum_update`. Read the property back with
+`cms_content_property_get`. There are no delete tools.
+
 For sites with `skeeks/cms-module-form2`, manage `/form2/admin-form` through
 the `form2_*` tools. Read `form2_form_property_component_list` before choosing
 field types. Use `form2_form_create_full` for atomic creation of a form with
