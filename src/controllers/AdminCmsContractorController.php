@@ -263,8 +263,9 @@ HTML
 <div class="col-12" style="margin-top: 15px;margin-bottom: 15px;">
     <div class="d-flex">
         <input type="text" id="sx-inn" style="max-width: 350px;" class="form-control" placeholder="Укажите ИНН" />
-        <button class="btn btn-default sx-btn-auto-inn">Найти и заполнить</button>
+        <button class="btn btn-default sx-btn-auto-inn">Заполнить по ИНН</button>
     </div>
+    <small class="form-text text-muted">Поля заполнятся из нашей базы или из открытых данных о компаниях. Можно заполнить и вручную.</small>
 </div>
 HTML
                     ,
@@ -359,7 +360,16 @@ $(".sx-btn-auto-inn").on("click", function() {
     var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
     ajaxHandler.on("success", function(e, response) {
         var companyData = response.data;
-        
+
+        // Requisites already in our base: their attributes as is.
+        if (companyData.local) {
+            $.each(companyData.local, function(attribute, value) {
+                $("#cmscontractor-" + attribute).val(value === null ? '' : value);
+            });
+            $("#cmscontractor-contractor_type").trigger("change");
+            return;
+        }
+
         $("#cmscontractor-address").val(companyData.data.address.unrestricted_value);
         $("#cmscontractor-mailing_address").val(companyData.data.address.unrestricted_value);
         $("#cmscontractor-mailing_postcode").val(companyData.data.address.data.postal_code);
@@ -587,20 +597,42 @@ JS
         $rr = new RequestResponse();
 
         try {
+            $inn = preg_replace('/\D+/', '', (string)\Yii::$app->request->post("inn"));
+            if ($inn === '') {
+                throw new Exception("Укажите ИНН.");
+            }
 
-            if ($inn = \Yii::$app->request->post("inn")) {
+            // Our base first: it works without external services, and a saved
+            // contractor with this INN is linked instead of being duplicated.
+            if ($local = CmsContractor::find()->andWhere(['inn' => $inn])->one()) {
+                $rr->success = true;
+                $rr->message = "Реквизиты с этим ИНН уже есть в базе — поля заполнены, при сохранении они будут привязаны.";
+                // Legal data only: contacts and notes of another record stay private.
+                $rr->data = ['local' => $local->toArray([
+                    'contractor_type', 'name', 'full_name', 'international_name',
+                    'first_name', 'last_name', 'patronymic',
+                    'inn', 'kpp', 'ogrn', 'okpo', 'address', 'mailing_address', 'mailing_postcode',
+                ])];
+                return $rr;
+            }
 
+            if (!\Yii::$app->has('dadataClient')) {
+                throw new Exception("Автозаполнение недоступно: сервис данных о компаниях не подключён. Заполните поля вручную.");
+            }
+            try {
                 $dadata = \Yii::$app->dadataClient->suggest->findByIdParty($inn);
-                if (isset($dadata[0]) && $dadata[0]) {
-                    //Создать компанию
-                    $party = new PartyModel($dadata[0]);
+            } catch (\Throwable $e) {
+                \Yii::warning("DaData: ".$e->getMessage(), self::class);
+                throw new Exception("Сервис данных о компаниях сейчас недоступен. Заполните поля вручную.");
+            }
+            if (isset($dadata[0]) && $dadata[0]) {
+                $party = new PartyModel($dadata[0]);
 
-                    $rr->success = true;
-                    $rr->message = "Данные заполнены";
-                    $rr->data = $party->toArray();
-                } else {
-                    throw new Exception("По этом ИНН ничего не надйено!");
-                }
+                $rr->success = true;
+                $rr->message = "Данные заполнены";
+                $rr->data = $party->toArray();
+            } else {
+                throw new Exception("По этому ИНН ничего не найдено. Заполните поля вручную.");
             }
 
         } catch (\Exception $e) {

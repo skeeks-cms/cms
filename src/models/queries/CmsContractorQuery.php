@@ -13,6 +13,8 @@ use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsCompany2contractor;
 use skeeks\cms\models\CmsContractor;
 use skeeks\cms\models\CmsContractorMap;
+use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLead2contractor;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
@@ -162,10 +164,15 @@ class CmsContractorQuery extends CmsActiveQuery
 
             $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
             $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
+            $cmsLeadQuery = CmsLead::find()->forManager($user)->select(CmsLead::tableName() . '.id');
 
             //Подзапросы вместо join: join по связям размножал строки контрагента
             $this->andWhere([
                 'or',
+                //Реквизиты доступных лидов (до создания компании)
+                [$this->getPrimaryTableName() . ".id" => CmsLead2contractor::find()
+                    ->select(CmsLead2contractor::tableName() . '.cms_contractor_id')
+                    ->andWhere([CmsLead2contractor::tableName() . '.cms_lead_id' => $cmsLeadQuery])],
                 //Контрагенты доступных компаний
                 [$this->getPrimaryTableName() . ".id" => CmsCompany2contractor::find()
                     ->select(CmsCompany2contractor::tableName() . '.cms_contractor_id')

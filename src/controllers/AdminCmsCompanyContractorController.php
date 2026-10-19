@@ -1,0 +1,59 @@
+<?php
+
+namespace skeeks\cms\controllers;
+
+use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsCompany2contractor;
+use skeeks\cms\models\CmsContractor;
+use yii\db\ActiveRecord;
+
+/** Requisites of a company: `create?company_id=<id>`. */
+class AdminCmsCompanyContractorController extends AdminCmsContractorAttachController
+{
+    public function init()
+    {
+        parent::init();
+        $this->name = 'Реквизиты компании';
+    }
+
+    protected function ownerParam(): string
+    {
+        return 'company_id';
+    }
+
+    protected function findOwner(int $id): ?ActiveRecord
+    {
+        return CmsCompany::find()->forManager()->andWhere([CmsCompany::tableName().'.id' => $id])->one();
+    }
+
+    protected function canAttach(ActiveRecord $owner): bool
+    {
+        return \Yii::$app->user->can('cms/admin-company/manage', ['model' => $owner]);
+    }
+
+    protected function isAttached(ActiveRecord $owner, CmsContractor $contractor): bool
+    {
+        return CmsCompany2contractor::find()
+            ->andWhere(['cms_company_id' => (int)$owner->id, 'cms_contractor_id' => (int)$contractor->id])
+            ->exists();
+    }
+
+    protected function attach(ActiveRecord $owner, CmsContractor $contractor): void
+    {
+        if ($this->isAttached($owner, $contractor)) {
+            return;
+        }
+        $map = new CmsCompany2contractor([
+            'cms_company_id' => (int)$owner->id,
+            'cms_contractor_id' => (int)$contractor->id,
+        ]);
+        if (!$map->save()) {
+            throw new \RuntimeException(implode('; ', $map->getFirstErrors()));
+        }
+    }
+
+    protected function ownerUrl(ActiveRecord $owner): array
+    {
+        return ['/cms/admin-cms-company/view', 'pk' => (int)$owner->id];
+    }
+}

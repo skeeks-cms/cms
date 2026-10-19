@@ -720,40 +720,21 @@ JS
 
 
                 <div>
-                    <?php $widget = \yii\bootstrap\Modal::begin([
-                        'header'       => "Добавление юр. лица",
-                        'size'         => \yii\bootstrap\Modal::SIZE_DEFAULT,
-                        'toggleButton' => [
-                            'label' => 'Добавить',
-                            'class' => 'btn btn-default btn-sm',
-                        ],
-                    ]); ?>
-
                     <?php
-                    $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                        'action'               => \yii\helpers\Url::to(['add-contractor', 'pk' => $model->id]),
-                        'enableAjaxValidation' => false,
-                        'clientCallback'       => new \yii\web\JsExpression(<<<JS
-        function (ActiveFormAjaxSubmit) {
-            ActiveFormAjaxSubmit.on('success', function(e, response) {
-                $(".modal").modal("hide");
-                setTimeout(function() {
-                    window.location.reload();
-                }, 500);
-                
-            });
-        }
+                    // Full contractor form with "fill by INN"; an INN already in the base is only linked.
+                    $actionData = \yii\helpers\Json::encode([
+                        "isOpenNewWindow" => true,
+                        "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                            "/cms/admin-cms-company-contractor/create",
+                            'company_id' => $model->id,
+                        ])->enableEmptyLayout()->enableNoActions()->url,
+                    ]);
+                    ?>
+                    <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
+               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
-                        ),
-                    ]); ?>
-
-                    <div class="d-flex flex-row" style="padding-bottom: 20px;">
-                        <input type="text" name="inn" class="form-control" placeholder="Инн организации или ИП">
-                        <button type="submit" class="btn btn-primary">Добавить</button>
-                    </div>
-                    <?php $form::end(); ?>
-
-                    <?php $widget::end(); ?>
+                    ); ?>'>Добавить
+                    </button>
 
                 </div>
 

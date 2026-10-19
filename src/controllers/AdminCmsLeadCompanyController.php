@@ -4,7 +4,10 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\backend\actions\BackendModelCreateAction;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsCompany2contractor;
+use skeeks\cms\models\CmsCompanyAddress;
 use skeeks\cms\models\CmsCompanyEmail;
+use skeeks\cms\models\CmsCompanyLink;
 use skeeks\cms\models\CmsCompanyPhone;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsLog;
@@ -105,6 +108,40 @@ class AdminCmsLeadCompanyController extends AdminCmsCompanyController
                 'sort' => $leadEmail->sort,
             ]);
             if (!$email->save()) { throw new \RuntimeException(implode('; ', $email->getFirstErrors())); }
+        }
+        foreach ($lead->addresses as $leadAddress) {
+            if (CmsCompanyAddress::find()->andWhere(['cms_company_id' => $company->id, 'value' => $leadAddress->value])->exists()) {
+                continue;
+            }
+            $address = new CmsCompanyAddress(['cms_company_id' => (int)$company->id]);
+            foreach (['name', 'value', 'latitude', 'longitude', 'entrance', 'floor', 'apartment_number', 'comment', 'postcode', 'sort'] as $attribute) {
+                $address->{$attribute} = $leadAddress->{$attribute};
+            }
+            if (!$address->save()) { throw new \RuntimeException(implode('; ', $address->getFirstErrors())); }
+        }
+        foreach ($lead->links as $leadLink) {
+            if (CmsCompanyLink::find()->andWhere(['cms_company_id' => $company->id, 'url' => $leadLink->url])->exists()) {
+                continue;
+            }
+            $link = new CmsCompanyLink([
+                'cms_company_id' => (int)$company->id,
+                'url' => $leadLink->url,
+                'link_type' => $leadLink->link_type,
+                'name' => $leadLink->name,
+                'sort' => $leadLink->sort,
+            ]);
+            if (!$link->save()) { throw new \RuntimeException(implode('; ', $link->getFirstErrors())); }
+        }
+        // Requisites are shared contractor records: the company gets a link, the lead keeps its own.
+        foreach ($lead->lead2contractors as $leadContractor) {
+            if (CmsCompany2contractor::find()->andWhere(['cms_company_id' => $company->id, 'cms_contractor_id' => $leadContractor->cms_contractor_id])->exists()) {
+                continue;
+            }
+            $map = new CmsCompany2contractor([
+                'cms_company_id' => (int)$company->id,
+                'cms_contractor_id' => (int)$leadContractor->cms_contractor_id,
+            ]);
+            if (!$map->save()) { throw new \RuntimeException(implode('; ', $map->getFirstErrors())); }
         }
 
         $log = new CmsLog();

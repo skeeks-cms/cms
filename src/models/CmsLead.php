@@ -683,6 +683,10 @@ class CmsLead extends Core
     public function getRejectReasonItem() { return $this->hasOne(CmsLeadRejectReason::class, ['id' => 'cms_lead_reject_reason_id']); }
     public function getPhones() { return $this->hasMany(CmsLeadPhone::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     public function getEmails() { return $this->hasMany(CmsLeadEmail::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
+    public function getAddresses() { return $this->hasMany(CmsLeadAddress::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
+    public function getLinks() { return $this->hasMany(CmsLeadLink::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
+    public function getLead2contractors() { return $this->hasMany(CmsLead2contractor::class, ['cms_lead_id' => 'id'])->orderBy(['id' => SORT_ASC]); }
+    public function getContractors() { return $this->hasMany(CmsContractor::class, ['id' => 'cms_contractor_id'])->via('lead2contractors'); }
     /** @return \skeeks\cms\models\queries\CmsTaskQuery */
     public function getTasks() { return $this->hasMany(CmsTask::class, ['cms_lead_id' => 'id']); }
 

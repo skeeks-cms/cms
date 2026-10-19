@@ -40,15 +40,16 @@ $sourceName = trim((string)$model->source_name);
 $sourceReferrer = trim((string)ArrayHelper::getValue($sourceData, 'request.referer', ''));
 TelephonyWidget::widget();
 LeadMatchesAsset::register($this);
-$contactAction = static function (string $route, string $modelClass, int $leadId): string {
-    return \yii\helpers\Json::encode([
+$contactAction = static function (string $route, string $modelClass, int $leadId, ?string $size = 'small'): string {
+    // A null size opens the regular window (the address form needs the map width).
+    return \yii\helpers\Json::encode(array_filter([
         'isOpenNewWindow' => true,
-        'size' => 'small',
+        'size' => $size,
         'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
             $route,
             $modelClass => ['cms_lead_id' => $leadId],
         ])->enableEmptyLayout()->enableNoActions()->url,
-    ]);
+    ], static fn($value) => $value !== null));
 };
 $identityCard = static function (
     string $controllerId,
@@ -422,6 +423,150 @@ CSS
                         <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить email', '#', [
                             'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
                             'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-email/create', 'CmsLeadEmail', (int)$model->id).').go(); return false;',
+                        ]); ?>
+                    <?php endif; ?>
+                </div>
+            <?php BackendSurfaceWidget::end(); ?>
+
+            <?php BackendSurfaceWidget::begin([
+                'title' => 'Адреса',
+                'titleTag' => 'h2',
+                'raised' => true,
+                'responsive' => true,
+            ]); ?>
+                <div class="sx-lead-contact-list">
+                    <?php foreach ($model->addresses as $address) : ?>
+                        <?php
+                        $addressDetails = array_filter([
+                            $address->entrance ? 'подъезд '.$address->entrance : null,
+                            $address->floor ? 'этаж '.$address->floor : null,
+                            $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
+                        ]);
+                        ?>
+                        <div class="sx-lead-contact-row">
+                            <div class="sx-collection-cell sx-collection-cell--stack">
+                                <span class="sx-collection-cell__secondary"><?= Html::encode($address->name ?: 'Адрес'); ?></span>
+                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= Html::encode($address->value); ?></span>
+                                <?php if ($addressDetails || $address->comment) : ?>
+                                    <span class="sx-collection-cell__secondary"><?= Html::encode(implode(', ', array_filter([implode(', ', $addressDetails), $address->comment]))); ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <?php if ($canWork) : ?>
+                                <div class="sx-lead-contact-actions">
+                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => '/cms/admin-cms-lead-address',
+                                        'modelId' => $address->id,
+                                        'tag' => 'div',
+                                        'options' => ['title' => 'Изменить адрес', 'class' => 'sx-icon-action'],
+                                    ]); ?><i class="fas fa-ellipsis-v" aria-hidden="true"></i><?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php if (!$model->addresses) : ?><span class="sx-collection-cell__secondary">Адресов пока нет</span><?php endif; ?>
+                    <?php if ($canWork) : ?>
+                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить адрес', '#', [
+                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
+                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-address/create', 'CmsLeadAddress', (int)$model->id, null).').go(); return false;',
+                        ]); ?>
+                    <?php endif; ?>
+                </div>
+            <?php BackendSurfaceWidget::end(); ?>
+
+            <?php BackendSurfaceWidget::begin([
+                'title' => 'Ссылки',
+                'titleTag' => 'h2',
+                'raised' => true,
+                'responsive' => true,
+            ]); ?>
+                <div class="sx-lead-contact-list">
+                    <?php foreach ($model->links as $link) : ?>
+                        <div class="sx-lead-contact-row">
+                            <div class="sx-collection-cell sx-collection-cell--stack">
+                                <span class="sx-collection-cell__secondary"><?= Html::encode($link->name ?: $link->linkTypeAsText ?: 'Ссылка'); ?></span>
+                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= Html::a(Html::encode($link->url), $link->url, [
+                                    'target' => '_blank',
+                                    'rel' => 'noopener noreferrer',
+                                    'data-pjax' => '0',
+                                ]); ?></span>
+                            </div>
+                            <?php if ($canWork) : ?>
+                                <div class="sx-lead-contact-actions">
+                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => '/cms/admin-cms-lead-link',
+                                        'modelId' => $link->id,
+                                        'tag' => 'div',
+                                        'options' => ['title' => 'Изменить ссылку', 'class' => 'sx-icon-action'],
+                                    ]); ?><i class="fas fa-ellipsis-v" aria-hidden="true"></i><?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php if (!$model->links) : ?><span class="sx-collection-cell__secondary">Ссылок пока нет</span><?php endif; ?>
+                    <?php if ($canWork) : ?>
+                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить ссылку', '#', [
+                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
+                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-link/create', 'CmsLeadLink', (int)$model->id).').go(); return false;',
+                        ]); ?>
+                    <?php endif; ?>
+                </div>
+            <?php BackendSurfaceWidget::end(); ?>
+
+            <?php BackendSurfaceWidget::begin([
+                'title' => 'Реквизиты',
+                'titleTag' => 'h2',
+                'raised' => true,
+                'responsive' => true,
+            ]); ?>
+                <div class="sx-lead-contact-list">
+                    <?php foreach ($model->contractors as $contractor) : ?>
+                        <div class="sx-lead-contact-row">
+                            <div class="sx-collection-cell sx-collection-cell--stack">
+                                <span class="sx-collection-cell__secondary"><?= Html::encode($contractor->contractor_type ? $contractor->getTypeAsText() : 'Реквизиты'); ?></span>
+                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-contractor',
+                                    'modelId' => $contractor->id,
+                                    'content' => Html::encode($contractor->asText),
+                                ]); ?></span>
+                                <?php if ($contractor->inn) : ?>
+                                    <span class="sx-collection-cell__secondary">ИНН <?= Html::encode($contractor->inn); ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <?php if ($canWork) : ?>
+                                <div class="sx-lead-contact-actions">
+                                    <button type="button" class="sx-button sx-button--secondary sx-button--sm" data-sx-lead-contractor-detach="<?= (int)$contractor->id; ?>" title="Убрать из лида" aria-label="Убрать из лида"><i class="fas fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php if (!$model->contractors) : ?><span class="sx-collection-cell__secondary">Реквизитов пока нет</span><?php endif; ?>
+                    <?php if ($canWork) : ?>
+                        <?php
+                        $contractorAction = \yii\helpers\Json::encode([
+                            'isOpenNewWindow' => true,
+                            'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                                '/cms/admin-cms-lead-contractor/create',
+                                'lead_id' => (int)$model->id,
+                            ])->enableEmptyLayout()->enableNoActions()->url,
+                        ]);
+                        $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => (int)$model->id]));
+                        $this->registerJs(<<<JS
+$(document).off('click.sxLeadContractor').on('click.sxLeadContractor', '[data-sx-lead-contractor-detach]', function () {
+    if (!confirm('Убрать эти реквизиты из лида? Сами реквизиты останутся в базе.')) {
+        return false;
+    }
+    var ajaxQuery = sx.ajax.preparePostQuery({$detachUrl}, {contractor_id: $(this).data('sxLeadContractorDetach')});
+    var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
+    handler.on('success', function () { window.location.reload(); });
+    ajaxQuery.execute();
+    return false;
+});
+JS
+                        );
+                        ?>
+                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить реквизиты', '#', [
+                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
+                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contractorAction.').go(); return false;',
                         ]); ?>
                     <?php endif; ?>
                 </div>
