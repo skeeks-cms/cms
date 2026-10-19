@@ -8,6 +8,7 @@ use skeeks\cms\models\CmsLog;
 use skeeks\cms\telephony\widgets\TelephonyWidget;
 use skeeks\cms\widgets\admin\CmsCommentWidget;
 use skeeks\cms\widgets\admin\CmsLogListWidget;
+use skeeks\cms\widgets\admin\CrmContactBlockWidget;
 use skeeks\cms\widgets\Pjax;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
@@ -40,17 +41,6 @@ $sourceName = trim((string)$model->source_name);
 $sourceReferrer = trim((string)ArrayHelper::getValue($sourceData, 'request.referer', ''));
 TelephonyWidget::widget();
 LeadMatchesAsset::register($this);
-$contactAction = static function (string $route, string $modelClass, int $leadId, ?string $size = 'small'): string {
-    // A null size opens the regular window (the address form needs the map width).
-    return \yii\helpers\Json::encode(array_filter([
-        'isOpenNewWindow' => true,
-        'size' => $size,
-        'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-            $route,
-            $modelClass => ['cms_lead_id' => $leadId],
-        ])->enableEmptyLayout()->enableNoActions()->url,
-    ], static fn($value) => $value !== null));
-};
 $identityCard = static function (
     string $controllerId,
     int $modelId,
@@ -101,39 +91,9 @@ $this->registerCss(<<<CSS
 .sx-lead-side .sx-properties {
     padding: 0;
 }
-.sx-lead-contact {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-}
-.sx-lead-contact__value,
 .sx-lead-description {
     min-width: 0;
     overflow-wrap: anywhere;
-}
-.sx-lead-contact__action {
-    flex: 0 0 auto;
-}
-.sx-lead-contact-list {
-    display: grid;
-    gap: 0.75rem;
-}
-.sx-lead-contact-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-}
-.sx-lead-contact-row .sx-collection-cell {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-.sx-lead-contact-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    flex: 0 0 auto;
 }
 .sx-lead-matches__loading,
 .sx-lead-matches__error {
@@ -350,207 +310,71 @@ CSS
                 ); ?>
             <?php endif; ?>
 
-            <?php BackendSurfaceWidget::begin([
+            <?php
+            // The same contact blocks as in the company card; editing only for the responsible manager.
+            $leadId = (int)$model->id;
+            $menu = static fn(string $controllerId, int $id, string $title): string => $canWork
+                ? CrmContactBlockWidget::menu($controllerId, $id, $title)
+                : '';
+
+            echo CrmContactBlockWidget::widget([
                 'title' => 'Телефоны',
-                'titleTag' => 'h2',
-                'raised' => true,
-                'responsive' => true,
-            ]); ?>
-                <div class="sx-lead-contact-list">
-                    <?php foreach ($model->phones as $phone) : ?>
-                        <div class="sx-lead-contact-row">
-                            <div class="sx-collection-cell sx-collection-cell--stack">
-                                <span class="sx-collection-cell__secondary"><?= Html::encode($phone->name ?: 'Телефон'); ?></span>
-                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= Html::a(Html::encode($phone->value), 'tel:'.preg_replace('/[^\d+]/', '', $phone->value), ['data-pjax' => '0']); ?></span>
-                            </div>
-                            <?php if ($canWork) : ?>
-                                <div class="sx-lead-contact-actions">
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => '/cms/admin-cms-lead-phone',
-                                        'modelId' => $phone->id,
-                                        'tag' => 'div',
-                                        'options' => ['title' => 'Изменить телефон', 'class' => 'sx-icon-action'],
-                                    ]); ?><i class="fas fa-ellipsis-v" aria-hidden="true"></i><?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                    <button type="button" class="sx-button sx-button--secondary sx-button--sm sx-send-sms-trigger" data-phone="<?= Html::encode($phone->value); ?>" title="Написать SMS" aria-label="Написать SMS"><i class="fas fa-sms" aria-hidden="true"></i></button>
-                                    <button type="button" class="sx-button sx-button--secondary sx-button--sm sx-telephony-btn" data-value="<?= Html::encode($phone->value); ?>" data-lead-id="<?= (int)$model->id; ?>" title="Позвонить" aria-label="Позвонить"><i class="fas fa-phone" aria-hidden="true"></i></button>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <?php if (!$model->phones) : ?><span class="sx-collection-cell__secondary">Телефонов пока нет</span><?php endif; ?>
-                    <?php if ($canWork) : ?>
-                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить телефон', '#', [
-                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
-                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-phone/create', 'CmsLeadPhone', (int)$model->id).').go(); return false;',
-                        ]); ?>
-                    <?php endif; ?>
-                </div>
-            <?php BackendSurfaceWidget::end(); ?>
+                'hint' => 'У лида может быть несколько телефонов. Первый из них основной, по нему звонят и пишут SMS. При создании компании телефоны переносятся в неё.',
+                'icon' => 'phone',
+                'items' => array_map(static fn($phone) => [
+                    'label' => $phone->name ?: 'Телефон',
+                    'value' => Html::a(Html::encode($phone->value), 'tel:'.preg_replace('/[^\d+]/', '', (string)$phone->value), ['data-pjax' => '0']),
+                    'actions' => $menu('/cms/admin-cms-lead-phone', (int)$phone->id, 'Изменить телефон')
+                        .($canWork
+                            ? CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value])
+                              .CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value, 'data-lead-id' => $leadId])
+                            : ''),
+                ], $model->phones),
+                'emptyText' => 'Телефонов пока нет',
+                'addLabel' => 'Добавить телефон',
+                'addRoute' => $canWork ? ['/cms/admin-cms-lead-phone/create', 'CmsLeadPhone' => ['cms_lead_id' => $leadId]] : null,
+                'addSize' => 'small',
+            ]);
 
-            <?php BackendSurfaceWidget::begin([
+            echo CrmContactBlockWidget::widget([
                 'title' => 'Email',
-                'titleTag' => 'h2',
-                'raised' => true,
-                'responsive' => true,
-            ]); ?>
-                <div class="sx-lead-contact-list">
-                    <?php foreach ($model->emails as $email) : ?>
-                        <div class="sx-lead-contact-row">
-                            <div class="sx-collection-cell sx-collection-cell--stack">
-                                <span class="sx-collection-cell__secondary"><?= Html::encode($email->name ?: 'Email'); ?></span>
-                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= Html::a(Html::encode($email->value), 'mailto:'.$email->value, ['data-pjax' => '0']); ?></span>
-                            </div>
-                            <?php if ($canWork) : ?>
-                                <div class="sx-lead-contact-actions">
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => '/cms/admin-cms-lead-email',
-                                        'modelId' => $email->id,
-                                        'tag' => 'div',
-                                        'options' => ['title' => 'Изменить email', 'class' => 'sx-icon-action'],
-                                    ]); ?><i class="fas fa-ellipsis-v" aria-hidden="true"></i><?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                    <?= Html::a('<i class="fas fa-envelope" aria-hidden="true"></i>', 'mailto:'.$email->value, [
-                                        'class' => 'sx-button sx-button--secondary sx-button--sm',
-                                        'title' => 'Написать письмо',
-                                        'aria-label' => 'Написать письмо',
-                                        'data-pjax' => '0',
-                                    ]); ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <?php if (!$model->emails) : ?><span class="sx-collection-cell__secondary">Email пока нет</span><?php endif; ?>
-                    <?php if ($canWork) : ?>
-                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить email', '#', [
-                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
-                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-email/create', 'CmsLeadEmail', (int)$model->id).').go(); return false;',
-                        ]); ?>
-                    <?php endif; ?>
-                </div>
-            <?php BackendSurfaceWidget::end(); ?>
+                'hint' => 'У лида может быть несколько email адресов. Первый из них основной. При создании компании адреса переносятся в неё.',
+                'icon' => 'mail',
+                'items' => array_map(static fn($email) => [
+                    'label' => $email->name ?: 'Email',
+                    'value' => Html::a(Html::encode($email->value), 'mailto:'.$email->value, ['data-pjax' => '0']),
+                    'actions' => $menu('/cms/admin-cms-lead-email', (int)$email->id, 'Изменить email')
+                        .CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
+                ], $model->emails),
+                'emptyText' => 'Email пока нет',
+                'addLabel' => 'Добавить email',
+                'addRoute' => $canWork ? ['/cms/admin-cms-lead-email/create', 'CmsLeadEmail' => ['cms_lead_id' => $leadId]] : null,
+                'addSize' => 'small',
+            ]);
 
-            <?php BackendSurfaceWidget::begin([
+            echo CrmContactBlockWidget::widget([
                 'title' => 'Адреса',
-                'titleTag' => 'h2',
-                'raised' => true,
-                'responsive' => true,
-            ]); ?>
-                <div class="sx-lead-contact-list">
-                    <?php foreach ($model->addresses as $address) : ?>
-                        <?php
-                        $addressDetails = array_filter([
-                            $address->entrance ? 'подъезд '.$address->entrance : null,
-                            $address->floor ? 'этаж '.$address->floor : null,
-                            $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
-                        ]);
-                        ?>
-                        <div class="sx-lead-contact-row">
-                            <div class="sx-collection-cell sx-collection-cell--stack">
-                                <span class="sx-collection-cell__secondary"><?= Html::encode($address->name ?: 'Адрес'); ?></span>
-                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= Html::encode($address->value); ?></span>
-                                <?php if ($addressDetails || $address->comment) : ?>
-                                    <span class="sx-collection-cell__secondary"><?= Html::encode(implode(', ', array_filter([implode(', ', $addressDetails), $address->comment]))); ?></span>
-                                <?php endif; ?>
-                            </div>
-                            <?php if ($canWork) : ?>
-                                <div class="sx-lead-contact-actions">
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => '/cms/admin-cms-lead-address',
-                                        'modelId' => $address->id,
-                                        'tag' => 'div',
-                                        'options' => ['title' => 'Изменить адрес', 'class' => 'sx-icon-action'],
-                                    ]); ?><i class="fas fa-ellipsis-v" aria-hidden="true"></i><?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <?php if (!$model->addresses) : ?><span class="sx-collection-cell__secondary">Адресов пока нет</span><?php endif; ?>
-                    <?php if ($canWork) : ?>
-                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить адрес', '#', [
-                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
-                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-address/create', 'CmsLeadAddress', (int)$model->id, null).').go(); return false;',
-                        ]); ?>
-                    <?php endif; ?>
-                </div>
-            <?php BackendSurfaceWidget::end(); ?>
+                'hint' => 'Адреса офиса, склада или магазина клиента. Первый из них основной. При создании компании адреса переносятся в неё.',
+                'icon' => 'map-pin',
+                'items' => array_map(static fn($address) => [
+                    'label' => $address->name ?: 'Адрес',
+                    'value' => Html::encode($address->value),
+                    'note' => implode(', ', array_filter([
+                        $address->entrance ? 'подъезд '.$address->entrance : null,
+                        $address->floor ? 'этаж '.$address->floor : null,
+                        $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
+                        $address->comment ?: null,
+                    ])),
+                    'actions' => $menu('/cms/admin-cms-lead-address', (int)$address->id, 'Изменить адрес'),
+                ], $model->addresses),
+                'emptyText' => 'Адресов пока нет',
+                'addLabel' => 'Добавить адрес',
+                'addRoute' => $canWork ? ['/cms/admin-cms-lead-address/create', 'CmsLeadAddress' => ['cms_lead_id' => $leadId]] : null,
+            ]);
 
-            <?php BackendSurfaceWidget::begin([
-                'title' => 'Ссылки',
-                'titleTag' => 'h2',
-                'raised' => true,
-                'responsive' => true,
-            ]); ?>
-                <div class="sx-lead-contact-list">
-                    <?php foreach ($model->links as $link) : ?>
-                        <div class="sx-lead-contact-row">
-                            <div class="sx-collection-cell sx-collection-cell--stack">
-                                <span class="sx-collection-cell__secondary"><?= Html::encode($link->name ?: $link->linkTypeAsText ?: 'Ссылка'); ?></span>
-                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= Html::a(Html::encode($link->url), $link->url, [
-                                    'target' => '_blank',
-                                    'rel' => 'noopener noreferrer',
-                                    'data-pjax' => '0',
-                                ]); ?></span>
-                            </div>
-                            <?php if ($canWork) : ?>
-                                <div class="sx-lead-contact-actions">
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => '/cms/admin-cms-lead-link',
-                                        'modelId' => $link->id,
-                                        'tag' => 'div',
-                                        'options' => ['title' => 'Изменить ссылку', 'class' => 'sx-icon-action'],
-                                    ]); ?><i class="fas fa-ellipsis-v" aria-hidden="true"></i><?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <?php if (!$model->links) : ?><span class="sx-collection-cell__secondary">Ссылок пока нет</span><?php endif; ?>
-                    <?php if ($canWork) : ?>
-                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить ссылку', '#', [
-                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
-                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contactAction('/cms/admin-cms-lead-link/create', 'CmsLeadLink', (int)$model->id).').go(); return false;',
-                        ]); ?>
-                    <?php endif; ?>
-                </div>
-            <?php BackendSurfaceWidget::end(); ?>
-
-            <?php BackendSurfaceWidget::begin([
-                'title' => 'Реквизиты',
-                'titleTag' => 'h2',
-                'raised' => true,
-                'responsive' => true,
-            ]); ?>
-                <div class="sx-lead-contact-list">
-                    <?php foreach ($model->contractors as $contractor) : ?>
-                        <div class="sx-lead-contact-row">
-                            <div class="sx-collection-cell sx-collection-cell--stack">
-                                <span class="sx-collection-cell__secondary"><?= Html::encode($contractor->contractor_type ? $contractor->getTypeAsText() : 'Реквизиты'); ?></span>
-                                <span class="sx-collection-cell__primary sx-lead-contact__value"><?= BackendEntityLink::widget([
-                                    'controllerId' => '/cms/admin-cms-contractor',
-                                    'modelId' => $contractor->id,
-                                    'content' => Html::encode($contractor->asText),
-                                ]); ?></span>
-                                <?php if ($contractor->inn) : ?>
-                                    <span class="sx-collection-cell__secondary">ИНН <?= Html::encode($contractor->inn); ?></span>
-                                <?php endif; ?>
-                            </div>
-                            <?php if ($canWork) : ?>
-                                <div class="sx-lead-contact-actions">
-                                    <button type="button" class="sx-button sx-button--secondary sx-button--sm" data-sx-lead-contractor-detach="<?= (int)$contractor->id; ?>" title="Убрать из лида" aria-label="Убрать из лида"><i class="fas fa-times" aria-hidden="true"></i></button>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                    <?php if (!$model->contractors) : ?><span class="sx-collection-cell__secondary">Реквизитов пока нет</span><?php endif; ?>
-                    <?php if ($canWork) : ?>
-                        <?php
-                        $contractorAction = \yii\helpers\Json::encode([
-                            'isOpenNewWindow' => true,
-                            'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                                '/cms/admin-cms-lead-contractor/create',
-                                'lead_id' => (int)$model->id,
-                            ])->enableEmptyLayout()->enableNoActions()->url,
-                        ]);
-                        $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => (int)$model->id]));
-                        $this->registerJs(<<<JS
+            if ($canWork) {
+                $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => $leadId]));
+                $this->registerJs(<<<JS
 $(document).off('click.sxLeadContractor').on('click.sxLeadContractor', '[data-sx-lead-contractor-detach]', function () {
     if (!confirm('Убрать эти реквизиты из лида? Сами реквизиты останутся в базе.')) {
         return false;
@@ -562,15 +386,45 @@ $(document).off('click.sxLeadContractor').on('click.sxLeadContractor', '[data-sx
     return false;
 });
 JS
-                        );
-                        ?>
-                        <?= Html::a('<i class="fas fa-plus" aria-hidden="true"></i> Добавить реквизиты', '#', [
-                            'class' => 'sx-button sx-button--secondary sx-button--sm align-self-start',
-                            'onclick' => 'new sx.classes.backend.widgets.Action('.$contractorAction.').go(); return false;',
-                        ]); ?>
-                    <?php endif; ?>
-                </div>
-            <?php BackendSurfaceWidget::end(); ?>
+                );
+            }
+            // Full contractor form with "fill by INN"; an INN already in the base is only linked.
+            echo CrmContactBlockWidget::widget([
+                'title' => 'Реквизиты',
+                'hint' => 'Реквизиты организации или ИП для счетов и договоров. Если такой ИНН уже есть в базе, реквизиты просто привязываются. При создании компании они переносятся в неё.',
+                'icon' => 'id-card',
+                'items' => array_map(static fn($contractor) => [
+                    'label' => $contractor->contractor_type ? $contractor->getTypeAsText() : 'Реквизиты',
+                    'value' => BackendEntityLink::widget([
+                        'controllerId' => '/cms/admin-cms-contractor',
+                        'modelId' => $contractor->id,
+                        'content' => Html::encode($contractor->asText),
+                    ]),
+                    'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
+                    'actions' => $canWork
+                        ? CrmContactBlockWidget::iconButton('close', 'Убрать из лида', ['data-sx-lead-contractor-detach' => (int)$contractor->id])
+                        : '',
+                ], $model->contractors),
+                'emptyText' => 'Реквизитов пока нет',
+                'addLabel' => 'Добавить реквизиты',
+                'addRoute' => $canWork ? ['/cms/admin-cms-lead-contractor/create', 'lead_id' => $leadId] : null,
+            ]);
+
+            echo CrmContactBlockWidget::widget([
+                'title' => 'Ссылки',
+                'hint' => 'Сайт и соцсети клиента. При создании компании ссылки переносятся в неё.',
+                'icon' => 'link',
+                'items' => array_map(static fn($link) => [
+                    'label' => $link->name ?: $link->linkTypeAsText ?: 'Ссылка',
+                    'value' => Html::a(Html::encode($link->url), $link->url, ['target' => '_blank', 'rel' => 'noopener noreferrer', 'data-pjax' => '0']),
+                    'actions' => $menu('/cms/admin-cms-lead-link', (int)$link->id, 'Изменить ссылку'),
+                ], $model->links),
+                'emptyText' => 'Ссылок пока нет',
+                'addLabel' => 'Добавить ссылку',
+                'addRoute' => $canWork ? ['/cms/admin-cms-lead-link/create', 'CmsLeadLink' => ['cms_lead_id' => $leadId]] : null,
+                'addSize' => 'small',
+            ]);
+            ?>
 
             <?php BackendSurfaceWidget::begin([
                 'title' => 'Описание',
@@ -587,7 +441,7 @@ JS
                 'raised' => true,
                 'responsive' => true,
             ]); ?>
-                <div class="sx-lead-contact-list">
+                <div class="sx-contact-list">
                     <div class="sx-collection-cell sx-collection-cell--stack">
                         <span class="sx-collection-cell__secondary">Источник</span>
                         <span class="sx-collection-cell__primary"><?= Html::encode($sourceTypeName); ?></span>

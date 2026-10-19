@@ -1,0 +1,145 @@
+/*
+ * Contact blocks of CRM cards (CrmContactBlockWidget): phones, emails,
+ * addresses, requisites, links. Rows with a type icon, a muted label, the
+ * value and its actions; a muted empty state; a dashed full-width "add" button.
+ */
+/* The "?" hint of a card block: present, but quieter than the content. */
+html[data-sx-theme] .sx-surface__actions .sx-hint-icon {
+    display: inline-flex;
+    font-size: 13px;
+    opacity: 0.45;
+    cursor: help;
+    transition: opacity 0.15s ease;
+}
+
+html[data-sx-theme] .sx-surface__actions .sx-hint-icon:hover,
+html[data-sx-theme] .sx-surface__actions .sx-hint-icon:focus {
+    opacity: 1;
+    outline: none;
+}
+
+.sx-contact-list {
+    display: grid;
+    gap: 4px;
+}
+
+.sx-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin: 0 -8px;
+    padding: 6px 8px;
+    border-radius: var(--sx-radius-control);
+    transition: background-color 0.15s ease;
+}
+
+.sx-contact-row:hover {
+    background: var(--sx-color-surface-hover, var(--sx-color-surface-muted));
+}
+
+.sx-contact-icon {
+    display: inline-flex;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-contact-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.35;
+}
+
+.sx-contact-label,
+.sx-contact-note {
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+}
+
+.sx-contact-value {
+    min-width: 0;
+    color: var(--sx-color-text);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+/* A phone number is read as one token; it must not break into digit groups. */
+.sx-contact-value a[href^="tel:"] {
+    white-space: nowrap;
+}
+
+.sx-contact-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+}
+
+/*
+ * The "⋮" row menu is secondary: on devices with a pointer it appears when the
+ * row is hovered or focused; touch screens keep it visible.
+ */
+@media (hover: hover) {
+    .sx-contact-row .sx-icon-action {
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+
+    .sx-contact-row:hover .sx-icon-action,
+    .sx-contact-row:focus-within .sx-icon-action,
+    .sx-contact-row .sx-icon-action[aria-expanded="true"] {
+        opacity: 1;
+    }
+}
+
+.sx-contact-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sx-contact-row .sx-icon-action {
+    display: inline-flex;
+    align-items: center;
+    color: var(--sx-color-text-muted);
+    cursor: pointer;
+}
+
+.sx-contact-empty {
+    padding: 4px 0;
+    color: var(--sx-color-text-muted);
+}
+
+.sx-contact-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 6px;
+    padding: 7px 12px;
+    border: 1px dashed var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    background: transparent;
+    color: var(--sx-color-text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.sx-contact-add:hover,
+.sx-contact-add:focus {
+    border-color: var(--sx-color-accent);
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-accent);
+    text-decoration: none;
+}
