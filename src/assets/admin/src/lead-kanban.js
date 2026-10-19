@@ -86,4 +86,22 @@
     $(function () {
         $(boardSelector).each(function () { init(this); });
     });
+
+    // Choosing an employee applies the filter at once; search waits for Enter.
+    $(document).on('change', '[data-sx-lead-kanban-filters] [data-sx-lead-kanban-submit]', function () {
+        this.form.submit();
+    });
+
+    // The settings menu is a native <details>: close it on an outside click or Escape.
+    $(document).on('click', function (event) {
+        $('[data-sx-lead-kanban-menu][open]').each(function () {
+            if (!this.contains(event.target)) {
+                this.removeAttribute('open');
+            }
+        });
+    }).on('keydown', function (event) {
+        if (event.key === 'Escape') {
+            $('[data-sx-lead-kanban-menu][open]').removeAttr('open');
+        }
+    });
 }(sx, sx.$));

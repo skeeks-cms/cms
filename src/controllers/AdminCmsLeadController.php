@@ -462,12 +462,62 @@ JS
 
     public function kanban()
     {
-        $mine = (bool)\Yii::$app->request->get('mine');
+        $request = \Yii::$app->request;
+        $userId = (int)\Yii::$app->user->id;
+        $managers = $this->kanbanManagers();
+
+        // `mine=1` is the historical "my leads" link; an employee outside the
+        // viewer's scope is ignored rather than revealing an empty board.
+        $executorId = (int)$request->get('executor') ?: ($request->get('mine') ? $userId : 0);
+        if ($executorId && !isset($managers[$executorId])) {
+            $executorId = 0;
+        }
+        $q = mb_substr(trim((string)$request->get('q')), 0, 100);
+
+        $isAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        $siteId = (int)\Yii::$app->skeeks->site->id;
 
         return $this->render('kanban', [
-            'columns' => (new CmsLeadBoardService())->columns($mine ? (int)\Yii::$app->user->id : null),
-            'mine' => $mine,
+            'columns' => (new CmsLeadBoardService())->columns($executorId ?: null, $q),
+            'executorId' => $executorId,
+            'q' => $q,
+            'managers' => $managers,
+            'isAdmin' => $isAdmin,
+            'setup' => $isAdmin ? [
+                'stages' => (bool)$this->stageItems(),
+                'rejectReasons' => CmsLeadRejectReason::siteHasReasons($siteId),
+            ] : null,
         ]);
+    }
+
+    /**
+     * Employees whose leads the viewer may look at on the kanban, id => name.
+     * Administrators see every active employee; a manager sees self and the
+     * subordinates whose leads `CmsLeadQuery::forManager()` already exposes.
+     */
+    private function kanbanManagers(): array
+    {
+        /** @var CmsUser $user */
+        $user = \Yii::$app->user->identity;
+        if (!$user) {
+            return [];
+        }
+
+        if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+            $users = CmsUser::find()->cmsSite()->isWorker()
+                ->andWhere([CmsUser::tableName().'.is_active' => 1])
+                ->all();
+        } else {
+            $users = $user->subordinates;
+        }
+
+        $result = [(int)$user->id => (string)$user->shortDisplayName];
+        foreach ($users as $item) {
+            $result[(int)$item->id] = (string)$item->shortDisplayName;
+        }
+        asort($result, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $result;
     }
 
     public function report()

@@ -36,19 +36,22 @@ class CmsLeadBoardService
     }
 
     /**
+     * Optional filters: the responsible employee and a free-text search
+     * (name, description, phone or email, see `CmsLeadQuery::search()`).
+     *
      * @return array[] each: key, title, status, stage (CmsLeadStage|null), leads (CmsLead[]), total
      */
-    public function columns(?int $executorId = null): array
+    public function columns(?int $executorId = null, string $search = ''): array
     {
         $stages = CmsLeadStage::forCurrentSite();
         $columns = [];
         $columns[] = $this->column(self::COLUMN_NEW, 'Новые', CmsLead::STATUS_NEW, null,
-            $this->query($executorId)->andWhere([CmsLead::tableName().'.status' => CmsLead::STATUS_NEW])
+            $this->query($executorId, $search)->andWhere([CmsLead::tableName().'.status' => CmsLead::STATUS_NEW])
                 ->orderBy([CmsLead::tableName().'.created_at' => SORT_DESC]),
             self::ACTIVE_LIMIT);
 
-        $inWork = function (?int $stageId) use ($executorId): CmsLeadQuery {
-            return $this->query($executorId)
+        $inWork = function (?int $stageId) use ($executorId, $search): CmsLeadQuery {
+            return $this->query($executorId, $search)
                 ->andWhere([CmsLead::tableName().'.status' => CmsLead::STATUS_IN_WORK])
                 ->andWhere([CmsLead::tableName().'.cms_lead_stage_id' => $stageId])
                 ->orderBy([CmsLead::tableName().'.updated_at' => SORT_DESC]);
@@ -68,7 +71,7 @@ class CmsLeadBoardService
         $since = time() - self::TERMINAL_DAYS * 86400;
         foreach ([self::COLUMN_SUCCESS => CmsLead::STATUS_SUCCESS, self::COLUMN_REJECTED => CmsLead::STATUS_REJECTED] as $key => $status) {
             $columns[] = $this->column($key, CmsLead::statuses()[$status], $status, null,
-                $this->query($executorId)
+                $this->query($executorId, $search)
                     ->andWhere([CmsLead::tableName().'.status' => $status])
                     ->andWhere(['>=', CmsLead::tableName().'.processed_at', $since])
                     ->orderBy([CmsLead::tableName().'.processed_at' => SORT_DESC]),
@@ -202,11 +205,14 @@ class CmsLeadBoardService
         return $result;
     }
 
-    private function query(?int $executorId): CmsLeadQuery
+    private function query(?int $executorId, string $search = ''): CmsLeadQuery
     {
         $query = CmsLead::find()->forManager()->cmsSite()->with(['activeTasks', 'stage', 'executor', 'rejectReasonItem']);
         if ($executorId) {
             $query->forExecutor($executorId);
+        }
+        if (trim($search) !== '') {
+            $query->search($search);
         }
 
         return $query;
