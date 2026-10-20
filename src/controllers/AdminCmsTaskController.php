@@ -1491,15 +1491,17 @@ JS
             $theme['company_url'] = $site->url;
         }
 
-        $html = $this->renderPartial('report-pdf', [
-            'report' => $report,
-            'theme'  => $theme,
-        ]);
-
         $tempDir = \Yii::getAlias('@runtime/mpdf');
         if (!is_dir($tempDir)) {
             @mkdir($tempDir, 0777, true);
         }
+
+        $report = $this->prepareTaskReportPdfImages($report, $tempDir);
+
+        $html = $this->renderPartial('report-pdf', [
+            'report' => $report,
+            'theme'  => $theme,
+        ]);
 
         $orientation = $theme && ArrayHelper::getValue($theme, 'page_orientation') == CmsDocumentTemplate::ORIENTATION_PORTRAIT
             ? 'P'
@@ -1549,6 +1551,157 @@ JS
             'mimeType' => 'application/pdf',
             'inline' => (bool)$inline,
         ]);
+    }
+
+    /**
+     * Подменяет изображения вложений уменьшенными копиями для PDF.
+     *
+     * mPDF встраивает картинку в исходном размере, а WEBP ещё и перекодирует
+     * через GD: длинный скриншот 1920×8000 требует сотни мегабайт и роняет
+     * запрос по memory_limit. В PDF вложение выводится не выше 42 мм, поэтому
+     * достаточно копии до TASK_REPORT_PDF_IMAGE_BOX пикселей по большей стороне.
+     * Изображение, которое не удаётся безопасно уменьшить, выводится ссылкой.
+     *
+     * @param array  $report
+     * @param string $tempDir
+     *
+     * @return array
+     */
+    protected function prepareTaskReportPdfImages(array $report, $tempDir)
+    {
+        $prepared = [];
+        $prepare = function (array $files) use ($tempDir, &$prepared) {
+            foreach ($files as $key => $file) {
+                if (!ArrayHelper::getValue($file, 'isImage') || !ArrayHelper::getValue($file, 'src')) {
+                    continue;
+                }
+
+                $src = (string)$file['src'];
+                if (!array_key_exists($src, $prepared)) {
+                    $prepared[$src] = $this->taskReportPdfImageFile($src, $tempDir);
+                }
+
+                if ($prepared[$src]) {
+                    $files[$key]['src'] = $prepared[$src];
+                } else {
+                    $files[$key]['isImage'] = false;
+                }
+            }
+
+            return $files;
+        };
+
+        foreach ((array)ArrayHelper::getValue($report, 'rows', []) as $rowKey => $row) {
+            $report['rows'][$rowKey]['result_files'] = $prepare((array)ArrayHelper::getValue($row, 'result_files', []));
+            foreach ((array)ArrayHelper::getValue($row, 'result_items', []) as $itemKey => $item) {
+                $report['rows'][$rowKey]['result_items'][$itemKey]['files'] = $prepare((array)ArrayHelper::getValue($item, 'files', []));
+            }
+        }
+
+        return $report;
+    }
+
+    const TASK_REPORT_PDF_IMAGE_BOX = 1400;
+
+    /**
+     * @param string $src     локальный путь или URL изображения
+     * @param string $tempDir
+     *
+     * @return string|null путь к файлу для mPDF или null, если изображение выводить нельзя
+     */
+    protected function taskReportPdfImageFile($src, $tempDir)
+    {
+        if (!is_file($src)) {
+            // Удалённый файл mPDF скачает сам; размер заранее неизвестен.
+            return $src;
+        }
+
+        $size = @getimagesize($src);
+        if (!$size || empty($size[0]) || empty($size[1])) {
+            return null;
+        }
+
+        list($width, $height, $type) = $size;
+        $box = self::TASK_REPORT_PDF_IMAGE_BOX;
+        $isWebp = defined('IMAGETYPE_WEBP') && $type == IMAGETYPE_WEBP;
+        if (!$isWebp && $width <= $box && $height <= $box) {
+            return $src;
+        }
+
+        if (!function_exists('imagecreatefromstring')) {
+            return null;
+        }
+
+        $isJpeg = $type == IMAGETYPE_JPEG;
+        $dir = $tempDir.DIRECTORY_SEPARATOR.'report-images';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0777, true);
+        }
+        $file = $dir.DIRECTORY_SEPARATOR.md5(implode('|', [$src, filemtime($src), filesize($src), $box])).($isJpeg ? '.jpg' : '.png');
+        if (is_file($file)) {
+            return $file;
+        }
+
+        // Распакованное изображение GD занимает около 5 байт на пиксель.
+        // Если его не вместить в оставшуюся память, не пытаемся.
+        $limit = $this->taskReportMemoryLimit();
+        if ($limit > 0 && memory_get_usage() + $width * $height * 5 + filesize($src) > $limit) {
+            \Yii::warning("Изображение {$src} ({$width}x{$height}) слишком велико для PDF-отчёта", self::class);
+
+            return null;
+        }
+
+        $image = @imagecreatefromstring((string)file_get_contents($src));
+        if (!$image) {
+            return null;
+        }
+
+        $scale = min(1, $box / max($width, $height));
+        $newWidth = max(1, (int)round($width * $scale));
+        $newHeight = max(1, (int)round($height * $scale));
+
+        $resized = imagecreatetruecolor($newWidth, $newHeight);
+        if (!$isJpeg) {
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+        }
+        imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+        imagedestroy($image);
+
+        $tmp = $file.'.'.getmypid().'.tmp';
+        $saved = $isJpeg ? imagejpeg($resized, $tmp, 85) : imagepng($resized, $tmp, 6);
+        imagedestroy($resized);
+
+        if (!$saved || !@rename($tmp, $file)) {
+            @unlink($tmp);
+
+            return null;
+        }
+
+        return $file;
+    }
+
+    /**
+     * @return int memory_limit в байтах, 0 — без ограничения
+     */
+    protected function taskReportMemoryLimit()
+    {
+        $value = trim((string)ini_get('memory_limit'));
+        if ($value === '' || $value === '-1') {
+            return 0;
+        }
+
+        $bytes = (int)$value;
+        switch (strtolower(substr($value, -1))) {
+            case 'g':
+                $bytes *= 1024;
+            case 'm':
+                $bytes *= 1024;
+            case 'k':
+                $bytes *= 1024;
+        }
+
+        return $bytes;
     }
 
     /**
