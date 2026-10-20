@@ -15,6 +15,38 @@ class SessionUser extends \yii\web\User
     private $restoringSecret;
     private const SESSION_KEY = '__skeeks_login_secret';
 
+    public function init()
+    {
+        parent::init();
+        // Tracking is on by default in the CMS web config; a site updated
+        // without running migrations keeps plain Yii login instead of failing.
+        if ($this->trackSessions && !self::isRegistryInstalled()) {
+            $this->trackSessions = false;
+        }
+    }
+
+    /** Whether the session registry table exists; a positive answer is cached for a day. */
+    private static function isRegistryInstalled(): bool
+    {
+        $db = Yii::$app->getDb();
+        $cache = Yii::$app->has('cache') ? Yii::$app->getCache() : null;
+        $key = [__METHOD__, $db->dsn, $db->tablePrefix];
+        if ($cache && $cache->get($key)) {
+            return true;
+        }
+        try {
+            $installed = $db->getTableSchema(CmsUserSession::tableName(), true) !== null;
+        } catch (\Throwable $e) {
+            Yii::warning('Session registry check failed: '.$e->getMessage(), __METHOD__);
+            return false;
+        }
+        if ($installed && $cache) {
+            $cache->set($key, true, 86400);
+        }
+
+        return $installed;
+    }
+
     public function getCurrentSession(): ?CmsUserSession
     {
         $identity = $this->getIdentity();

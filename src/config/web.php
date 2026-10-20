@@ -24,6 +24,10 @@ $config = [
 
         'user' => [
             'class'           => \skeeks\cms\web\SessionUser::class,
+            // "Devices and sessions" for every site; switches itself off until
+            // the cms_user_session migration is applied. Enabling it once signs
+            // out existing logins: they are not in the session registry.
+            'trackSessions'   => true,
             'identityClass'   => 'skeeks\cms\models\CmsUser',
             'enableAutoLogin' => true,
             'loginUrl'        => ['cms/auth/login'],
