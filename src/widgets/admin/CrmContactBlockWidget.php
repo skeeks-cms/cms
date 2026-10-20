@@ -51,6 +51,8 @@ class CrmContactBlockWidget extends Widget
         'help' => 'far fa-question-circle',
         'close' => 'fas fa-times',
         'plus' => 'fas fa-plus',
+        'edit' => 'fas fa-pen',
+        'building' => 'far fa-building',
     ];
 
     public string $title = '';

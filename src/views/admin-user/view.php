@@ -1,6 +1,7 @@
 <?php
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+use skeeks\cms\widgets\admin\CrmContactBlockWidget;
 use yii\helpers\Html;
 
 /* @var $model \skeeks\cms\models\CmsUser */
@@ -28,20 +29,14 @@ $surfaceConfig = static function (string $title, string $tooltip = ''): array {
     ];
 
     if ($tooltip !== '') {
-        $config['actions'] = Html::tag('i', '', [
-            'class'          => 'far fa-question-circle sx-hint-icon',
-            'data-toggle'    => 'tooltip',
-            'data-html'      => 'true',
-            'data-container' => 'body',
-            'data-placement' => 'top',
-            'tabindex'       => '0',
-            'aria-label'     => $tooltip,
-            'title'          => $tooltip,
-        ]);
+        $config['actions'] = CrmContactBlockWidget::hintIcon($tooltip);
     }
 
     return $config;
 };
+// Contact blocks share the card density; the widget renders them as in the company and lead cards.
+$contactSurface = ['options' => ['class' => 'sx-surface--compact']];
+\skeeks\cms\assets\admin\CrmContactsAsset::register($this);
 
 if (!$model->is_worker) {
     $quickAccessItemsJson = \yii\helpers\Json::encode([[
@@ -230,26 +225,20 @@ CSS
         <div class="sx-detail-layout__aside sx-surface-stack">
 
             <?php if ($model->companiesAll) : ?>
-                <?php BackendSurfaceWidget::begin($surfaceConfig(
-                    'Компании',
-                    'Компании с которыми связан клиент'
-                )); ?>
-                    <?php foreach ($model->companiesAll as $company) : ?>
-                        <div class="d-flex mb-2">
-                            <div class="w-100">
-                                <?= BackendEntityLink::widget([
-                                    'controllerId' => '/cms/admin-cms-company',
-                                    'modelId'      => $company->id,
-                                    'content'      => Html::encode($company->name),
-                                    'options'      => [
-                                        'class'      => 'sx-preview-card__related',
-                                        'aria-label' => $company->name,
-                                    ],
-                                ]); ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php BackendSurfaceWidget::end(); ?>
+                <?= CrmContactBlockWidget::widget([
+                    'title' => 'Компании',
+                    'hint' => 'Компании с которыми связан клиент',
+                    'icon' => 'building',
+                    'surface' => $contactSurface,
+                    'items' => array_map(static fn($company) => [
+                        'label' => 'Компания',
+                        'value' => BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-company',
+                            'modelId' => $company->id,
+                            'content' => Html::encode($company->name),
+                        ]),
+                    ], $model->companiesAll),
+                ]); ?>
             <?php endif; ?>
 
 
@@ -290,222 +279,65 @@ CSS
 
             <?php BackendSurfaceWidget::end(); ?>
 
-            <?php BackendSurfaceWidget::begin($surfaceConfig(
-                'Телефон',
-                'У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию.'
-            )); ?>
-                    <div class="sx-phones-block">
-                        <? foreach ($model->cmsUserPhones as $cmsUserPhone) : ?>
-                            <div class="d-flex mb-2">
-                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
-                                    <div class="sx-collection-cell__secondary">
-                                        <? if ($cmsUserPhone->name) : ?>
-                                            <? echo $cmsUserPhone->name; ?>
-                                        <? else : ?>
-                                            Телефон
-                                        <? endif; ?>
-                                    </div>
-                                    <div class="sx-collection-cell__primary">
-                                        <?= Html::a(
-                                            Html::encode($cmsUserPhone->value),
-                                            'tel:' . preg_replace('/[^\d+]/', '', $cmsUserPhone->value)
-                                        ); ?>
-                                        <?php if ($cmsUserPhone->is_approved) : ?>
-                                            <span class="sx-text--success" data-html="true" data-toggle="tooltip"
-                                                  title="Телефон подтвержден пользователем<br />Пользователь реально получил код на этот телефон и подтвердил его.">✓</span>
-                                        <?php else : ?>
-                                            <span class="sx-text--muted" data-html="true" data-toggle="tooltip" title="Пользователь не подтверждал телефон."><i class="far fa-question-circle"></i></span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
+            <?php
+            echo CrmContactBlockWidget::widget([
+                'title' => 'Телефоны',
+                'hint' => 'У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию.',
+                'icon' => 'phone',
+                'surface' => $contactSurface,
+                'items' => array_map(static fn($phone) => [
+                    'label' => $phone->name ?: 'Телефон',
+                    'value' => Html::a(Html::encode($phone->value), 'tel:'.preg_replace('/[^\d+]/', '', (string)$phone->value), ['data-pjax' => '0']),
+                    'note' => $phone->is_approved ? 'Подтверждён клиентом' : 'Не подтверждён',
+                    'actions' => CrmContactBlockWidget::menu('/cms/admin-user-phone', (int)$phone->id, 'Изменить телефон')
+                        .CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value])
+                        .CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value]),
+                ], $model->cmsUserPhones),
+                'emptyText' => 'Телефонов пока нет',
+                'addLabel' => 'Добавить телефон',
+                'addRoute' => ['/cms/admin-user-phone/create', 'CmsUserPhone' => ['cms_user_id' => $model->id]],
+                'addSize' => 'small',
+            ]);
 
-                                <div class="my-auto">
-                                    <?
-                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => "/cms/admin-user-phone",
-                                        'modelId'      => $cmsUserPhone->id,
-                                        'tag'          => 'div',
-                                        'options'      => [
-                                            'title' => 'Редактировать телефон',
-                                            'class' => 'sx-icon-action',
-                                        ],
-                                    ]);
-                                    ?>
-                                    <!--<i class="hs-admin-angle-down"></i>-->
-                                    <i class="fas fa-ellipsis-v"></i>
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+            echo CrmContactBlockWidget::widget([
+                'title' => 'Email',
+                'hint' => 'У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию.',
+                'icon' => 'mail',
+                'surface' => $contactSurface,
+                'items' => array_map(static fn($email) => [
+                    'label' => $email->name ?: 'Email',
+                    'value' => Html::a(Html::encode($email->value), 'mailto:'.$email->value, ['data-pjax' => '0']),
+                    'note' => $email->is_approved ? 'Подтверждён клиентом' : 'Не подтверждён',
+                    'actions' => CrmContactBlockWidget::menu('/cms/admin-user-email', (int)$email->id, 'Изменить email')
+                        .CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
+                ], $model->cmsUserEmails),
+                'emptyText' => 'Email пока нет',
+                'addLabel' => 'Добавить email',
+                'addRoute' => ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => $model->id]],
+                'addSize' => 'small',
+            ]);
 
-                                </div>
-                                <div class="my-auto d-flex">
-
-                                    <button type="button" class="btn btn-default sx-send-sms-trigger mr-1"
-                                            data-phone="<?= Html::encode($cmsUserPhone->value); ?>"
-                                            data-html="true" title="Написать sms">
-                                        <i class="fas fa-sms"></i>
-                                    </button>
-
-
-                                    <button type="button" class="btn btn-default sx-telephony-btn"
-                                            data-value="<?= Html::encode($cmsUserPhone->value); ?>"
-                                            data-html="true" title="Начать звонок">
-                                        <i class="fas fa-phone"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        <? endforeach; ?>
-                    </div>
-                    <?
-
-                    $actionData = \yii\helpers\Json::encode([
-                        "isOpenNewWindow" => true,
-                        "size"            => 'small',
-                        "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                            "/cms/admin-user-phone/create",
-                            'CmsUserPhone' => [
-                                'cms_user_id' => $model->id,
-                            ],
-                        ])->enableEmptyLayout()->enableNoActions()->url,
-                    ]);
-                    ?>
-                    <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
-               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
-JS
-                    ); ?>'>Добавить
-                    </button>
-            <?php BackendSurfaceWidget::end(); ?>
-
-
-            <?php BackendSurfaceWidget::begin($surfaceConfig(
-                'Email',
-                'У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию.'
-            )); ?>
-                    <div class="sx-phones-block">
-                        <? foreach ($model->cmsUserEmails as $cmsUserEmail) : ?>
-                            <div class="d-flex mb-2">
-                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
-                                    <div class="sx-collection-cell__secondary">
-                                        <? if ($cmsUserEmail->name) : ?>
-                                            <? echo $cmsUserEmail->name; ?>
-                                        <? else : ?>
-                                            Email
-                                        <? endif; ?>
-                                    </div>
-                                    <div class="sx-collection-cell__primary">
-                                        <?= Html::a(Html::encode($cmsUserEmail->value), 'mailto:' . $cmsUserEmail->value); ?>
-                                        <?php if ($cmsUserEmail->is_approved) : ?>
-                                            <span class="sx-text--success" data-html="true" data-toggle="tooltip"
-                                                  title="Email подтвержден пользователем<br />Пользователь реально получил код на этот email и подтвердил его.">✓</span>
-                                        <?php else : ?>
-                                            <span class="sx-text--muted" data-html="true" data-toggle="tooltip" title="Пользователь не подтверждал email."><i class="far fa-question-circle"></i></span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <div class="my-auto">
-                                    <?
-                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => "/cms/admin-user-email",
-                                        'modelId'      => $cmsUserEmail->id,
-                                        'tag'          => 'div',
-                                        'options'      => [
-                                            'title' => 'Редактировать email',
-                                            'class' => 'sx-icon-action',
-                                        ],
-                                    ]);
-                                    ?>
-                                    <!--<i class="hs-admin-angle-down"></i>-->
-                                    <i class="fas fa-ellipsis-v"></i>
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-
-                                </div>
-                                <div class="my-auto">
-                                    <a class="btn btn-default" href="mailto:<?= Html::encode($cmsUserEmail->value); ?>" data-html="true" title="Написать письмо">
-                                        <i class="far fa-envelope"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        <? endforeach; ?>
-                    </div>
-                    <?
-
-                    $actionData = \yii\helpers\Json::encode([
-                        "isOpenNewWindow" => true,
-                        "size"            => 'small',
-                        "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                            "/cms/admin-user-email/create",
-                            'CmsUserEmail' => [
-                                'cms_user_id' => $model->id,
-                            ],
-                        ])->enableEmptyLayout()->enableNoActions()->url,
-                    ]);
-                    ?>
-                    <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
-               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
-JS
-                    ); ?>'>Добавить
-                    </button>
-            <?php BackendSurfaceWidget::end(); ?>
-
-
-            <?php BackendSurfaceWidget::begin($surfaceConfig(
-                'Адреса',
-                'У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию.'
-            )); ?>
-                    <div class="sx-phones-block">
-                        <? foreach ($model->cmsUserAddresses as $cmsUserAddress) : ?>
-                            <div class="d-flex mb-2">
-                                <div class="sx-collection-cell sx-collection-cell--stack w-100">
-                                    <div class="sx-collection-cell__secondary">
-                                        <? if ($cmsUserAddress->name) : ?>
-                                            <? echo $cmsUserAddress->name; ?>
-                                        <? else : ?>
-                                            Адрес
-                                        <? endif; ?>
-                                    </div>
-                                    <div class="sx-collection-cell__primary">
-                                        <?= Html::encode($cmsUserAddress->value); ?>
-                                    </div>
-                                </div>
-
-                                <div class="my-auto">
-                                    <?
-                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId' => "/cms/admin-user-address",
-                                        'modelId'      => $cmsUserAddress->id,
-                                        'tag'          => 'div',
-                                        'options'      => [
-                                            'title' => 'Редактировать адрес',
-                                            'class' => 'sx-icon-action',
-                                        ],
-                                    ]);
-                                    ?>
-                                    <!--<i class="hs-admin-angle-down"></i>-->
-                                    <i class="fas fa-ellipsis-v"></i>
-                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-
-                                </div>
-                            </div>
-                        <? endforeach; ?>
-                    </div>
-                    <?
-
-                    $actionData = \yii\helpers\Json::encode([
-                        "isOpenNewWindow" => true,
-                        //"size"            => 'small',
-                        "url"             => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                            "/cms/admin-user-address/create",
-                            'CmsUserAddress' => [
-                                'cms_user_id' => $model->id,
-                            ],
-                        ])->enableEmptyLayout()->enableNoActions()->url,
-                    ]);
-                    ?>
-                    <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
-               new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
-JS
-                    ); ?>'>Добавить
-                    </button>
-            <?php BackendSurfaceWidget::end(); ?>
+            echo CrmContactBlockWidget::widget([
+                'title' => 'Адреса',
+                'hint' => 'У пользователя может быть задано несколько адресов. Первый из них является основным и используется по умолчанию.',
+                'icon' => 'map-pin',
+                'surface' => $contactSurface,
+                'items' => array_map(static fn($address) => [
+                    'label' => $address->name ?: 'Адрес',
+                    'value' => Html::encode($address->value),
+                    'note' => implode(', ', array_filter([
+                        $address->entrance ? 'подъезд '.$address->entrance : null,
+                        $address->floor ? 'этаж '.$address->floor : null,
+                        $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
+                        $address->comment ?: null,
+                    ])),
+                    'actions' => CrmContactBlockWidget::menu('/cms/admin-user-address', (int)$address->id, 'Изменить адрес'),
+                ], $model->cmsUserAddresses),
+                'emptyText' => 'Адресов пока нет',
+                'addLabel' => 'Добавить адрес',
+                'addRoute' => ['/cms/admin-user-address/create', 'CmsUserAddress' => ['cms_user_id' => $model->id]],
+            ]);
+            ?>
 
             <?php BackendSurfaceWidget::begin($surfaceConfig(
                 'Информация',
@@ -545,114 +377,35 @@ JS
                         ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
                     ]);
                     ?>
-                    <button class="btn btn-default btn-sm" onclick='<?= new \yii\web\JsExpression(<<<JS
+                    <button type="button" class="sx-contact-add" onclick='<?= new \yii\web\JsExpression(<<<JS
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
-                    ); ?>'>Редактировать
+                    ); ?>'><?= CrmContactBlockWidget::icon('edit'); ?> Редактировать
                     </button>
             <?php BackendSurfaceWidget::end(); ?>
 
-            <?php BackendSurfaceWidget::begin($surfaceConfig(
-                'Реквизиты',
-                'Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел.'
-            )); ?>
-
-
-                <? foreach ($model->cmsContractors as $cmsContractor) : ?>
-                    <?php
-                    $contractorContent = Html::tag('span', Html::encode($cmsContractor->asText), [
-                        'class' => 'sx-collection-cell__primary',
-                    ]);
-                    if ($cmsContractor->inn) {
-                        $contractorContent .= Html::tag('small', 'ИНН '.Html::encode($cmsContractor->inn), [
-                            'class' => 'sx-collection-cell__secondary',
-                        ]);
-                    }
-                    ?>
-                    <div class="d-flex mb-2">
-                        <div class="sx-collection-cell sx-collection-cell--stack w-100">
-                            <div class="sx-collection-cell__secondary">
-                                <? if ($cmsContractor->contractor_type) : ?>
-                                    <? echo $cmsContractor->getTypeAsText(); ?>
-                                <? else : ?>
-
-                                <? endif; ?>
-                            </div>
-                            <div class="sx-collection-cell__primary">
-                                <?= BackendEntityLink::widget([
-                                    'controllerId' => '/cms/admin-cms-contractor',
-                                    'modelId'      => $cmsContractor->id,
-                                    'content'      => Html::tag('span', $contractorContent, [
-                                        'class' => 'sx-collection-cell sx-collection-cell--stack',
-                                    ]),
-                                    'options'      => [
-                                        'class'      => 'sx-preview-card__related',
-                                        'aria-label' => $cmsContractor->asText,
-                                    ],
-                                ]); ?>
-                            </div>
-                        </div>
-
-                        <div class="my-auto">
-                            <?
-                            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                'controllerId' => "/cms/admin-cms-contractor",
-                                'modelId'      => $cmsContractor->id,
-                                'tag'          => 'div',
-                                'options'      => [
-                                    'title' => 'Редактировать юр. лицо',
-                                    'class' => 'sx-icon-action',
-                                ],
-                            ]);
-                            ?>
-                            <!--<i class="hs-admin-angle-down"></i>-->
-                            <i class="fas fa-ellipsis-v"></i>
-                            <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-
-                        </div>
-                        <!--<div class="my-auto">
-                            <div class="btn btn-default" data-html="true" title="Написать письмо">
-                                <i class="far fa-envelope"></i>
-                            </div>
-                        </div>-->
-                    </div>
-                <? endforeach; ?>
-
-                    <?php $widget = \yii\bootstrap\Modal::begin([
-                        'header'       => "Добавление юр. лица",
-                        'size'         => \yii\bootstrap\Modal::SIZE_DEFAULT,
-                        'toggleButton' => [
-                            'label' => 'Добавить',
-                            'class' => 'btn btn-default btn-sm',
-                        ],
-                    ]); ?>
-
-                    <?php
-                    $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                        'action'               => \yii\helpers\Url::to(['add-contractor', 'pk' => $model->id]),
-                        'enableAjaxValidation' => false,
-                        'clientCallback'       => new \yii\web\JsExpression(<<<JS
-        function (ActiveFormAjaxSubmit) {
-            ActiveFormAjaxSubmit.on('success', function(e, response) {
-                $(".modal").modal("hide");
-                setTimeout(function() {
-                    window.location.reload();
-                }, 500);
-                
-            });
-        }
-JS
-                        ),
-                    ]); ?>
-
-                    <div class="d-flex flex-row pb-3">
-                        <input type="text" name="inn" class="form-control" placeholder="Инн организации или ИП">
-                        <button type="submit" class="btn btn-primary">Добавить</button>
-                    </div>
-                    <?php $form::end(); ?>
-
-                    <?php $widget::end(); ?>
-            <?php BackendSurfaceWidget::end(); ?>
+            <?php
+            // Full contractor form with "fill by INN"; an INN already in the base is only linked.
+            echo CrmContactBlockWidget::widget([
+                'title' => 'Реквизиты',
+                'hint' => 'Для оформления заказов и сделок на юридическое лицо необходимо добавить контрагента-компанию в этот раздел.',
+                'icon' => 'id-card',
+                'surface' => $contactSurface,
+                'items' => array_map(static fn($contractor) => [
+                    'label' => $contractor->contractor_type ? $contractor->getTypeAsText() : 'Реквизиты',
+                    'value' => BackendEntityLink::widget([
+                        'controllerId' => '/cms/admin-cms-contractor',
+                        'modelId' => $contractor->id,
+                        'content' => Html::encode($contractor->asText),
+                    ]),
+                    'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
+                    'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-contractor', (int)$contractor->id, 'Изменить реквизиты'),
+                ], $model->cmsContractors),
+                'emptyText' => 'Реквизитов пока нет',
+                'addLabel' => 'Добавить реквизиты',
+                'addRoute' => ['/cms/admin-cms-user-contractor/create', 'user_id' => $model->id],
+            ]);
+            ?>
 
             <? if ($model->managers) : ?>
                 <?php BackendSurfaceWidget::begin($surfaceConfig(
