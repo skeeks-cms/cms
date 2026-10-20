@@ -130,6 +130,12 @@ Test: tests/cms-lead-company-access.php with Composer autoload, isolated SQLite.
 
 ## Verification
 
+`WidgetRenderable` logs rendering exceptions and PHP errors server-side and
+returns a neutral message in normal mode. With YII_DEBUG, render the original
+failure's getTraceAsString() inline. Never expose exception text/traces in public widget HTML
+or cache a failed render. `tests/widget-render-error.php` checks privacy,
+logging, recovery and successful-render caching.
+
 Before finishing a change:
 
 1. Check the package Git status and preserve unrelated work.
