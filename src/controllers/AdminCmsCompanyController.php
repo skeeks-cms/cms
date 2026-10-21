@@ -587,18 +587,27 @@ HTML
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
                 'callback'  => [$this, 'addContractor'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
             ],
 
             'add-user' => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
                 'callback'  => [$this, 'addUser'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
             ],
 
             'add-log' => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
                 'callback'  => [$this, 'addLog'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
             ],
 
             "create" => [
@@ -608,6 +617,21 @@ HTML
                 'fields' => [$this, 'updateFields'],
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
+            ],
+
+            //generateAccessActions is off: deleting needs the same access to the company as editing
+            "delete" => [
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
+            ],
+            "delete-multi" => [
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can($this->permissionName);
+                },
+                "eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $model]);
                 },
             ],
 
