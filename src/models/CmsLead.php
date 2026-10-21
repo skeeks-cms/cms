@@ -44,6 +44,8 @@ class CmsLead extends Core
     public const SOURCE_PHONE = 'phone';
     public const SOURCE_IMPORT = 'import';
     public const SOURCE_API = 'api';
+    public const SOURCE_EMAIL = 'email';
+    public const SOURCE_MAX = 'max';
 
     public static function tableName()
     {
@@ -546,6 +548,8 @@ class CmsLead extends Core
             self::SOURCE_FORM => 'Конструктор форм',
             self::SOURCE_VK => 'VK',
             self::SOURCE_TELEGRAM => 'Telegram',
+            self::SOURCE_MAX => 'MAX',
+            self::SOURCE_EMAIL => 'Электронная почта',
             self::SOURCE_PHONE => 'Телефония',
             self::SOURCE_IMPORT => 'Импорт',
             self::SOURCE_API => 'API',

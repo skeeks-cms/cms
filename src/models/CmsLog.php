@@ -4,6 +4,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\CmsLogBehavior;
+use skeeks\cms\log\CmsLogRendererInterface;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\queries\CmsLogQuery;
@@ -443,6 +444,12 @@ class CmsLog extends ActiveRecord
 
     public function render()
     {
+        // Log types of other packages (Skeeks::$logRenderers) render themselves.
+        $renderer = \Yii::$app->skeeks->getLogRenderer($this->log_type);
+        if ($renderer !== null) {
+            return $renderer instanceof CmsLogRendererInterface ? $renderer->render($this) : (string)call_user_func($renderer, $this);
+        }
+
         $name = ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$this->model_code, 'name_one'], $this->model_code);
 
         if ($this->log_type == CmsLog::LOG_TYPE_COMMENT) {

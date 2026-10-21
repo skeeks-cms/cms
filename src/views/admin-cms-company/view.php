@@ -438,8 +438,10 @@ JS
                     'label' => $phone->name ?: 'Телефон',
                     'value' => Html::a(Html::encode($phone->value), 'tel:'.preg_replace('/[^\d+]/', '', (string)$phone->value), ['data-pjax' => '0']),
                     'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-company-phone', (int)$phone->id, 'Изменить телефон')
-                        .CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value])
-                        .CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value]),
+                        .CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_PHONE, (string)$phone->value, $model, [
+                            'sms' => CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value]),
+                            'call' => CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value]),
+                        ]),
                 ], $model->phones),
                 'emptyText' => 'Телефонов пока нет',
                 'addLabel' => 'Добавить телефон',
@@ -456,7 +458,9 @@ JS
                     'label' => $email->name ?: 'Email',
                     'value' => Html::a(Html::encode($email->value), 'mailto:'.$email->value, ['data-pjax' => '0']),
                     'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-company-email', (int)$email->id, 'Изменить email')
-                        .CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
+                        .CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_EMAIL, (string)$email->value, $model, [
+                            'mailto' => CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
+                        ]),
                 ], $model->emails),
                 'emptyText' => 'Email пока нет',
                 'addLabel' => 'Добавить email',
@@ -628,10 +632,7 @@ CSS
                 <?php BackendSurfaceWidget::end(); ?>
 
                 <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                    'query'                => $model->getCompanyLogs()->logType([
-                        \skeeks\cms\models\CmsLog::LOG_TYPE_PHONE_CALL,
-                        \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT,
-                    ]),
+                    'query'                => $model->getCompanyLogs()->activity(),
                     'is_show_model'        => false,
                     'is_show_pin_controls' => true,
                 ]); ?>

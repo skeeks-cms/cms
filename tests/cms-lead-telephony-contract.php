@@ -19,7 +19,7 @@ $checks = [
         && strpos($service, '?int $leadId = null') !== false,
     'explicit lead context is employee and site scoped' => strpos($service, '->forManager()') !== false
         && substr_count($service, '->cmsSite()') >= 2,
-    'lead button sends its id' => strpos($view, 'data-lead-id=') !== false,
+    'lead button sends its id' => strpos($view, "'data-lead-id' => \$leadId") !== false,
     'widget forwards lead context' => strpos($widget, 'context.lead_id') !== false,
     'client posts optional context' => strpos($script, '$.extend({ phone: phone }, context || {})') !== false,
     'confirmed webhook attaches the call' => strpos($webhook, 'attachToLead($call)') !== false,

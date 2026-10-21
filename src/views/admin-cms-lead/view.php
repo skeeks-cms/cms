@@ -325,10 +325,10 @@ CSS
                     'label' => $phone->name ?: 'Телефон',
                     'value' => Html::a(Html::encode($phone->value), 'tel:'.preg_replace('/[^\d+]/', '', (string)$phone->value), ['data-pjax' => '0']),
                     'actions' => $menu('/cms/admin-cms-lead-phone', (int)$phone->id, 'Изменить телефон')
-                        .($canWork
-                            ? CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value])
-                              .CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value, 'data-lead-id' => $leadId])
-                            : ''),
+                        .CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_PHONE, (string)$phone->value, $model, $canWork ? [
+                            'sms' => CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value]),
+                            'call' => CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value, 'data-lead-id' => $leadId]),
+                        ] : []),
                 ], $model->phones),
                 'emptyText' => 'Телефонов пока нет',
                 'addLabel' => 'Добавить телефон',
@@ -344,7 +344,9 @@ CSS
                     'label' => $email->name ?: 'Email',
                     'value' => Html::a(Html::encode($email->value), 'mailto:'.$email->value, ['data-pjax' => '0']),
                     'actions' => $menu('/cms/admin-cms-lead-email', (int)$email->id, 'Изменить email')
-                        .CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
+                        .CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_EMAIL, (string)$email->value, $model, [
+                            'mailto' => CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
+                        ]),
                 ], $model->emails),
                 'emptyText' => 'Email пока нет',
                 'addLabel' => 'Добавить email',
@@ -559,10 +561,7 @@ CSS
                     <?php BackendSurfaceWidget::end(); ?>
                 <?php endif; ?>
                 <?= CmsLogListWidget::widget([
-                    'query' => $model->getLogs()->logType([
-                        CmsLog::LOG_TYPE_PHONE_CALL,
-                        CmsLog::LOG_TYPE_COMMENT,
-                    ]),
+                    'query' => $model->getLogs()->activity(),
                     'is_show_model' => false,
                     'is_show_pin_controls' => false,
                 ]); ?>

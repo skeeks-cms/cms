@@ -314,6 +314,24 @@ A successful lead's amount is corrected through the hidden deal-amount action
 It saves only deal_amount: the status does not change, so EVENT_PARTNER_SUCCESS
 and the partner reward are not triggered again.
 
+## CRM extension points for other packages
+
+Packages such as skeeks/cms-communication extend CRM cards without core
+changes. Skeeks::$logRenderers maps a log type to a CmsLogRendererInterface
+class/config or a callable; CmsLog::render() calls it before the built-in
+branches, so a registered type renders itself (trusted HTML: encode values).
+Skeeks::$activityLogTypes adds types to the lead, company and client feeds
+(CmsLogQuery::activity(), defaults: phone_call, comment); registrations merge
+and never replace. Label new types through Skeeks::$logTypes.
+Phone and email rows of the lead, company and client cards render their
+actions through CrmContactBlockWidget::contactActions(): the card passes its
+defaults (`sms`, `call`, `mailto`; none for a lead the employee cannot work
+with) and the class-level EVENT_CONTACT_ACTIONS (CrmContactActionsEvent with
+contactType, value, owner, actions) lets handlers replace, add or remove
+entries. Handlers check their own permissions. CmsLead sources include
+`email` and `max` for leads created from mailboxes and MAX bots.
+Test: tests/crm-extension-points.php (Composer autoload, no database).
+
 ## Contractor delivery address
 
 cms_contractor.delivery_address (m261015_020000, varchar 255, null) is the
@@ -323,3 +341,66 @@ it. skeeks/cms-shop ShopDocument::createFromBill fills consignee_address of
 UPD, waybill and invoice-facture from it, falling back to the buyer address.
 Model rules, form and card access it through hasAttribute(), so code works
 before the migration is applied. The API writes it through safeAttributes.
+
+## Planned: storage file usage registry
+
+Status: plan agreed with the owner on 2026-10-21, not started. Nothing below
+exists in code yet; do not document it in the skill until it is implemented.
+`skeeks/cms-backend` is out of scope (the owner postponed base backend changes).
+
+Why. `cms_storage_file` does not know where a file is used. HasStorageFile /
+HasStorageFileMulti delete a file when it is removed from its record, and a
+manual delete in "Файловое хранилище" silently removes the file from every
+record that refers to it (cascading foreign keys). This is tolerable while one
+file belongs to one record. It stops being safe once a file is shared: mail
+already shares one stored file between letters with the same content, and
+next come retention cleanup of letter files, "create a task from a letter"
+with attachments, a shared rich-text editor with images in tasks and news, and
+reuse of identical content across the platform.
+
+Design: the registry asks the owners, it does not store references. A
+separate "file -> usage" table is rejected: every writer in every package
+would have to keep it in sync, and one missed writer lets a cleanup delete a
+live file. Instead:
+
+1. A provider contract in `skeeks/cms` (working name
+   `StorageFileUsageProviderInterface`): for a list of storage file ids return
+   where each one is used — the kind of record ("Письмо", "Задача", "Товар"),
+   record id, its title and its admin URL. A provider reads the same data its
+   section works with, so the answer is always current.
+2. `Yii::$app->storage` (`components\storage\Storage`) keeps the list of
+   providers, filled from package configuration (an optional package registers
+   its own provider; core never depends on it), and exposes "where is this
+   file used" and "is this file used".
+3. Core providers only for relations verified in code: task files
+   (`CmsTaskFile`), images and files of content elements and trees, user
+   images and the like. Other packages (shop, news, products) connect
+   gradually, each with its own provider.
+4. The storage file card in "Файловое хранилище" (`AdminStorageFilesController`
+   update page) shows "Где используется" with links; deleting a used file warns
+   instead of removing it everywhere.
+
+First candidate: mail (`skeeks/cms-communication`). It already keeps its own
+registry, `cms_comm_message_file` (letter -> storage file, name, attachment or
+inline image, `content_hash`, size; see its `ARCHITECTURE.md`, "Файлы писем").
+Connecting it is one provider class over that table (letter subject and a link
+to the letter) registered in the package config; the rest of mail stays as is.
+
+Rules until the registry covers every package that stores files:
+
+- A file is handed from one section to another as a copy, not as a reference
+  to the same storage file (e.g. "create a task from a letter"). References
+  become allowed once both sections are connected.
+- A section's own cleanup deletes a storage file only when its own records no
+  longer refer to it and, once the registry exists, when "is this file used"
+  answers no.
+- While coverage is partial, "not used" means "not found in connected
+  sections": do not enable a platform-wide cleanup of unused files or reuse of
+  identical content across sections until every file-storing package is
+  connected.
+
+Done when: the storage card of a letter file (on the skeeks.com stand, the
+files of letter #234) shows "Где используется" with a link to the letter, an
+unused file shows "nowhere", deleting a used file warns, and the verified
+contract is recorded in the `skeeks-cms-package-development` skill with the
+partial-coverage caveat.

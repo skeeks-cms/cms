@@ -184,7 +184,7 @@ if (strpos($view, "'title' => \$model->name") !== false
 if (strpos($view, 'min-height: 220px') !== false) {
     throw new RuntimeException('Lead card must not retain the old artificial minimum height.');
 }
-foreach (['sx-detail-layout__aside', 'sx-detail-layout__main', 'Добавить комментарий', 'CmsLog::LOG_TYPE_PHONE_CALL', 'CmsLog::LOG_TYPE_COMMENT'] as $activityFragment) {
+foreach (['sx-detail-layout__aside', 'sx-detail-layout__main', 'Добавить комментарий', '$model->getLogs()->activity()'] as $activityFragment) {
     if (strpos($view, $activityFragment) === false) {
         throw new RuntimeException('Lead card must use the company-style split activity layout: '.$activityFragment);
     }
@@ -265,7 +265,10 @@ foreach (['if (!$this->model || $this->model->isTerminal)', 'return false;'] as 
         throw new RuntimeException('Completed leads must remain read-only in controller actions: '.$terminalAccessContract);
     }
 }
-if (substr_count($view, '<?php if ($canWork) : ?>') < 4
+// Contact blocks pass add routes, row menus and call/SMS actions only when $canWork.
+if (substr_count($view, "'addRoute' => \$canWork ?") < 5
+    || strpos($view, 'string $title): string => $canWork') === false
+    || strpos($view, '(string)$phone->value, $model, $canWork ? [') === false
     || strpos($view, '$canWork = $model->canBeWorkedBy') === false
 ) {
     throw new RuntimeException('Completed lead contact controls must remain behind the shared work-access predicate.');

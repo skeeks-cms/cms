@@ -9,6 +9,7 @@
 namespace skeeks\cms;
 
 use skeeks\cms\backend\BackendComponent;
+use skeeks\cms\log\CmsLogRendererInterface;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsCompanyAddress;
 use skeeks\cms\models\CmsCompanyEmail;
@@ -50,6 +51,7 @@ use yii\web\View;
 
 /**
  * @property array   $logTypes
+ * @property string[] $activityLogTypes
  * @property CmsSite $site
  *
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -460,6 +462,76 @@ class Skeeks extends Component implements BootstrapInterface
     public function getLogTypes()
     {
         return ArrayHelper::merge((array)$this->defaultLogTypes, (array)$this->_logTypes);
+    }
+
+    /**
+     * Renderers of log types owned by other packages: log type => class name,
+     * Yii object config or callable `function (CmsLog $log): string`.
+     * A registered renderer takes precedence over the built-in rendering.
+     *
+     * @var array
+     */
+    public $logRenderers = [];
+
+    /** @var CmsLogRendererInterface[]|callable[] */
+    private $_logRendererInstances = [];
+
+    /**
+     * @param string $logType
+     * @return CmsLogRendererInterface|callable|null
+     */
+    public function getLogRenderer($logType)
+    {
+        $logType = (string)$logType;
+        if (!isset($this->logRenderers[$logType])) {
+            return null;
+        }
+
+        if (!array_key_exists($logType, $this->_logRendererInstances)) {
+            $renderer = $this->logRenderers[$logType];
+            if (!is_callable($renderer)) {
+                $renderer = \Yii::createObject($renderer);
+                if (!$renderer instanceof CmsLogRendererInterface) {
+                    throw new \yii\base\InvalidConfigException("Log renderer of «{$logType}» must implement ".CmsLogRendererInterface::class);
+                }
+            }
+            $this->_logRendererInstances[$logType] = $renderer;
+        }
+
+        return $this->_logRendererInstances[$logType];
+    }
+
+    /**
+     * Log types shown in the activity feeds of CRM cards (lead, company, client).
+     *
+     * @var string[]
+     */
+    public $defaultActivityLogTypes = [
+        CmsLog::LOG_TYPE_PHONE_CALL,
+        CmsLog::LOG_TYPE_COMMENT,
+    ];
+
+    /** @var string[] */
+    private $_activityLogTypes = [];
+
+    /**
+     * Adds log types to the activity feeds; packages register their own types here.
+     *
+     * @param string[] $logTypes
+     * @return $this
+     */
+    public function setActivityLogTypes(array $logTypes)
+    {
+        $this->_activityLogTypes = array_merge($this->_activityLogTypes, array_values($logTypes));
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getActivityLogTypes()
+    {
+        return array_values(array_unique(array_map('strval', array_merge((array)$this->defaultActivityLogTypes, $this->_activityLogTypes))));
     }
 
     /**

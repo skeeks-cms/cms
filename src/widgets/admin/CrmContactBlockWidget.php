@@ -7,6 +7,7 @@ use skeeks\cms\backend\helpers\BackendIcon;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+use yii\base\Event;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -39,6 +40,12 @@ use yii\helpers\Json;
  */
 class CrmContactBlockWidget extends Widget
 {
+    public const CONTACT_PHONE = 'phone';
+    public const CONTACT_EMAIL = 'email';
+
+    /** Class-level event: packages add actions to phone and email rows. */
+    public const EVENT_CONTACT_ACTIONS = 'contactActions';
+
     /** Icon-font glyphs for BackendIcon names missing in an older cms-backend. */
     private const ICON_FALLBACK = [
         'phone' => 'fas fa-phone',
@@ -111,6 +118,33 @@ class CrmContactBlockWidget extends Widget
         $options['aria-label'] = $title;
 
         return Html::tag($tag, self::icon($icon, 16), $options);
+    }
+
+    /**
+     * Actions of a phone or email row: the card's defaults plus those added by
+     * packages through {@see EVENT_CONTACT_ACTIONS}.
+     *
+     * ```php
+     * Event::on(CrmContactBlockWidget::class, CrmContactBlockWidget::EVENT_CONTACT_ACTIONS, function (CrmContactActionsEvent $e) {
+     *     if ($e->contactType === CrmContactBlockWidget::CONTACT_EMAIL) {
+     *         $e->actions['mailto'] = CrmContactBlockWidget::iconButton('mail', 'Написать письмо', [...]);
+     *     }
+     * });
+     * ```
+     *
+     * @param string[] $defaults id => trusted HTML
+     */
+    public static function contactActions(string $contactType, string $value, $owner = null, array $defaults = []): string
+    {
+        $event = new CrmContactActionsEvent([
+            'contactType' => $contactType,
+            'value' => $value,
+            'owner' => $owner,
+            'actions' => $defaults,
+        ]);
+        Event::trigger(self::class, self::EVENT_CONTACT_ACTIONS, $event);
+
+        return implode('', $event->actions);
     }
 
     public function run()

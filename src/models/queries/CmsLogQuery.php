@@ -61,5 +61,16 @@ class CmsLogQuery extends CmsActiveQuery
         return $this->logType(CmsLog::LOG_TYPE_PHONE_CALL);
     }
 
+    /**
+     * Entries of the activity feed of CRM cards: calls, comments and the types
+     * registered by packages in Skeeks::$activityLogTypes.
+     *
+     * @return $this
+     */
+    public function activity()
+    {
+        return $this->logType(\Yii::$app->skeeks->activityLogTypes);
+    }
+
 
 }
