@@ -544,9 +544,6 @@ class GridView extends \yii\grid\GridView
     {
         if ($callbackEventName = BackendUrlHelper::createByParams()->setBackendParamsByCurrentRequest()->callbackEventName) {
 
-            $isCkeditor = (int) \Yii::$app->request->get("CKEditorFuncNum");
-            $jsData = Json::encode(['is_ckeditor' => $isCkeditor]);
-
             $this->view->registerJs(<<<JS
 (function(sx, $, _)
 {
@@ -573,47 +570,14 @@ class GridView extends \yii\grid\GridView
 
         submit: function(data)
         {
-            if (this.get("is_ckeditor")) {
-                sx.EventManager.trigger('submitElement', data);
-                
-                if (window.opener) {
-                    if (window.opener.CKEDITOR) {
-                        window.opener.CKEDITOR.tools.callFunction(self.get("is_ckeditor"), data.basenamesrc);
-                        window.close();
-                    }
-                }
-    
-            } else {
-                sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
-            }
-            
-            /*this.trigger("submit", data);
-            sx.EventManager.trigger('submitElement', data);
-            console.log('submit');*/
-            
-            /*
-            if (window.opener)
-            {
-                if (window.opener.sx)
-                {
-                    window.opener.sx.EventManager.trigger('{$callbackEventName}', data);
-                    return this;
-                }
-            } else if (window.parent)
-            {
-                if (window.parent.sx)
-                {
-                    window.parent.sx.EventManager.trigger('{$callbackEventName}', data);
-                    return this;
-                }
-            }*/
+            sx.Window.openerWidgetTriggerEvent('{$callbackEventName}', data);
 
             return this;
         }
     });
 
     
-    sx.SelectCmsElement = new sx.classes.SelectCmsElement({$jsData});
+    sx.SelectCmsElement = new sx.classes.SelectCmsElement();
 
 })(sx, sx.$, sx._);
 JS

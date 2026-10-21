@@ -91,7 +91,7 @@ class ComponentSettingsWidget extends InputWidget
 
 
     /**
-     * Registers CKEditor plugin
+     * Registers the widget script
      */
     protected function registerPlugin()
     {

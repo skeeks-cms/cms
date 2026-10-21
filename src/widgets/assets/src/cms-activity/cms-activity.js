@@ -5,98 +5,6 @@
         return;
     }
 
-    var readThemeColor = function (name) {
-        return window.getComputedStyle(document.documentElement)
-            .getPropertyValue(name)
-            .trim();
-    };
-
-    var syncEditorTheme = function (editor) {
-        if (!editor || !editor.document) {
-            return;
-        }
-
-        var body = editor.document.getBody();
-        if (!body || !body.$) {
-            return;
-        }
-
-        var surface = readThemeColor("--sx-color-surface");
-        var text = readThemeColor("--sx-color-text");
-        var muted = readThemeColor("--sx-color-text-muted");
-        var accent = readThemeColor("--sx-color-accent");
-        var frame = editor.container && editor.container.$
-            ? editor.container.$.querySelector("iframe")
-            : null;
-
-        body.setStyles({
-            "background-color": surface,
-            "color": text
-        });
-        editor.document.getDocumentElement().setStyle(
-            "color-scheme",
-            document.documentElement.getAttribute("data-sx-theme") || "light"
-        );
-
-        if (frame) {
-            frame.style.backgroundColor = surface;
-        }
-
-        Array.prototype.forEach.call(
-            editor.document.$.querySelectorAll("a"),
-            function (link) {
-                link.style.color = accent;
-            }
-        );
-        Array.prototype.forEach.call(
-            editor.document.$.querySelectorAll("blockquote"),
-            function (quote) {
-                quote.style.color = muted;
-            }
-        );
-    };
-
-    var syncEditorsTheme = function () {
-        if (!window.CKEDITOR || !window.CKEDITOR.instances) {
-            return false;
-        }
-
-        Object.keys(window.CKEDITOR.instances).forEach(function (key) {
-            syncEditorTheme(window.CKEDITOR.instances[key]);
-        });
-
-        return true;
-    };
-
-    var ckEditorEventsBound = false;
-    var bindCkEditorTheme = function () {
-        if (!window.CKEDITOR) {
-            return false;
-        }
-
-        if (!ckEditorEventsBound) {
-            window.CKEDITOR.on("instanceReady", function (event) {
-                syncEditorTheme(event.editor);
-            });
-            ckEditorEventsBound = true;
-        }
-
-        syncEditorsTheme();
-        return true;
-    };
-
-    var ckEditorBindAttempts = 0;
-    var ckEditorBindTimer = window.setInterval(function () {
-        ckEditorBindAttempts += 1;
-        if (bindCkEditorTheme() || ckEditorBindAttempts >= 50) {
-            window.clearInterval(ckEditorBindTimer);
-        }
-    }, 100);
-
-    document.addEventListener("sx:themechange", function () {
-        window.setTimeout(syncEditorsTheme, 0);
-    });
-
     new sx.classes.LinkActivation(".sx-comment-wrapper");
 
     $("body")
@@ -196,7 +104,6 @@
         .off("pjax:end.sxLogShare")
         .on("pjax:end.sxLogShare", function () {
             window.setTimeout(window.sxScrollToLogComment, 150);
-            window.setTimeout(bindCkEditorTheme, 0);
         });
     window.setTimeout(window.sxScrollToLogComment, 350);
 

@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
 class UserPropertyTypeComboText extends PropertyType
 {
     public $code = self::CODE_STRING;
-    public $name = "Текст/CKEditor/HTML";
+    public $name = "Текст/Визуальный редактор/HTML";
 
 
     public function attributeLabels()
@@ -48,13 +48,7 @@ class UserPropertyTypeComboText extends PropertyType
     {
         $field = parent::renderForActiveForm($relatedPropertiesModel);
 
-        $field->widget(\skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-            [
-                'ckeditorOptions' =>
-                    [
-                        'relatedModel' => $relatedPropertiesModel->relatedElementModel
-                    ]
-            ]);
+        $field->widget(\skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className());
 
         return $field;
     }

@@ -181,6 +181,12 @@ class Tree extends ActiveRecord
                 'fields' => ['image_id', 'image_full_id'],
             ],
 
+            // Site page HTML is trusted: only images pasted into the editor are stored on save.
+            \skeeks\cms\behaviors\RichTextBehavior::class => [
+                'class'      => \skeeks\cms\behaviors\RichTextBehavior::class,
+                'attributes' => ['description_short' => false, 'description_full' => false],
+            ],
+
             HasStorageFileMulti::className() => [
                 'class'     => HasStorageFileMulti::className(),
                 'relations' => [

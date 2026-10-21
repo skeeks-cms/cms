@@ -261,31 +261,6 @@ JS
     ]);
 ?>
 
-<?php /*= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-        [
-            'modelAttributeSaveType' => 'description_short_type',
-            'ckeditorOptions' => [
-
-                'preset'        => 'full',
-                'relatedModel'  => $model,
-            ],
-            'codemirrorOptions' =>
-            [
-                'preset'    => 'php',
-                'assets'    =>
-                [
-                    \skeeks\widget\codemirror\CodemirrorAsset::THEME_NIGHT
-                ],
-
-                'clientOptions'   =>
-                [
-                    'theme' => 'night',
-                ],
-            ]
-        ])
-        */ ?>
-
 <? $fieldSet::end(); ?>
 
     <div data-listen="isLink" data-show="0" class="sx-hide">

@@ -37,6 +37,11 @@ class CmsFaq extends ActiveRecord
     {
         return ArrayHelper::merge(parent::behaviors(), [
 
+            // The answer is edited with RichTextInputWidget (preset "full"); old pictures are kept.
+            \skeeks\cms\behaviors\RichTextBehavior::class => [
+                'class'      => \skeeks\cms\behaviors\RichTextBehavior::class,
+                'attributes' => ['response' => ['preset' => 'full', 'images' => true]],
+            ],
 
             RelationalBehavior::class => [
                 'class'         => RelationalBehavior::class,

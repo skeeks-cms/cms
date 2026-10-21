@@ -20,7 +20,7 @@ use skeeks\cms\models\CmsFaq;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
-use skeeks\yii2\ckeditor\CKEditorWidget;
+use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
@@ -175,8 +175,13 @@ class AdminCmsFaqController extends BackendModelStandartController
                     ],
                     'name',
                     'response'        => [
-                        'class'       => WidgetField::class,
-                        'widgetClass' => CKEditorWidget::class,
+                        // CmsFaq cleans it with the same preset (RichTextBehavior).
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => RichTextInputWidget::class,
+                        'widgetConfig' => [
+                            'preset'    => ['preset' => 'full', 'images' => true],
+                            'minHeight' => 260,
+                        ],
                     ],
                     'trees'           => [
                         'class'        => WidgetField::class,

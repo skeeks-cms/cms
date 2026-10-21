@@ -28,18 +28,6 @@ $this->registerJs(<<<JS
 
         submit: function(file)
         {
-            if (this.GetParams['CKEditorFuncNum'])
-            {
-                if (window.opener)
-                {
-                    if (window.opener.CKEDITOR)
-                    {
-                        window.opener.CKEDITOR.tools.callFunction(this.GetParams['CKEditorFuncNum'], file);
-                        window.close();
-                        return this;
-                    }
-                }
-            }
 
             if (this.GetParams['callbackEvent'])
             {

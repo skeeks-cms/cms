@@ -19,7 +19,8 @@ use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsUserEmail;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\rbac\CmsManager;
-use skeeks\yii2\ckeditor\CKEditorWidget;
+use skeeks\cms\behaviors\RichTextBehavior;
+use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\TextField;
@@ -120,7 +121,9 @@ class AdminCmsLogController extends BackendModelStandartController
                 $log = new CmsLog();
 
                 $log->log_type = CmsLog::LOG_TYPE_COMMENT;
-                
+                // The comment form uses RichTextInputWidget with the "basic" preset.
+                $log->attachBehavior('richText', ['class' => RichTextBehavior::class, 'attributes' => ['comment' => 'basic']]);
+
                 if ($log->load(\Yii::$app->request->post()) && $log->save()) {
 
                 } else {
@@ -181,11 +184,17 @@ class AdminCmsLogController extends BackendModelStandartController
     {
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
+        // Old comments keep their tables and pictures when edited (pasted letters).
+        $model->attachBehavior('richText', [
+            'class' => RichTextBehavior::class,
+            'attributes' => ['comment' => ['preset' => 'basic', 'tables' => true, 'images' => true]],
+        ]);
 
         $result = [
             'comment' => [
                 'class' => WidgetField::class,
-                'widgetClass' => CKEditorWidget::class
+                'widgetClass' => RichTextInputWidget::class,
+                'widgetConfig' => ['preset' => 'basic', 'paragraph' => 'div', 'minHeight' => 160],
             ],
             'is_pinned' => [
                 'class' => BoolField::class,

@@ -73,63 +73,14 @@ JS
     <div class="sx-comment-form__editor">
         <?php
 
+        // The comment is cleaned with the same preset in AdminCmsLogController::addComment().
         echo $form->field($log, "comment")->widget(
-            \skeeks\yii2\ckeditor\CKEditorWidget::class,
+            \skeeks\cms\widgets\formInputs\richText\RichTextInputWidget::class,
             [
-                'preset'        => false,
-                'clientOptions' => [
-                    'enterMode' => 2,
-                    'placeholder' => 'test',
-                    'editorplaceholder' => 'test',
-                    /*'editorplaceholder' => 'test',*/
-                    /*'placeholder' => 'test',
-                    'editorplaceholder' => 'test',*/
-                    'height'    => 120,
-                    'allowedContent' => false,
-                    //'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
-                    'toolbar'   => [
-                        [
-                            'name'   => 'basicstyles',
-                            'groups' => ['basicstyles', 'cleanup'],
-                            'items'  => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'],
-                        ],
-                        [
-                            'name'   => 'paragraph',
-                            'groups' => ['list', 'indent', 'blocks', 'align', 'bidi'],
-                            'items'  => [
-                                'NumberedList',
-                                'BulletedList',
-                                '-',
-                                'Blockquote',
-                                '-',
-                                'JustifyLeft',
-                                'JustifyCenter',
-                                'JustifyRight',
-                                'JustifyBlock',
-                            ],
-                        ],
-
-                        /*[
-                            'name'   => 'paragraph',
-                            'groups' => ['list', 'indent', 'blocks', 'align', 'bidi'],
-                            'items'  => [
-                                'NumberedList',
-                                'BulletedList',
-                                '-',
-                                'Blockquote',
-                                '-',
-                                'JustifyLeft',
-                                'JustifyCenter',
-                                'JustifyRight',
-                                'JustifyBlock',
-
-                            ],
-                        ],*/
-                        ['name' => 'links', 'items' => ['Link','Unlink']],
-
-                    ],
-                ],
-
+                'preset'      => 'basic',
+                'paragraph'   => 'div',
+                'minHeight'   => 110,
+                'placeholder' => 'Напишите комментарий…',
             ])->label(false); ?>
     </div>
 

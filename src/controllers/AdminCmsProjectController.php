@@ -434,8 +434,6 @@ HTML
             ],
 
             'description' => [
-                /*'class' => WidgetField::class,
-                'widgetClass' => Ckeditor::class*/
                 'class' => TextareaField::class,
             ],
 

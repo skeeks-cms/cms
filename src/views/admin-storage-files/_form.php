@@ -52,20 +52,19 @@ CSS
     <?= $form->fieldSet(\Yii::t('skeeks/cms', 'Description')); ?>
 
     <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        \skeeks\cms\widgets\formInputs\richText\RichTextInputWidget::class,
         [
-            'options' => ['rows' => 20],
-            'preset' => 'full',
-            'relatedModel' => $model,
+            // StorageFile cleans it with the same preset (RichTextBehavior).
+            'preset'    => ['preset' => 'full', 'images' => true],
+            'minHeight' => 260,
         ])
     ?>
 
     <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor::className(),
+        \skeeks\cms\widgets\formInputs\richText\RichTextInputWidget::class,
         [
-            'options' => ['rows' => 6],
-            'preset' => 'full',
-            'relatedModel' => $model,
+            'preset'    => ['preset' => 'standard', 'images' => true],
+            'minHeight' => 120,
         ])
     ?>
 

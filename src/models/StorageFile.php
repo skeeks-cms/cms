@@ -78,7 +78,15 @@ class StorageFile extends Core
             HasJsonFieldsBehavior::class => [
                 'class' => HasJsonFieldsBehavior::class,
                 'fields' => ['sx_data']
-            ]
+            ],
+            // Descriptions are edited with RichTextInputWidget (the same presets in admin-storage-files/_form); old pictures are kept.
+            \skeeks\cms\behaviors\RichTextBehavior::class => [
+                'class'      => \skeeks\cms\behaviors\RichTextBehavior::class,
+                'attributes' => [
+                    'description_short' => ['preset' => 'standard', 'images' => true],
+                    'description_full'  => ['preset' => 'full', 'images' => true],
+                ],
+            ],
         ]);
     }
 

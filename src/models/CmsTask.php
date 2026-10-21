@@ -4,6 +4,7 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\CmsLogBehavior;
+use skeeks\cms\behaviors\RichTextBehavior;
 use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\behaviors\traits\HasLogTrait;
@@ -138,6 +139,12 @@ class CmsTask extends ActiveRecord
                         'property' => 'fileIds',
                     ],
                 ],
+            ],
+
+            // The description is edited with RichTextInputWidget (preset "full"); old pasted pictures are kept.
+            RichTextBehavior::class => [
+                'class'      => RichTextBehavior::class,
+                'attributes' => ['description' => ['preset' => 'full', 'images' => true]],
             ],
 
             CmsLogBehavior::class => [

@@ -39,79 +39,6 @@
         },
     });
 
-    sx.classes.combotext.controlls.Ckeditor = sx.classes.combotext.controlls._Base.extend({
-
-        _init: function()
-        {
-            this.ckeditorInited = false;
-        },
-
-        run: function()
-        {
-            var self = this;
-
-            this.onWindowReady(function()
-            {
-                self._run();
-            });
-        },
-
-        _run: function()
-        {
-            CKEDITOR.replace(this.widget.get('inputId'), _.extend({
-               // allowedContent: true,
-            }, this.widget.get('ckeditor')) );
-
-            this.getInstance().updateElement();
-            //При первом запуске будет запущен этот код.
-            if (this.ckeditorInited === false)
-            {
-                sx.ckEditorWidget.registerOnChangeHandler(this.widget.get('inputId'));
-
-                if (this.widget.get('ckeditor').filebrowserUploadUrl)
-                {
-                    sx.ckEditorWidget.registerCsrfImageUploadHandler();
-                }
-
-                //TODO: Это не работает, нужно дорабатывать.
-                CKEDITOR.config.protectedSource.push( /<\?[\s\S]*?\?>/g );                                           // PHP code
-                CKEDITOR.config.protectedSource.push( /<%[\s\S]*?%>/g );                                             // ASP code
-                CKEDITOR.config.protectedSource.push( /(<asp:[^\>]+>[\s|\S]*?<\/asp:[^\>]+>)|(<asp:[^\>]+\/>)/gi );  // ASP.Net code
-                CKEDITOR.config.protectedSource.push(/<(style)[^>]*>.*<\/style>/ig);
-                CKEDITOR.config.protectedSource.push(/<(script)[^>]*>.*<\/script>/ig);// разрешить теги <script>
-                CKEDITOR.config.protectedSource.push(/<\?[\s\S]*?\?>/g);// разрешить php-код
-                CKEDITOR.config.protectedSource.push(/<!--dev-->[\s\S]*<!--\/dev-->/g);
-                CKEDITOR.config.allowedContent = true; /* all tags */
-
-                this.ckeditorInited = true;
-            }
-        },
-
-        /**
-        *
-        * @returns {sx.classes.combotext.controlls.ControllCkeditor}
-        */
-        stop: function()
-        {
-            if (this.getInstance())
-            {
-                this.getInstance().destroy();
-            }
-
-            return this;
-        },
-
-        /**
-        *
-        * @returns {CKEDITOR.editor}
-        */
-        getInstance: function()
-        {
-            return CKEDITOR.instances[this.widget.get('inputId')];
-        }
-    });
-
-
 
     sx.classes.combotext.controlls.Codemirror = sx.classes.combotext.controlls._Base.extend({
 
@@ -141,7 +68,7 @@
 
         /**
         *
-        * @returns {sx.classes.combotext.controlls.ControllCkeditor}
+        * @returns {sx.classes.combotext.controlls.Codemirror}
         */
         stop: function()
         {
@@ -160,12 +87,40 @@
     });
 
 
+    /**
+     * The visual mode: the light RichTextInputWidget editing the same textarea.
+     * A text with scripts, styles or embeds stays locked: it is edited in the HTML mode.
+     */
+    sx.classes.combotext.controlls.RichText = sx.classes.combotext.controlls._Base.extend({
+
+        root: function()
+        {
+            return $('[data-sx-combo-richtext]', this.widget.jQueryWrapper);
+        },
+
+        run: function()
+        {
+            var jRoot = this.root();
+            $('#' + this.widget.get('inputId')).hide();
+            jRoot.prop('hidden', false);
+            sx.RichText.load(jRoot);
+            return this;
+        },
+
+        stop: function()
+        {
+            this.root().prop('hidden', true);
+            $('#' + this.widget.get('inputId')).show();
+            return this;
+        }
+    });
+
     //Основной объект
     sx.classes.combotext.ComboTextInputWidget = sx.classes.Component.extend({
 
         _init: function()
         {
-            this.ControllCkeditor   = new sx.classes.combotext.controlls.Ckeditor(this);
+            this.ControllRichText   = new sx.classes.combotext.controlls.RichText(this);
             this.ControllCodemirror   = new sx.classes.combotext.controlls.Codemirror(this);
             this.currentControll    = null;
         },
@@ -191,13 +146,12 @@
                 this.currentControll.stop();
             }
 
+            this.currentControll = null;
+
             if (code == 'editor')
             {
-                this.currentControll = this.ControllCkeditor;
-                this.ControllCkeditor.run();
-
-            } else if (code == 'text')
-            {
+                this.currentControll = this.ControllRichText;
+                this.ControllRichText.run();
 
             } else if (code == 'html')
             {

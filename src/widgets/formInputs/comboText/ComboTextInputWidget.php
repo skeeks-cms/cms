@@ -8,10 +8,11 @@
 
 namespace skeeks\cms\widgets\formInputs\comboText;
 
+use skeeks\cms\behaviors\RichTextBehavior;
 use skeeks\cms\Exception;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\widget\codemirror\CodemirrorWidget;
-use skeeks\yii2\ckeditor\CKEditorPresets;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -60,21 +61,18 @@ class ComboTextInputWidget extends InputWidget
 
 
     /**
-     * @var array Опции для CKEditor
+     * @var array Опции RichTextInputWidget режима «Визуальный редактор».
+     * Текст считается доверенным HTML сайта; текст со скриптами, стилями и
+     * встроенными блоками визуальный редактор не открывает — он правится в режиме HTML.
+     * Картинки вставляются, только если у модели есть RichTextBehavior для этого поля
+     * (он переносит их в хранилище при сохранении).
      */
-    public $ckeditorOptions = [];
+    public $richTextOptions = [];
 
     /**
      * @var array Опции для CodeMirror
      */
     public $codemirrorOptions = [];
-
-
-    //TODO: сделать etter и зактрытый setter
-    /**
-     * @var \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor
-     */
-    public $ckeditor = null;
 
     /**
      * @var CodemirrorWidget
@@ -100,7 +98,7 @@ class ComboTextInputWidget extends InputWidget
 
         if ($this->hasModel()) {
             if (!array_key_exists('id', $this->options)) {
-                $this->clientOptions['inputId'] = Html::getInputId($model, $attribute);
+                $this->clientOptions['inputId'] = Html::getInputId($this->model, $this->attribute);
             } else {
                 $this->clientOptions['inputId'] = $this->options['id'];
             }
@@ -114,6 +112,19 @@ class ComboTextInputWidget extends InputWidget
 
         $this->registerPlugin();
 
+        // The visual mode edits the same textarea; shown by combo-widget.js in the "editor" mode.
+        $textarea .= RichTextInputWidget::widget(ArrayHelper::merge([
+            'model'          => $this->model,
+            'attribute'      => $this->attribute,
+            'inputId'        => $this->clientOptions['inputId'],
+            'preset'         => 'full',
+            'trusted'        => true,
+            'minHeight'      => 320,
+            // Without the behavior nothing would move pasted pictures out of the temporary area.
+            'uploadUrl'      => RichTextBehavior::covers($this->model, $this->attribute) ? ['/cms/admin-rich-text/upload'] : null,
+            'wrapperOptions' => ['hidden' => true, 'data-sx-combo-richtext' => true],
+        ], $this->richTextOptions));
+
         echo $this->render('combo-text', [
             'widget' => $this,
             'textarea' => $textarea
@@ -122,18 +133,10 @@ class ComboTextInputWidget extends InputWidget
 
 
     /**
-     * Registers CKEditor plugin
+     * Registers CodeMirror and the widget script
      */
     protected function registerPlugin()
     {
-        $view = $this->getView();
-
-        $this->ckeditor = new \skeeks\cms\widgets\formInputs\ckeditor\Ckeditor(ArrayHelper::merge([
-            'model' => $this->model,
-            'attribute' => $this->attribute,
-            'relatedModel' => $this->model,
-        ], $this->ckeditorOptions));
-
         $this->codemirror = new CodemirrorWidget(ArrayHelper::merge([
             'model' => $this->model,
             'attribute' => $this->attribute,
@@ -150,10 +153,8 @@ class ComboTextInputWidget extends InputWidget
 
         ], $this->codemirrorOptions));
 
-        $this->ckeditor->registerAssets();
         $this->codemirror->registerAssets();
 
-        $this->clientOptions['ckeditor'] = $this->ckeditor->clientOptions;
         $this->clientOptions['codemirror'] = $this->codemirror->clientOptions;
 
         ComboTextInputWidgetAsset::register($this->view);

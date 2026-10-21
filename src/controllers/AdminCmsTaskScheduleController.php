@@ -28,7 +28,6 @@ use skeeks\cms\widgets\admin\CmsTaskViewWidget;
 use skeeks\cms\widgets\admin\CmsWorkerViewWidget;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
-use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
 use skeeks\cms\widgets\formInputs\SmartDurationInputWidget;
 use skeeks\cms\widgets\formInputs\SmartTimeInputWidget;
 use skeeks\cms\widgets\GridView;

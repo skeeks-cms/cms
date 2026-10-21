@@ -32,7 +32,7 @@ use skeeks\cms\widgets\admin\CmsTaskViewWidget;
 use skeeks\cms\widgets\admin\CmsWorkerViewWidget;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
-use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
+use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\cms\widgets\formInputs\SmartDurationInputWidget;
 use skeeks\cms\widgets\formInputs\SmartTimeInputWidget;
 use skeeks\cms\widgets\GridView;
@@ -2421,15 +2421,12 @@ JS
 
 
             'description' => [
-                /*'class'          => TextareaField::class,
-                'elementOptions' => [
-                    'rows' => 10,
-                ],*/
+                // CmsTask cleans it with the same preset (RichTextBehavior).
                 'class'        => WidgetField::class,
-                'widgetClass'  => Ckeditor::class,
+                'widgetClass'  => RichTextInputWidget::class,
                 'widgetConfig' => [
-                    'options' => ['rows' => 20],
-                    'preset'  => 'htmlmixed',
+                    'preset'    => 'full',
+                    'minHeight' => 260,
                 ],
             ],
 

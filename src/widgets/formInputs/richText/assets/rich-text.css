@@ -1,0 +1,474 @@
+/*
+ * Light rich-text editor (RichTextInputWidget). Colors come from the shared
+ * --sx-* theme, so light and dark both work.
+ */
+.sx-rte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sx-color-border, #dedede);
+    border-radius: var(--sx-radius-md, 10px);
+    background: var(--sx-color-surface, #fff);
+    color: var(--sx-color-text, #262626);
+}
+
+.sx-rte[hidden] {
+    display: none;
+}
+
+.sx-rte.is-focused {
+    border-color: var(--sx-color-accent, #ee4d7d);
+    box-shadow: 0 0 0 3px var(--sx-color-focus-ring, rgba(238, 77, 125, .18));
+}
+
+.sx-rte--plain,
+.sx-rte--plain.is-focused {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* The toolbar stays in sight while a long text scrolls. */
+.sx-rte__tools {
+    position: sticky;
+    top: var(--sx-rte-sticky-top, var(--sx-shell-top-offset, 0px));
+    z-index: 6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--sx-color-border, #dedede);
+    border-radius: var(--sx-radius-md, 10px) var(--sx-radius-md, 10px) 0 0;
+    background: var(--sx-color-surface, #fff);
+}
+
+/* Windows and panels (empty layout) have no shell header, though the offset variable stays set. */
+.sx-empty .sx-rte__tools {
+    top: var(--sx-rte-sticky-top, 0px);
+}
+
+.sx-rte--plain .sx-rte__tools {
+    padding: 4px 0;
+    border-bottom: 0;
+    border-radius: 0;
+}
+
+/* "На весь экран": the editor covers the window, the text scrolls inside it. */
+.sx-rte__fullscreen {
+    margin-left: auto;
+}
+
+.sx-rte__fullscreen .sx-icon--minimize,
+.sx-rte.is-fullscreen .sx-rte__fullscreen .sx-icon--expand {
+    display: none;
+}
+
+.sx-rte.is-fullscreen .sx-rte__fullscreen .sx-icon--minimize {
+    display: inline;
+}
+
+.sx-rte.is-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    border: 0;
+    border-radius: 0;
+    background: var(--sx-color-surface, #fff);
+    box-shadow: none;
+}
+
+.sx-rte.is-fullscreen .sx-rte__tools {
+    position: static;
+    padding: 6px 16px;
+    border-bottom: 1px solid var(--sx-color-border, #dedede);
+    border-radius: 0;
+}
+
+.sx-rte.is-fullscreen .sx-rte__editor {
+    flex: 1;
+    min-height: 0 !important;
+    overflow-y: auto;
+    padding: 24px max(16px, calc((100% - 960px) / 2));
+}
+
+.sx-rte.is-fullscreen .sx-rte__linkbox {
+    padding: 6px 16px;
+}
+
+html.sx-rte-fullscreen-open,
+html.sx-rte-fullscreen-open body {
+    overflow: hidden;
+}
+
+/* The shared page wrapper clips overflow, which would stop the sticky toolbar. */
+.sx-main-wrapper:has(.sx-rte) {
+    overflow: clip;
+}
+
+.sx-rte__tools button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 30px;
+    padding: 0 6px;
+    border: 0;
+    border-radius: var(--sx-radius-sm, 6px);
+    background: transparent;
+    color: var(--sx-color-text, #262626);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.sx-rte__tools button:hover,
+.sx-rte__tools button.is-active {
+    background: var(--sx-color-surface-muted, #eef1f4);
+}
+
+.sx-rte__tools button svg {
+    flex: none;
+}
+
+.sx-rte button:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+.sx-rte button:focus-visible {
+    outline: 2px solid var(--sx-color-focus-ring, rgba(238, 77, 125, .28));
+    outline-offset: 1px;
+}
+
+.sx-rte__sep {
+    width: 1px;
+    height: 18px;
+    margin: 0 4px;
+    background: var(--sx-color-border, #dedede);
+}
+
+.sx-rte__menu-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.sx-rte__caret {
+    margin-left: 2px;
+    font-size: 10px;
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+.sx-rte__font-label,
+.sx-rte__block-label {
+    display: inline-block;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sx-rte__font-label {
+    min-width: 92px;
+    max-width: 120px;
+}
+
+.sx-rte__block-label {
+    min-width: 96px;
+    max-width: 110px;
+}
+
+.sx-rte__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    min-width: 170px;
+    padding: 6px;
+    border: 1px solid var(--sx-color-border, #dedede);
+    border-radius: 10px;
+    background: var(--sx-color-surface, #fff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .16);
+}
+
+.sx-rte__menu[hidden] {
+    display: none;
+}
+
+.sx-rte__tools .sx-rte__menu-item {
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    padding: 7px 10px;
+    line-height: 1.25;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.sx-rte__size-2 { font-size: 12px !important; }
+.sx-rte__size-3 { font-size: 14px !important; }
+.sx-rte__size-4 { font-size: 17px !important; }
+.sx-rte__size-5 { font-size: 21px !important; }
+.sx-rte__size-6 { font-size: 26px !important; }
+
+/* Heading samples: sized down so the menu stays compact, the order still reads. */
+.sx-rte__block-h1 { font-size: 20px !important; font-weight: 700; }
+.sx-rte__block-h2 { font-size: 18px !important; font-weight: 700; }
+.sx-rte__block-h3 { font-size: 16px !important; font-weight: 700; }
+.sx-rte__block-h4 { font-size: 14px !important; font-weight: 700; }
+
+.sx-rte__menu--swatches {
+    display: grid;
+    grid-template-columns: repeat(6, 26px);
+    gap: 6px;
+    min-width: 0;
+    padding: 10px;
+}
+
+.sx-rte__tools .sx-rte__swatch {
+    min-width: 0;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid rgba(127, 127, 127, .35);
+    border-radius: 50%;
+}
+
+.sx-rte__menu-wide {
+    grid-column: 1 / -1;
+}
+
+.sx-rte__menu--emoji {
+    display: grid;
+    grid-template-columns: repeat(8, 34px);
+    gap: 2px;
+    min-width: 0;
+}
+
+.sx-rte__tools .sx-rte__emoji {
+    min-width: 0;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    font-size: 20px;
+}
+
+.sx-rte__menu--row {
+    flex-direction: row;
+    min-width: 0;
+}
+
+.sx-rte__linkbox {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    max-width: 560px;
+    padding: 6px 8px;
+}
+
+.sx-rte--plain .sx-rte__linkbox {
+    padding: 4px 0 8px;
+}
+
+.sx-rte__link-input {
+    flex: 1;
+    min-width: 180px;
+    padding: 6px 10px;
+    border: 1px solid var(--sx-color-border, #dedede);
+    border-radius: var(--sx-radius-sm, 6px);
+    background: var(--sx-color-surface, #fff);
+    color: var(--sx-color-text, #262626);
+    font-size: 14px;
+    outline: none;
+}
+
+.sx-rte__link-input:focus {
+    border-color: var(--sx-color-accent, #ee4d7d);
+}
+
+.sx-rte__link-apply,
+.sx-rte__link-cancel {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: var(--sx-radius-sm, 6px);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.sx-rte__link-apply {
+    background: var(--sx-color-accent, #ee4d7d);
+    color: var(--sx-color-accent-contrast, #fff);
+}
+
+.sx-rte__link-cancel {
+    background: transparent;
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+/* The text */
+.sx-rte__editor {
+    padding: 10px 14px;
+    font-size: 15px;
+    line-height: 1.55;
+    outline: none;
+    overflow-wrap: anywhere;
+    caret-color: var(--sx-color-accent, #ee4d7d);
+}
+
+.sx-rte--plain .sx-rte__editor {
+    padding: 10px 0;
+}
+
+.sx-rte__editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--sx-color-text-subtle, #9aa0aa);
+}
+
+.sx-rte__editor > :first-child {
+    margin-top: 0;
+}
+
+.sx-rte__editor p {
+    margin: 0 0 .7em;
+}
+
+.sx-rte__editor h1,
+.sx-rte__editor h2,
+.sx-rte__editor h3,
+.sx-rte__editor h4 {
+    margin: .9em 0 .4em;
+    color: inherit;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.sx-rte__editor h1 { font-size: 1.75em; }
+.sx-rte__editor h2 { font-size: 1.45em; }
+.sx-rte__editor h3 { font-size: 1.2em; }
+.sx-rte__editor h4 { font-size: 1.05em; }
+
+.sx-rte__editor ul,
+.sx-rte__editor ol {
+    margin: 0 0 .7em;
+    padding-left: 1.6em;
+}
+
+.sx-rte__editor blockquote {
+    margin: 0 0 .7em .8ex !important;
+    padding-left: 1ex;
+    border-left: 2px solid var(--sx-color-border, #ccc) !important;
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+.sx-rte__editor a {
+    color: var(--sx-color-accent, #ee4d7d);
+}
+
+.sx-rte__editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* A pasted picture being copied to us. */
+.sx-rte__editor img.is-importing {
+    opacity: .45;
+    outline: 2px dashed var(--sx-color-border, #dedede);
+}
+
+.sx-rte__editor table {
+    max-width: 100%;
+    margin: 0 0 .7em;
+    border-collapse: collapse;
+}
+
+.sx-rte__editor td,
+.sx-rte__editor th {
+    padding: 4px 8px;
+    border: 1px solid var(--sx-color-border, #dedede);
+}
+
+.sx-rte__editor pre {
+    padding: 8px 10px;
+    border-radius: var(--sx-radius-sm, 6px);
+    background: var(--sx-color-surface-muted, #f4f6f8);
+    white-space: pre-wrap;
+}
+
+.sx-rte.is-locked .sx-rte__tools {
+    opacity: .45;
+    pointer-events: none;
+}
+
+.sx-rte.is-locked .sx-rte__editor {
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+.sx-rte.is-uploading .sx-rte__editor {
+    cursor: progress;
+}
+
+/* Drop zones shown while files are dragged over the page. */
+.sx-rte__drop {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--sx-color-surface, #fff) 82%, transparent);
+}
+
+.sx-rte__drop[hidden] {
+    display: none;
+}
+
+.sx-rte__zone {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 80px;
+    border: 2px dashed var(--sx-color-border-strong, var(--sx-color-text-muted, #9aa0aa));
+    border-radius: 12px;
+    color: var(--sx-color-text-muted, #6f7484);
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: border-color .12s, color .12s, background-color .12s;
+}
+
+.sx-rte__zone * {
+    pointer-events: none;
+}
+
+.sx-rte__zone.is-over {
+    border-color: var(--sx-color-accent, #ee4d7d);
+    background: var(--sx-color-accent-soft, rgba(238, 77, 125, .08));
+    color: var(--sx-color-accent, #ee4d7d);
+}
+
+@media (max-width: 600px) {
+    .sx-rte__font-label {
+        display: none;
+    }
+
+    .sx-rte__block-label {
+        min-width: 0;
+        max-width: 72px;
+    }
+
+    .sx-rte__menu--emoji {
+        grid-template-columns: repeat(6, 34px);
+    }
+
+    .sx-rte__drop {
+        flex-direction: column;
+    }
+}

@@ -97,20 +97,6 @@ class AdminStorageFilesController extends BackendModelStandartController
                     },
                     'on beforeRender' => function (Event $event) {
 
-                        if ($CKEditorFuncNum = \Yii::$app->request->get("CKEditorFuncNum")) {
-                            \Yii::$app->view->registerJs(<<<JS
-                            if (window.opener) {
-                                if (window.opener.CKEDITOR) {
-                                    sx.EventManager.on("submitElement", function(e, data) {
-                                        window.opener.CKEDITOR.tools.callFunction({$CKEditorFuncNum}, data.basenamesrc);
-                                        window.close();
-                                    });
-                                }
-                            }
-JS
-                            );
-                        }
-
                         $dm = new DynamicModel();
                         $dm->defineAttribute("files", 'safe');
 

@@ -342,6 +342,20 @@ UPD, waybill and invoice-facture from it, falling back to the buyer address.
 Model rules, form and card access it through hasAttribute(), so code works
 before the migration is applied. The API writes it through safeAttributes.
 
+## Rich-text editor
+
+RichTextInputWidget (widgets/formInputs/richText) replaces yii2-ckeditor in
+the task description, CRM comments (CmsCommentWidget, comment editing, UPA
+support), the visual mode of ComboTextInputWidget (always RichText, trusted
+HTML; pictures only with RichTextBehavior on the model) and the
+cms-communication letter form; yii2-ckeditor is removed. A preset
+(basic, standard, full; RichTextHtml::PRESETS) sets the toolbar and the
+server cleaning together; the font family is opt-in and used only by
+letters. RichTextBehavior cleans changed attributes only and moves pasted
+images from TemporaryUploads into the storage on save
+(cms/admin-rich-text/upload). Full contract: skeeks-cms-package-development
+references/rich-text-editor.md. Test: tests/rich-text-editor.php.
+
 ## Planned: storage file usage registry
 
 Status: plan agreed with the owner on 2026-10-21, not started. Nothing below

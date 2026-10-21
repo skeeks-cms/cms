@@ -7,6 +7,7 @@ namespace skeeks\cms\controllers;
 
 use skeeks\cms\support\SupportTaskExecutorResolver;
 use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\behaviors\RichTextBehavior;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\components\Cms;
@@ -545,7 +546,7 @@ class UpaSupportController extends BackendModelStandartController
 
     protected function createCommentModel(CmsTask $model): CmsLog
     {
-        return new CmsLog([
+        $comment = new CmsLog([
             'log_type' => CmsLog::LOG_TYPE_COMMENT,
             'model_code' => CmsTask::class,
             'model_id' => $model->id,
@@ -553,6 +554,10 @@ class UpaSupportController extends BackendModelStandartController
             'cms_company_id' => $model->cms_company_id ?: ($model->cmsProject ? $model->cmsProject->cms_company_id : null),
             'cms_user_id' => \Yii::$app->user->id,
         ]);
+        // The comment form uses RichTextInputWidget with the "basic" preset.
+        $comment->attachBehavior('richText', ['class' => RichTextBehavior::class, 'attributes' => ['comment' => 'basic']]);
+
+        return $comment;
     }
 
     protected function prepareClientTask(CmsTask $model): void

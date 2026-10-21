@@ -40,7 +40,7 @@
         "skeeks/yii2-form": "^1.0 || dev-master@dev",
 
         "skeeks/cms-backend": "^2.0 || dev-master@dev",
-        "skeeks/cms-backend-admin": "^2.0 || dev-master@dev",
+        "skeeks/cms-backend-admin": "^2.1.1.11 || dev-master@dev",
         "skeeks/cms-admin": "^3.0 || dev-master@dev",
 
         "skeeks/cms-query-filters": "^2.0 || dev-master@dev",
@@ -56,7 +56,6 @@
         "skeeks/yii2-ajax-file-upload": "^2.0.2 || dev-master",
         "skeeks/yii2-imagine": "^2.0 || dev-master@dev",
         "skeeks/yii2-sx": "^1.4 || dev-master@dev",
-        "skeeks/yii2-ckeditor": "^1.1 || dev-master@dev",
         "skeeks/yii2-widget-simpleajaxuploader": "^1.1.0 || dev-master@dev",
         "skeeks/yii2-widget-chosen": "^1.2 || dev-master@dev",
         "skeeks/yii2-widget-highcharts": "^1.0 || dev-master@dev",
