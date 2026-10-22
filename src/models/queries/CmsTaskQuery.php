@@ -57,9 +57,9 @@ class CmsTaskQuery extends CmsActiveQuery
 
             $this->andWhere([
                 "or",
-                [self::getPrimaryTableName() . ".cms_project_id" => CmsProject::find()->forManager()->select(CmsProject::tableName() . '.id')],
-                [self::getPrimaryTableName() . ".cms_company_id" => CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id')],
-                [self::getPrimaryTableName() . ".cms_user_id" => CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id')],
+                [self::getPrimaryTableName() . ".cms_project_id" => CmsProject::find()->forManager($user)->select(CmsProject::tableName() . '.id')],
+                [self::getPrimaryTableName() . ".cms_company_id" => CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id')],
+                [self::getPrimaryTableName() . ".cms_user_id" => CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".executor_id" => $user->id],
                 [self::getPrimaryTableName() . ".created_by" => $user->id],
             ]);

@@ -330,7 +330,27 @@ with) and the class-level EVENT_CONTACT_ACTIONS (CrmContactActionsEvent with
 contactType, value, owner, actions) lets handlers replace, add or remove
 entries. Handlers check their own permissions. CmsLead sources include
 `email` and `max` for leads created from mailboxes and MAX bots.
-Test: tests/crm-extension-points.php (Composer autoload, no database).
+"Создание из источника": Skeeks::$recordSources maps a source type to a
+source\RecordSourceInterface; every standard create window
+(BackendModelCreateAction) opened with `?source=<type>:<id>` is handled by
+source\RecordSources (class-level events attached in Skeeks::bootstrap for
+web apps): find() checks the employee's access, prefill() fills the new
+record on opening (posted values win), a line from describe() stands above
+the fields, enforce() sets source-owned attributes after the controller's
+own beforeValidate handlers, created() links back in the save transaction
+(a failure rolls the record back). Unknown, hidden or unsupported sources
+are ignored. Core keeps no knowledge of the source (mail is the first one).
+A source that also implements source\RecordOriginInterface says where a
+saved record came from: source\RecordOriginWidget at the top of the task,
+lead and deal cards shows "Создано из письма «…»" (label plain text, html
+trusted, a link only when the employee may open the source); nothing when
+the record has no origin.
+The task card feed uses CmsLogQuery::activity() like lead/company/client,
+so package log types (letters) show there. CmsTaskQuery/CmsDealQuery
+forManager($user) pass the explicit user into nested company/client/project
+scopes.
+Test: tests/crm-extension-points.php (Composer autoload, SQLite memory for
+record sources).
 
 ## Contractor delivery address
 

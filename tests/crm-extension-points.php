@@ -52,11 +52,82 @@ class CrmExtensionTestLog extends CmsLog
     }
 }
 
+/** A record created from a test source: one SQLite table. */
+class CrmExtensionTestRecord extends \yii\db\ActiveRecord
+{
+    public static function tableName()
+    {
+        return 'test_record';
+    }
+
+    public function rules()
+    {
+        return [[['name', 'owner'], 'safe']];
+    }
+}
+
+/** "note:<id>": a source the test owns; id 7 exists, id 8 is hidden from the employee. */
+class CrmExtensionTestSource implements \skeeks\cms\source\RecordSourceInterface, \skeeks\cms\source\RecordOriginInterface
+{
+    public function origins(\yii\db\ActiveRecord $record): array
+    {
+        return $record->owner === 'acme' ? [['label' => 'Создано из <заметки>', 'html' => '<a href="#n7">№7</a>'], ['label' => 'пусто', 'html' => '']] : [];
+    }
+
+    public static array $created = [];
+    public static bool $failCreated = false;
+
+    public function find(string $id)
+    {
+        return $id === '7' ? (object)['id' => 7, 'title' => 'Письмо «Привет»', 'owner' => 'acme'] : null;
+    }
+
+    public function supports(string $modelClass): bool
+    {
+        return $modelClass === CrmExtensionTestRecord::class;
+    }
+
+    public function prefill($source, \yii\db\ActiveRecord $model): void
+    {
+        $model->name = $source->title;
+    }
+
+    public function enforce($source, \yii\db\ActiveRecord $model): void
+    {
+        $model->owner = $source->owner;
+    }
+
+    public function created($source, \yii\db\ActiveRecord $model): void
+    {
+        if (self::$failCreated) {
+            throw new \RuntimeException('link failed');
+        }
+        self::$created[] = [$source->id, (int)$model->id];
+    }
+
+    public function describe($source): string
+    {
+        return 'Из '.$source->title;
+    }
+}
+
+/** What RecordSources reads of a create action: its new model and its fields. */
+class CrmExtensionTestCreateAction extends \yii\base\Component
+{
+    public $model;
+    public $fields;
+}
+
 new \yii\console\Application([
     'id' => 'crm-extension-points',
     'basePath' => sys_get_temp_dir(),
     'components' => [
+        'db' => ['class' => \yii\db\Connection::class, 'dsn' => 'sqlite::memory:'],
         'skeeks' => [
+            'recordSources' => [
+                'note' => CrmExtensionTestSource::class,
+                'broken' => \stdClass::class,
+            ],
             'class' => Skeeks::class,
             'logRenderers' => [
                 'message' => CrmExtensionTestRenderer::class,
@@ -137,5 +208,92 @@ foreach (['admin-cms-lead', 'admin-cms-company', 'admin-user'] as $viewDir) {
 // Lead sources of communication channels.
 crmExtensionExpect(isset(CmsLead::sources()[CmsLead::SOURCE_EMAIL], CmsLead::sources()[CmsLead::SOURCE_MAX]),
     'Lead sources must include email and MAX.');
+
+// "Создание из источника": ?source=<type>:<id> of a standard create window.
+use skeeks\cms\source\RecordSources;
+
+crmExtensionExpect(RecordSources::parse('note:7') === ['note', '7'], 'A "<type>:<id>" value must parse.');
+foreach (['', 'note', 'note:', ':7', 'Note:7', 'note:7;drop', ['note:7'], null] as $bad) {
+    crmExtensionExpect(RecordSources::parse($bad) === null, 'A malformed source must be ignored: '.json_encode($bad));
+}
+crmExtensionExpect($skeeks->getRecordSource('note') === $skeeks->getRecordSource('note'), 'A record source must be created once.');
+crmExtensionExpect($skeeks->getRecordSource('unknown') === null, 'An unknown source type must give null.');
+try {
+    $skeeks->getRecordSource('broken');
+    crmExtensionExpect(false, 'A record source without the interface must be rejected.');
+} catch (\yii\base\InvalidConfigException $e) {
+}
+crmExtensionExpect(RecordSources::resolve('note:8', CrmExtensionTestRecord::class) === null, 'A source hidden from the employee must be ignored.');
+crmExtensionExpect(RecordSources::resolve('note:7', \yii\base\Model::class) === null, 'A source that does not support the model must be ignored.');
+crmExtensionExpect(RecordSources::resolve('other:7', CrmExtensionTestRecord::class) === null, 'An unregistered source type must be ignored.');
+
+Yii::$app->db->createCommand()->createTable('test_record', ['id' => 'pk', 'name' => 'string', 'owner' => 'string'])->execute();
+$createAction = static function () {
+    $action = new CrmExtensionTestCreateAction(['model' => new CrmExtensionTestRecord(), 'fields' => static fn() => ['name' => []]]);
+    return $action;
+};
+$run = static function (CrmExtensionTestCreateAction $action, array $post) {
+    $action->model->setAttributes($post);
+    RecordSources::onBeforeValidate(new Event(['sender' => $action]));
+    RecordSources::onBeforeSave(new Event(['sender' => $action]));
+    $action->model->save(false);
+    RecordSources::onAfterSave(new Event(['sender' => $action]));
+};
+
+$action = $createAction();
+crmExtensionExpect(!RecordSources::start($action, 'note:8'), 'A hidden source must leave the window as it is.');
+crmExtensionExpect($action->model->name === null && is_callable($action->fields) && call_user_func($action->fields, $action) === ['name' => []],
+    'Without a source the record and its fields must stay unchanged.');
+
+$action = $createAction();
+crmExtensionExpect(RecordSources::start($action, 'note:7'), 'A visible source must be applied.');
+crmExtensionExpect($action->model->name === 'Письмо «Привет»', 'prefill() must fill the new record.');
+$fields = call_user_func($action->fields, $action);
+crmExtensionExpect(array_keys($fields) === ['__record_source', 'name'] && strpos($fields['__record_source']['content'], 'Из Письмо «Привет»') !== false,
+    'The source line must stand above the original fields, encoded.');
+// The employee edits the name; the owner is the source's and comes back before validation.
+$run($action, ['name' => 'Своё название', 'owner' => 'forged']);
+$saved = CrmExtensionTestRecord::find()->orderBy(['id' => SORT_DESC])->one();
+crmExtensionExpect($saved->name === 'Своё название' && $saved->owner === 'acme', 'Posted values must win over prefill(); enforce() must set the source attributes.');
+crmExtensionExpect(CrmExtensionTestSource::$created === [[7, (int)$saved->id]], 'created() must run once with the saved record.');
+
+// A failing link rolls the new record back.
+CrmExtensionTestSource::$failCreated = true;
+$action = $createAction();
+RecordSources::start($action, 'note:7');
+$count = (int)CrmExtensionTestRecord::find()->count();
+try {
+    $run($action, ['name' => 'x']);
+    crmExtensionExpect(false, 'A failing created() must be reported.');
+} catch (\RuntimeException $e) {
+    crmExtensionExpect($e->getMessage() === 'link failed', 'The error of created() must reach the window.');
+}
+crmExtensionExpect((int)CrmExtensionTestRecord::find()->count() === $count && !Yii::$app->db->getTransaction(),
+    'A failing created() must roll the record back and close the transaction.');
+CrmExtensionTestSource::$failCreated = false;
+
+// A window without a source does not open a transaction.
+$action = $createAction();
+RecordSources::start($action, null);
+$run($action, ['name' => 'plain']);
+crmExtensionExpect(!Yii::$app->db->getTransaction() && count(CrmExtensionTestSource::$created) === 1, 'A window without a source must save as before.');
+
+// "Создано из …" at the top of the card: sources that know the origin of a saved record.
+use skeeks\cms\source\RecordOriginWidget;
+
+$fromSource = CrmExtensionTestRecord::find()->andWhere(['owner' => 'acme'])->one();
+$plain = CrmExtensionTestRecord::find()->andWhere(['name' => 'plain'])->one();
+crmExtensionExpect(RecordOriginWidget::origins($fromSource) === [['label' => 'Создано из <заметки>', 'html' => '<a href="#n7">№7</a>']],
+    'Origins must come from sources implementing RecordOriginInterface, without empty entries.');
+crmExtensionExpect(RecordOriginWidget::origins($plain) === [] && RecordOriginWidget::origins(new CrmExtensionTestRecord()) === [],
+    'A record without an origin and a new record must have none.');
+foreach (['admin-cms-task', 'admin-cms-lead', 'admin-cms-deal'] as $viewDir) {
+    $view = file_get_contents(dirname(__DIR__).'/src/views/'.$viewDir.'/view.php');
+    crmExtensionExpect(strpos($view, '\skeeks\cms\source\RecordOriginWidget::widget([\'model\' => $model') !== false, $viewDir.' must show the origin of the record.');
+}
+
+// The task card shows the registered feed types (letters linked to the task), not only comments.
+$taskView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-task/view.php');
+crmExtensionExpect(strpos($taskView, "'query'                => \$model->getLogs()->activity(),") !== false, 'The task feed must use CmsLogQuery::activity().');
 
 echo "CRM extension points: OK\n";

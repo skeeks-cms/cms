@@ -306,6 +306,7 @@ JS
 ?>
 
 <div class="sx-task-content sx-surface-stack">
+<?= \skeeks\cms\source\RecordOriginWidget::widget(['model' => $model]) ?>
 <div class="sx-task-layout sx-detail-layout sx-detail-layout--main-first">
     <div class="sx-task-layout__main sx-detail-layout__main">
         <?php BackendSurfaceWidget::begin([
@@ -684,7 +685,7 @@ JS
             <?php BackendSurfaceWidget::end(); ?>
 
         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-            'query'                => $model->getLogs()->comments(),
+            'query'                => $model->getLogs()->activity(),
             'is_show_model'        => false,
             'is_show_pin_controls' => true,
         ]); ?>

@@ -210,6 +210,7 @@ CSS
 );
 ?>
 
+<?= \skeeks\cms\source\RecordOriginWidget::widget(['model' => $model, 'options' => ['class' => 'sx-record-origin--spaced']]) ?>
 <?php BackendSurfaceWidget::begin([
     'raised'      => true,
     'clip'        => true,

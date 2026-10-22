@@ -244,6 +244,7 @@ CSS
 ?>
 
 <div class="sx-surface-stack">
+    <?= \skeeks\cms\source\RecordOriginWidget::widget(['model' => $model]) ?>
     <?php BackendSurfaceWidget::begin(['raised' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
         <?= $this->render('_stage-bar', [
             'model' => $model,

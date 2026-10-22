@@ -87,6 +87,11 @@ class Skeeks extends Component implements BootstrapInterface
 
     public function bootstrap($application)
     {
+        // "Создание из источника" (?source=<type>:<id>) in every standard create window.
+        if ($application instanceof \yii\web\Application) {
+            \skeeks\cms\source\RecordSources::attach();
+        }
+
         Event::on(View::class, View::EVENT_AFTER_RENDER, function (Event $event) {
 
             /*<!--форма обратная связь-->
@@ -499,6 +504,41 @@ class Skeeks extends Component implements BootstrapInterface
         }
 
         return $this->_logRendererInstances[$logType];
+    }
+
+    /**
+     * Sources new CRM records are created from ("Создать задачу из письма"):
+     * source type => class name or Yii object config of a
+     * \skeeks\cms\source\RecordSourceInterface. The standard create window
+     * uses it with ?source=<type>:<id> (\skeeks\cms\source\RecordSources).
+     * Registrations of several packages merge.
+     *
+     * @var array
+     */
+    public $recordSources = [];
+
+    /** @var \skeeks\cms\source\RecordSourceInterface[] */
+    private $_recordSourceInstances = [];
+
+    /**
+     * @param string $type
+     * @return \skeeks\cms\source\RecordSourceInterface|null
+     */
+    public function getRecordSource($type)
+    {
+        $type = (string)$type;
+        if (!isset($this->recordSources[$type])) {
+            return null;
+        }
+        if (!isset($this->_recordSourceInstances[$type])) {
+            $source = \Yii::createObject($this->recordSources[$type]);
+            if (!$source instanceof \skeeks\cms\source\RecordSourceInterface) {
+                throw new \yii\base\InvalidConfigException("Record source «{$type}» must implement ".\skeeks\cms\source\RecordSourceInterface::class);
+            }
+            $this->_recordSourceInstances[$type] = $source;
+        }
+
+        return $this->_recordSourceInstances[$type];
     }
 
     /**

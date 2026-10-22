@@ -42,16 +42,16 @@ class CmsDealQuery extends CmsActiveQuery
         //Если нет прав админа, нужно показать только доступные сделки
         if (!$isCanAdmin) {
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id');
-            $cmsUserQuery = CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id');
+            $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
+            $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
 
             //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
             $this->andWhere([
                 'or',
                 //Связь клиентов с менеджерами
-                ["cms_company_id" => $cmsCompanyQuery],
+                [self::getPrimaryTableName() . ".cms_company_id" => $cmsCompanyQuery],
                 //Искать конткты по всем доступным компаниям
-                ["cms_user_id" => $cmsUserQuery],
+                [self::getPrimaryTableName() . ".cms_user_id" => $cmsUserQuery],
             ]);
         }
 
