@@ -20,7 +20,10 @@ use yii\web\UploadedFile;
  *
  * A file is referred to by an opaque token "<prefix>-<32 hex>/<name>", never
  * by a path. Tokens are bound to the uploader's session: only that session
- * can preview, use or store the file.
+ * can preview, use or store the file. The binding is an owner mark in the
+ * token directory (a keyed hash of the session id), not a list in the
+ * session data: parallel uploads of one session never overwrite each other's
+ * tokens. The daily cleanup removes the mark together with the file.
  */
 class TemporaryUploads
 {
@@ -30,7 +33,8 @@ class TemporaryUploads
     /** Raster images shown in a page; everything else is only downloaded. */
     public const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-    private const SESSION_KEY = 'sx-temporary-uploads';
+    /** Owner mark in the token directory; a file name never starts with a dot (safeName()). */
+    private const OWNER_FILE = '.owner';
 
     /**
      * Saves an uploaded file into the temporary area.
@@ -59,6 +63,10 @@ class TemporaryUploads
         if (!preg_match('/^[a-z]{2,10}$/', $prefix)) {
             throw new \InvalidArgumentException('Invalid upload prefix.');
         }
+        $owner = self::owner();
+        if ($owner === null) {
+            throw new \RuntimeException('Нет сессии для загрузки файла.');
+        }
         $key = $prefix.'-'.bin2hex(random_bytes(16));
         $name = self::safeName($name);
         $dir = self::root().DIRECTORY_SEPARATOR.$key;
@@ -66,14 +74,10 @@ class TemporaryUploads
             throw new \RuntimeException('Не удалось сохранить файл.');
         }
         $path = $dir.DIRECTORY_SEPARATOR.$name;
-        if (!$write($path)) {
+        if (file_put_contents($dir.DIRECTORY_SEPARATOR.self::OWNER_FILE, $owner) !== strlen($owner) || !$write($path)) {
             throw new \RuntimeException('Не удалось сохранить файл.');
         }
         $token = $key.'/'.$name;
-        $session = \Yii::$app->session;
-        $uploads = array_slice((array)$session->get(self::SESSION_KEY, []), -200, null, true);
-        $uploads[$token] = time();
-        $session->set(self::SESSION_KEY, $uploads);
 
         return ['token' => $token, 'name' => $name, 'size' => (int)filesize($path)];
     }
@@ -81,17 +85,52 @@ class TemporaryUploads
     /** Path of a temporary file of this session, or null. */
     public static function path(string $token): ?string
     {
-        if (!self::isToken($token) || !\Yii::$app->has('session')
-            || !isset(((array)\Yii::$app->session->get(self::SESSION_KEY, []))[$token])) {
-            return null;
-        }
-        $root = realpath(self::root());
-        $path = realpath(self::root().DIRECTORY_SEPARATOR.$token);
-        if (!$root || !$path || strpos($path, $root.DIRECTORY_SEPARATOR) !== 0 || !is_file($path) || is_link($path)) {
+        $dir = self::ownDir($token);
+        $path = $dir !== null ? realpath(self::root().DIRECTORY_SEPARATOR.$token) : false;
+        if (!$path || dirname($path) !== $dir || !is_file($path) || is_link($path)) {
             return null;
         }
 
         return $path;
+    }
+
+    /** Directory of a token uploaded by this session (the file itself may be gone), or null. */
+    private static function ownDir(string $token): ?string
+    {
+        $owner = self::isToken($token) ? self::owner() : null;
+        $root = $owner !== null ? realpath(self::root()) : false;
+        $dir = $root ? realpath(self::root().DIRECTORY_SEPARATOR.dirname($token)) : false;
+        if (!$dir || dirname($dir) !== $root || is_link(self::root().DIRECTORY_SEPARATOR.dirname($token))) {
+            return null;
+        }
+        $mark = $dir.DIRECTORY_SEPARATOR.self::OWNER_FILE;
+        if (!is_file($mark) || is_link($mark) || !hash_equals($owner, (string)file_get_contents($mark))) {
+            return null;
+        }
+
+        return $dir;
+    }
+
+    /**
+     * Owner mark of the current session: the session id hashed with the
+     * application secret, so the mark does not reveal the session id.
+     */
+    private static function owner(): ?string
+    {
+        if (!\Yii::$app->has('session')) {
+            return null;
+        }
+        $session = \Yii::$app->session;
+        $session->open();
+        $id = (string)$session->getId();
+        if ($id === '') {
+            return null;
+        }
+        $request = \Yii::$app->has('request') ? \Yii::$app->request : null;
+        $secret = $request instanceof \yii\web\Request && (string)$request->cookieValidationKey !== ''
+            ? $request->cookieValidationKey : \Yii::$app->id;
+
+        return hash_hmac('sha256', $id, (string)$secret);
     }
 
     public static function isToken(string $token): bool
@@ -146,17 +185,16 @@ class TemporaryUploads
      */
     public static function forget(string $token): void
     {
+        $dir = self::ownDir($token);
+        if ($dir === null) {
+            return;
+        }
         $path = self::path($token);
-        $uploads = (array)\Yii::$app->session->get(self::SESSION_KEY, []);
-        unset($uploads[$token]);
-        \Yii::$app->session->set(self::SESSION_KEY, $uploads);
-        if ($path && is_file($path)) {
+        if ($path !== null) {
             @unlink($path);
         }
-        $dir = self::root().DIRECTORY_SEPARATOR.dirname($token);
-        if (self::isToken($token) && is_dir($dir)) {
-            @rmdir($dir);
-        }
+        @unlink($dir.DIRECTORY_SEPARATOR.self::OWNER_FILE);
+        @rmdir($dir);
     }
 
     private static function root(): string

@@ -1,8 +1,9 @@
 <?php
 /**
  * Server side of the rich-text editor (RichTextInputWidget): cleaning presets
- * and RichTextBehavior on an isolated SQLite memory database. No session, so
- * editor uploads are always "expired" here.
+ * and RichTextBehavior on an isolated SQLite memory database, and the session
+ * binding of TemporaryUploads with a stub session (parallel uploads run as
+ * child processes). Editor uploads of the behavior checks are "expired".
  *
  * Usage: php tests/rich-text-editor.php [vendor/autoload.php]
  */
@@ -32,13 +33,45 @@ function rteExpect($condition, string $message): void
     }
 }
 
+/** Session with a given id and no storage: TemporaryUploads must not need session data. */
+class RteSession extends \yii\web\Session
+{
+    public $fakeId = '';
+
+    public function open()
+    {
+    }
+
+    public function getIsActive()
+    {
+        return true;
+    }
+
+    public function getId()
+    {
+        return $this->fakeId;
+    }
+}
+
+$uploadRoot = getenv('RTE_UPLOAD_ROOT') ?: sys_get_temp_dir().'/rte-uploads-'.getmypid();
 new \yii\console\Application([
     'id' => 'cms-rich-text-editor',
     'basePath' => sys_get_temp_dir(),
     'components' => [
         'db' => ['class' => \yii\db\Connection::class, 'dsn' => 'sqlite::memory:'],
+        'session' => ['class' => RteSession::class, 'fakeId' => (string)getenv('RTE_SESSION')],
+    ],
+    'modules' => [
+        'ajaxfileupload' => ['class' => \skeeks\yii2\ajaxfileupload\AjaxFileUploadModule::class, 'private_tmp_dir' => $uploadRoot],
     ],
 ]);
+
+// Child process of the parallel upload check: wait for the common start, upload, print the token.
+if (getenv('RTE_SESSION') !== false) {
+    time_sleep_until((float)getenv('RTE_START'));
+    echo TemporaryUploads::putBytes('bytes of '.getmypid(), 'скрин '.getmypid().'.png')['token'];
+    exit(0);
+}
 
 $html = '<h2 class="x">Заголовок</h2><p style="font-family:Arial;font-size:large;color:red;position:fixed">Текст <b>жирный</b></p>'
     .'<table><tr><td colspan="2" onclick="x()">ячейка</td></tr></table>'
@@ -63,6 +96,58 @@ rteExpect(strpos($full, '<table><tr><td colspan="2">ячейка</td></tr></tabl
 rteExpect(RichTextHtml::uploadTokens($standard) === ['rt-0123456789abcdef0123456789abcdef/скрин.png'], 'Upload tokens must be found.');
 rteExpect(!TemporaryUploads::isToken('../../etc/passwd') && !TemporaryUploads::isToken('rt-0123/x.png'), 'Only random tokens are accepted.');
 rteExpect(RichTextHtml::isEmpty('<p>&nbsp;</p><br>') && !RichTextHtml::isEmpty('<p><img src="/a.png"></p>'), 'Empty text detection.');
+
+// Temporary uploads: bound to the session by an owner mark, not by session data, so parallel uploads all stay usable.
+$session = \Yii::$app->session;
+$session->fakeId = '';
+try {
+    TemporaryUploads::putBytes('x', 'a.png');
+    rteExpect(false, 'An upload without a session must be refused.');
+} catch (RuntimeException $e) {
+    rteExpect(strpos($e->getMessage(), 'must be refused') === false, $e->getMessage());
+}
+$session->fakeId = 'session-a';
+$start = microtime(true) + 1;
+$children = $childPipes = [];
+for ($i = 0; $i < 4; $i++) {
+    $children[] = proc_open([PHP_BINARY, __FILE__, ...array_slice($argv, 1, 1)], [1 => ['pipe', 'w']], $pipes,
+        null, array_merge(getenv(), ['RTE_SESSION' => 'session-a', 'RTE_START' => (string)$start, 'RTE_UPLOAD_ROOT' => $uploadRoot]));
+    $childPipes[] = $pipes[1];
+}
+$tokens = [];
+foreach ($children as $i => $child) {
+    $tokens[] = trim((string)stream_get_contents($childPipes[$i]));
+    rteExpect(proc_close($child) === 0, 'Parallel upload process failed: '.end($tokens));
+}
+rteExpect(count(array_unique(array_filter($tokens, [TemporaryUploads::class, 'isToken']))) === 4, 'Each parallel upload gets its token: '.implode(', ', $tokens));
+foreach ($tokens as $token) {
+    $path = TemporaryUploads::path($token);
+    rteExpect($path && strpos((string)file_get_contents($path), 'bytes of ') === 0, 'Every parallel upload must stay usable: '.$token);
+}
+$session->fakeId = 'session-b';
+rteExpect(TemporaryUploads::path($tokens[0]) === null, 'Another session must not see the upload.');
+TemporaryUploads::forget($tokens[0]);
+$session->fakeId = 'session-a';
+rteExpect(TemporaryUploads::path($tokens[0]) !== null, 'Another session must not forget the upload.');
+rteExpect(TemporaryUploads::path('rt-0123456789abcdef0123456789abcdef/скрин.png') === null, 'An unknown token has no path.');
+TemporaryUploads::forget($tokens[0]);
+rteExpect(TemporaryUploads::path($tokens[0]) === null && !is_dir($uploadRoot.'/'.dirname($tokens[0])), 'forget() removes the file, the mark and the directory.');
+// A caller that consumed the file (store() moves it into the storage) still gets the directory removed.
+unlink(TemporaryUploads::path($tokens[1]));
+TemporaryUploads::forget($tokens[1]);
+rteExpect(!is_dir($uploadRoot.'/'.dirname($tokens[1])), 'forget() after the file was consumed removes the mark and the directory.');
+// The daily cleanup removes old uploads together with their marks (the emptied directory on a later run).
+$oldDir = $uploadRoot.'/'.dirname($tokens[2]);
+foreach ([$uploadRoot.'/'.$tokens[2], $oldDir.'/.owner'] as $old) {
+    touch($old, time() - 7200);
+}
+(new \skeeks\yii2\ajaxfileupload\services\TemporaryFileCleanup())->run($uploadRoot, 3600);
+rteExpect(count(scandir($oldDir)) === 2 && TemporaryUploads::path($tokens[3]) !== null, 'Cleanup removes expired uploads with their marks and keeps fresh ones.');
+touch($oldDir, time() - 7200);
+(new \skeeks\yii2\ajaxfileupload\services\TemporaryFileCleanup())->run($uploadRoot, 3600);
+rteExpect(!is_dir($oldDir), 'Cleanup removes the emptied upload directory.');
+TemporaryUploads::forget($tokens[3]);
+@rmdir($uploadRoot);
 
 // The behavior: changed values are cleaned, untouched and plain ones are kept, expired uploads are errors.
 \Yii::$app->db->createCommand()->createTable('rte_item', ['id' => 'pk', 'body' => 'text', 'page' => 'text'])->execute();
