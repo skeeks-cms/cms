@@ -11,9 +11,10 @@ use yii\db\ActiveRecord;
 
 /**
  * A record source (Skeeks::$recordSources) that can also say which saved
- * records were created from it: the card of a task, lead or deal shows
- * "Создано из письма «…»" at the top (RecordOriginWidget). Optional: a
- * source without it only fills new records.
+ * records were created from it or are linked to it: the card of a task,
+ * lead or deal shows "Создано из письма «…»", "Переписка: …" at the top
+ * (RecordOriginWidget). Optional: a source without it only fills new
+ * records.
  */
 interface RecordOriginInterface
 {
