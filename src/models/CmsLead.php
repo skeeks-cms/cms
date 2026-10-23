@@ -46,6 +46,8 @@ class CmsLead extends Core
     public const SOURCE_API = 'api';
     public const SOURCE_EMAIL = 'email';
     public const SOURCE_MAX = 'max';
+    /** Recipients of mailings imported into leads (skeeks/cms-communication). */
+    public const SOURCE_MAILING = 'mailing';
 
     public static function tableName()
     {
@@ -552,6 +554,7 @@ class CmsLead extends Core
             self::SOURCE_EMAIL => 'Электронная почта',
             self::SOURCE_PHONE => 'Телефония',
             self::SOURCE_IMPORT => 'Импорт',
+            self::SOURCE_MAILING => 'Рассылка',
             self::SOURCE_API => 'API',
         ];
     }
