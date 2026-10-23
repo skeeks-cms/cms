@@ -1,0 +1,104 @@
+/* Form attachments (AttachmentsInputWidget): chips and the light "Прикрепить" button. */
+
+/* No files: the field takes no place in the form (its inputs are still posted). */
+.sx-attach:not(:has(.sx-attach__file)) {
+    display: none;
+}
+
+.sx-attach__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sx-attach__list:not(:has(.sx-attach__file)) {
+    display: none;
+}
+
+.sx-attach__file {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    min-height: 30px;
+    padding: 4px 4px 4px 10px;
+    border: 1px solid var(--sx-color-border, #dedede);
+    border-radius: var(--sx-radius-sm, 6px);
+    background: var(--sx-color-surface-muted, #f4f6f8);
+    color: var(--sx-color-text, #262626);
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.sx-attach__file > .sx-icon {
+    flex: 0 0 auto;
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+.sx-attach__file.is-loading {
+    opacity: .7;
+    padding-right: 10px;
+}
+
+.sx-attach__name {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sx-attach__size {
+    color: var(--sx-color-text-muted, #6f7484);
+    white-space: nowrap;
+}
+
+.sx-attach__remove {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 16px;
+    line-height: 1;
+    opacity: .6;
+    cursor: pointer;
+}
+
+.sx-attach__remove:hover {
+    opacity: 1;
+    background: rgba(127, 127, 127, .18);
+}
+
+.sx-attach__remove[hidden] {
+    display: none;
+}
+
+.sx-attach-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: var(--sx-radius-sm, 6px);
+    background: transparent;
+    color: var(--sx-color-text, #262626);
+    font-size: 14px;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.sx-attach-button:hover {
+    background: var(--sx-color-surface-muted, #eef1f4);
+}
+
+.sx-attach-button:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (max-width: 600px) {
+    .sx-attach__name {
+        max-width: 180px;
+    }
+}

@@ -296,4 +296,44 @@ foreach (['admin-cms-task', 'admin-cms-lead', 'admin-cms-deal'] as $viewDir) {
 $taskView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-task/view.php');
 crmExtensionExpect(strpos($taskView, "'query'                => \$model->getLogs()->activity(),") !== false, 'The task feed must use CmsLogQuery::activity().');
 
+// Blocks of other packages in lead, company and deal cards (proposals first).
+$cardOwner = new CrmExtensionTestRecord();
+crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::blocks($cardOwner) === [], 'A card without handlers has no package blocks.');
+$blocksHandler = static function (\skeeks\cms\widgets\admin\CrmCardBlocksEvent $e) {
+    if ($e->position !== \skeeks\cms\widgets\admin\CrmCardBlocksWidget::POSITION_ASIDE) {
+        return;
+    }
+    $e->blocks['bills'] = '<b>bills</b>';
+    $e->blocks['empty'] = '  ';
+    $e->blocks['proposals'] = '<b>proposals</b>';
+    $e->priority['proposals'] = 50;
+};
+Event::on(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::EVENT_BLOCKS, $blocksHandler);
+crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::blocks($cardOwner) === ['proposals' => '<b>proposals</b>', 'bills' => '<b>bills</b>'],
+    'Blocks are ordered by priority, then by the order handlers added them; empty blocks are dropped.');
+crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::blocks($cardOwner, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::POSITION_MAIN) === [], 'Handlers see the position of the place.');
+crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::blocks(null) === [], 'No record, no blocks.');
+Event::off(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::EVENT_BLOCKS, $blocksHandler);
+foreach (['admin-cms-lead', 'admin-cms-company', 'admin-cms-deal', 'admin-user'] as $viewDir) {
+    $view = file_get_contents(dirname(__DIR__).'/src/views/'.$viewDir.'/view.php');
+    crmExtensionExpect(strpos($view, 'CrmCardBlocksWidget::') !== false, $viewDir.' must render package blocks through CrmCardBlocksWidget.');
+}
+
+// Actions of packages in the next step of a card ("Отправить презентацию", "Сделать КП").
+crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions($cardOwner) === [], 'A card without handlers has no package actions.');
+$actionsHandler = static function (\skeeks\cms\widgets\admin\CrmCardBlocksEvent $e) {
+    $e->actions['proposal'] = ['label' => 'Сделать КП', 'url' => '/kp'];
+    $e->priority['proposal'] = 60;
+    $e->actions['presentation'] = ['label' => 'Отправить презентацию', 'url' => '/presentations', 'icon' => 'send'];
+    $e->priority['presentation'] = 50;
+    $e->actions['broken'] = ['label' => 'Без адреса'];
+};
+Event::on(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::EVENT_ACTIONS, $actionsHandler);
+crmExtensionExpect(array_keys(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions($cardOwner)) === ['presentation', 'proposal'],
+    'Actions are ordered by priority; an action without a label or an address is dropped.');
+crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions(null) === [], 'No record, no actions.');
+Event::off(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::EVENT_ACTIONS, $actionsHandler);
+crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/view.php'), 'CrmCardBlocksWidget::actions(') !== false,
+    'The next step of a lead offers the actions of packages.');
+
 echo "CRM extension points: OK\n";

@@ -206,6 +206,9 @@ $this->registerCss(<<<CSS
         grid-template-columns: 1fr;
     }
 }
+.sx-deal-blocks {
+    margin-top: 10px;
+}
 CSS
 );
 ?>
@@ -261,3 +264,8 @@ CSS
         </section>
     <?php endif; ?>
 <?php BackendSurfaceWidget::end(); ?>
+
+<?php // Blocks of other packages (КП and others), CrmCardBlocksWidget::EVENT_BLOCKS. ?>
+<?php if ($blocks = \skeeks\cms\widgets\admin\CrmCardBlocksWidget::blocks($model, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::POSITION_MAIN)) : ?>
+    <div class="sx-surface-stack sx-deal-blocks"><?= implode('', $blocks); ?></div>
+<?php endif; ?>

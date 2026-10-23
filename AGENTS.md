@@ -349,6 +349,12 @@ The task card feed uses CmsLogQuery::activity() like lead/company/client,
 so package log types (letters) show there. CmsTaskQuery/CmsDealQuery
 forManager($user) pass the explicit user into nested company/client/project
 scopes.
+Package blocks in cards: widgets\admin\CrmCardBlocksWidget is rendered in
+the aside of the lead, company and client (admin-user) cards and under the deal card
+(POSITION_MAIN); handlers of the class-level EVENT_BLOCKS
+(CrmCardBlocksEvent: owner, position, blocks id => trusted HTML, priority)
+add their own surfaces ("КП" of skeeks/cms-proposal). Core has no package
+blocks of its own.
 Test: tests/crm-extension-points.php (Composer autoload, SQLite memory for
 record sources).
 

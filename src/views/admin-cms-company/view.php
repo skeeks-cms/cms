@@ -526,6 +526,8 @@ JS
                 'addSize' => 'small',
             ]);
             ?>
+            <?php // Blocks of other packages (КП and others), CrmCardBlocksWidget::EVENT_BLOCKS. ?>
+            <?= \skeeks\cms\widgets\admin\CrmCardBlocksWidget::widget(['model' => $model]); ?>
             <? if ($model->managers) : ?>
                 <?php BackendSurfaceWidget::begin($surfaceConfig(
                     'Работают с компанией',

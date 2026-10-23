@@ -81,6 +81,8 @@ JS
                 'paragraph'   => 'div',
                 'minHeight'   => 110,
                 'placeholder' => 'Напишите комментарий…',
+                // Screenshots and files given to the text go to the attachments below.
+                'attachLabel' => $widget->isShowAttachments ? 'Прикрепить файлом' : false,
             ])->label(false); ?>
     </div>
 
@@ -88,35 +90,34 @@ JS
     <?php echo \yii\helpers\Html::activeHiddenInput($log, 'model_id'); ?>
 
     <?php if ($widget->isShowAttachments) : ?>
-        <div class="sx-comment-form__attachments">
-            <?php echo $form->field($log, "fileIds")->widget(\skeeks\cms\widgets\AjaxFileUploadWidget::class, [
-                //'accept'            => 'image/*',
-                'multiple' => true,
-                /*'is_show_file_info' => false,
-                'is_allow_deselect' => false,
-                'tools'             => [
-                    'remote' => new \yii\helpers\UnsetArrayValue(),
-                ],*/
-            ])->label(false); ?>
-        </div>
+        <?php // Files wait in the temporary area; HasStorageFileMulti stores them with the comment. ?>
+        <?php echo \skeeks\cms\widgets\formInputs\attachments\AttachmentsInputWidget::widget([
+            'model'   => $log,
+            'attribute' => 'fileIds',
+            'options' => ['class' => 'sx-comment-form__attachments'],
+        ]); ?>
     <?php endif; ?>
-    <?php if ($widget->isShowPin) : ?>
-        <div class="sx-comment-pin-field">
-            <?php echo \yii\helpers\Html::activeHiddenInput($log, 'is_pinned', [
-                'id' => $pinInputId,
-                'value' => 0,
-            ]); ?>
-            <button type="button"
-                    class="sx-button sx-button--secondary sx-button--sm sx-comment-pin-toggle"
-                    data-input="<?php echo $pinInputId; ?>"
-                    aria-pressed="false">
-                <i class="fas fa-thumbtack"></i>
-                <span><?php echo \yii\helpers\Html::encode($pinLabel); ?></span>
-            </button>
-        </div>
-    <?php endif; ?>
+    <?php // One row, as in the letter form: send, attach, pin. ?>
     <div class="sx-comment-actions">
         <button type="submit" class="sx-button sx-button--primary">Отправить</button>
+        <?php if ($widget->isShowAttachments) : ?>
+            <?php echo \skeeks\cms\widgets\formInputs\attachments\AttachmentsInputWidget::button(); ?>
+        <?php endif; ?>
+        <?php if ($widget->isShowPin) : ?>
+            <div class="sx-comment-pin-field">
+                <?php echo \yii\helpers\Html::activeHiddenInput($log, 'is_pinned', [
+                    'id' => $pinInputId,
+                    'value' => 0,
+                ]); ?>
+                <button type="button"
+                        class="sx-button sx-button--secondary sx-button--sm sx-comment-pin-toggle"
+                        data-input="<?php echo $pinInputId; ?>"
+                        aria-pressed="false">
+                    <i class="fas fa-thumbtack"></i>
+                    <span><?php echo \yii\helpers\Html::encode($pinLabel); ?></span>
+                </button>
+            </div>
+        <?php endif; ?>
         <div class="sx-success-result sx-text--success" aria-live="polite"></div>
     </div>
 

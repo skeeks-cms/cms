@@ -50,9 +50,13 @@
     gap: 16px;
 }
 
-.sx-comment-form__editor .form-group,
-.sx-comment-form__attachments .form-group {
+.sx-comment-form__editor .form-group {
     margin: 0;
+}
+
+/* The editor and the attached files sit close together, like in the letter form. */
+.sx-comment-form__attachments {
+    margin-top: -8px;
 }
 
 .sx-comment-pin-field {
@@ -65,6 +69,7 @@
 
 .sx-comment-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--sx-button-group-gap);
 }

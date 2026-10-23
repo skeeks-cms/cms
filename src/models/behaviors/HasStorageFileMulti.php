@@ -13,6 +13,7 @@ namespace skeeks\cms\models\behaviors;
 
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\services\TemporaryUploads;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
@@ -64,6 +65,7 @@ class HasStorageFileMulti extends Behavior
     {
         return [
             BaseActiveRecord::EVENT_BEFORE_DELETE => "deleteStorgaFile",
+            BaseActiveRecord::EVENT_BEFORE_VALIDATE => "validateTemporaryFiles",
 
             BaseActiveRecord::EVENT_BEFORE_INSERT => [$this, "saveStorgaFile"],
             BaseActiveRecord::EVENT_BEFORE_UPDATE => "saveStorgaFile",
@@ -91,7 +93,11 @@ class HasStorageFileMulti extends Behavior
                 $files = [];
                 if ($this->owner->{$fieldCode} && is_array($this->owner->{$fieldCode})) {
                     foreach ($this->owner->{$fieldCode} as $fileId) {
-                        if (is_string($fileId) && ((string)(int)$fileId != (string)$fileId)) {
+                        if (is_string($fileId) && TemporaryUploads::isToken($fileId)) {
+                            if ($file = $this->storeTemporary($fileId)) {
+                                $files[] = $file->id;
+                            }
+                        } elseif (is_string($fileId) && ((string)(int)$fileId != (string)$fileId)) {
                             try {
                                 $data = [];
 
@@ -167,7 +173,16 @@ class HasStorageFileMulti extends Behavior
 
                 if ($this->owner->{$fieldCode} && is_array($this->owner->{$fieldCode})) {
                     foreach ($this->owner->{$fieldCode} as $fileId) {
-                        if (is_string($fileId) && ((string)(int)$fileId != (string)$fileId)) {
+                        if (is_string($fileId) && TemporaryUploads::isToken($fileId)) {
+                            if ($file = $this->storeTemporary($fileId)) {
+                                if ($this->owner->isNewRecord) {
+                                    $this->_linkFiles[$relation][] = $file;
+                                } else {
+                                    $this->owner->link($relation, $file);
+                                }
+                                $files[] = $file->id;
+                            }
+                        } elseif (is_string($fileId) && ((string)(int)$fileId != (string)$fileId)) {
                             try {
                                 $data = [];
 
@@ -242,6 +257,42 @@ class HasStorageFileMulti extends Behavior
             }
         }
 
+    }
+
+    /**
+     * Files attached in the form (AttachmentsInputWidget) come as tokens of the
+     * temporary upload area; one of another session or an expired one is an
+     * error of the field, not a silently lost file.
+     */
+    public function validateTemporaryFiles($e)
+    {
+        $properties = array_merge($this->fields, array_filter(ArrayHelper::getColumn($this->relations, 'property')));
+        foreach ($properties as $property) {
+            $value = $this->owner->{$property};
+            if (!is_array($value)) {
+                continue;
+            }
+            foreach ($value as $fileId) {
+                if (is_string($fileId) && TemporaryUploads::isToken($fileId) && !TemporaryUploads::path($fileId)) {
+                    $this->owner->addError($property, 'Файл «'.TemporaryUploads::name($fileId).'» устарел: прикрепите его заново.');
+                }
+            }
+        }
+    }
+
+    /** Moves a file attached in the form into the storage. */
+    protected function storeTemporary(string $token): ?CmsStorageFile
+    {
+        $data = [];
+        if (isset($this->owner->{$this->nameAttribute}) && ($name = $this->owner->{$this->nameAttribute})) {
+            $data['name'] = $name;
+        }
+        try {
+            return TemporaryUploads::store($token, $data);
+        } catch (\Exception $e) {
+            \Yii::warning($e->getMessage(), self::class);
+            return null;
+        }
     }
 
     /**

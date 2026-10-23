@@ -429,6 +429,9 @@ JS
             ]);
             ?>
 
+            <?php // Blocks of other packages (КП and others), CrmCardBlocksWidget::EVENT_BLOCKS. ?>
+            <?= \skeeks\cms\widgets\admin\CrmCardBlocksWidget::widget(['model' => $model]); ?>
+
             <?php BackendSurfaceWidget::begin([
                 'title' => 'Описание',
                 'titleTag' => 'h2',
@@ -502,14 +505,59 @@ JS
                     ['size' => 'small']
                 );
             }
+            // Actions of the next step: "Поставить задачу" and those of packages
+            // (CrmCardBlocksWidget::EVENT_ACTIONS: "Отправить презентацию", "Сделать КП") in one menu.
+            $stepItems = [];
             if ($canWork && \Yii::$app->user->can('cms/admin-task')) {
-                $nextStepActions[] = $openActionLink(
-                    '<i class="fas fa-plus" aria-hidden="true"></i> Поставить задачу',
-                    (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                $stepItems['task'] = [
+                    'label' => 'Поставить задачу',
+                    'icon' => 'plus',
+                    'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                         '/cms/admin-cms-task/create',
                         'CmsTask' => ['cms_lead_id' => $model->id],
                     ])->enableEmptyLayout()->enableNoActions()->url,
-                    $leadTasks ? 'secondary' : 'primary'
+                ];
+            }
+            if ($canWork) {
+                $stepItems += \skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions($model);
+            }
+            $stepVariant = $leadTasks ? 'secondary' : 'primary';
+            if (count($stepItems) === 1) {
+                $item = reset($stepItems);
+                $nextStepActions[] = $openActionLink(
+                    \skeeks\cms\backend\helpers\BackendIcon::renderConfigured((string)($item['icon'] ?? 'plus'), ['size' => 16]).' '.Html::encode($item['label']),
+                    (string)$item['url'],
+                    $stepVariant
+                );
+            } elseif ($stepItems) {
+                $menu = '';
+                foreach ($stepItems as $item) {
+                    $menu .= Html::a(
+                        (!empty($item['icon']) ? \skeeks\cms\backend\helpers\BackendIcon::renderConfigured((string)$item['icon'], ['size' => 16]).' ' : '').Html::encode($item['label']),
+                        (string)$item['url'],
+                        [
+                            'class' => 'sx-lead-next-step__menu-item',
+                            'role' => 'menuitem',
+                            'data-pjax' => '0',
+                            'onclick' => 'this.closest("details").removeAttribute("open"); new sx.classes.backend.widgets.Action('
+                                .\yii\helpers\Json::encode(['isOpenNewWindow' => true, 'url' => (string)$item['url']]).').go(); return false;',
+                        ]
+                    );
+                }
+                $nextStepActions[] = Html::tag('details',
+                    Html::tag('summary', \skeeks\cms\backend\helpers\BackendIcon::render('plus', ['size' => 16]).' Действие '
+                        .Html::tag('span', '▾', ['aria-hidden' => 'true']), ['class' => 'sx-button sx-button--'.$stepVariant.' sx-button--sm'])
+                    .Html::tag('div', $menu, ['class' => 'sx-lead-next-step__menu', 'role' => 'menu']),
+                    ['class' => 'sx-lead-next-step__actions', 'data-sx-lead-step-menu' => true]
+                );
+                // A native <details>: closed by an outside click or Escape.
+                $this->registerJs(<<<JS
+$(document).on('click', function (e) {
+    $('[data-sx-lead-step-menu][open]').each(function () { if (!this.contains(e.target)) { this.removeAttribute('open'); } });
+}).on('keydown', function (e) {
+    if (e.key === 'Escape') { $('[data-sx-lead-step-menu][open]').removeAttr('open'); }
+});
+JS
                 );
             }
             ?>
@@ -525,6 +573,45 @@ JS
 .sx-lead-next-step__task .sx-preview-card {
     flex-grow: 1;
     min-width: 0;
+}
+.sx-lead-next-step__actions {
+    position: relative;
+}
+.sx-lead-next-step__actions > summary {
+    list-style: none;
+    cursor: pointer;
+}
+.sx-lead-next-step__actions > summary::-webkit-details-marker {
+    display: none;
+}
+.sx-lead-next-step__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    min-width: 230px;
+    padding: 4px;
+    border: 1px solid var(--sx-menu-border-color, var(--sx-color-border));
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-menu-background, var(--sx-color-surface-raised));
+    box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
+}
+.sx-lead-next-step__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--sx-radius-control);
+    color: var(--sx-menu-color, var(--sx-color-text));
+    white-space: nowrap;
+    text-decoration: none !important;
+}
+.sx-lead-next-step__menu-item:hover,
+.sx-lead-next-step__menu-item:focus {
+    background: var(--sx-menu-hover-background, var(--sx-color-surface-hover));
+    color: var(--sx-menu-active-color, var(--sx-color-accent));
 }
 CSS
                 );
