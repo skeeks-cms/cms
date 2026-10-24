@@ -109,11 +109,12 @@ JS
                     'id' => $pinInputId,
                     'value' => 0,
                 ]); ?>
+                <?php // A quiet toggle like "Прикрепить": the pin and the label, no frame; pressed — accent. ?>
                 <button type="button"
-                        class="sx-button sx-button--secondary sx-button--sm sx-comment-pin-toggle"
+                        class="sx-comment-pin-toggle"
                         data-input="<?php echo $pinInputId; ?>"
                         aria-pressed="false">
-                    <i class="fas fa-thumbtack"></i>
+                    <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('pin', ['size' => 16]); ?>
                     <span><?php echo \yii\helpers\Html::encode($pinLabel); ?></span>
                 </button>
             </div>

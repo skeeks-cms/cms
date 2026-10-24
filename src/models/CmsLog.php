@@ -4,6 +4,8 @@ namespace skeeks\cms\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\CmsLogBehavior;
+use skeeks\cms\log\CmsLogEntry;
+use skeeks\cms\log\CmsLogEntryRendererInterface;
 use skeeks\cms\log\CmsLogRendererInterface;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
@@ -442,6 +444,79 @@ class CmsLog extends ActiveRecord
         );
     }
 
+    /**
+     * The content of this entry for the activity feed frame
+     * (CmsLogListWidget): the type icon, the title, the main line, details.
+     * Log types of other packages give it through
+     * CmsLogEntryRendererInterface; an older renderer (render() only)
+     * becomes the body of a generic entry.
+     */
+    public function entry(): CmsLogEntry
+    {
+        $renderer = \Yii::$app->skeeks->getLogRenderer($this->log_type);
+        if ($renderer instanceof CmsLogEntryRendererInterface) {
+            return $renderer->entry($this);
+        }
+        if ($renderer !== null) {
+            return new CmsLogEntry(['icon' => 'info', 'title' => $this->logTypeAsText, 'body' => (string)$this->render()]);
+        }
+
+        switch ($this->log_type) {
+            case self::LOG_TYPE_COMMENT:
+                return new CmsLogEntry(['icon' => 'comment', 'title' => 'Комментарий', 'body' => (string)$this->comment]);
+            case self::LOG_TYPE_PHONE_CALL:
+                return $this->phoneCallEntry();
+            case self::LOG_TYPE_INSERT:
+                return new CmsLogEntry(['icon' => 'plus-circle', 'title' => 'Создание записи', 'body' => (string)$this->render()]);
+            case self::LOG_TYPE_UPDATE:
+                return new CmsLogEntry(['icon' => 'edit', 'title' => 'Изменение данных', 'body' => (string)$this->render()]);
+            case self::LOG_TYPE_DELETE:
+                return new CmsLogEntry(['icon' => 'trash', 'tone' => CmsLogEntry::TONE_DANGER, 'title' => 'Удаление', 'body' => (string)$this->render()]);
+        }
+
+        return new CmsLogEntry(['icon' => 'info', 'title' => $this->logTypeAsText, 'body' => (string)$this->render()]);
+    }
+
+    /**
+     * "Исходящий звонок", the number, the duration and the recording; a
+     * call without a connection is red ("Пропущен", "Не дозвонились").
+     */
+    protected function phoneCallEntry(): CmsLogEntry
+    {
+        $callId = ArrayHelper::getValue($this->data, "id");
+        $call = $callId ? CmsTelephonyCall::findOne($callId) : null;
+        if (!$call) {
+            return new CmsLogEntry(['icon' => 'phone', 'title' => 'Телефонный звонок', 'details' => ['Запись удалена']]);
+        }
+
+        $incoming = $call->direction == CmsTelephonyCall::DIRECTION_IN;
+        $failed = $call->status == CmsTelephonyCall::STATUS_FAILED;
+        $entry = new CmsLogEntry([
+            'icon'    => $failed ? 'phone-missed' : ($incoming ? 'phone-in' : 'phone-out'),
+            'tone'    => $failed ? CmsLogEntry::TONE_DANGER : ($call->status == CmsTelephonyCall::STATUS_ANSWERED ? CmsLogEntry::TONE_SUCCESS : CmsLogEntry::TONE_NEUTRAL),
+            'title'   => $incoming ? 'Входящий звонок' : 'Исходящий звонок',
+            'summary' => Html::tag('span', $incoming ? 'С номера' : 'На номер', ['class' => 'sx-gray']).' '.Html::encode($call->client_phone),
+        ]);
+        if ($failed) {
+            $entry->badges[] = CmsLogEntry::badge($incoming ? 'Пропущен' : 'Не дозвонились', '', CmsLogEntry::TONE_DANGER);
+        }
+        if ($call->duration) {
+            $entry->details[] = 'Длительность: '.Html::encode(\Yii::$app->formatter->asDuration($call->duration));
+        }
+        if ($call->cms_record_file_id && ($file = $call->cmsRecordFile)) {
+            $entry->body = Html::tag('div',
+                Html::tag('audio', '', ['controls' => true, 'preload' => 'none', 'src' => $file->src])
+                .Html::a('Скачать запись ('.\Yii::$app->formatter->asShortSize($file->size).')', $file->src, [
+                    'class'     => 'sx-log-entry__download',
+                    'download'  => $file->name.'.'.$file->extension,
+                    'data-pjax' => '0',
+                ]),
+                ['class' => 'sx-log-entry__audio']);
+        }
+
+        return $entry;
+    }
+
     public function render()
     {
         // Log types of other packages (Skeeks::$logRenderers) render themselves.
@@ -617,7 +692,7 @@ class CmsLog extends ActiveRecord
             if ($callId && $call) {
 
                 $status = $call->status;
-                $directionText = $call->direction == CmsTelephonyCall::DIRECTION_IN ? "Входщий звонок" : "Исходщий звонок";
+                $directionText = $call->direction == CmsTelephonyCall::DIRECTION_IN ? "Входящий звонок" : "Исходящий звонок";
                 $directionTextPrefix = $call->direction == CmsTelephonyCall::DIRECTION_IN ? "С номера" : "На номер";
 
                 $durationText = '';
