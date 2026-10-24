@@ -1,9 +1,18 @@
 ---
 name: skeeks-cms
-description: Develop SkeekS CMS/Yii PHP code and handle advanced or unfamiliar site content, AI-managed themes and HTML pages, shop, MCP, REST and OAuth2 workflows. Use for custom site headers and footers, site-wide CSS or scripts, and html-content pages. Routine central CRM reads use the global AGENTS direct-first client and do not require this skill.
+description: Develop SkeekS CMS/Yii PHP code and handle advanced or unfamiliar site content, AI-managed themes and HTML pages, shop, MCP, REST and OAuth2 workflows. Use for custom site headers and footers, site-wide CSS or scripts, and html-content pages, and for going through CRM clients with their history and preparing personal letters with an offer (drafts, campaigns). Routine central CRM reads use the global AGENTS direct-first client and do not require this skill.
 ---
 
 # SkeekS CMS
+
+## Maintain this skill
+
+Canonical source: https://github.com/skeeks-cms/cms/tree/master/.agents/skills/skeeks-cms.
+Edit `.agents/skills/skeeks-cms` in the active `skeeks/cms` checkout, publish
+the intended changes, then synchronize the installed `~/.codex/skills/skeeks-cms`
+copy. Compare both copies first and preserve useful local additions. The separate
+`skeeks-cms-package-development` repository owns the development guide, not this
+operational skill. Never copy credentials or tool-cache files into either skill.
 
 ## Start here
 
@@ -154,6 +163,17 @@ records first, create or partially update only the requested values, and read
 them back afterward. Setting a domain's `is_main` flag replaces the previous
 main domain. No delete tools are available.
 
+## CRM clients, letters and personal offers
+
+To go through companies, clients and leads with their history, decide whom
+to offer what and prepare personal letters with a КП or Презентация, read
+[`references/crm-clients-and-offers.md`](references/crm-clients-and-offers.md)
+first. In short: overview and history (`cms_crm_*`), letters and "may we
+write" (`cms_comm_*`), offers (`cms_proposal_*`); then
+`cms_comm_draft_create` or a draft campaign — a dry run without `confirm`,
+the person agrees, then `confirm=true`. AI never sends letters or launches
+campaigns: employees do it in the CRM.
+
 For an unfamiliar tool, use the lower-level client:
 
 ```powershell
@@ -188,9 +208,11 @@ revision alone is not a reason to force authorization.
 ### OAuth scope upgrades after API expansion
 
 When a site deploys new REST tools, an existing refresh token may remain valid
-but lack their new scopes. If the user requests reauthorization, or an expected
-tool is absent from the authorized catalog, run the canonical login client once
-with `-ForceAuthorization`. Let the browser complete the normal consent and
+but lack their new scopes. First distinguish missing scopes from an undeployed
+tool or an RBAC restriction. With authorization to extend access to the required
+families (including write scopes when needed), run the canonical login client
+once with `-ForceAuthorization`. Existing explicit authorization is sufficient;
+do not ask again. Let the browser complete the normal consent and
 loopback callback; do not inspect or copy tokens.
 
 After authorization, read `tools-index` and verify the exact required tool names
@@ -203,13 +225,21 @@ for diagnostics. Common expanded families include:
 - `cms_site_phone_*`, `cms_site_email_*`, `cms_site_address_*` and
   `cms_site_social_*`: `cms.site_contact.read` / `cms.site_contact.write`;
 - `cms_site_info_get`, `cms_site_update` and `cms_site_domain_*`:
-  `cms.site.read` / `cms.site.write`.
+  `cms.site.read` / `cms.site.write`;
+- `cms_crm_history_get`: `cms.activity.read`; `cms_crm_client_overview_*`:
+  `cms.company.read`;
+- `cms_comm_*` and `cms_proposal_*` reads: `cms.communication.read`;
+  `cms_comm_draft_create` and `cms_comm_campaign_*`: `cms.communication.send`.
 
 Do not repeat forced authorization when the required methods are already in the
 authorized catalog. A schema change with the same scopes only requires the
 relevant tool schema or cache refresh.
 
 ## Connected site MCP
+
+When asked to check new tools or compare MCP and REST access, read
+[`references/tool-access.md`](references/tool-access.md). This is a discovery
+workflow, not a preflight for routine known reads.
 
 The canonical project endpoint and OAuth resource are identical:
 
@@ -366,6 +396,23 @@ approval.
 
 ## Package development
 
+For new or changed background jobs, administration sections, customer cabinets,
+and shared CMS package code, first read the complete active
+`skeeks-cms-package-development/SKILL.md` and the relevant references it routes to.
+This also applies to project-owned handlers and admin sections that consume CMS
+contracts. In this development context, a request to "посмотри умение" includes
+this development guide; the user need not name each underlying document.
+
+Use the active working copy:
+
+- Windows: `C:\SkeekS\dev\php\vendor\skeeks\skeeks-cms-package-development\SKILL.md`;
+- WSL: `/home/skeeks/dev/php/vendor/skeeks/skeeks-cms-package-development/SKILL.md`.
+
+Do not substitute an installed or cached copy. The development guide routes job
+work to `references/background-jobs.md` and the active `cms-job` documentation,
+including temporary workspaces; it routes admin/cabinet work to the corresponding
+backend references. Keep those contracts in their owning documents.
+
 Package ownership:
 
 - `skeeks/cms` owns CMS models, reusable domain behavior and administration;
@@ -378,6 +425,11 @@ search for PHP symbols, usages, inheritance and callers. Do not update the
 shared vendor index unless the user explicitly asks. Keep transport tools thin
 and business logic in services/models. Run PHP syntax checks when PHP is
 available and the narrowest relevant tests.
+
+For HTML-to-PDF report work, also read
+[`references/pdf-report-rendering.md`](references/pdf-report-rendering.md).
+It covers print-option propagation, rich result comments, pagination-safe task
+cards, attachments, template seed migrations and renderer-level verification.
 
 Project-only MCP providers belong in the application, for example under
 `common/mcp`, and are registered through `cmsMcp.toolProviders`. Consult
