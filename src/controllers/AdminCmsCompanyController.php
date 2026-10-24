@@ -33,6 +33,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\queries\CmsCompanyQuery;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\models\ShopDocument;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
@@ -150,7 +151,7 @@ HTML
                                     'has_tasks'      => 'Есть дела и задачи',
                                     'has_tasks_for_me'      => 'Есть дела и задачи для меня',
                                     'not_paid_bills' => 'Есть неоплаченные счета',
-                                ],
+                                ] + (class_exists(ShopPayment::class) ? ['no_payments' => 'Нет оплат'] : []),
                                 'on apply' => function (QueryFiltersEvent $e) {
                                     /**
                                      * @var $query ActiveQuery
@@ -254,6 +255,13 @@ HTML
                                             'countNotPaidFilter',
                                             0,
                                         ]);
+                                    } elseif ($e->field->value == 'no_payments' && class_exists(ShopPayment::class)) {
+                                        // Not a client yet: no incoming payment of the company and no paid bill.
+                                        $company = new Expression(CmsCompany::tableName().".id");
+                                        $query->andWhere(['not exists', ShopPayment::find()->select(['id'])
+                                            ->andWhere(['is_debit' => 1, 'cms_company_id' => $company])]);
+                                        $query->andWhere(['not exists', ShopBill::find()->select(['id'])
+                                            ->andWhere(['not', ['paid_at' => null]])->andWhere(['cms_company_id' => $company])]);
                                     }
                                 },
                             ],
