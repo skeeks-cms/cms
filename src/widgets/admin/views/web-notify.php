@@ -545,24 +545,25 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         });
         
         ajaxHandler.on('error', function (e, response) {
-            /*console.log(response.data);*/
+            self.jItemsContainer.hide();
+            self.jEmptyContainer.text("Не удалось загрузить уведомления").show();
         });
 
         ajaxHandler.on('success', function (e, response) {
-            
+
             if (response.data.items.length) {
                 self.jEmptyContainer.hide();
                 self.jItemsContainer.show();
-                
-                self.jList.empty();
+
+                self.jList.empty().show();
                 response.data.items.forEach(function(item) {
                     self.jList.append(item.render);
                 });
             } else {
-                self.jEmptyContainer.show();
+                self.jEmptyContainer.text("Все уведомления прочитаны").show();
                 self.jList.hide();
             }
-            
+
             if (response.data.total > 0) {
                 self.jBage.empty().append(response.data.total);
                 self.getJWrapper().addClass("sx-has-notifies");

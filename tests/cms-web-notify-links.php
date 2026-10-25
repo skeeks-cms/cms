@@ -8,7 +8,7 @@ foreach ([
     "[['url'], 'string', 'max' => 1000]",
     'public function getTargetUrl(): ?string',
     '$model instanceof CmsLead',
-    'Html::a(Html::encode($model->asText), $url',
+    'Html::a(Html::encode($label), $url',
 ] as $fragment) {
     if (strpos($model, $fragment) === false) {
         throw new RuntimeException('Web notification link contract is incomplete: '.$fragment);

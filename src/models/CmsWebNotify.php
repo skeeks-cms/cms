@@ -89,13 +89,45 @@ class CmsWebNotify extends ActiveRecord
         return $this->hasOne(\Yii::$app->user->identityClass, ['id' => 'cms_user_id']);
     }
 
+    /**
+     * One broken notification (a model without a label, a missing controller,
+     * a failing widget) must not break the whole header notification list:
+     * it is rendered without a link and the error goes to the log.
+     */
     public function getHtml()
+    {
+        try {
+            return $this->renderHtml();
+        } catch (\Throwable $e) {
+            \Yii::error("Web notification #{$this->id} ({$this->model_code}#{$this->model_id}) render failed: ".$e->getMessage()."\n".$e->getTraceAsString(), self::class);
+        }
+
+        return $this->renderHtml(false);
+    }
+
+    /**
+     * Link label of the notification model: the asText property of CMS
+     * records, the asText() method of plain Yii records, otherwise the id.
+     */
+    public function getModelLabel($model): string
+    {
+        if ($model->canGetProperty('asText')) {
+            return (string)$model->asText;
+        }
+        if (method_exists($model, 'asText')) {
+            return (string)$model->asText();
+        }
+
+        return '#'.(int)$this->model_id;
+    }
+
+    protected function renderHtml(bool $withLinks = true): string
     {
         $items = [];
         $class = $this->is_read ? "": "sx-not-read";
         $time = \Yii::$app->formatter->asRelativeTime($this->created_at);
-        $model = $this->model;
-        $url = $this->getTargetUrl();
+        $model = $withLinks ? $this->model : null;
+        $url = $withLinks ? $this->getTargetUrl() : null;
         $name = Html::encode($this->name);
         if (!$model && $url) {
             $name = Html::a($name, $url, [
@@ -112,22 +144,23 @@ class CmsWebNotify extends ActiveRecord
 HTML;
 if ($model) {
     $controllerId = ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$this->model_code, 'controller']);
+    $label = $this->getModelLabel($model);
     $items[] = $url
-        ? Html::a(Html::encode($model->asText), $url, [
+        ? Html::a(Html::encode($label), $url, [
             'class'      => 'sx-action-trigger',
-            'aria-label' => (string)$model->asText,
+            'aria-label' => $label,
         ])
         : ($controllerId
         ? BackendEntityLink::widget([
             'controllerId' => $controllerId,
             'modelId'      => $this->model_id,
-            'label'        => $model->asText,
+            'label'        => $label,
             'options'      => [
                 'class'      => 'sx-action-trigger',
-                'aria-label' => (string)$model->asText,
+                'aria-label' => $label,
             ],
         ])
-        : Html::encode($model->asText));
+        : Html::encode($label));
 }
 
 
