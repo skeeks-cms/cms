@@ -12,8 +12,11 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\CmsScheduleHelper;
+use skeeks\cms\deal\DealAccess;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsLog;
+use skeeks\cms\models\queries\CmsTaskQuery;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsProject2user;
 use skeeks\cms\models\CmsTask;
@@ -290,6 +293,13 @@ class UpaSupportController extends BackendModelStandartController
                             'format' => 'raw',
                             'value' => static function (CmsTask $model) {
                                 $parts = [];
+                                if ($model->hasAttribute('cms_deal_id') && $model->cms_deal_id && $model->cmsDeal) {
+                                    $parts[] = Html::tag(
+                                        'span',
+                                        Html::tag('strong', 'Услуга: ').Html::encode($model->cmsDeal->name),
+                                        ['class' => 'sx-collection-cell__relations']
+                                    );
+                                }
                                 if ($model->cmsCompany) {
                                     $parts[] = Html::tag(
                                         'span',
@@ -381,6 +391,11 @@ class UpaSupportController extends BackendModelStandartController
             $model->cms_project_id = (int)$projects[0]->id;
         }
 
+        $deals = $this->clientTaskDealsQuery()->limit(2)->all();
+        if (CmsTaskQuery::hasDealColumn() && !$model->cms_deal_id && count($deals) === 1) {
+            $model->cms_deal_id = (int)$deals[0]->id;
+        }
+
         $model->executor_id = $this->resolveExecutorId($model);
 
         $fields = [
@@ -390,6 +405,21 @@ class UpaSupportController extends BackendModelStandartController
                 'elementOptions' => [
                     'rows' => 8,
                     'placeholder' => 'Опишите задачу, проблему или пожелание',
+                ],
+            ],
+            'cms_deal_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
+                'label' => 'Услуга',
+                'widgetConfig' => [
+                    'modelClass' => CmsDeal::class,
+                    'searchQuery' => function ($word = '') {
+                        $query = $this->clientTaskDealsQuery();
+                        if ($word) {
+                            $query->andWhere(['like', CmsDeal::tableName().'.name', $word]);
+                        }
+                        return $query;
+                    },
                 ],
             ],
             'cms_company_id' => [
@@ -434,6 +464,13 @@ class UpaSupportController extends BackendModelStandartController
             ],
         ];
 
+        if (!$deals) {
+            unset($fields['cms_deal_id']);
+        } else {
+            //The service decides the company.
+            unset($fields['cms_company_id']);
+        }
+
         if (!$companies) {
             unset($fields['cms_company_id']);
         }
@@ -465,7 +502,19 @@ class UpaSupportController extends BackendModelStandartController
         return $this->render('@skeeks/cms/views/upa-support/view', [
             'model' => $this->model,
             'comment' => $this->createCommentModel($this->model),
+            'canComment' => $this->canComment($this->model),
         ]);
+    }
+
+    /**
+     * A task of a deal is commented with "Задачи: комментировать"; own tasks and
+     * tasks of projects the client takes part in — as before.
+     */
+    protected function canComment(CmsTask $model): bool
+    {
+        return $this->clientTasksQuery(DealAccess::LEVEL_ACT)
+            ->andWhere([CmsTask::tableName().'.id' => (int)$model->id])
+            ->exists();
     }
 
     public function actionAddComment($pk)
@@ -477,6 +526,10 @@ class UpaSupportController extends BackendModelStandartController
 
             if (!$model) {
                 throw new NotFoundHttpException('Задача не найдена.');
+            }
+
+            if (!$this->canComment($model)) {
+                throw new Exception('В этой услуге вам открыт только просмотр задач.');
             }
 
             $comment = $this->createCommentModel($model);
@@ -514,9 +567,14 @@ class UpaSupportController extends BackendModelStandartController
         }
     }
 
-    protected function applyClientTaskAccess(ActiveQuery $query): ActiveQuery
+    protected function applyClientTaskAccess(ActiveQuery $query, int $level = DealAccess::LEVEL_VIEW): ActiveQuery
     {
         $taskTable = CmsTask::tableName();
+
+        //"Сделка как услуга": tasks of the client's deals, own tasks, tasks of projects the client takes part in.
+        if ($query instanceof CmsTaskQuery && CmsTaskQuery::hasDealColumn()) {
+            return $query->forClient(\Yii::$app->user->identity, $level);
+        }
 
         return $query->andWhere([
             'or',
@@ -525,9 +583,20 @@ class UpaSupportController extends BackendModelStandartController
         ]);
     }
 
-    protected function clientTasksQuery(): ActiveQuery
+    protected function clientTasksQuery(int $level = DealAccess::LEVEL_VIEW): ActiveQuery
     {
-        return $this->applyClientTaskAccess(CmsTask::find());
+        return $this->applyClientTaskAccess(CmsTask::find(), $level);
+    }
+
+    /**
+     * Deals where the client may create tasks ("Задачи": ставить задачи).
+     */
+    protected function clientTaskDealsQuery(): ActiveQuery
+    {
+        if (!CmsTaskQuery::hasDealColumn()) {
+            return CmsDeal::find()->andWhere('1=0');
+        }
+        return CmsDeal::find()->forClient(\Yii::$app->user->identity, DealAccess::AREA_TASKS, DealAccess::LEVEL_FULL);
     }
 
     protected function clientProjectsQuery(): ActiveQuery
@@ -566,6 +635,29 @@ class UpaSupportController extends BackendModelStandartController
         $model->cms_user_id = \Yii::$app->user->id;
         $model->status = CmsTask::STATUS_NEW;
         $model->plan_start_at = null;
+
+        //A task in a service: only in a deal where the client may create tasks; the deal gives the company.
+        if (CmsTaskQuery::hasDealColumn()) {
+            $model->is_internal = 0;
+            $model->deal_resource_type = null;
+            $model->deal_resource_id = null;
+            $deal = $model->cms_deal_id
+                ? $this->clientTaskDealsQuery()->andWhere([CmsDeal::tableName().'.id' => (int)$model->cms_deal_id])->one()
+                : null;
+            $model->cms_deal_id = $deal ? (int)$deal->id : null;
+            if ($deal && $deal->cms_company_id) {
+                $model->cms_company_id = (int)$deal->cms_company_id;
+                if ($model->cms_project_id) {
+                    $project = $this->clientProjectsQuery()->andWhere([CmsProject::tableName().'.id' => (int)$model->cms_project_id])->one();
+                    if (!$project || (int)$project->cms_company_id !== (int)$deal->cms_company_id) {
+                        $model->cms_project_id = null;
+                    }
+                }
+                $model->executor_id = $this->resolveExecutorId($model);
+                return;
+            }
+        }
+
         $selectedCompanyId = $model->cms_company_id ? (int)$model->cms_company_id : null;
 
         if ($model->cms_project_id) {

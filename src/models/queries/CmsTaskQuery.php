@@ -10,6 +10,8 @@ namespace skeeks\cms\models\queries;
 
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsContractor;
+use skeeks\cms\models\CmsDeal;
+use skeeks\cms\models\CmsProject2user;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsTask;
@@ -55,26 +57,50 @@ class CmsTaskQuery extends CmsActiveQuery
                 $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
             }
 
-            $this->andWhere([
+            $condition = [
                 "or",
                 [self::getPrimaryTableName() . ".cms_project_id" => CmsProject::find()->forManager($user)->select(CmsProject::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".cms_company_id" => CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".cms_user_id" => CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".executor_id" => $user->id],
                 [self::getPrimaryTableName() . ".created_by" => $user->id],
-            ]);
+            ];
+            if (static::hasDealColumn()) {
+                $condition[] = [self::getPrimaryTableName() . ".cms_deal_id" => CmsDeal::find()->forManager($user)->select(CmsDeal::tableName() . '.id')];
+            }
+            $this->andWhere($condition);
         }
 
         return $this;
     }
 
+    /** @var bool|null */
+    private static $_hasDealColumn;
+
     /**
-     * Поиск задач доступных клиенту
+     * cms_task.cms_deal_id exists ("Сделка как услуга", code may run before the migration).
+     */
+    public static function hasDealColumn(): bool
+    {
+        if (self::$_hasDealColumn === null) {
+            $schema = \Yii::$app->db->getTableSchema(CmsTask::tableName());
+            self::$_hasDealColumn = $schema && $schema->getColumn('cms_deal_id') && CmsDealQuery::dealAccessReady();
+        }
+        return self::$_hasDealColumn;
+    }
+
+    /**
+     * Tasks a client person sees ("Сделка как услуга"); an internal task (is_internal) never:
+     * - a task of a deal: only when "Задачи" is open in the deal and granted to the person at $level,
+     *   whoever created it and whatever project it is in;
+     * - a task without a deal: the person created it, or (for now) takes part in its project (CmsProject2user).
+     * A task linked only to a company or a client, without a deal, is internal work and is never shown.
      *
      * @param User|null $user
+     * @param int       $level DealAccess::LEVEL_VIEW to see, LEVEL_ACT to comment
      * @return $this
      */
-    public function forClient(User $user = null)
+    public function forClient(User $user = null, int $level = \skeeks\cms\deal\DealAccess::LEVEL_VIEW)
     {
         if ($user === null) {
             $user = \Yii::$app->user->identity;
@@ -84,6 +110,29 @@ class CmsTaskQuery extends CmsActiveQuery
             return $this;
         }
 
+        if (static::hasDealColumn()) {
+            $table = self::getPrimaryTableName();
+            //"Внутренняя" closes a task to every client, its author included.
+            $this->andWhere([$table.".is_internal" => 0]);
+            $this->andWhere([
+                "or",
+                //A task of a deal: only the rights in that deal decide.
+                [$table.".cms_deal_id" => CmsDeal::find()->forClient($user, \skeeks\cms\deal\DealAccess::AREA_TASKS, $level)->select(CmsDeal::tableName().'.id')],
+                //Tasks without a deal keep the previous rules for now: own tasks and projects the client takes part in.
+                [
+                    'and',
+                    [$table.".cms_deal_id" => null],
+                    [
+                        'or',
+                        [$table.".created_by" => $user->id],
+                        [$table.".cms_project_id" => CmsProject2user::find()->select('cms_project_id')->andWhere(['cms_user_id' => $user->id])],
+                    ],
+                ],
+            ]);
+            return $this;
+        }
+
+        //Before the migration of "Сделка как услуга": the previous rule.
         $this->andWhere([
             "or",
             [self::getPrimaryTableName().".cms_project_id" => CmsProject::find()->forClient($user)->select(CmsProject::tableName().'.id')],

@@ -23,6 +23,9 @@ return [
         [
             'class' => \skeeks\cms\rbac\CmsCompanyRule::class,
         ],
+        [
+            'class' => \skeeks\cms\rbac\CmsDealAreaRule::class,
+        ],
     ],
 
     'roles' => [
@@ -40,6 +43,7 @@ return [
             'child'       => [
                 'permissions' => [
                     \skeeks\cms\components\Cms::UPA_PERMISSION,
+                    \skeeks\cms\rbac\CmsDealAreaRule::PERMISSION,
                 ],
             ],
         ],
@@ -261,6 +265,11 @@ return [
         [
             'name'        => \skeeks\cms\components\Cms::UPA_PERMISSION,
             'description' => ['skeeks/cms', 'Доступ к личному кабинету клиента'],
+        ],
+        [
+            'name'        => \skeeks\cms\rbac\CmsDealAreaRule::PERMISSION,
+            'description' => ['skeeks/cms', 'Области доступа клиента в своих услугах (сделках)'],
+            'ruleName'    => \skeeks\cms\rbac\CmsDealAreaRule::NAME,
         ],
 
         [

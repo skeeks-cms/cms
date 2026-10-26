@@ -257,6 +257,10 @@ CSS
         </section>
     <?php endif; ?>
 
+    <?php if (\skeeks\cms\models\queries\CmsDealQuery::dealAccessReady()) : ?>
+        <?= $this->render('_client-access', ['model' => $model]); ?>
+    <?php endif; ?>
+
     <?php if (trim((string)$model->description) !== '') : ?>
         <section class="sx-deal-section">
             <h3 class="sx-deal-section-title">Описание</h3>

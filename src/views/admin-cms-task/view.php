@@ -510,6 +510,56 @@ JS
                     </span>
                 </li>
                 <?php endif; ?>
+                <?php if ($model->hasAttribute('cms_deal_id') && $model->cms_deal_id && $model->cmsDeal) : ?>
+                <li>
+                    <span class="sx-properties--name">
+                        Сделка
+                    </span>
+                    <span class="sx-properties--value">
+                        <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-deal',
+                            'modelId'      => $model->cmsDeal->id,
+                            'label'        => $model->cmsDeal->name,
+                            'options'      => [
+                                'class'      => 'sx-preview-card__related',
+                                'aria-label' => (string)$model->cmsDeal->name,
+                            ],
+                        ]); ?>
+                        <?php if ($resource = $model->dealResource) : ?>
+                            <div class="sx-text-muted"><?= \yii\helpers\Html::encode($resource->title); ?></div>
+                        <?php endif; ?>
+                        <?php if ($model->is_internal) : ?>
+                            <div class="sx-text-muted">Внутренняя: клиент не видит</div>
+                        <?php endif; ?>
+                    </span>
+                </li>
+                <?php
+                $dealClients = $model->is_internal ? [] : \Yii::$app->dealAccess
+                    ->usersQuery($model->cmsDeal, \skeeks\cms\deal\DealAccess::AREA_TASKS)
+                    ->limit(20)
+                    ->all();
+                ?>
+                <?php if ($dealClients) : ?>
+                <li>
+                    <span class="sx-properties--name">
+                        Видят клиенты
+                        <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
+                           title="Задачи этой сделки открыты этим людям клиента. Учитывайте это при заполнении описания и комментариев."></i>
+                    </span>
+                    <span class="sx-properties--value">
+                        <?php foreach ($dealClients as $index => $client) : ?>
+                            <?php if ($index) : ?><br><?php endif; ?>
+                            <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                                'controllerId' => '/cms/admin-user',
+                                'modelId'      => $client->id,
+                                'label'        => $client->shortDisplayNameWithAlias,
+                                'options'      => ['class' => 'sx-preview-card__related'],
+                            ]); ?>
+                        <?php endforeach; ?>
+                    </span>
+                </li>
+                <?php endif; ?>
+                <?php endif; ?>
                 <li>
                     <span class="sx-properties--name">
                         Проект

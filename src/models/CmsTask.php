@@ -28,6 +28,10 @@ use yii\helpers\ArrayHelper;
  * @property int|null            $cms_company_id Компания
  * @property int|null            $cms_user_id Клиент
  * @property int|null            $cms_lead_id Лид
+ * @property int|null            $cms_deal_id Сделка (услуга)
+ * @property string|null         $deal_resource_type Тип ресурса сделки (DealAccess provider)
+ * @property int|null            $deal_resource_id Ресурс сделки
+ * @property int                 $is_internal Внутренняя задача сделки: клиент не видит
  * @property int|null            $parent_cms_task_id Связанная задача
  *
  * @property int|null            $plan_start_at Планируемое начало
@@ -158,6 +162,7 @@ class CmsTask extends ActiveRecord
                     'cms_company_id' => 'cmsCompany',
                     'cms_user_id'    => 'cmsUser',
                     'cms_lead_id'    => 'cmsLead',
+                    'cms_deal_id'    => 'cmsDeal',
                     'executor_id'    => 'executor',
                     'status'         => 'statusAsText',
                 ],
@@ -329,6 +334,13 @@ class CmsTask extends ActiveRecord
             [['cms_lead_id'], 'integer'],
             [['cms_lead_id'], 'default', 'value' => null],
             [['cms_lead_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLead::class, 'targetAttribute' => 'id'],
+
+            //"Сделка как услуга": the deal of the task, a resource of that deal, internal tasks hidden from the client.
+            [['cms_deal_id', 'deal_resource_id'], 'integer', 'when' => function () { return $this->hasAttribute('cms_deal_id'); }],
+            [['deal_resource_type'], 'string', 'max' => 64, 'when' => function () { return $this->hasAttribute('cms_deal_id'); }],
+            [['is_internal'], 'boolean', 'when' => function () { return $this->hasAttribute('cms_deal_id'); }],
+            [['dealResourceKey'], 'safe'],
+            [['cms_deal_id'], 'validateDeal', 'skipOnEmpty' => false, 'when' => function () { return $this->hasAttribute('cms_deal_id'); }],
 
             [['executor_end_at'], 'integer'],
             [['name'], 'required'],
@@ -573,6 +585,10 @@ class CmsTask extends ActiveRecord
 
             'cms_company_id' => 'Компания',
             'cms_user_id'    => 'Клиент',
+            'cms_deal_id'    => 'Сделка (услуга)',
+            'deal_resource_id' => 'Ресурс сделки',
+            'is_internal'    => 'Внутренняя: клиент не видит',
+            'dealResourceKey' => 'Ресурс сделки',
             'cms_lead_id'    => 'Лид',
             'parent_cms_task_id' => 'Связанная задача',
 
@@ -820,6 +836,93 @@ class CmsTask extends ActiveRecord
     public function getCmsCompany()
     {
         return $this->hasOne(CmsCompany::class, ['id' => 'cms_company_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsDeal()
+    {
+        return $this->hasOne(CmsDeal::class, ['id' => 'cms_deal_id']);
+    }
+
+    /**
+     * "type:id" of the deal resource, for a single select in forms.
+     */
+    public function getDealResourceKey(): string
+    {
+        if (!$this->hasAttribute('deal_resource_type') || !$this->deal_resource_type || !$this->deal_resource_id) {
+            return '';
+        }
+        return $this->deal_resource_type.':'.(int)$this->deal_resource_id;
+    }
+
+    public function setDealResourceKey($value)
+    {
+        if (!$this->hasAttribute('deal_resource_type')) {
+            return;
+        }
+        $parts = explode(':', (string)$value, 2);
+        if (count($parts) === 2 && $parts[0] !== '' && (int)$parts[1] > 0) {
+            $this->deal_resource_type = $parts[0];
+            $this->deal_resource_id = (int)$parts[1];
+        } else {
+            $this->deal_resource_type = null;
+            $this->deal_resource_id = null;
+        }
+    }
+
+    /**
+     * The resource of the deal the task is about, if any.
+     */
+    public function getDealResource(): ?\skeeks\cms\deal\DealResource
+    {
+        if (!$this->hasAttribute('deal_resource_type') || !$this->deal_resource_type || !$this->deal_resource_id || !\Yii::$app->has('dealAccess')) {
+            return null;
+        }
+        return \Yii::$app->get('dealAccess')->resource((string)$this->deal_resource_type, (int)$this->deal_resource_id);
+    }
+
+    /**
+     * A task of a deal belongs to the deal's company (or client): it is filled
+     * when the task has neither; a different company is refused. The resource
+     * must be a resource of this deal.
+     */
+    public function validateDeal($attribute)
+    {
+        if (!$this->cms_deal_id) {
+            $this->cms_deal_id = null;
+            $this->deal_resource_type = null;
+            $this->deal_resource_id = null;
+            return;
+        }
+
+        $deal = CmsDeal::findOne((int)$this->cms_deal_id);
+        if (!$deal) {
+            $this->addError($attribute, 'Сделка не найдена.');
+            return;
+        }
+
+        if ($deal->cms_company_id) {
+            if (!$this->cms_company_id) {
+                $this->cms_company_id = (int)$deal->cms_company_id;
+            } elseif ((int)$this->cms_company_id !== (int)$deal->cms_company_id) {
+                $this->addError($attribute, 'Сделка относится к другой компании.');
+                return;
+            }
+        } elseif ($deal->cms_user_id && !$this->cms_company_id && !$this->cms_user_id && !$this->cms_project_id) {
+            $this->cms_user_id = (int)$deal->cms_user_id;
+        }
+
+        //Checked when the link is set: a resource moved to another deal later stays on the task as history.
+        $linkChanged = $this->isNewRecord || $this->isAttributeChanged('cms_deal_id', false)
+            || $this->isAttributeChanged('deal_resource_type', false) || $this->isAttributeChanged('deal_resource_id', false);
+        if ($linkChanged && ($this->deal_resource_type || $this->deal_resource_id)) {
+            $resource = $this->getDealResource();
+            if (!$resource || (int)$resource->dealId !== (int)$deal->id) {
+                $this->addError('deal_resource_id', 'Ресурс не относится к этой сделке.');
+            }
+        }
     }
 
     /**

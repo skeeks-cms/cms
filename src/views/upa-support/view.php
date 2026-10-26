@@ -3,6 +3,7 @@
  * @var $this yii\web\View
  * @var $model \skeeks\cms\models\CmsTask
  * @var $comment \skeeks\cms\models\CmsLog
+ * @var $canComment bool|null a task of a deal with "Задачи: смотреть" is read-only
  */
 
 use skeeks\cms\helpers\CmsScheduleHelper;
@@ -110,6 +111,12 @@ $taskResultQuery = $model->getLogs()->comments()->results();
                     <span class="sx-properties--value"><?php echo $planEndAt ? \Yii::$app->formatter->asDatetime($planEndAt) : '—'; ?></span>
                 </li>
                 <?php endif; ?>
+                <?php if ($model->hasAttribute('cms_deal_id') && $model->cmsDeal) : ?>
+                <li>
+                    <span class="sx-properties--name">Услуга</span>
+                    <span class="sx-properties--value"><?php echo Html::encode($model->cmsDeal->name); ?></span>
+                </li>
+                <?php endif; ?>
                 <li>
                     <span class="sx-properties--name">Компания</span>
                     <span class="sx-properties--value"><?php echo $model->cmsCompany ? Html::encode($model->cmsCompany->name) : '—'; ?></span>
@@ -138,6 +145,7 @@ $taskResultQuery = $model->getLogs()->comments()->results();
     </section>
 <?php endif; ?>
 
+<?php if (!isset($canComment) || $canComment) : ?>
 <div class="sx-upa-task-comment-block">
     <div class="sx-surface sx-surface--padded">
         <?php echo CmsCommentWidget::widget([
@@ -146,6 +154,7 @@ $taskResultQuery = $model->getLogs()->comments()->results();
         ]); ?>
     </div>
 </div>
+<?php endif; ?>
 
 <?php if ($model->getLogs()->comments()->count()) : ?>
     <div class="sx-upa-task-section">

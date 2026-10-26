@@ -219,6 +219,7 @@ class CmsDeal extends ActiveRecord
                     return !$this->cms_company_id;
                 },
             ],
+            [['cms_company_id'], 'validateClientChange', 'skipOnEmpty' => false],
 
             [
                 'is_periodic',
@@ -456,7 +457,7 @@ class CmsDeal extends ActiveRecord
      */
     public function getCmsDeal2bills()
     {
-        return $this->hasMany(CmsDeal2bill::className(), ['shop_bill_id' => 'id']);
+        return $this->hasMany(CmsDeal2bill::className(), ['cms_deal_id' => 'id']);
     }
 
     /**
@@ -466,7 +467,134 @@ class CmsDeal extends ActiveRecord
      */
     public function getCmsDeal2payments()
     {
-        return $this->hasMany(CmsDeal2payment::className(), ['shop_payment_id' => 'id']);
+        return $this->hasMany(CmsDeal2payment::className(), ['cms_deal_id' => 'id']);
+    }
+
+    /**
+     * Grants of client people on this deal only (company-wide ones: DealAccess::dealGrants()).
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientAccesses()
+    {
+        return $this->hasMany(CmsClientAccess::class, ['cms_deal_id' => 'id']);
+    }
+
+    /**
+     * The composition of the deal.
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems()
+    {
+        return $this->hasMany(CmsDealItem::class, ['cms_deal_id' => 'id'])->orderBy(['priority' => SORT_ASC, 'id' => SORT_ASC]);
+    }
+
+    /**
+     * Access areas narrowed in this deal.
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaRows()
+    {
+        return $this->hasMany(CmsDealArea::class, ['cms_deal_id' => 'id']);
+    }
+
+    /**
+     * @return \skeeks\cms\models\queries\CmsTaskQuery|\yii\db\ActiveQuery
+     */
+    public function getTasks()
+    {
+        return $this->hasMany(CmsTask::class, ['cms_deal_id' => 'id']);
+    }
+
+    /**
+     * "Сделка как услуга": a deal does not silently move to another client.
+     * While it has grants of client people or tasks of the previous company, a change
+     * of the company (or from a company to a person) is refused: those people would
+     * keep seeing the service and the tasks would point at another client. Giving a
+     * personal deal to a company is allowed when it has no grants besides the owner
+     * (the owner then gets a full grant, see afterSave()).
+     */
+    public function validateClientChange($attribute)
+    {
+        if ($this->isNewRecord || !$this->isAttributeChanged('cms_company_id', false)) {
+            return;
+        }
+        $oldCompanyId = (int)$this->getOldAttribute('cms_company_id');
+        if ((int)$this->cms_company_id === $oldCompanyId || !static::getDb()->getTableSchema(CmsClientAccess::tableName())) {
+            return;
+        }
+
+        $grants = (int)CmsClientAccess::find()->andWhere(['cms_deal_id' => (int)$this->id])->count();
+        $tasks = 0;
+        if ($oldCompanyId && \skeeks\cms\models\queries\CmsTaskQuery::hasDealColumn()) {
+            $tasks = (int)CmsTask::find()
+                ->andWhere([CmsTask::tableName().'.cms_deal_id' => (int)$this->id, CmsTask::tableName().'.cms_company_id' => $oldCompanyId])
+                ->count();
+        }
+        if ($grants || $tasks) {
+            $parts = [];
+            if ($grants) {
+                $parts[] = "доступы людей клиента ({$grants})";
+            }
+            if ($tasks) {
+                $parts[] = "задачи прежней компании ({$tasks})";
+            }
+            $this->addError($attribute, 'Сделку нельзя перевести на другого клиента: у неё есть '.implode(' и ', $parts)
+                .'. Уберите доступы в блоке «Доступ клиента» и перенесите или отвяжите задачи, затем смените клиента.');
+        }
+    }
+
+    /**
+     * The owner of a deal without a company has full access without a grant.
+     * When such a deal is given to a company, the owner keeps a full grant on it.
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert || !array_key_exists('cms_company_id', $changedAttributes)) {
+            return;
+        }
+        $oldCompanyId = (int)$changedAttributes['cms_company_id'];
+        if ($oldCompanyId === (int)$this->cms_company_id || !static::getDb()->getTableSchema(CmsClientAccess::tableName())) {
+            return;
+        }
+
+        //Safety net for writers that skip validateClientChange(): people of the previous company lose this deal.
+        if ($oldCompanyId) {
+            $removed = 0;
+            foreach (CmsClientAccess::find()->andWhere(['cms_deal_id' => (int)$this->id, 'cms_company_id' => $oldCompanyId])->all() as $grant) {
+                $grant->delete();
+                $removed++;
+            }
+            if ($removed) {
+                \Yii::$app->get('dealAccess')->writeDealLog($this, "Сделка переведена на другого клиента: снято доступов людей прежней компании — {$removed}.");
+            }
+            return;
+        }
+
+        //A personal deal given to a company: its owner keeps full access.
+        $ownerId = (int)($changedAttributes['cms_user_id'] ?? $this->cms_user_id);
+        if (!$ownerId || CmsClientAccess::find()->andWhere(['cms_user_id' => $ownerId, 'scope_key' => 'd:'.(int)$this->id])->exists()) {
+            return;
+        }
+        $role = CmsDealRole::find()->andWhere(['code' => CmsDealRole::CODE_FULL])->one();
+        $grant = new CmsClientAccess([
+            'cms_user_id'      => $ownerId,
+            'cms_deal_id'      => (int)$this->id,
+            'cms_deal_role_id' => $role ? $role->id : null,
+            'is_full'          => 1,
+        ]);
+        if (!$grant->save()) {
+            throw new \RuntimeException('Владелец сделки не получил доступ: '.implode('; ', $grant->getFirstErrors()));
+        }
+    }
+
+    /**
+     * A change of the client and the grants that follow it are written together.
+     */
+    public function transactions()
+    {
+        return [self::SCENARIO_DEFAULT => self::OP_UPDATE];
     }
 
 

@@ -484,6 +484,12 @@ return array_merge(dashboardsMenu(), [
                             /*"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],*/
                         ],
                         [
+                            "label" => "Роли доступа клиентов",
+                            "url"   => ["cms/admin-cms-deal-role"],
+                            'priority' => 900,
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
+                        ],
+                        [
                             "label" => \Yii::t('skeeks/cms', "Статусы компаний"),
                             "url"   => ["cms/admin-cms-company-status"],
                             'priority' => 900,

@@ -109,6 +109,21 @@ class AdminCmsDealController extends BackendModelStandartController
                 'callback' => [$this, 'documents'],
                 'icon'     => 'fas fa-file-signature',
             ],
+            //"Сделка как услуга": tasks of the service.
+            'tasks' => [
+                'class'           => \skeeks\cms\backend\actions\BackendGridModelRelatedAction::class,
+                'name'            => 'Задачи',
+                'priority'        => 300,
+                'icon'            => 'fas fa-list',
+                'controllerRoute' => "/cms/admin-cms-task",
+                'relation'        => ['cms_deal_id' => 'id'],
+                'accessCallback'  => function () {
+                    return \skeeks\cms\models\queries\CmsTaskQuery::hasDealColumn();
+                },
+                'on gridInit'     => function ($e) {
+                    $e->sender->relatedIndexAction->backendShowings = false;
+                },
+            ],
             'log' => [
                 'class' => BackendModelLogAction::class,
             ],

@@ -36,6 +36,7 @@ use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\cms\widgets\formInputs\SmartDurationInputWidget;
 use skeeks\cms\widgets\formInputs\SmartTimeInputWidget;
 use skeeks\cms\widgets\GridView;
+use skeeks\cms\models\CmsDeal;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -621,6 +622,17 @@ JS
                     }
 
                     if ($form->hasRelationChange()) {
+                        //A deal of another company or client does not move with the task.
+                        if ($model->hasAttribute('cms_deal_id') && $model->cms_deal_id) {
+                            $deal = CmsDeal::findOne((int)$model->cms_deal_id);
+                            $keep = $deal && (
+                                ($form->cms_company_id && (int)$deal->cms_company_id === (int)$form->cms_company_id)
+                                || (!$form->cms_company_id && $form->cms_user_id && !$deal->cms_company_id && (int)$deal->cms_user_id === (int)$form->cms_user_id)
+                            );
+                            if (!$keep) {
+                                $model->cms_deal_id = null;
+                            }
+                        }
                         if ($form->cms_company_id) {
                             $model->cms_company_id = (int)$form->cms_company_id;
                             $model->cms_project_id = $form->cms_project_id ? (int)$form->cms_project_id : null;
@@ -1899,6 +1911,17 @@ JS
         if ($model->isNewRecord && $model->cms_lead_id) {
             $this->applyLeadToNewTask($model);
         }
+        $hasDeal = \skeeks\cms\models\queries\CmsTaskQuery::hasDealColumn();
+        //A task created in a deal: show the deal's company (or client) in the relation switcher.
+        if ($hasDeal && $model->isNewRecord && $model->cms_deal_id && !$model->cms_company_id && !$model->cms_user_id && !$model->cms_project_id) {
+            $deal = CmsDeal::find()->forManager()->andWhere([CmsDeal::tableName().'.id' => (int)$model->cms_deal_id])->one();
+            if ($deal) {
+                $model->cms_company_id = $deal->cms_company_id ?: null;
+                $model->cms_user_id = $deal->cms_company_id ? null : $deal->cms_user_id;
+            } else {
+                $model->cms_deal_id = null;
+            }
+        }
         $isExecutorLocked = !$model->isNewRecord && CmsTaskSchedule::find()->task($model)->exists();
 
         $projectAjaxUrl = \yii\helpers\Json::encode(\yii\helpers\Url::current([
@@ -2418,6 +2441,49 @@ JS
                 ],
             ],
 
+            //"Сделка как услуга": the service of the task.
+            'cms_deal_id' => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => AjaxSelectModel::class,
+                'hint'         => 'Задача по услуге видна клиенту, если ему открыты задачи этой сделки',
+                'widgetConfig' => [
+                    'id'          => 'cmstask-deal-relation-select',
+                    'modelClass'  => CmsDeal::class,
+                    'searchQuery' => function ($word = '') use ($model) {
+                        $query = CmsDeal::find()->forManager();
+                        $companyId = (int)\Yii::$app->request->get('cms_company_id', $model->cms_company_id);
+                        $userId = (int)\Yii::$app->request->get('cms_user_id', $model->cms_user_id);
+                        if ($companyId) {
+                            $query->andWhere([CmsDeal::tableName().'.cms_company_id' => $companyId]);
+                        } elseif ($userId) {
+                            $query->andWhere([CmsDeal::tableName().'.cms_user_id' => $userId, CmsDeal::tableName().'.cms_company_id' => null]);
+                        }
+                        if ($word) {
+                            $query->andWhere(['like', CmsDeal::tableName().'.name', $word]);
+                        }
+                        return $query->orderBy([CmsDeal::tableName().'.is_active' => SORT_DESC, CmsDeal::tableName().'.id' => SORT_DESC]);
+                    },
+                    'pluginOptions' => [
+                        'ajax' => [
+                            'data' => new JsExpression('function(params) { return {q: params.term, cms_company_id: $(".cms_company_id-btn").hasClass("sx-active") ? $("#cmstask-cms_company_id").val() : "", cms_user_id: $(".cms_user_id-btn").hasClass("sx-active") ? $("#cmstask-cms_user_id").val() : ""}; }'),
+                        ],
+                    ],
+                ],
+            ],
+
+            'dealResourceKey' => [
+                'class' => SelectField::class,
+                'label' => 'Ресурс сделки',
+                'items' => $this->dealResourceItems($model),
+            ],
+
+            'is_internal' => [
+                'class'       => BoolField::class,
+                'allowNull'   => false,
+                'formElement' => BoolField::ELEMENT_CHECKBOX,
+                'hint'        => 'Задача по услуге, которую клиенту показывать не нужно',
+            ],
+
 
 
             'description' => [
@@ -2531,6 +2597,24 @@ JS
             unset($result['fact_duration']);
         }
 
+        if (!$hasDeal) {
+            unset($result['cms_deal_id'], $result['dealResourceKey'], $result['is_internal']);
+        } else {
+            if (!$result['dealResourceKey']['items']) {
+                unset($result['dealResourceKey']);
+            }
+            //Another company or client: the deal no longer fits; another deal: its resources are not listed yet.
+            $this->view->registerJs(<<<JS
+$("body").on("select2:select select2:unselect", "#cmstask-cms_company_id, #cmstask-cms_user_id", function() {
+    $("#cmstask-deal-relation-select").val("").trigger("change");
+});
+$("body").on("change", "#cmstask-deal-relation-select", function() {
+    $(".field-cmstask-dealresourcekey").slideUp().find("select").val("");
+});
+JS
+            );
+        }
+
         /*if ($model->crmProject) {
             if ($model->crmProject->crmContractors) {
                 $contrator_ids = ArrayHelper::map($model->crmProject->crmContractors, "id", "id");
@@ -2553,6 +2637,24 @@ JS
 
 
         return $result;
+    }
+
+    /**
+     * Resources of the task's deal for the "Ресурс сделки" select.
+     */
+    protected function dealResourceItems(CmsTask $model): array
+    {
+        $items = [];
+        if (!\skeeks\cms\models\queries\CmsTaskQuery::hasDealColumn() || !$model->cms_deal_id || !($deal = CmsDeal::findOne((int)$model->cms_deal_id))) {
+            return $items;
+        }
+        /** @var \skeeks\cms\deal\DealAccess $dealAccess */
+        $dealAccess = \Yii::$app->get('dealAccess');
+        foreach ($dealAccess->resources($deal) as $resource) {
+            $provider = $dealAccess->getProvider($resource->type);
+            $items[$resource->type.':'.$resource->id] = ($provider ? $provider->label().': ' : '').$resource->title;
+        }
+        return $items;
     }
 
     public function actionUnlinkRelatedTask($pk)

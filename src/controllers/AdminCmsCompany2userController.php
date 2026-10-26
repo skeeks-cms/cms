@@ -34,12 +34,14 @@ class AdminCmsCompany2userController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = "";
+        $this->name = "Контакт компании";
         $this->modelShowAttribute = "asText";
         $this->modelClassName = CmsCompany2user::class;
 
         $this->permissionName = 'cms/admin-company';
         $this->generateAccessActions = false;
+        //A small window: the person is named in the form; removing is "Убрать из компании" in the card menu.
+        $this->modelHeader = '';
 
         parent::init();
     }
@@ -78,6 +80,14 @@ class AdminCmsCompany2userController extends BackendModelStandartController
         $model->load(\Yii::$app->request->get());
 
         $result = [
+            [
+                'class'   => HtmlBlock::class,
+                'content' => \yii\helpers\Html::tag('div',
+                    \yii\helpers\Html::tag('label', 'Человек')
+                    .\yii\helpers\Html::tag('div', \yii\helpers\Html::encode($model->cmsUser ? $model->cmsUser->shortDisplayName : '#'.$model->cms_user_id)),
+                    ['class' => 'col-12 form-group']
+                ),
+            ],
             'comment',
             'is_root' => [
                 'class' => BoolField::class,

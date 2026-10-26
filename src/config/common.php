@@ -72,6 +72,11 @@ return [
             'class' => '\skeeks\cms\Skeeks',
         ],
 
+        //"Сделка как услуга": access of client people to deals, access areas and deal resources.
+        'dealAccess' => [
+            'class' => \skeeks\cms\deal\DealAccess::class,
+        ],
+
         'legal' => [
             'class' => \skeeks\cms\components\LegalComponent::class,
         ],

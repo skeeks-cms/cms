@@ -358,6 +358,32 @@ blocks of its own.
 Test: tests/crm-extension-points.php (Composer autoload, SQLite memory for
 record sources).
 
+## Client access to deals ("Сделка как услуга", steps У1–У2)
+
+Client people (not employees) are checked by one service, the `dealAccess`
+component (deal\DealAccess): access areas with integer levels, grants on a deal
+or on all deals of a company (cms_client_access + _area), editable roles
+(cms_deal_role), what a deal type/deal opens (cms_deal_type_area,
+cms_deal_area), deal composition (cms_deal_item), resources from package
+providers. CmsDealQuery::forClient($user, $area) and CmsTaskQuery::forClient()
+use it; forClient() without an area means full access only, so screens that
+do not ask for an area keep the old boundary and never widen to limited roles;
+a task of a deal is decided only by the deal rights, an internal task is
+hidden from everyone, a task without a deal (company or client only) is never
+shown to the client. is_root of CmsCompany2user is kept equal to a company-wide
+full grant in one transaction. A deal with client grants or tasks of its
+company cannot be moved to another client (CmsDeal::validateClientChange).
+Migrations m261026_200000 (tables, roles, carry-over of is_root and contacts of
+company deals), m261026_200100 (cms_task.cms_deal_id, resource, is_internal)
+and m261026_200200 (journal of moving projects).
+Projects → deals: console cms/deal-access/migrate-projects (plan by default,
+--apply journals each project in the same transaction, revert --run=<key>
+keeps grants changed by hand). UI: «Роли доступа клиентов»
+(Справочники), «Доступ клиента», «Ресурсы» and «Задачи» in the deal card,
+«Сделка», «Ресурс сделки», «Внутренняя» in the task form. Full contract:
+skeeks-cms-package-development references/deal-client-access.md.
+Test: tests/deal-client-access.php (Composer autoload, SQLite memory).
+
 ## Contractor delivery address
 
 cms_contractor.delivery_address (m261015_020000, varchar 255, null) is the
