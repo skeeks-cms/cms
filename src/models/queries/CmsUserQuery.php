@@ -123,6 +123,37 @@ class CmsUserQuery extends CmsActiveQuery
 
 
     /**
+     * Сотрудники, чьи задачи и лиды доступны пользователю: администратору — все сотрудники,
+     * остальным — он сам и его подчиненные (User::getSubordinates()). Для фильтров «Исполнитель».
+     *
+     * @param User|null $user
+     * @return $this
+     */
+    public function managedBy(User $user = null)
+    {
+        if ($user === null) {
+            $user = \Yii::$app->user->identity;
+            $isCanAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        } else {
+            $isCanAdmin = \Yii::$app->authManager->checkAccess($user->id, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        }
+
+        $this->isWorker();
+
+        if (!$user) {
+            return $this->andWhere('0=1');
+        }
+
+        if (!$isCanAdmin) {
+            $ids = \skeeks\cms\models\CmsDepartment::subordinateIds((int)$user->id);
+            $ids[] = (int)$user->id;
+            $this->andWhere([$this->getPrimaryTableName().'.id' => $ids]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Поиск компаний доступных пользователю
      *
      * @param User|null $user

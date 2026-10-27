@@ -144,6 +144,69 @@ class CmsDepartment extends ActiveRecord
     }
 
     /**
+     * Подчиненные руководителя: сотрудники отделов, которыми он руководит, и всех их подотделов,
+     * а также руководители этих подотделов. Сам руководитель в список не входит.
+     *
+     * Единственное место этого правила: User::getSubordinates() и через него все forManager().
+     *
+     * @param int $leaderId
+     * @return int[]
+     */
+    public static function subordinateIds(int $leaderId): array
+    {
+        if ($leaderId <= 0) {
+            return [];
+        }
+
+        $rows = (new \yii\db\Query())
+            ->select(['id', 'pid', 'worker_id'])
+            ->from(static::tableName())
+            ->all(static::getDb());
+
+        $children = [];
+        $queue = [];
+        foreach ($rows as $row) {
+            $children[(int)$row['pid']][] = $row;
+            if ((int)$row['worker_id'] === $leaderId) {
+                $queue[] = (int)$row['id'];
+            }
+        }
+
+        $result = [];
+        $departmentIds = [];
+        while ($queue) {
+            $departmentId = array_shift($queue);
+            if (isset($departmentIds[$departmentId])) {
+                continue;
+            }
+            $departmentIds[$departmentId] = $departmentId;
+
+            foreach ($children[$departmentId] ?? [] as $child) {
+                if ($child['worker_id']) {
+                    $result[(int)$child['worker_id']] = (int)$child['worker_id'];
+                }
+                $queue[] = (int)$child['id'];
+            }
+        }
+
+        if ($departmentIds) {
+            $workerIds = (new \yii\db\Query())
+                ->select(['worker_id'])
+                ->from(CmsDepartment2worker::tableName())
+                ->andWhere(['cms_department_id' => array_values($departmentIds)])
+                ->column(static::getDb());
+            foreach ($workerIds as $workerId) {
+                $result[(int)$workerId] = (int)$workerId;
+            }
+        }
+
+        unset($result[$leaderId]);
+        sort($result);
+
+        return $result;
+    }
+
+    /**
      * @param string $glue
      *
      * @return string

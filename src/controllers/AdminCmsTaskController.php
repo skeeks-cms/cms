@@ -277,7 +277,8 @@ class AdminCmsTaskController extends BackendModelStandartController
                                 'field' => [
                                     'widgetConfig' => [
                                         'searchQuery' => function ($word = '') {
-                                            $q = CmsUser::find()->isWorker();
+                                            //Только сотрудники, чьи задачи видны: сам и подчиненные (администратору — все)
+                                            $q = CmsUser::find()->managedBy();
 
                                             if ($word) {
                                                 $q->search($word);

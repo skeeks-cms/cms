@@ -1392,17 +1392,12 @@ class User
     }
 
     /**
-     * Подчиненные
+     * Подчиненные: сотрудники отделов, которыми руководит пользователь, включая все подотделы
+     * и их руководителей (правило — CmsDepartment::subordinateIds()).
      * @return \skeeks\cms\query\CmsActiveQuery
      */
     public function getSubordinates()
     {
-        //Отделы где пользователь является руководителем
-        $needDepartmentsQuery = CmsDepartment::find()->andWhere(['worker_id' => $this->id])->select(['id']);
-
-        //Отделы где нужно искать сотрудников
-        $subQuery = CmsDepartment2worker::find()->andWhere(['cms_department_id' => $needDepartmentsQuery])->select(['worker_id']);
-
         $userClass = \Yii::$app->user->identityClass;
 
         $q = $userClass::find();
@@ -1410,7 +1405,7 @@ class User
 
         $q->isWorker();
 
-        $q->andWhere([CmsUser::tableName().'.id' => $subQuery]);
+        $q->andWhere([CmsUser::tableName().'.id' => CmsDepartment::subordinateIds((int)$this->id)]);
 
         return $q;
     }

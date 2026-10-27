@@ -656,7 +656,7 @@ JS);
                     'value'      => ArrayHelper::getValue($params, 'executor_id') ?: null,
                     'modelClass' => CmsUser::class,
                     'searchQuery' => function ($word = '') {
-                        $query = CmsUser::find()->isWorker();
+                        $query = CmsUser::find()->managedBy();
                         if ($word) {
                             $query->search($word);
                         }

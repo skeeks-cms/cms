@@ -62,8 +62,9 @@ class CmsTaskQuery extends CmsActiveQuery
                 [self::getPrimaryTableName() . ".cms_project_id" => CmsProject::find()->forManager($user)->select(CmsProject::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".cms_company_id" => CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".cms_user_id" => CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id')],
-                [self::getPrimaryTableName() . ".executor_id" => $user->id],
-                [self::getPrimaryTableName() . ".created_by" => $user->id],
+                //Свои задачи и задачи подчиненных: исполнитель или постановщик
+                [self::getPrimaryTableName() . ".executor_id" => array_values($managers)],
+                [self::getPrimaryTableName() . ".created_by" => array_values($managers)],
             ];
             if (static::hasDealColumn()) {
                 $condition[] = [self::getPrimaryTableName() . ".cms_deal_id" => CmsDeal::find()->forManager($user)->select(CmsDeal::tableName() . '.id')];
