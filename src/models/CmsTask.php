@@ -311,12 +311,11 @@ class CmsTask extends ActiveRecord
                 continue;
             }
 
-            $notify = new CmsWebNotify();
-            $notify->cms_user_id = (int)$adminUserId;
-            $notify->name = 'Новая неразобранная задача от клиента';
-            $notify->model_id = (int)$this->id;
-            $notify->model_code = static::class;
-            $notify->save();
+            \Yii::$app->notifications->notify((int)$adminUserId, 'task.client_unassigned', [
+                'name'     => 'Новая неразобранная задача от клиента',
+                'model'    => $this,
+                'eventKey' => 'task.client_unassigned:'.(int)$this->id,
+            ]);
         }
     }
 
@@ -1184,12 +1183,14 @@ class CmsTask extends ActiveRecord
 
         //Если приоритет задач обновил другой пользователь, то уведомим исполнителя
         if ($sortTaskIds && $currentUser && $currentUser->id != $user->id) {
-            $notify = new CmsWebNotify();
-            $notify->cms_user_id = $user->id;
-            $notify->name = $currentUser->asText . " поменял(а) порядок ваших задач.";
-            $notify->model_id = $user->id;
-            $notify->model_code = $user->skeeksModelCode;
-            $notify->save();
+            \Yii::$app->notifications->notify($user->id, 'task.order', [
+                'name'       => $currentUser->asText . " поменял(а) порядок ваших задач.",
+                'model_code' => $user->skeeksModelCode,
+                'model_id'   => $user->id,
+                // Reordering in a row is one notification until it is read.
+                'eventKey'   => 'task.order:'.$user->id.':'.$currentUser->id,
+                'collapse'   => true,
+            ]);
         }
         return true;
     }

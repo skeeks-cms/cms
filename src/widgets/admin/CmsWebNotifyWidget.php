@@ -24,6 +24,29 @@ class CmsWebNotifyWidget extends Widget
      */
     public $enableWorkReminders = false;
 
+    /**
+     * The personal notification settings page ("⚙" in the window). Null — the
+     * administration profile page for those who have the administration.
+     *
+     * @var string|array|false|null
+     */
+    public $settingsUrl;
+
+    public function getSettingsUrl(): ?string
+    {
+        if ($this->settingsUrl === false) {
+            return null;
+        }
+        if ($this->settingsUrl !== null) {
+            return \yii\helpers\Url::to($this->settingsUrl);
+        }
+        if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ADMIN_ACCESS)) {
+            return \yii\helpers\Url::to(['/cms/admin-profile/notifications']);
+        }
+
+        return null;
+    }
+
     public function getUser()
     {
         return \Yii::$app->user->identity;

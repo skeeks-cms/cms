@@ -159,149 +159,71 @@ class Skeeks extends Component implements BootstrapInterface
              * @var $sender CmsLog
              */
             $sender = $event->sender;
+            if ($sender->model_code != CmsTask::class) {
+                return;
+            }
+            /**
+             * @var $model CmsTask
+             */
+            $model = $sender->model;
+            if (!$model) {
+                return;
+            }
+            $notifications = \Yii::$app->notifications;
+            $task = ['model' => $model];
 
             //Поставлена задача
             if ($sender->log_type == CmsLog::LOG_TYPE_INSERT) {
-                if ($sender->model_code == CmsTask::class) {
-                    /**
-                     * @var $model CmsTask
-                     */
-                    $model = $sender->model;
-                    if ($model->executor_id && $model->executor_id != $model->created_by) {
-                        $notify = new CmsWebNotify();
-                        $notify->cms_user_id = $model->executor_id;
-                        $notify->name = "Вам поставлена новая задача";
-                        $notify->model_id = $sender->model_id;
-                        $notify->model_code = $sender->model_code;
-                        $notify->save();
-                    }
+                if ($model->executor_id && $model->executor_id != $model->created_by) {
+                    $notifications->notify($model->executor_id, 'task.created', ['name' => "Вам поставлена новая задача", 'eventKey' => 'task.created:'.$model->id] + $task);
                 }
             }
 
             if ($sender->log_type == CmsLog::LOG_TYPE_UPDATE) {
-                if ($sender->model_code == CmsTask::class) {
-                    /**
-                     * @var $model CmsTask
-                     */
-                    $model = $sender->model;
-                    //Только если не сам себе ставил задачу
-                    if ($model->executor_id != $model->created_by) {
+                //Только если не сам себе ставил задачу
+                if ($model->executor_id != $model->created_by) {
 
-                        $executor = ArrayHelper::getValue($sender->data, "executor_id.value");
-                        $status = ArrayHelper::getValue($sender->data, "status.value");
-                        $oldStatus = ArrayHelper::getValue($sender->data, "status.old_value");
+                    $executor = ArrayHelper::getValue($sender->data, "executor_id.value");
+                    $status = ArrayHelper::getValue($sender->data, "status.value");
+                    $oldStatus = ArrayHelper::getValue($sender->data, "status.old_value");
+                    $clientUrl = $model->isClientAuthored() ? $model->getClientViewUrl() : null;
 
-                        //У задачи поменялся исполнитель
-                        if ($executor) {
-                            $notify = new CmsWebNotify();
-                            $notify->cms_user_id = $executor;
-                            $notify->name = "Вам передали задачу";
-                            $notify->model_id = $sender->model_id;
-                            $notify->model_code = $sender->model_code;
-                            $notify->save();
-                        }
-                        //У задачи поменялся статус
-                        if ($status) {
-                            if ($status == CmsTask::STATUS_ON_CHECK) {
-                                $notify = new CmsWebNotify();
-                                $notify->cms_user_id = $model->created_by;
-                                $notify->name = "Вам необходимо проверить задачу";
-                                $notify->model_id = $sender->model_id;
-                                $notify->model_code = $sender->model_code;
-                                if ($model->isClientAuthored()) {
-                                    $notify->url = $model->getClientViewUrl();
-                                }
-                                $notify->save();
-                            }
-
-                            if ($status == CmsTask::STATUS_READY) {
-                                $notify = new CmsWebNotify();
-                                $notify->cms_user_id = $model->created_by;
-                                $notify->name = "Ваша задача готова";
-                                $notify->model_id = $sender->model_id;
-                                $notify->model_code = $sender->model_code;
-                                if ($model->isClientAuthored()) {
-                                    $notify->url = $model->getClientViewUrl();
-                                }
-                                $notify->save();
-                            }
-
-                            if ($status == CmsTask::STATUS_CANCELED) {
-                                $notify = new CmsWebNotify();
-                                $notify->cms_user_id = $model->created_by;
-                                $notify->name = "Задача отменена";
-                                $notify->model_id = $sender->model_id;
-                                $notify->model_code = $sender->model_code;
-                                $notify->save();
-
-                                $notify = new CmsWebNotify();
-                                $notify->cms_user_id = $model->executor_id;
-                                $notify->name = "Задача отменена";
-                                $notify->model_id = $sender->model_id;
-                                $notify->model_code = $sender->model_code;
-                                $notify->save();
-                            }
-
-                            if ($status == CmsTask::STATUS_IN_WORK && $oldStatus == CmsTask::STATUS_ON_CHECK) {
-                                $notify = new CmsWebNotify();
-                                $notify->cms_user_id = $model->executor_id;
-                                $notify->name = "Задача возобновлена";
-                                $notify->model_id = $sender->model_id;
-                                $notify->model_code = $sender->model_code;
-                                $notify->save();
-                            }
-
+                    //У задачи поменялся исполнитель
+                    if ($executor) {
+                        $notifications->notify($executor, 'task.passed', ['name' => "Вам передали задачу", 'eventKey' => 'task.passed:'.$sender->id] + $task);
+                    }
+                    //У задачи поменялся статус
+                    if ($status) {
+                        if ($status == CmsTask::STATUS_ON_CHECK) {
+                            $notifications->notify($model->created_by, 'task.check', ['name' => "Вам необходимо проверить задачу", 'url' => $clientUrl, 'eventKey' => 'task.status:'.$sender->id] + $task);
                         }
 
+                        if ($status == CmsTask::STATUS_READY) {
+                            $notifications->notify($model->created_by, 'task.ready', ['name' => "Ваша задача готова", 'url' => $clientUrl, 'eventKey' => 'task.status:'.$sender->id] + $task);
+                        }
+
+                        if ($status == CmsTask::STATUS_CANCELED) {
+                            $notifications->notify([$model->created_by, $model->executor_id], 'task.canceled', ['name' => "Задача отменена", 'eventKey' => 'task.status:'.$sender->id] + $task);
+                        }
+
+                        if ($status == CmsTask::STATUS_IN_WORK && $oldStatus == CmsTask::STATUS_ON_CHECK) {
+                            $notifications->notify($model->executor_id, 'task.resumed', ['name' => "Задача возобновлена", 'eventKey' => 'task.status:'.$sender->id] + $task);
+                        }
                     }
                 }
             }
 
-
-            //Добавлен комментарий
+            //Добавлен комментарий к задаче
             if ($sender->log_type == CmsLog::LOG_TYPE_COMMENT) {
-                //Комментарий к задаче
-                if ($sender->model_code == CmsTask::class) {
-                    /**
-                     * @var $model CmsTask
-                     */
-                    $model = $sender->model;
-
-                    $notify = new CmsWebNotify();
-
-                    $notify->cms_user_id = $model->executor_id;
-                    $notify->name = "Добавлен новый комментарий к задаче";
-                    $notify->model_id = $sender->model_id;
-                    $notify->model_code = $sender->model_code;
-
-                    $user_ids = [];
-
-                    if ($model->executor_id) {
-                        $user_ids[] = $model->executor_id;
+                $currentUserId = \Yii::$app->has('user') && !\Yii::$app->user->isGuest
+                    ? (int)\Yii::$app->user->id
+                    : null;
+                foreach (array_unique(array_filter([(int)$model->executor_id, (int)$model->created_by])) as $id) {
+                    if ($currentUserId !== null && $id === $currentUserId) {
+                        continue;
                     }
-
-                    if ($model->created_by) {
-                        $user_ids[] = $model->created_by;
-                    }
-
-                    $user_ids = array_unique($user_ids);
-                    if ($user_ids) {
-                        $currentUserId = \Yii::$app->has('user') && !\Yii::$app->user->isGuest
-                            ? (int)\Yii::$app->user->id
-                            : null;
-                        foreach ($user_ids as $id) {
-                            if ($currentUserId === null || (int)$id !== $currentUserId) {
-                                $notifyTmp = clone $notify;
-                                $notifyTmp->cms_user_id = $id;
-                                if ((int)$id === (int)$model->created_by && $model->isClientAuthored()) {
-                                    $notifyTmp->url = $model->getClientViewUrl((int)$sender->id);
-                                }
-                                $notifyTmp->save();
-                            }
-                        }
-                    }
-
-
+                    $url = $id === (int)$model->created_by && $model->isClientAuthored() ? $model->getClientViewUrl((int)$sender->id) : null;
+                    $notifications->notify($id, 'task.comment', ['name' => "Добавлен новый комментарий к задаче", 'url' => $url, 'eventKey' => 'task.comment:'.$sender->id] + $task);
                 }
             }
         });

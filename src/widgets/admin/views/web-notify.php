@@ -32,13 +32,16 @@ if ($qNotifiesNotPopups) {
 }*/
 
 $qNotifies = \Yii::$app->user->identity->getCmsWebNotifies()->notRead();
-$notReaded = $qNotifies->count();
-$lastNotify = $qNotifies->limit(1)->one();
+$notReaded = (new \skeeks\cms\notify\NotifyList((int)\Yii::$app->user->id))->badge();
+$lastNotify = $qNotifies->orderBy(['id' => SORT_DESC])->limit(1)->one();
+$settingsUrl = $widget->getSettingsUrl();
 
 $jsData = [
     'backend_notifies' => \yii\helpers\Url::to(['/cms/ajax/web-notifies']),
     'backend_notifies_new' => \yii\helpers\Url::to(['/cms/ajax/web-notifies-new']),
     'backend_notifies_clear' => \yii\helpers\Url::to(['/cms/ajax/web-notifies-clear']),
+    'backend_notifies_read_all' => \yii\helpers\Url::to(['/cms/ajax/web-notifies-read-all']),
+    'backend_notify_action' => \yii\helpers\Url::to(['/cms/ajax/web-notify-action']),
     'backend_idle_work_check' => \yii\helpers\Url::to(['/cms/ajax/idle-work-check']),
     'backend_idle_work_stop' => \yii\helpers\Url::to(['/cms/ajax/idle-work-stop']),
     'backend_stale_work_check' => \yii\helpers\Url::to(['/cms/ajax/stale-work-check']),
@@ -68,7 +71,13 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         self.jEmptyContainer = $(".sx-empty", self.getJWrapper());
         self.jItemsContainer = $(".sx-notifies-has-items", self.getJWrapper());
         self.jList = $(".sx-notifies-list", self.getJWrapper());
+        self.jScroll = $(".sx-notifies-scroll", self.getJWrapper());
         self.jBtnClear = $(".sx-btn-clear", self.getJWrapper());
+        self.jBtnReadAll = $(".sx-btn-read-all", self.getJWrapper());
+        self.jBtnMore = $(".sx-btn-more", self.getJWrapper());
+        self.jTabs = $(".sx-notifies-tabs", self.getJWrapper());
+        self.category = "";
+        self.nextCursor = null;
         self.jBrowserPermission = $(".sx-browser-permission", self.getJWrapper());
         self.jBrowserPermissionEnable = $(".sx-browser-permission-enable", self.getJWrapper());
         self.jBrowserPermissionDenied = $(".sx-browser-permission-denied", self.getJWrapper());
@@ -103,6 +112,12 @@ sx.classes.WebNotify = sx.classes.Component.extend({
             self.jTrigger.attr("aria-expanded", "true");
             self.jContainer.fadeIn();
             self.loadMessages();
+        });
+
+        $(window).on("resize", function() {
+            if (self.jContainer.is(":visible")) {
+                self.fitHeight();
+            }
         });
 
         self.jBtnBrowserPermission.on("click", function(e) {
@@ -147,11 +162,96 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         }
         
         self.jBtnClear.on("click", function() {
-            self.jTrigger.attr("aria-expanded", "false");
-            self.jContainer.fadeOut();
+            var question = self.category
+                ? "Удалить все уведомления раздела «" + $.trim(self.jTabs.find(".sx-is-active .sx-notifies-tab__name").text()) + "»?"
+                : "Удалить все уведомления?";
+            if (!window.confirm(question)) {
+                return;
+            }
             self.clearMessages();
         });
-        
+
+        self.jBtnReadAll.on("click", function() {
+            self.postAction(self.get("backend_notifies_read_all"), {"category": self.category}, function() {
+                self.loadMessages();
+            });
+        });
+
+        self.jBtnMore.on("click", function() {
+            self.loadMessages(true);
+        });
+
+        self.jTabs.on("click", "[data-sx-notify-category]", function(e) {
+            e.preventDefault();
+            self.category = $(this).data("sx-notify-category") || "";
+            self.loadMessages();
+        });
+
+        self.jList.on("click", ".sx-notify-entry__menu-toggle", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var jEntry = $(this).closest(".sx-notify-entry");
+            var isOpen = jEntry.hasClass("sx-is-menu-open");
+            self.jList.find(".sx-notify-entry").removeClass("sx-is-menu-open").find(".sx-notify-entry__menu-toggle").attr("aria-expanded", "false");
+            if (!isOpen) {
+                jEntry.addClass("sx-is-menu-open");
+                $(this).attr("aria-expanded", "true");
+            }
+        });
+
+        // An open menu of an entry closes by a click elsewhere or Esc.
+        var closeMenus = function() {
+            self.jList.find(".sx-notify-entry.sx-is-menu-open").removeClass("sx-is-menu-open")
+                .find(".sx-notify-entry__menu-toggle").attr("aria-expanded", "false");
+        };
+        // mousedown: clicks inside the panel do not always bubble up to the document.
+        $(document).on("mousedown touchstart", function(e) {
+            if (!$(e.target).closest(".sx-notify-entry__actions").length) {
+                closeMenus();
+            }
+        });
+        $(document).on("keydown", function(e) {
+            if (e.key === "Escape") {
+                closeMenus();
+            }
+        });
+
+        self.jList.on("click", "[data-sx-notify-action]", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var jEntry = $(this).closest(".sx-notify-entry");
+            var action = $(this).data("sx-notify-action");
+            self.postAction(self.get("backend_notify_action"), {"id": jEntry.data("sx-notify-id"), "action": action}, function(data) {
+                if (action === "delete" || action === "mute") {
+                    jEntry.slideUp(150, function() {
+                        jEntry.remove();
+                        if (!self.jList.children(".sx-notify-entry").length) {
+                            self.loadMessages();
+                        }
+                    });
+                } else {
+                    var isRead = action === "read";
+                    jEntry.toggleClass("sx-not-read", !isRead).removeClass("sx-is-menu-open");
+                    jEntry.find("[data-sx-notify-action='read'], [data-sx-notify-action='unread']")
+                        .data("sx-notify-action", isRead ? "unread" : "read")
+                        .attr("data-sx-notify-action", isRead ? "unread" : "read")
+                        .text(isRead ? "Отметить непрочитанным" : "Отметить прочитанным");
+                }
+                if (data && data.tabs) {
+                    self.renderTabs(data.tabs);
+                }
+            });
+        });
+
+        // Opening a record from an entry reads the whole entry.
+        self.jList.on("click", ".sx-item-inner a, .sx-item-inner .sx-action-trigger", function() {
+            var jEntry = $(this).closest(".sx-notify-entry");
+            if (jEntry.hasClass("sx-not-read")) {
+                jEntry.removeClass("sx-not-read");
+                self.postAction(self.get("backend_notify_action"), {"id": jEntry.data("sx-notify-id"), "action": "read"});
+            }
+        });
+
         
         $(document).mouseup(function (e) {
                 
@@ -531,14 +631,18 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         ajaxQuery.execute();
     },
     
-    loadMessages: function() {
+    loadMessages: function(append) {
         var self = this;
-        
-        var ajaxQuery = sx.ajax.preparePostQuery(self.get("backend_notifies"));
+        var data = {"category": self.category};
+        if (append && self.nextCursor) {
+            data.after = self.nextCursor;
+        }
+
+        var ajaxQuery = sx.ajax.preparePostQuery(self.get("backend_notifies"), data);
         
         var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
             'blockerSelector' : self.jContainer,
-            'enableBlocker': true,
+            'enableBlocker': !append,
             'allowResponseSuccessMessage': false,
             'allowResponseErrorMessage': false,
             'ajaxExecuteErrorAllowMessage': false,
@@ -550,58 +654,120 @@ sx.classes.WebNotify = sx.classes.Component.extend({
         });
 
         ajaxHandler.on('success', function (e, response) {
+            self.nextCursor = response.data.next || null;
+            self.jBtnMore.toggle(!!self.nextCursor);
+            self.renderTabs(response.data.tabs || {});
 
-            if (response.data.items.length) {
+            if (!append) {
+                self.jList.empty();
+            }
+            response.data.items.forEach(function(item) {
+                // A group may continue on the next page: it is shown once.
+                if (!self.jList.children("[data-sx-notify-id='" + item.id + "']").length) {
+                    self.jList.append(item.render);
+                }
+            });
+
+            if (self.jList.children().length) {
                 self.jEmptyContainer.hide();
                 self.jItemsContainer.show();
-
-                self.jList.empty().show();
-                response.data.items.forEach(function(item) {
-                    self.jList.append(item.render);
-                });
+                self.jList.show();
             } else {
-                self.jEmptyContainer.text("Все уведомления прочитаны").show();
+                self.jItemsContainer.show();
                 self.jList.hide();
+                self.jEmptyContainer.text(self.category ? "В этом разделе уведомлений нет" : "Уведомлений нет").show();
             }
 
-            if (response.data.total > 0) {
-                self.jBage.empty().append(response.data.total);
-                self.getJWrapper().addClass("sx-has-notifies");
-            } else {
-                self.jBage.empty();
-                self.getJWrapper().removeClass("sx-has-notifies");
-                
-            }
+            self.updateBadge(response.data.total);
+            self.fitHeight();
         });
 
+        ajaxQuery.execute();
+    },
+
+    renderTabs: function(tabs) {
+        var self = this;
+        var codes = Object.keys(tabs);
+        if (self.category && !tabs[self.category]) {
+            self.category = "";
+        }
+        self.jTabs.empty().toggle(codes.length > 1);
+        var unreadAll = 0;
+        codes.forEach(function(code) {
+            unreadAll += tabs[code].unread;
+        });
+        var addTab = function(code, name, unread) {
+            var jTab = $("<button type='button' class='sx-notifies-tab' role='tab'>")
+                .attr("data-sx-notify-category", code)
+                .attr("aria-selected", self.category === code ? "true" : "false")
+                .toggleClass("sx-is-active", self.category === code)
+                .append($("<span class='sx-notifies-tab__name'>").text(name));
+            if (unread > 0) {
+                jTab.append($("<span class='sx-notifies-tab__count'>").text(unread));
+            }
+            self.jTabs.append(jTab);
+        };
+        addTab("", "Все", unreadAll);
+        codes.forEach(function(code) {
+            addTab(code, tabs[code].name, tabs[code].unread);
+        });
+    },
+
+    /**
+     * The window fits the screen: the list with "Показать ещё" under it takes what the
+     * browser notice, the head, the sections and the buttons leave, so the buttons are always seen.
+     */
+    fitHeight: function() {
+        var self = this;
+        var panel = self.jContainer[0];
+        var list = self.jScroll[0];
+        if (!panel || !list) {
+            return;
+        }
+        list.style.maxHeight = "";
+        var top = panel.getBoundingClientRect().top;
+        var rest = panel.getBoundingClientRect().height - list.getBoundingClientRect().height;
+        var available = window.innerHeight - top - rest - 16;
+        list.style.maxHeight = Math.max(160, Math.min(available, 640)) + "px";
+    },
+
+    updateBadge: function(total) {
+        var self = this;
+        if (total > 0) {
+            self.jBage.empty().append(total);
+            self.getJWrapper().addClass("sx-has-notifies");
+        } else {
+            self.jBage.empty();
+            self.getJWrapper().removeClass("sx-has-notifies");
+        }
+    },
+
+    postAction: function(url, data, callback) {
+        var self = this;
+        var ajaxQuery = sx.ajax.preparePostQuery(url, data || {});
+        var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+            'enableBlocker': false,
+            'allowResponseSuccessMessage': true,
+            'allowResponseErrorMessage': true,
+            'ajaxExecuteErrorAllowMessage': false,
+        });
+        ajaxHandler.on('success', function (e, response) {
+            if (response.data && typeof response.data.total !== "undefined") {
+                self.updateBadge(response.data.total);
+            }
+            if (callback) {
+                callback(response.data || {});
+            }
+        });
         ajaxQuery.execute();
     },
     
     clearMessages: function() {
         var self = this;
-        
-        var ajaxQuery = sx.ajax.preparePostQuery(self.get("backend_notifies_clear"));
-        
-        var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
-            'blockerSelector' : self.jContainer,
-            'enableBlocker': true,
-            'allowResponseSuccessMessage': false,
-            'allowResponseErrorMessage': false,
-            'ajaxExecuteErrorAllowMessage': false,
+        self.postAction(self.get("backend_notifies_clear"), {"category": self.category}, function() {
+            self.category = "";
+            self.loadMessages();
         });
-        
-        ajaxHandler.on('error', function (e, response) {
-            /*console.log(response.data);*/
-        });
-
-        ajaxHandler.on('success', function (e, response) {
-            self.jItemsContainer.hide();
-            self.jEmptyContainer.show();
-            self.jList.hide();
-            
-        });
-
-        ajaxQuery.execute();
     },
 
     isBrowserNotificationsSupported: function() {
@@ -755,12 +921,27 @@ JS
                 <div class="sx-browser-permission-text">&#1056;&#1072;&#1079;&#1088;&#1077;&#1096;&#1080;&#1090;&#1077; &#1091;&#1074;&#1077;&#1076;&#1086;&#1084;&#1083;&#1077;&#1085;&#1080;&#1103; &#1076;&#1083;&#1103; &#1101;&#1090;&#1086;&#1075;&#1086; &#1089;&#1072;&#1081;&#1090;&#1072; &#1074; &#1085;&#1072;&#1089;&#1090;&#1088;&#1086;&#1081;&#1082;&#1072;&#1093; &#1073;&#1088;&#1072;&#1091;&#1079;&#1077;&#1088;&#1072;.</div>
             </div>
         </div>
+        <div class="sx-notifies-head">
+            <div class="sx-notifies-head__title">Уведомления</div>
+            <?php if ($settingsUrl) : ?>
+                <a class="sx-notifies-head__settings" href="<?= \yii\helpers\Html::encode($settingsUrl); ?>" data-pjax="0" title="Настройки уведомлений" aria-label="Настройки уведомлений">
+                    <?= \skeeks\cms\backend\helpers\BackendIcon::render('settings', ['size' => 18]); ?>
+                </a>
+            <?php endif; ?>
+        </div>
+        <div class="sx-notifies-tabs" role="tablist" aria-label="Разделы уведомлений"></div>
         <div class="sx-notifies-has-items">
-            <div class="sx-notifies-list sx-surface__body">
+            <div class="sx-notifies-scroll">
+                <div class="sx-notifies-list sx-surface__body">
 
+                </div>
+                <div class="sx-notifies-more">
+                    <button type="button" class="sx-button sx-button--sm sx-btn-more">Показать ещё</button>
+                </div>
             </div>
             <div class="sx-notifies-btns sx-surface__footer">
-                <button class="sx-button sx-button--primary sx-button--sm sx-btn-clear">Очистить</button>
+                <button type="button" class="sx-button sx-button--sm sx-btn-read-all">Прочитать всё</button>
+                <button type="button" class="sx-button sx-button--primary sx-button--sm sx-btn-clear">Очистить</button>
             </div>
         </div>
 

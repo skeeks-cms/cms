@@ -24,6 +24,7 @@ use skeeks\cms\models\CmsUserSchedule;
 use skeeks\cms\models\CmsUserUniversalProperty;
 use skeeks\cms\models\CmsUserUniversalPropertyEnum;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\notify\NotifyList;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\widgets\admin\CmsUserScheduleBtnWidget;
@@ -780,36 +781,83 @@ class AjaxController extends Controller
         }
 
         $rr->data = [
-            'total' => \Yii::$app->user->identity->getCmsWebNotifies()->notRead()->count(),
+            'total' => (new NotifyList((int)\Yii::$app->user->id))->badge(),
             'items' => $qNotifiesNotPopupsArray,
         ];
 
         return $rr;
     }
+
+    /**
+     * "Очистить": removes the notifications of the open section (all of them in "Все").
+     */
     public function actionWebNotifiesClear() {
         $rr = new RequestResponse();
         $rr->success = true;
 
-        if (\Yii::$app->user->isGuest) {
-
+        // Changes only by POST: Yii checks its CSRF token, a link cannot clear the bell.
+        if (\Yii::$app->user->isGuest || !\Yii::$app->request->isPost) {
+            $rr->success = false;
             return $rr;
         }
 
-        $qNotifies = \Yii::$app->user->identity->getCmsWebNotifies();
-
-        if ($qNotifies->count()) {
-            /**
-             * @var \skeeks\cms\models\CmsWebNotify[] $qNotifiesNotPopups
-             */
-            foreach ($qNotifies->each(10) as $qNotifiesNotPopup)
-            {
-                $qNotifiesNotPopup->delete();
-            }
-        }
+        $list = new NotifyList((int)\Yii::$app->user->id);
+        $list->clear($this->notifyCategory());
+        $rr->data = ['total' => $list->badge()];
 
         return $rr;
     }
 
+    /**
+     * "Прочитать всё" of the open section.
+     */
+    public function actionWebNotifiesReadAll()
+    {
+        $rr = new RequestResponse();
+        $rr->success = true;
+
+        if (\Yii::$app->user->isGuest || !\Yii::$app->request->isPost) {
+            $rr->success = false;
+            return $rr;
+        }
+
+        $list = new NotifyList((int)\Yii::$app->user->id);
+        $list->readAll($this->notifyCategory());
+        $rr->data = ['total' => $list->badge()];
+
+        return $rr;
+    }
+
+    /**
+     * An action on one entry: read, unread, delete, mute ("не уведомлять о таком").
+     */
+    public function actionWebNotifyAction()
+    {
+        $rr = new RequestResponse();
+
+        if (\Yii::$app->user->isGuest || !\Yii::$app->request->isPost) {
+            $rr->success = false;
+            return $rr;
+        }
+
+        $list = new NotifyList((int)\Yii::$app->user->id);
+        $action = (string)\Yii::$app->request->post('action');
+        $rr->success = $list->act((int)\Yii::$app->request->post('id'), $action);
+        if (!$rr->success) {
+            $rr->message = 'Не удалось выполнить действие.';
+        } elseif ($action === 'mute') {
+            $rr->message = 'Больше не будем уведомлять о таком. Вернуть можно в настройках уведомлений.';
+        }
+        $rr->data = ['total' => $list->badge(), 'tabs' => $list->tabs()];
+
+        return $rr;
+    }
+
+    /**
+     * The window: sections, a page of entries (related events as one entry),
+     * the badge. Opening the window resets the badge; unread entries stay
+     * highlighted until read.
+     */
     public function actionWebNotifies()
     {
         $rr = new RequestResponse();
@@ -824,33 +872,36 @@ class AjaxController extends Controller
             return $rr;
         }
 
+        $list = new NotifyList((int)\Yii::$app->user->id);
+        $after = (string)\Yii::$app->request->post('after');
+        if ($after === '') {
+            $list->markSeen();
+        }
+        $page = $list->page($this->notifyCategory(), $after !== '' ? $after : null);
 
-        $qNotifiesAll = \Yii::$app->user->identity->getCmsWebNotifies()->orderBy(['is_read' => SORT_ASC, 'created_at' => SORT_DESC])->limit(40);
-
-        $qNotifiesNotPopupsArray = [];
-        $qNotifiesNotPopups = $qNotifiesAll->all();
-
-        if ($qNotifiesNotPopups) {
-            /**
-             * @var \skeeks\cms\models\CmsWebNotify[] $qNotifiesNotPopups
-             */
-            foreach ($qNotifiesNotPopups as $qNotifiesNotPopup)
-            {
-                $qNotifiesNotPopupsArray[] = \yii\helpers\ArrayHelper::merge(['render' => $qNotifiesNotPopup->getHtml()], $qNotifiesNotPopup->toArray());
-
-                $qNotifiesNotPopup->is_read = 1;
-                $qNotifiesNotPopup->update(false, ['is_read']);
-            }
+        $items = [];
+        foreach ($page['entries'] as $rows) {
+            $items[] = [
+                'id'     => (int)$rows[0]->id,
+                'render' => NotifyList::render($rows),
+            ];
         }
 
-        $qNotifies = \Yii::$app->user->identity->getCmsWebNotifies()->notRead();
-
         $rr->data = [
-            'total' => $qNotifies->count(),
-            'items' => $qNotifiesNotPopupsArray,
+            'total' => $list->badge(),
+            'items' => $items,
+            'next'  => $page['next'],
+            'tabs'  => $list->tabs(),
         ];
 
         return $rr;
+    }
+
+    private function notifyCategory(): ?string
+    {
+        $category = (string)\Yii::$app->request->post('category');
+
+        return $category !== '' && preg_match('/^[a-z0-9_.-]{1,32}$/', $category) ? $category : null;
     }
 
     /**

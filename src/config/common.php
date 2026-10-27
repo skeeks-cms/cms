@@ -47,6 +47,20 @@ return [
                     'resourceKey' => static function () { return 'cms:temporary-files'; },
                     'dedupKey' => static function () { return 'cms:cleanup-temporary-files'; },
                 ],
+                'cms.notify-cleanup' => [
+                    'type' => 'cms.notify-cleanup',
+                    'title' => 'Чистка прочитанных уведомлений',
+                    'handler' => \skeeks\cms\jobs\NotifyCleanupJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 600,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => true,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'cms:notify-cleanup'; },
+                    'dedupKey' => static function () { return 'cms:notify-cleanup'; },
+                ],
             ],
         ],
 
@@ -75,6 +89,11 @@ return [
         //"Сделка как услуга": access of client people to deals, access areas and deal resources.
         'dealAccess' => [
             'class' => \skeeks\cms\deal\DealAccess::class,
+        ],
+
+        //Notifications of employees and clients: kinds of events, categories, channels, personal settings.
+        'notifications' => [
+            'class' => \skeeks\cms\notify\Notifications::class,
         ],
 
         'legal' => [
@@ -155,6 +174,13 @@ return [
                     'jobType' => 'cms.cleanup-temporary-files',
                     'class' => \skeeks\cms\agent\CmsAgent::class,
                     'name' => ['skeeks/cms', 'Cleaning temporarily downloaded files'],
+                    'interval' => 3600 * 24,
+                ],
+
+                'cms/notify/cleanup' => [
+                    'jobType' => 'cms.notify-cleanup',
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => ['skeeks/cms', 'Чистка прочитанных уведомлений'],
                     'interval' => 3600 * 24,
                 ],
 

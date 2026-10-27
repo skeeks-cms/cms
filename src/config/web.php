@@ -14,6 +14,13 @@ $config = [
 
     'components' => [
 
+        // A short link of a notification for mail and messengers: opens the record in the CRM (controllers\NotifyController).
+        'urlManager' => [
+            'rules' => [
+                '~n/<id:\d+>' => 'cms/notify/open',
+            ],
+        ],
+
         'adult' => [
             'class' => \skeeks\cms\components\Adult::class,
         ],

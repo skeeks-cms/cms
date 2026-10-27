@@ -17,7 +17,7 @@ $checks = [
     'admin filter uses the reusable triage scope' => strpos($controllerSource, '$query->unassignedFromClients()') !== false,
     'admin task list keeps manager access scope' => strpos($controllerSource, '$query->forManager()') !== false,
     'unassigned client task notifies admin users' => strpos($taskSource, 'notifyAdminUsersAboutUnassignedClientTask') !== false,
-    'notification uses standard web notify model' => strpos($taskSource, 'new CmsWebNotify()') !== false,
+    'notification uses the registered kind of the standard mechanism' => strpos($taskSource, "notifications->notify((int)\$adminUserId, 'task.client_unassigned'") !== false,
     'notification recipients use admin permission' => strpos($taskSource, 'PERMISSION_ROLE_ADMIN_ACCESS') !== false,
     'notification does not target the task author' => strpos($taskSource, "(int)\$adminUserId === (int)\$this->created_by") !== false,
     'triage widget is restricted to admin permission' => strpos($triageWidgetSource, 'PERMISSION_ROLE_ADMIN_ACCESS') !== false,

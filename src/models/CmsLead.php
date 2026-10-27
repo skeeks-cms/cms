@@ -201,7 +201,9 @@ class CmsLead extends Core
                     $this->sendWebNotify(
                         (int)$this->executor_id,
                         'Вам назначен новый лид',
-                        $this->sourceNameAsText
+                        $this->sourceNameAsText,
+                        null,
+                        'lead.assigned'
                     );
                 }
             } elseif (!$this->deferManagerNotifications) {
@@ -215,7 +217,8 @@ class CmsLead extends Core
                 (int)$this->partner_id,
                 'Изменился статус партнёрской заявки',
                 'Новый статус: '.$this->statusName,
-                $this->getPartnerViewUrl()
+                $this->getPartnerViewUrl(),
+                'lead.partner_update'
             );
         }
     }
@@ -409,7 +412,8 @@ class CmsLead extends Core
                 (int)$this->partner_id,
                 'Новый комментарий по партнёрской заявке',
                 null,
-                $this->getPartnerViewUrl($logId)
+                $this->getPartnerViewUrl($logId),
+                'lead.partner_update'
             );
         }
     }
@@ -417,12 +421,12 @@ class CmsLead extends Core
     public function notifyManagersAboutPartnerComment(): void
     {
         if ($this->executor_id) {
-            $this->sendWebNotify((int)$this->executor_id, 'Новый комментарий партнёра по лиду');
+            $this->sendWebNotify((int)$this->executor_id, 'Новый комментарий партнёра по лиду', null, null, 'lead.partner_comment');
             return;
         }
 
         foreach ($this->availableManagerIds() as $userId) {
-            $this->sendWebNotify($userId, 'Новый комментарий партнёра по нераспределённому лиду');
+            $this->sendWebNotify($userId, 'Новый комментарий партнёра по нераспределённому лиду', null, null, 'lead.partner_comment');
         }
     }
 
@@ -467,17 +471,16 @@ class CmsLead extends Core
         int $userId,
         string $name,
         ?string $comment = null,
-        ?string $url = null
+        ?string $url = null,
+        string $kind = 'lead.new'
     ): void
     {
-        $notify = new CmsWebNotify();
-        $notify->cms_user_id = $userId;
-        $notify->name = $name;
-        $notify->comment = $comment;
-        $notify->model_id = (int)$this->id;
-        $notify->model_code = $this->skeeksModelCode;
-        $notify->url = $url;
-        $notify->save();
+        \Yii::$app->notifications->notify($userId, $kind, [
+            'name'    => $name,
+            'comment' => $comment,
+            'url'     => $url,
+            'model'   => $this,
+        ]);
     }
 
     /**

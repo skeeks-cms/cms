@@ -1,0 +1,304 @@
+.sx-notify-settings__channels {
+    display: grid;
+    gap: .5rem;
+}
+
+.sx-notify-settings__channel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem 1rem;
+    padding: .625rem .75rem;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+}
+
+.sx-notify-settings__channel-name {
+    color: var(--sx-color-text);
+    font-weight: 650;
+}
+
+.sx-notify-settings__channel-status {
+    color: var(--sx-color-text-muted);
+    font-size: .875rem;
+}
+
+.sx-notify-settings__channel-status.sx-is-connected {
+    color: var(--sx-color-success-on-surface);
+}
+
+.sx-notify-settings__channel-actions,
+.sx-notify-settings__presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+.sx-notify-settings__inline-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.sx-notify-settings__table-wrap {
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+
+.sx-notify-settings__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sx-notify-settings__table th,
+.sx-notify-settings__table td {
+    padding: .5rem;
+    border-bottom: 1px solid var(--sx-color-border);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.sx-notify-settings__table thead th {
+    color: var(--sx-color-text-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.sx-notify-settings__channel-head {
+    display: block;
+}
+
+.sx-notify-settings__copy,
+.sx-notify-settings__expand {
+    padding: 0;
+    color: var(--sx-color-accent);
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: .75rem;
+    font-weight: 500;
+}
+
+.sx-notify-settings__copy:hover,
+.sx-notify-settings__expand:hover {
+    text-decoration: underline;
+}
+
+.sx-notify-settings__category-row th {
+    color: var(--sx-color-text);
+    font-weight: 650;
+}
+
+.sx-notify-settings__expand {
+    display: block;
+    margin-top: .125rem;
+}
+
+.sx-notify-settings__kind-row th {
+    padding-left: 1.25rem;
+    color: var(--sx-color-text-muted);
+    font-size: .875rem;
+    font-weight: 400;
+}
+
+.sx-notify-settings__select {
+    min-width: 6.5rem;
+    padding: .3rem .5rem;
+    color: var(--sx-color-text);
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-color-surface);
+    font: inherit;
+    font-size: .875rem;
+}
+
+.sx-notify-settings__select--kind {
+    min-width: 8.5rem;
+    color: var(--sx-color-text-muted);
+}
+
+.sx-notify-settings__tag {
+    display: inline-block;
+    margin-left: .25rem;
+    padding: 0 .375rem;
+    color: var(--sx-color-warning-on-soft);
+    border-radius: var(--sx-radius-sm);
+    background: var(--sx-color-warning-soft);
+    font-size: .75rem;
+}
+
+.sx-notify-settings__tag--urgent {
+    color: var(--sx-color-danger-on-soft);
+    background: var(--sx-color-danger-soft);
+}
+
+.sx-notify-settings__tag--muted {
+    color: var(--sx-color-text-muted);
+    background: var(--sx-color-surface-muted);
+}
+
+.sx-notify-settings__quiet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1rem;
+}
+
+.sx-notify-settings__check,
+.sx-notify-settings__time {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin: 0;
+    color: var(--sx-color-text);
+}
+
+.sx-notify-settings__time-input {
+    padding: .3rem .5rem;
+    color: var(--sx-color-text);
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-color-surface);
+    font: inherit;
+}
+
+.sx-notify-settings__muted {
+    display: grid;
+    gap: .5rem;
+}
+
+.sx-notify-settings__muted-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.sx-notify-settings__muted-category {
+    margin-left: .5rem;
+    color: var(--sx-color-text-muted);
+    font-size: .8125rem;
+}
+
+/* A phone: every row is a card, channels under the name. */
+@media (max-width: 640px) {
+    .sx-notify-settings__table thead {
+        display: none;
+    }
+
+    .sx-notify-settings__table,
+    .sx-notify-settings__table tbody,
+    .sx-notify-settings__table tr,
+    .sx-notify-settings__table th,
+    .sx-notify-settings__table td {
+        display: block;
+        width: 100%;
+    }
+
+    .sx-notify-settings__table tr[hidden] {
+        display: none;
+    }
+
+    .sx-notify-settings__table tr {
+        padding: .5rem 0;
+        border-bottom: 1px solid var(--sx-color-border);
+    }
+
+    .sx-notify-settings__table th,
+    .sx-notify-settings__table td {
+        padding: .25rem 0;
+        border: 0;
+    }
+
+    .sx-notify-settings__table td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .sx-notify-settings__table td::before {
+        color: var(--sx-color-text-muted);
+        content: attr(data-label);
+        font-size: .875rem;
+    }
+
+    .sx-notify-settings__kind-row th {
+        padding-left: 0;
+    }
+}
+
+.sx-notify-settings__hint {
+    color: var(--sx-color-text-muted);
+    font-size: .8125rem;
+}
+
+/* The delivery journal (added by skeeks/cms-communication). */
+.sx-notify-journal td {
+    font-size: .875rem;
+}
+
+.sx-notify-journal__time {
+    color: var(--sx-color-text-muted);
+    white-space: nowrap;
+}
+
+.sx-notify-journal__title {
+    min-width: 14rem;
+}
+
+.sx-notify-journal__state {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.sx-notify-journal__state--sent {
+    color: var(--sx-color-success-on-surface);
+}
+
+.sx-notify-journal__state--failed,
+.sx-notify-journal__state--unknown {
+    color: var(--sx-color-danger-on-surface);
+}
+
+.sx-notify-journal__state--skipped,
+.sx-notify-journal__state--postponed,
+.sx-notify-journal__state--queued,
+.sx-notify-journal__state--sending {
+    color: var(--sx-color-text-muted);
+}
+
+.sx-notify-journal__reason {
+    color: var(--sx-color-text-muted);
+    font-size: .8125rem;
+}
+
+/* Focus: no browser ring after a mouse click, the theme ring for the keyboard.
+   Stronger than bootstrap's button:focus { outline: auto }. */
+.sx-notify-settings .sx-notify-settings__copy:focus,
+.sx-notify-settings .sx-notify-settings__expand:focus,
+.sx-notify-settings .sx-notify-settings__select:focus,
+.sx-notify-settings .sx-notify-settings__time-input:focus {
+    outline: none;
+}
+
+.sx-notify-settings__copy:focus-visible,
+.sx-notify-settings__expand:focus-visible {
+    border-radius: var(--sx-radius-sm);
+    box-shadow: 0 0 0 2px var(--sx-color-focus-ring);
+}
+
+.sx-notify-settings__select:focus,
+.sx-notify-settings__time-input:focus {
+    border-color: var(--sx-color-accent);
+    box-shadow: 0 0 0 2px var(--sx-color-focus-ring);
+}
+
+.sx-notify-settings__channel-problem {
+    margin-top: .25rem;
+    color: var(--sx-color-danger-on-surface);
+    font-size: .875rem;
+}
