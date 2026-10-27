@@ -36,6 +36,9 @@ use yii\helpers\ArrayHelper;
  */
 class CmsDealItem extends \skeeks\cms\base\ActiveRecord
 {
+    /** The form value of "Без ресурса": a select drops the label of an empty key. */
+    const RESOURCE_NONE = 'none';
+
     public static function tableName()
     {
         return '{{%cms_deal_item}}';
@@ -56,8 +59,30 @@ class CmsDealItem extends \skeeks\cms\base\ActiveRecord
             [['period', 'resource_type', 'resource_id', 'description'], 'default', 'value' => null],
             [['resource_type'], 'string', 'max' => 64],
             [['cms_deal_id'], 'exist', 'targetClass' => CmsDeal::class, 'targetAttribute' => 'id'],
+            [['resourceKey'], 'safe'],
             [['resource_id'], 'validateResource', 'skipOnEmpty' => false],
         ]);
+    }
+
+    /**
+     * The resource as one form value: "<type>:<id>", RESOURCE_NONE — no resource.
+     */
+    public function getResourceKey(): string
+    {
+        return $this->resource_type && $this->resource_id ? $this->resource_type.':'.(int)$this->resource_id : self::RESOURCE_NONE;
+    }
+
+    public function setResourceKey($value)
+    {
+        $value = trim((string)$value);
+        if ($value === '' || strpos($value, ':') === false) {
+            $this->resource_type = null;
+            $this->resource_id = null;
+            return;
+        }
+        [$type, $id] = explode(':', $value, 2);
+        $this->resource_type = $type;
+        $this->resource_id = (int)$id ?: null;
     }
 
     public function attributeLabels()
@@ -73,6 +98,16 @@ class CmsDealItem extends \skeeks\cms\base\ActiveRecord
             'resource_type' => 'Вид ресурса',
             'resource_id'   => 'Ресурс',
             'priority'      => 'Сортировка',
+            'resourceKey'   => 'Ресурс',
+        ]);
+    }
+
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'price'       => 'Цена 0 — строка видна клиенту как подарок (бонус)',
+            'period'      => 'Пусто — как у сделки',
+            'resourceKey' => 'Сайт, домен или сертификат этой сделки, к которому относится строка',
         ]);
     }
 
