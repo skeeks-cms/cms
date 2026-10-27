@@ -65,7 +65,7 @@ if ($showRelations && $model->cmsLead) {
             'controllerId' => '/cms/admin-cms-lead',
             'action'       => 'view',
             'modelId'      => $model->cmsLead->id,
-            'label'        => 'Лид: '.$model->cmsLead->displayName,
+            'label'        => 'Сделка: '.$model->cmsLead->displayName,
         ])
     );
 }

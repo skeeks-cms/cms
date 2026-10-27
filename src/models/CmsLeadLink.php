@@ -54,7 +54,7 @@ class CmsLeadLink extends ActiveRecord
             [['name'], 'default', 'value' => null],
             [['link_type'], 'default', 'value' => CmsCompanyLink::TYPE_OTHER],
             [['link_type'], 'in', 'range' => array_keys(CmsCompanyLink::getLinkTypes())],
-            [['url'], 'unique', 'targetAttribute' => ['cms_lead_id', 'url'], 'message' => 'Такая ссылка уже добавлена к лиду.'],
+            [['url'], 'unique', 'targetAttribute' => ['cms_lead_id', 'url'], 'message' => 'Такая ссылка уже добавлена к сделке.'],
             [['cms_lead_id'], 'exist', 'targetClass' => CmsLead::class, 'targetAttribute' => 'id'],
         ]);
     }
@@ -62,7 +62,7 @@ class CmsLeadLink extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_lead_id' => 'Лид',
+            'cms_lead_id' => 'Сделка',
             'url'         => 'Ссылка на соцсеть или сайт',
             'link_type'   => 'Социальная сеть или сайт',
             'name'        => 'Название',

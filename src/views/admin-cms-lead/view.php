@@ -15,7 +15,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /** @var CmsLead $model */
-$this->title = 'Лид №'.(int)$model->id;
+$this->title = 'Сделка №'.(int)$model->id;
 $canWork = $model->canBeWorkedBy((int)\Yii::$app->user->id);
 $sourceData = (array)$model->source_data;
 $formSendId = $model->source_type === CmsLead::SOURCE_FORM
@@ -320,7 +320,7 @@ CSS
 
             echo CrmContactBlockWidget::widget([
                 'title' => 'Телефоны',
-                'hint' => 'У лида может быть несколько телефонов. Первый из них основной, по нему звонят и пишут SMS. При создании компании телефоны переносятся в неё.',
+                'hint' => 'У сделки может быть несколько телефонов. Первый из них основной, по нему звонят и пишут SMS. При создании компании телефоны переносятся в неё.',
                 'icon' => 'phone',
                 'items' => array_map(static fn($phone) => [
                     'label' => $phone->name ?: 'Телефон',
@@ -339,7 +339,7 @@ CSS
 
             echo CrmContactBlockWidget::widget([
                 'title' => 'Email',
-                'hint' => 'У лида может быть несколько email адресов. Первый из них основной. При создании компании адреса переносятся в неё.',
+                'hint' => 'У сделки может быть несколько email адресов. Первый из них основной. При создании компании адреса переносятся в неё.',
                 'icon' => 'mail',
                 'items' => array_map(static fn($email) => [
                     'label' => $email->name ?: 'Email',
@@ -379,7 +379,7 @@ CSS
                 $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => $leadId]));
                 $this->registerJs(<<<JS
 $(document).off('click.sxLeadContractor').on('click.sxLeadContractor', '[data-sx-lead-contractor-detach]', function () {
-    if (!confirm('Убрать эти реквизиты из лида? Сами реквизиты останутся в базе.')) {
+    if (!confirm('Убрать эти реквизиты из сделки? Сами реквизиты останутся в базе.')) {
         return false;
     }
     var ajaxQuery = sx.ajax.preparePostQuery({$detachUrl}, {contractor_id: $(this).data('sxLeadContractorDetach')});
@@ -405,7 +405,7 @@ JS
                     ]),
                     'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
                     'actions' => $canWork
-                        ? CrmContactBlockWidget::iconButton('close', 'Убрать из лида', ['data-sx-lead-contractor-detach' => (int)$contractor->id])
+                        ? CrmContactBlockWidget::iconButton('close', 'Убрать из сделки', ['data-sx-lead-contractor-detach' => (int)$contractor->id])
                         : '',
                 ], $model->contractors),
                 'emptyText' => 'Реквизитов пока нет',
@@ -628,7 +628,7 @@ CSS
                     <?php if (!$leadTasks) : ?>
                         <p>
                             <span class="sx-status sx-status--warning">Не запланирован</span>
-                            Поставьте задачу, чтобы не забыть про лид: когда перезвонить или что сделать дальше.
+                            Поставьте задачу, чтобы не забыть про сделку: когда перезвонить или что сделать дальше.
                         </p>
                     <?php else : ?>
                         <div class="sx-surface-stack">

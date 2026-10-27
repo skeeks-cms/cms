@@ -948,7 +948,7 @@ JS
             'cms_deal_id' => [
                 'class' => WidgetField::class,
                 'widgetClass' => AjaxSelectModel::class,
-                'hint' => 'Сделки выбранной компании или клиента. Задачи перейдут к компании сделки.',
+                'hint' => 'Услуги выбранной компании или клиента. Задачи перейдут к компании услуги.',
                 'widgetConfig' => [
                     'id' => 'cmstask-bulk-deal-select',
                     'modelClass' => CmsDeal::class,
@@ -2427,7 +2427,7 @@ JS
                 'content' => $model->cms_lead_id && $model->cmsLead
                     ? '<div class="col-12 form-group sx-task-lead">'
                         .Html::activeHiddenInput($model, 'cms_lead_id')
-                        .'<span class="text-muted">Лид:</span> '
+                        .'<span class="text-muted">Сделка:</span> '
                         .\skeeks\cms\backend\widgets\BackendEntityLink::widget([
                             'controllerId' => '/cms/admin-cms-lead',
                             'action'       => 'view',
@@ -2513,7 +2513,7 @@ JS
             'cms_deal_id' => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => AjaxSelectModel::class,
-                'hint'         => 'Задача по услуге видна клиенту, если ему открыты задачи этой сделки',
+                'hint'         => 'Задача по услуге видна клиенту, если ему открыты задачи этой услуги',
                 'widgetConfig' => [
                     'id'          => 'cmstask-deal-relation-select',
                     'modelClass'  => CmsDeal::class,
@@ -2541,7 +2541,7 @@ JS
 
             'dealResourceKey' => [
                 'class' => SelectField::class,
-                'label' => 'Ресурс сделки',
+                'label' => 'Ресурс услуги',
                 'items' => $this->dealResourceItems($model),
             ],
 

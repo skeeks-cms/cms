@@ -105,13 +105,13 @@ class CmsLeadIdentityService
             throw new \DomainException('Не выбрана компания или клиент для привязки.');
         }
         if ($lead->status !== CmsLead::STATUS_IN_WORK || $lead->isTerminal) {
-            throw new \DomainException('Привязывать записи можно только к лиду в работе.');
+            throw new \DomainException('Привязывать записи можно только к сделке в работе.');
         }
         if ($companyId && $lead->cms_company_id && (int)$lead->cms_company_id !== $companyId) {
-            throw new \DomainException('К лиду уже привязана другая компания.');
+            throw new \DomainException('К сделке уже привязана другая компания.');
         }
         if ($clientId && $lead->cms_user_id && (int)$lead->cms_user_id !== $clientId) {
-            throw new \DomainException('К лиду уже привязан другой клиент.');
+            throw new \DomainException('К сделке уже привязан другой клиент.');
         }
 
         $company = $companyId

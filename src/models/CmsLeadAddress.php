@@ -56,7 +56,7 @@ class CmsLeadAddress extends ActiveRecord
             [['floor', 'apartment_number', 'entrance', 'postcode'], 'string', 'max' => 255],
             [['comment', 'name', 'value'], 'string', 'max' => 255],
             [['name', 'comment', 'floor', 'apartment_number', 'entrance', 'postcode'], 'default', 'value' => null],
-            [['value'], 'unique', 'targetAttribute' => ['cms_lead_id', 'value'], 'message' => 'Такой адрес уже добавлен к лиду.'],
+            [['value'], 'unique', 'targetAttribute' => ['cms_lead_id', 'value'], 'message' => 'Такой адрес уже добавлен к сделке.'],
             [['cms_lead_id'], 'exist', 'targetClass' => CmsLead::class, 'targetAttribute' => 'id'],
         ]);
     }
@@ -64,7 +64,7 @@ class CmsLeadAddress extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_lead_id'      => 'Лид',
+            'cms_lead_id'      => 'Сделка',
             'name'             => 'Название',
             'value'            => 'Адрес',
             'latitude'         => 'Широта',

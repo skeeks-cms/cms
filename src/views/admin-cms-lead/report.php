@@ -53,7 +53,7 @@ $bars = static function (array $rows, string $unit) use ($formatter): string {
 
 $groupTable = static function (array $groups, string $firstColumn, bool $hasRewards) use ($formatter, $money, $percent): string {
     $head = '<tr><th>'.Html::encode($firstColumn).'</th>'
-        .'<th class="sx-lead-report__num">Лидов</th>'
+        .'<th class="sx-lead-report__num">Сделок</th>'
         .'<th class="sx-lead-report__num">Целевых</th>'
         .'<th class="sx-lead-report__num">Успешных</th>'
         .'<th class="sx-lead-report__num">Конверсия</th>'
@@ -81,7 +81,7 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
     <?php BackendSurfaceWidget::begin(['raised' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
         <?= Html::beginForm(Url::to(['report']), 'get', ['class' => 'sx-lead-report__filters']); ?>
             <label class="sx-lead-report__filter">
-                <span class="sx-lead-report__filter-label">Лиды, пришедшие за период</span>
+                <span class="sx-lead-report__filter-label">Сделки, пришедшие за период</span>
                 <?= DaterangeInputWidget::widget([
                     'name' => 'period',
                     'value' => $period,
@@ -98,12 +98,12 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
 
     <?php if (!$total['leads']) : ?>
         <?php BackendSurfaceWidget::begin(['raised' => true]); ?>
-            <p class="sx-lead-report__note">За этот период лидов нет. Выберите другой период или источник.</p>
+            <p class="sx-lead-report__note">За этот период сделок нет. Выберите другой период или источник.</p>
         <?php BackendSurfaceWidget::end(); ?>
     <?php else : ?>
         <?php BackendSurfaceWidget::begin(['raised' => true, 'bodyFlush' => true]); ?>
             <div class="sx-metrics sx-metrics--4">
-                <?= $metric($formatter->asInteger($total['leads']), 'Лидов пришло'.($total['notTarget'] ? ', нецелевых '.$formatter->asInteger($total['notTarget']) : '')); ?>
+                <?= $metric($formatter->asInteger($total['leads']), 'Сделок пришло'.($total['notTarget'] ? ', нецелевых '.$formatter->asInteger($total['notTarget']) : '')); ?>
                 <?= $metric($formatter->asInteger($total['success']), 'Успешных · конверсия '.$percent($total['conversion'])); ?>
                 <?= $metric($total['dealCount'] ? $money($total['dealSum']) : '—', 'Сумма сделок'); ?>
                 <?= $metric($money($total['avgCheck']), 'Средний чек'); ?>
@@ -117,15 +117,15 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
         <?php BackendSurfaceWidget::end(); ?>
 
         <div class="sx-lead-report__columns">
-            <?php BackendSurfaceWidget::begin(['title' => 'Где сейчас лиды', 'hint' => 'Целевые лиды за период по текущему этапу', 'raised' => true]); ?>
-                <?= $bars($report['funnel'], 'лидов'); ?>
+            <?php BackendSurfaceWidget::begin(['title' => 'Где сейчас сделки', 'hint' => 'Целевые сделки за период по текущему этапу', 'raised' => true]); ?>
+                <?= $bars($report['funnel'], 'сделок'); ?>
             <?php BackendSurfaceWidget::end(); ?>
 
-            <?php BackendSurfaceWidget::begin(['title' => 'Почему теряем', 'hint' => 'Отклонённые лиды за период по причинам', 'raised' => true]); ?>
+            <?php BackendSurfaceWidget::begin(['title' => 'Почему теряем', 'hint' => 'Отклонённые сделки за период по причинам', 'raised' => true]); ?>
                 <?php if ($report['rejectReasons']) : ?>
-                    <?= $bars($report['rejectReasons'], 'лидов'); ?>
+                    <?= $bars($report['rejectReasons'], 'сделок'); ?>
                 <?php else : ?>
-                    <p class="sx-lead-report__note">Отклонённых лидов за период нет.</p>
+                    <p class="sx-lead-report__note">Отклонённых сделок за период нет.</p>
                 <?php endif; ?>
             <?php BackendSurfaceWidget::end(); ?>
         </div>
@@ -147,9 +147,9 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
         <?php endif; ?>
 
         <p class="sx-lead-report__note">
-            Считаются лиды, созданные в выбранный период, в их текущем состоянии. Конверсия — успешные от целевых:
+            Считаются сделки, созданные в выбранный период, в их текущем состоянии. Конверсия — успешные от целевых:
             нецелевые причины отказа (спам, дубли) отмечаются в справочнике причин и в конверсию не входят.
-            Сумма сделок и средний чек — по успешным лидам с указанной суммой.
+            Сумма сделок и средний чек — по успешным сделкам с указанной суммой.
         </p>
     <?php endif; ?>
 </div>

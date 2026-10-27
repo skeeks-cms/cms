@@ -63,7 +63,7 @@ class CmsDealItem extends \skeeks\cms\base\ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_deal_id'   => 'Сделка',
+            'cms_deal_id'   => 'Услуга',
             'name'          => 'Что входит',
             'description'   => 'Описание',
             'quantity'      => 'Количество',
@@ -93,7 +93,7 @@ class CmsDealItem extends \skeeks\cms\base\ActiveRecord
         $dealAccess = \Yii::$app->get('dealAccess');
         $resource = $dealAccess->resource((string)$this->resource_type, (int)$this->resource_id);
         if (!$resource || (int)$resource->dealId !== (int)$this->cms_deal_id) {
-            $this->addError($attribute, 'Ресурс не относится к этой сделке.');
+            $this->addError($attribute, 'Ресурс не относится к этой услуге.');
         }
     }
 

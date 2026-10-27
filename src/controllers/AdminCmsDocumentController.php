@@ -361,7 +361,7 @@ class AdminCmsDocumentController extends BackendModelStandartController
                             },
                         ],
                         'deals' => [
-                            'label' => 'Сделки',
+                            'label' => 'Услуги',
                             'format' => 'raw',
                             'value' => function (ShopDocument $model) {
                                 $result = [];

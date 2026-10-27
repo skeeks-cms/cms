@@ -304,6 +304,22 @@ return array_merge(dashboardsMenu(), [
         "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/storage.svg'],
     ],
 
+    //«Услуги»: services of clients (CmsDeal) first, then resources that packages add
+    //to the same group key ('project': cms-hosting, project menus) with the default priority.
+    'project' => [
+        'label'    => \Yii::t('skeeks/cms', 'Услуги'),
+        'priority' => 200,
+        "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/deal.svg'],
+        'items' => [
+            [
+                'label'    => \Yii::t('skeeks/cms', 'Услуги клиентов'),
+                'priority' => 10,
+                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/deal.svg'],
+                "url"      => ["cms/admin-cms-deal"],
+            ],
+        ],
+    ],
+
     'crm' => [
         'label'    => \Yii::t('skeeks/cms', 'Клиенты и сделки'),
         'priority' => 190,
@@ -333,16 +349,10 @@ return array_merge(dashboardsMenu(), [
                 ],*/
             ],
             [
-                'label'    => \Yii::t('skeeks/cms', 'Лиды'),
+                'label'    => \Yii::t('skeeks/cms', 'Сделки'),
                 'priority' => 120,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                 "url"      => ["cms/admin-cms-lead"],
-            ],
-            [
-                'label'    => \Yii::t('skeeks/cms', 'Сделки'),
-                'priority' => 200,
-                "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/deal.svg'],
-                "url"      => ["cms/admin-cms-deal"],
             ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Счета'),
@@ -497,13 +507,13 @@ return array_merge(dashboardsMenu(), [
                             /*"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],*/
                         ],
                         [
-                            "label" => \Yii::t('skeeks/cms', "Этапы лидов"),
+                            "label" => \Yii::t('skeeks/cms', "Этапы сделок"),
                             "url"   => ["cms/admin-cms-lead-stage"],
                             'priority' => 900,
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                         ],
                         [
-                            "label" => \Yii::t('skeeks/cms', "Причины отказа лидов"),
+                            "label" => \Yii::t('skeeks/cms', "Причины отказа по сделкам"),
                             "url"   => ["cms/admin-cms-lead-reject-reason"],
                             'priority' => 900,
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],

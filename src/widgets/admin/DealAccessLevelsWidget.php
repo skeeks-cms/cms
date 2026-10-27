@@ -66,11 +66,11 @@ class DealAccessLevelsWidget extends Widget
             $items = [0 => $this->noneLabel ?: 'Нет'] + $levels;
             $hint = $config['hint'] ? Html::tag('div', Html::encode($config['hint']), ['class' => 'sx-deal-levels__hint']) : '';
             if ($this->maxLevels !== null && !$levels) {
-                $hint .= Html::tag('div', 'Закрыто в типе сделки', ['class' => 'sx-deal-levels__hint']);
+                $hint .= Html::tag('div', 'Закрыто в типе услуги', ['class' => 'sx-deal-levels__hint']);
             }
             if ($this->openLevels !== null && (int)($this->openLevels[$area] ?? 0) < max(array_keys($config['levels']))) {
                 $open = (int)($this->openLevels[$area] ?? 0);
-                $hint .= Html::tag('div', $open ? 'В сделке открыто: '.mb_strtolower($dealAccess->levelName($area, $open)) : 'В сделке закрыто', ['class' => 'sx-deal-levels__hint sx-deal-levels__hint--warning']);
+                $hint .= Html::tag('div', $open ? 'В услуге открыто: '.mb_strtolower($dealAccess->levelName($area, $open)) : 'В услуге закрыто', ['class' => 'sx-deal-levels__hint sx-deal-levels__hint--warning']);
             }
             $rows .= Html::tag('div',
                 Html::tag('div', Html::encode($config['name']).$hint, ['class' => 'sx-deal-levels__name'])

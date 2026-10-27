@@ -24,7 +24,7 @@ class AdminCmsLeadClientController extends AdminUserController
     public function init()
     {
         parent::init();
-        $this->name = 'Клиент из лида';
+        $this->name = 'Клиент из сделки';
     }
 
     public function actions()
@@ -68,7 +68,7 @@ class AdminCmsLeadClientController extends AdminUserController
                 ->andWhere([CmsLead::tableName().'.id' => (int)\Yii::$app->request->get('lead_id')])
                 ->one();
             if (!$this->_lead) {
-                throw new NotFoundHttpException('Лид не найден.');
+                throw new NotFoundHttpException('Сделка не найдена.');
             }
         }
         return $this->_lead;
@@ -78,10 +78,10 @@ class AdminCmsLeadClientController extends AdminUserController
     {
         $lead = CmsLead::find()->forManager()->cmsSite()->andWhere([CmsLead::tableName().'.id' => $this->lead->id])->one();
         if (!$lead || $lead->status !== CmsLead::STATUS_IN_WORK || !$lead->canBeWorkedBy((int)\Yii::$app->user->id)) {
-            throw new ForbiddenHttpException('Лид недоступен для работы.');
+            throw new ForbiddenHttpException('Сделка недоступна для работы.');
         }
         if ($lead->cms_user_id) {
-            throw new \RuntimeException('С лидом уже связан клиент.');
+            throw new \RuntimeException('Со сделкой уже связан клиент.');
         }
         $lead->cms_user_id = $client->id;
         if (!$lead->save()) {
@@ -117,7 +117,7 @@ class AdminCmsLeadClientController extends AdminUserController
         $log->model_id = $client->id;
         $log->model_as_text = $client->asText;
         $log->cms_user_id = $client->id;
-        $log->comment = 'Клиент создан из лида №'.(int)$lead->id.' «'.Html::encode($lead->name).'».';
+        $log->comment = 'Клиент создан из сделки №'.(int)$lead->id.' «'.Html::encode($lead->name).'».';
         if (!$log->save()) {
             throw new \RuntimeException(implode('; ', $log->getFirstErrors()));
         }

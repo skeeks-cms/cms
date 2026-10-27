@@ -26,7 +26,7 @@ class CmsTelephonyCallLinkService
     ): void {
         $this->synchronize(
             $call,
-            $this->resolveScopedEntity(CmsLead::class, $leadId, 'Лид'),
+            $this->resolveScopedEntity(CmsLead::class, $leadId, 'Сделка'),
             $this->resolveScopedEntity(CmsCompany::class, $companyId, 'Компания'),
             $this->resolveScopedEntity(CmsUser::class, $userId, 'Клиент')
         );
@@ -143,7 +143,7 @@ class CmsTelephonyCallLinkService
             ->andWhere([$modelClass::tableName().'.id' => $id])
             ->one();
         if (!$model) {
-            throw new DomainException($label.' недоступен менеджеру на текущем сайте.');
+            throw new DomainException($label.': нет доступа менеджеру на текущем сайте.');
         }
 
         return $model;

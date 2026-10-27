@@ -27,7 +27,7 @@ class AdminCmsLeadCompanyController extends AdminCmsCompanyController
     public function init()
     {
         parent::init();
-        $this->name = 'Компания из лида';
+        $this->name = 'Компания из сделки';
     }
 
     public function actions()
@@ -70,7 +70,7 @@ class AdminCmsLeadCompanyController extends AdminCmsCompanyController
                 ->cmsSite()
                 ->andWhere([CmsLead::tableName().'.id' => (int)\Yii::$app->request->get('lead_id')])
                 ->one();
-            if (!$this->_lead) { throw new NotFoundHttpException('Лид не найден.'); }
+            if (!$this->_lead) { throw new NotFoundHttpException('Сделка не найдена.'); }
         }
         return $this->_lead;
     }
@@ -79,9 +79,9 @@ class AdminCmsLeadCompanyController extends AdminCmsCompanyController
     {
         $lead = CmsLead::find()->forManager()->cmsSite()->andWhere([CmsLead::tableName().'.id' => $this->lead->id])->one();
         if (!$lead || $lead->status !== CmsLead::STATUS_IN_WORK || !$lead->canBeWorkedBy((int)\Yii::$app->user->id)) {
-            throw new ForbiddenHttpException('Лид недоступен для работы.');
+            throw new ForbiddenHttpException('Сделка недоступна для работы.');
         }
-        if ($lead->cms_company_id) { throw new \RuntimeException('С лидом уже связана компания.'); }
+        if ($lead->cms_company_id) { throw new \RuntimeException('Со сделкой уже связана компания.'); }
         $lead->cms_company_id = $company->id;
         if (!$lead->save()) { throw new \RuntimeException(implode('; ', $lead->getFirstErrors())); }
 
@@ -150,7 +150,7 @@ class AdminCmsLeadCompanyController extends AdminCmsCompanyController
         $log->model_id = $company->id;
         $log->model_as_text = $company->asText;
         $log->cms_company_id = $company->id;
-        $log->comment = 'Компания создана из лида №'.(int)$lead->id.' «'.Html::encode($lead->name).'».';
+        $log->comment = 'Компания создана из сделки №'.(int)$lead->id.' «'.Html::encode($lead->name).'».';
         if (!$log->save()) { throw new \RuntimeException(implode('; ', $log->getFirstErrors())); }
     }
 }

@@ -738,13 +738,13 @@ class DealAccess extends Component
                 $lines = (int)\skeeks\cms\models\CmsDealItem::find()
                     ->andWhere(['cms_deal_id' => (int)$fromDeal->id, 'resource_type' => $type, 'resource_id' => $id])->count();
                 if ($tasks || $lines) {
-                    $left = " В прежней сделке остались как история: задач {$tasks}, строк состава {$lines}.";
+                    $left = " В прежней услуге остались как история: задач {$tasks}, строк состава {$lines}.";
                 }
-                $this->writeDealLog($fromDeal, "{$label} перенесён в сделку «{$toDeal->asText}».{$left}");
+                $this->writeDealLog($fromDeal, "{$label} перенесён в услугу «{$toDeal->asText}».{$left}");
             }
             $this->writeDealLog($toDeal, $fromDeal
-                ? "{$label} перенесён из сделки «{$fromDeal->asText}».{$left}"
-                : "{$label} добавлен в сделку.");
+                ? "{$label} перенесён из услуги «{$fromDeal->asText}».{$left}"
+                : "{$label} добавлен в услугу.");
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();

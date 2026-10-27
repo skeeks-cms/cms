@@ -494,7 +494,7 @@ JS
                 <?php if ($model->cmsLead) : ?>
                 <li>
                     <span class="sx-properties--name">
-                        Лид
+                        Сделка
                     </span>
                     <span class="sx-properties--value">
                         <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
@@ -513,7 +513,7 @@ JS
                 <?php if ($model->hasAttribute('cms_deal_id') && $model->cms_deal_id && $model->cmsDeal) : ?>
                 <li>
                     <span class="sx-properties--name">
-                        Сделка
+                        Услуга
                     </span>
                     <span class="sx-properties--value">
                         <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
@@ -544,7 +544,7 @@ JS
                     <span class="sx-properties--name">
                         Видят клиенты
                         <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
-                           title="Задачи этой сделки открыты этим людям клиента. Учитывайте это при заполнении описания и комментариев."></i>
+                           title="Задачи этой услуги открыты этим людям клиента. Учитывайте это при заполнении описания и комментариев."></i>
                     </span>
                     <span class="sx-properties--value">
                         <?php foreach ($dealClients as $index => $client) : ?>

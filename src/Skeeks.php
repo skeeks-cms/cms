@@ -233,28 +233,28 @@ class Skeeks extends Component implements BootstrapInterface
     public $modelsConfig = [
 
         CmsLead::class          => [
-            'name'       => 'Лиды',
-            'name_one'   => 'Лид',
+            'name'       => 'Сделки',
+            'name_one'   => 'Сделка',
             'controller' => 'cms/admin-cms-lead',
         ],
         CmsLeadStage::class     => [
-            'name'       => 'Этапы лидов',
-            'name_one'   => 'Этап лида',
+            'name'       => 'Этапы сделок',
+            'name_one'   => 'Этап сделки',
             'controller' => 'cms/admin-cms-lead-stage',
         ],
         CmsLeadRejectReason::class => [
-            'name'       => 'Причины отказа лидов',
+            'name'       => 'Причины отказа по сделкам',
             'name_one'   => 'Причина отказа',
             'controller' => 'cms/admin-cms-lead-reject-reason',
         ],
         CmsLeadPhone::class     => [
-            'name'       => 'Телефоны лидов',
-            'name_one'   => 'Телефон лида',
+            'name'       => 'Телефоны сделок',
+            'name_one'   => 'Телефон сделки',
             'controller' => 'cms/admin-cms-lead-phone',
         ],
         CmsLeadEmail::class     => [
-            'name'       => 'Email-ы лидов',
-            'name_one'   => 'Email лида',
+            'name'       => 'Email-ы сделок',
+            'name_one'   => 'Email сделки',
             'controller' => 'cms/admin-cms-lead-email',
         ],
 
@@ -325,8 +325,8 @@ class Skeeks extends Component implements BootstrapInterface
 
 
         CmsDeal::class           => [
-            'name'       => 'Сделки',
-            'name_one'   => 'Сделка',
+            'name'       => 'Услуги',
+            'name_one'   => 'Услуга',
             'controller' => 'cms/admin-cms-deal',
         ],
         CmsProject::class        => [

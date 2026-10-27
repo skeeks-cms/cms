@@ -80,7 +80,7 @@ class CmsLeadStage extends ActiveRecord
             return false;
         }
         if ($this->getLeads()->exists()) {
-            $this->addError('name', 'На этом этапе есть лиды. Сначала переведите их на другой этап.');
+            $this->addError('name', 'На этом этапе есть сделки. Сначала переведите их на другой этап.');
             return false;
         }
 

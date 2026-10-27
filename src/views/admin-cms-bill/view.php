@@ -611,7 +611,7 @@ JS
                 <h3 class="sx-bill-section-title">Связи</h3>
                 <div class="sx-bill-entities">
                     <?php foreach ($model->deals as $deal) : ?>
-                        <?= $entityLink('/cms/admin-cms-deal', $deal, 'Сделка', '', 'fa fa-file'); ?>
+                        <?= $entityLink('/cms/admin-cms-deal', $deal, 'Услуга', '', 'fa fa-file'); ?>
                     <?php endforeach; ?>
                 </div>
             </div>

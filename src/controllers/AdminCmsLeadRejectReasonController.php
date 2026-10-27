@@ -41,7 +41,7 @@ class AdminCmsLeadRejectReasonController extends BackendModelStandartController
             'index' => [
                 'emptyState' => [
                     'title' => 'Причин отказа пока нет',
-                    'description' => 'Когда список заполнен, при отклонении лида причину выбирают из него. Так видно, почему теряются лиды. Пока список пуст, причину пишут текстом.',
+                    'description' => 'Когда список заполнен, при отклонении сделки причину выбирают из него. Так видно, почему теряются сделки. Пока список пуст, причину пишут текстом.',
                     'icon' => 'fas fa-ban',
                     'action' => ['backendAction' => 'create', 'label' => 'Добавить причину'],
                 ],
@@ -81,7 +81,7 @@ class AdminCmsLeadRejectReasonController extends BackendModelStandartController
                                 : '',
                         ],
                         'countLeads' => [
-                            'label' => 'Отклонено лидов',
+                            'label' => 'Отклонено сделок',
                             'format' => 'raw',
                             'value' => static fn(CmsLeadRejectReason $model) => Html::tag('span',
                                 Html::tag('strong', \Yii::$app->formatter->asInteger((int)$model->raw_row['countLeads'])),

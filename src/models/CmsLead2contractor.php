@@ -28,7 +28,7 @@ class CmsLead2contractor extends \skeeks\cms\base\ActiveRecord
             [['cms_lead_id', 'cms_contractor_id'], 'integer'],
             [['cms_lead_id', 'cms_contractor_id'], 'required'],
             [['cms_lead_id', 'cms_contractor_id'], 'unique', 'targetAttribute' => ['cms_lead_id', 'cms_contractor_id'],
-                'message' => 'Эти реквизиты уже добавлены к лиду.'],
+                'message' => 'Эти реквизиты уже добавлены к сделке.'],
         ]);
     }
 
@@ -36,7 +36,7 @@ class CmsLead2contractor extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_contractor_id' => 'Контрагент',
-            'cms_lead_id'       => 'Лид',
+            'cms_lead_id'       => 'Сделка',
         ]);
     }
 

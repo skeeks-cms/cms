@@ -34,7 +34,7 @@
         }).done(function (response) {
             if (!response || !response.success) {
                 revert(event);
-                sx.notify.error(response && response.message ? response.message : 'Не удалось перенести лид.');
+                sx.notify.error(response && response.message ? response.message : 'Не удалось перенести сделку.');
                 return;
             }
             if (response.data && response.data.openUrl) {
@@ -53,7 +53,7 @@
             }
         }).fail(function () {
             revert(event);
-            sx.notify.error('Не удалось перенести лид. Обновите страницу.');
+            sx.notify.error('Не удалось перенести сделку. Обновите страницу.');
         }).always(function () {
             board.removeClass('is-busy');
         });

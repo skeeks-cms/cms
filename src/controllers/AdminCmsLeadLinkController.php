@@ -17,7 +17,7 @@ class AdminCmsLeadLinkController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = 'Ссылки лида';
+        $this->name = 'Ссылки сделки';
         $this->modelShowAttribute = 'url';
         $this->modelClassName = CmsLeadLink::class;
         $this->permissionName = 'cms/admin-lead';

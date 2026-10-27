@@ -79,13 +79,13 @@ $dealLink = static function (CmsDeal $deal): string {
         <p style="margin: 10px 0 6px;">
             <?php if ($isFull) : ?>
                 <span class="sx-deal-badge sx-deal-badge--accent">Полный доступ ко всем услугам</span>
-                <span class="sx-deal-access__muted">все сделки компании, в том числе будущие, и все области доступа</span>
+                <span class="sx-deal-access__muted">все услуги компании, в том числе будущие, и все области доступа</span>
             <?php elseif ($companyGrant) : ?>
                 <span class="sx-deal-badge sx-deal-badge--accent">Во всех услугах: <?= Html::encode($companyGrant->roleAsText); ?></span>
                 <span class="sx-deal-access__muted"><?= Html::encode($companyGrant->levelsAsText); ?></span>
             <?php else : ?>
                 <span class="sx-deal-badge">Только выбранные услуги</span>
-                <span class="sx-deal-access__muted">доступ выдаётся в каждой сделке отдельно</span>
+                <span class="sx-deal-access__muted">доступ выдаётся в каждой услуге отдельно</span>
             <?php endif; ?>
         </p>
         <div class="sx-person-access__actions">
@@ -104,7 +104,7 @@ $dealLink = static function (CmsDeal $deal): string {
         'raised'     => true,
         'responsive' => true,
         'options'    => ['class' => 'sx-surface--compact'],
-        'actions'    => CrmContactBlockWidget::hintIcon('Что человек видит в каждой сделке компании. Итоговые права по областям — в карточке сделки, в блоке «Доступ и уведомления».'),
+        'actions'    => CrmContactBlockWidget::hintIcon('Что человек видит в каждой услуге компании. Итоговые права по областям — в карточке услуги, в блоке «Доступ и уведомления».'),
     ]); ?>
         <div class="sx-person-access__deals">
             <?php foreach ($deals as $deal) : ?>
@@ -113,7 +113,7 @@ $dealLink = static function (CmsDeal $deal): string {
                 if ($isFull) {
                     $text = 'Полный доступ по роли в компании';
                 } elseif ($grant) {
-                    $text = 'Выдано в сделке: '.$grant->roleAsText.' — '.$grant->levelsAsText;
+                    $text = 'Выдано в услуге: '.$grant->roleAsText.' — '.$grant->levelsAsText;
                 } elseif ($companyGrant) {
                     $text = 'По роли в компании: '.$companyGrant->roleAsText;
                 } else {

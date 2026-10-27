@@ -95,7 +95,7 @@ class DealAccessController extends Controller
             $this->stderr("Нечего откатывать: запуск не найден или уже откачен.\n");
             return ExitCode::DATAERR;
         }
-        $this->stdout("Откат: проектов {$result['projects']}, у задач снята сделка — {$result['tasks']}, снято доступов — {$result['grants']}"
+        $this->stdout("Откат: проектов {$result['projects']}, у задач снята услуга — {$result['tasks']}, снято доступов — {$result['grants']}"
             .($result['kept_grants'] ? ", оставлено изменённых вручную — {$result['kept_grants']}" : '').".\n");
         return ExitCode::OK;
     }
@@ -115,16 +115,16 @@ class DealAccessController extends Controller
     protected function printPlan(array $plan): void
     {
         $ok = array_filter($plan, function ($row) { return (bool)$row['deal_id']; });
-        $this->stdout("Проектов найдено: ".count($plan).", сопоставлено со сделкой: ".count($ok)."\n\n");
+        $this->stdout("Проектов найдено: ".count($plan).", сопоставлено с услугой: ".count($ok)."\n\n");
         foreach ($plan as $row) {
             if ($row['deal_id']) {
-                $line = sprintf("#%d → сделка #%d (%s): задач %d%s, участников %d, новых доступов %d",
+                $line = sprintf("#%d → услуга #%d (%s): задач %d%s, участников %d, новых доступов %d",
                     $row['project_id'], $row['deal_id'], $row['reason'], $row['tasks'],
-                    $row['tasks_other'] ? ", уже в другой сделке {$row['tasks_other']}" : '',
+                    $row['tasks_other'] ? ", уже в другой услуге {$row['tasks_other']}" : '',
                     count($row['people']), count($row['people_new']));
             } else {
                 $line = sprintf("#%d НЕ ПЕРЕНОСИТСЯ: %s%s", $row['project_id'], $row['reason'],
-                    $row['candidates'] ? ' (сделки: #'.implode(', #', $row['candidates']).')' : '');
+                    $row['candidates'] ? ' (услуги: #'.implode(', #', $row['candidates']).')' : '');
             }
             $this->stdout($line."\n");
         }

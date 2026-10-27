@@ -54,7 +54,7 @@ if ($model->canBeClaimed) {
     ])
         .Html::submitButton('<i class="fas fa-anchor" aria-hidden="true"></i> Взять в работу', [
             'class' => 'sx-button sx-button--primary sx-button--sm',
-            'data-confirm' => 'Закрепить лид за вами?',
+            'data-confirm' => 'Закрепить сделку за вами?',
         ])
         .Html::endForm();
 } elseif ($model->canBeReopenedBy((int)Yii::$app->user->id)) {
@@ -63,7 +63,7 @@ if ($model->canBeClaimed) {
     ])
         .Html::submitButton('<i class="fas fa-undo" aria-hidden="true"></i> Вернуть в работу', [
             'class' => 'sx-button sx-button--secondary sx-button--sm',
-            'data-confirm' => 'Вернуть лид в работу?',
+            'data-confirm' => 'Вернуть сделку в работу?',
         ])
         .Html::endForm();
     if ($model->status === CmsLead::STATUS_SUCCESS) {

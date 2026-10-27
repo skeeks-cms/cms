@@ -16,7 +16,7 @@ class AdminCmsLeadPhoneController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = 'Телефоны лида';
+        $this->name = 'Телефоны сделки';
         $this->modelShowAttribute = 'value';
         $this->modelClassName = CmsLeadPhone::class;
         $this->permissionName = 'cms/admin-lead';

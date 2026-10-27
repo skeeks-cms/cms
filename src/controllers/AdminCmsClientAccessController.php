@@ -100,7 +100,7 @@ class AdminCmsClientAccessController extends BackendModelStandartController
             $visible = true; //validation reports the missing scope
         }
         if (!$visible) {
-            throw new ForbiddenHttpException('Нет доступа к этой сделке или компании.');
+            throw new ForbiddenHttpException('Нет доступа к этой услуге или компании.');
         }
     }
 
@@ -120,7 +120,7 @@ class AdminCmsClientAccessController extends BackendModelStandartController
         $this->authorizeScope($model);
         if ($originDeal = (int)\Yii::$app->request->get('deal')) {
             if (!CmsDeal::find()->forManager()->andWhere([CmsDeal::tableName().'.id' => $originDeal])->exists()) {
-                throw new ForbiddenHttpException('Нет доступа к этой сделке.');
+                throw new ForbiddenHttpException('Нет доступа к этой услуге.');
             }
         }
 
@@ -184,7 +184,7 @@ class AdminCmsClientAccessController extends BackendModelStandartController
                 'label'     => 'Где действует',
                 'allowNull' => false,
                 'items'     => [
-                    (string)$originDealId => 'Только в сделке «'.($originDeal ? $originDeal->name : $originDealId).'»',
+                    (string)$originDealId => 'Только в услуге «'.($originDeal ? $originDeal->name : $originDealId).'»',
                     ''                    => 'Во всех услугах компании, включая будущие',
                 ],
             ];

@@ -16,7 +16,7 @@ class AdminCmsLeadContractorController extends AdminCmsContractorAttachControlle
     public function init()
     {
         parent::init();
-        $this->name = 'Реквизиты лида';
+        $this->name = 'Реквизиты сделки';
         // Lead managers work here without the company section permission.
         $this->permissionName = 'cms/admin-lead';
         $this->permissionNames = [$this->permissionName => $this->name];
@@ -45,7 +45,7 @@ class AdminCmsLeadContractorController extends AdminCmsContractorAttachControlle
             'cms_contractor_id' => (int)\Yii::$app->request->post('contractor_id'),
         ])->one();
         $rr->success = $map && $map->delete() !== false;
-        $rr->message = $rr->success ? 'Реквизиты убраны из лида.' : 'Реквизиты не найдены.';
+        $rr->message = $rr->success ? 'Реквизиты убраны из сделки.' : 'Реквизиты не найдены.';
 
         return $rr;
     }

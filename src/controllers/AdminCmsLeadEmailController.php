@@ -15,7 +15,7 @@ class AdminCmsLeadEmailController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = 'Email-ы лида';
+        $this->name = 'Email-ы сделки';
         $this->modelShowAttribute = 'value';
         $this->modelClassName = CmsLeadEmail::class;
         $this->permissionName = 'cms/admin-lead';

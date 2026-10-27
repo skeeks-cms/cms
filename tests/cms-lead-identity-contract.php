@@ -37,8 +37,8 @@ $checks = [
     'combined linking verifies the client-company relation' => strpos($service, "'cms_company_id' => \$company->id") !== false
         && strpos($service, "'cms_user_id' => \$client->id") !== false
         && strpos($service, '->exists()') !== false,
-    'existing links cannot be overwritten' => strpos($service, 'К лиду уже привязана другая компания.') !== false
-        && strpos($service, 'К лиду уже привязан другой клиент.') !== false,
+    'existing links cannot be overwritten' => strpos($service, 'К сделке уже привязана другая компания.') !== false
+        && strpos($service, 'К сделке уже привязан другой клиент.') !== false,
     'linking produces an auditable lead activity' => strpos($service, "'action' => 'lead_identity_link'") !== false,
     'candidate evidence is visible before linking' => strpos($partial, "implode(' · ', \$match['reasons'])") !== false,
     'client and related company can be linked together' => strpos($partial, "'Привязать оба'") !== false,

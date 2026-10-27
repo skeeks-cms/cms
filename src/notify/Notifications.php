@@ -147,9 +147,9 @@ class Notifications extends Component
             'task.comment' => ['name' => 'Комментарий к задаче'] + $task,
             'task.order' => ['name' => 'Изменён порядок ваших задач', 'audience' => self::AUDIENCE_WORKER] + $task,
             'task.client_unassigned' => ['name' => 'Неразобранная задача от клиента', 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER] + $task,
-            'lead.new' => ['name' => 'Новый лид', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
-            'lead.assigned' => ['name' => 'Вам назначен лид', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
-            'lead.partner_comment' => ['name' => 'Комментарий партнёра по лиду', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
+            'lead.new' => ['name' => 'Новая сделка', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
+            'lead.assigned' => ['name' => 'Вам назначена сделка', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
+            'lead.partner_comment' => ['name' => 'Комментарий партнёра по сделке', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
             'lead.partner_update' => ['name' => 'Партнёрская заявка: статус и комментарии', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_CLIENT],
         ];
     }

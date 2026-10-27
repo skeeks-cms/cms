@@ -147,7 +147,7 @@ class CmsLead extends Core
                 },
                 'whenClient' => 'function (attribute, value) { return $("[data-sx-lead-status]").val() === "'.self::STATUS_REJECTED.'"; }',
             ],
-            [['result_comment'], 'required', 'message' => 'Укажите результат обработки лида', 'when' => static function (self $model) {
+            [['result_comment'], 'required', 'message' => 'Укажите результат обработки сделки', 'when' => static function (self $model) {
                 return $model->status === self::STATUS_SUCCESS;
             }],
             [['partner_reward_value'], 'required', 'message' => 'Укажите вознаграждение партнёру', 'when' => static function (self $model) {
@@ -200,7 +200,7 @@ class CmsLead extends Core
                 if ((int)$this->executor_id !== $currentUserId) {
                     $this->sendWebNotify(
                         (int)$this->executor_id,
-                        'Вам назначен новый лид',
+                        'Вам назначена новая сделка',
                         $this->sourceNameAsText,
                         null,
                         'lead.assigned'
@@ -322,7 +322,7 @@ class CmsLead extends Core
         }
 
         if (!$log->save()) {
-            throw new \RuntimeException('Не удалось сохранить запись активности лида: '.implode('; ', $log->getFirstErrors()));
+            throw new \RuntimeException('Не удалось сохранить запись активности сделки: '.implode('; ', $log->getFirstErrors()));
         }
 
         return $log;
@@ -340,13 +340,13 @@ class CmsLead extends Core
 
         if ($this->source_type === self::SOURCE_PARTNER) {
             return $actor === null
-                ? 'Добавлен лид «'.$name.'»'
-                : $actor.' добавил лид «'.$name.'»';
+                ? 'Добавлена сделка «'.$name.'»'
+                : $actor.' добавил сделку «'.$name.'»';
         }
 
         return $actor === null
-            ? 'Создан лид «'.$name.'»'
-            : $actor.' создал лид «'.$name.'»';
+            ? 'Создана сделка «'.$name.'»'
+            : $actor.' создал сделку «'.$name.'»';
     }
 
     /**
@@ -421,12 +421,12 @@ class CmsLead extends Core
     public function notifyManagersAboutPartnerComment(): void
     {
         if ($this->executor_id) {
-            $this->sendWebNotify((int)$this->executor_id, 'Новый комментарий партнёра по лиду', null, null, 'lead.partner_comment');
+            $this->sendWebNotify((int)$this->executor_id, 'Новый комментарий партнёра по сделке', null, null, 'lead.partner_comment');
             return;
         }
 
         foreach ($this->availableManagerIds() as $userId) {
-            $this->sendWebNotify($userId, 'Новый комментарий партнёра по нераспределённому лиду', null, null, 'lead.partner_comment');
+            $this->sendWebNotify($userId, 'Новый комментарий партнёра по нераспределённой сделке', null, null, 'lead.partner_comment');
         }
     }
 
@@ -437,11 +437,11 @@ class CmsLead extends Core
                 'cms_user_id' => $userId,
                 'model_code' => $this->skeeksModelCode,
                 'model_id' => (int)$this->id,
-                'name' => 'Появился новый лид',
+                'name' => 'Появилась новая сделка',
             ])->exists()) {
                 continue;
             }
-            $this->sendWebNotify($userId, 'Появился новый лид', $this->sourceNameAsText);
+            $this->sendWebNotify($userId, 'Появилась новая сделка', $this->sourceNameAsText);
         }
     }
 
@@ -538,7 +538,7 @@ class CmsLead extends Core
     public static function statusDescriptions(): array
     {
         return [
-            self::STATUS_NEW => 'Лид получен и ожидает ответственного менеджера.',
+            self::STATUS_NEW => 'Сделка получена и ожидает ответственного менеджера.',
             self::STATUS_IN_WORK => 'Ответственный менеджер уже работает с обращением.',
             self::STATUS_SUCCESS => 'Обращение успешно обработано.',
             self::STATUS_REJECTED => 'Обращение закрыто без результата.',
@@ -659,7 +659,7 @@ class CmsLead extends Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'name' => 'Название лида',
+            'name' => 'Название сделки',
             'description' => 'Описание',
             'status' => 'Статус',
             'source_type' => 'Источник',

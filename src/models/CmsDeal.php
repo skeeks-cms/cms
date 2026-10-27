@@ -53,7 +53,7 @@ class CmsDeal extends ActiveRecord
      */
     public function getAsShortText()
     {
-        return "Сделка №{$this->id} «".$this->name."»";
+        return "Услуга №{$this->id} «".$this->name."»";
     }
 
     /**
@@ -85,7 +85,7 @@ class CmsDeal extends ActiveRecord
         return true;
         //TODO::доработать
         if ($this->getCmsDeal2bills()->joinWith('bill as bill')->andWhere(['is not', 'bill.paid_at', null])->exists()) {
-            throw new Exception("Нельзя удалить эту сделку, потому что по ней есть оплаченные счета");
+            throw new Exception("Нельзя удалить эту услугу, потому что по ней есть оплаченные счета");
         }
 
         if ($bill2Deals = $this->getCmsDeal2bills()->all()) {
@@ -251,22 +251,22 @@ class CmsDeal extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'start_at'         => 'Дата начала сделки',
-            'end_at'           => 'Дата завершения сделки',
-            'cms_deal_type_id' => 'Тип сделки',
+            'start_at'         => 'Дата начала услуги',
+            'end_at'           => 'Дата завершения услуги',
+            'cms_deal_type_id' => 'Тип услуги',
             'cms_user_id'                 => "Клиент",
             'cms_company_id'   => 'Компания',
             'name'             => 'Название',
             'description'      => 'Комментарий',
             'amount'           => 'Сумма',
             'currency_code'    => 'Валюта',
-            'period'           => 'Период действия для периодической сделки',
+            'period'           => 'Период действия для периодической услуги',
             'is_active'        => 'Активность',
-            'is_periodic'      => 'Периодическая сделка?',
+            'is_periodic'      => 'Периодическая услуга?',
             'payments'         => 'Платежи',
             'bills'            => 'Счета',
             'is_auto'          => 'Авто продление + уведомления',
-            'isCreateNotify'   => 'Уведомить после создания сделки?',
+            'isCreateNotify'   => 'Уведомить после создания услуги?',
         ]);
     }
 
@@ -285,9 +285,9 @@ class CmsDeal extends ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_periodic' => 'Сделки бывают разовые или постоянные',
-            'period'      => 'Период действия сделки',
-            'is_auto'     => 'Если выбрано "да", то клиент будет получать уведомления перед завершением действия сделки.',
+            'is_periodic' => 'Услуги бывают разовые или постоянные',
+            'period'      => 'Период действия услуги',
+            'is_auto'     => 'Если выбрано "да", то клиент будет получать уведомления перед завершением действия услуги.',
             'start_at'    => 'Если не заполнить, то поле будет заполнено текущим временем автоматически.',
         ]);
     }
@@ -538,7 +538,7 @@ class CmsDeal extends ActiveRecord
             if ($tasks) {
                 $parts[] = "задачи прежней компании ({$tasks})";
             }
-            $this->addError($attribute, 'Сделку нельзя перевести на другого клиента: у неё есть '.implode(' и ', $parts)
+            $this->addError($attribute, 'Услугу нельзя перевести на другого клиента: у неё есть '.implode(' и ', $parts)
                 .'. Уберите доступы в блоке «Доступ клиента» и перенесите или отвяжите задачи, затем смените клиента.');
         }
     }
@@ -567,7 +567,7 @@ class CmsDeal extends ActiveRecord
                 $removed++;
             }
             if ($removed) {
-                \Yii::$app->get('dealAccess')->writeDealLog($this, "Сделка переведена на другого клиента: снято доступов людей прежней компании — {$removed}.");
+                \Yii::$app->get('dealAccess')->writeDealLog($this, "Услуга переведена на другого клиента: снято доступов людей прежней компании — {$removed}.");
             }
             return;
         }
@@ -585,7 +585,7 @@ class CmsDeal extends ActiveRecord
             'is_full'          => 1,
         ]);
         if (!$grant->save()) {
-            throw new \RuntimeException('Владелец сделки не получил доступ: '.implode('; ', $grant->getFirstErrors()));
+            throw new \RuntimeException('Владелец услуги не получил доступ: '.implode('; ', $grant->getFirstErrors()));
         }
     }
 

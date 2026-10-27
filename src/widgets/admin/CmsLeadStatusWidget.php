@@ -92,7 +92,7 @@ class CmsLeadStatusWidget extends Widget
 
         return Html::tag('span', $dot.Html::encode($stage->name), [
             'class' => 'sx-status',
-            'title' => 'Этап работы с лидом',
+            'title' => 'Этап работы со сделкой',
         ]);
     }
 }

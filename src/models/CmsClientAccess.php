@@ -86,7 +86,7 @@ class CmsClientAccess extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_user_id'      => 'Человек',
             'cms_company_id'   => 'Компания',
-            'cms_deal_id'      => 'Сделка',
+            'cms_deal_id'      => 'Услуга',
             'cms_deal_role_id' => 'Роль',
             'is_full'          => 'Полный доступ',
             'is_custom'        => 'Настроено вручную',
@@ -143,7 +143,7 @@ class CmsClientAccess extends \skeeks\cms\base\ActiveRecord
         }
         $this->normalizeScope();
         if ($this->scope_key === '') {
-            throw new \yii\base\InvalidArgumentException('Доступ клиента без сделки и компании сохранить нельзя.');
+            throw new \yii\base\InvalidArgumentException('Доступ клиента без услуги и компании сохранить нельзя.');
         }
         return true;
     }
@@ -159,7 +159,7 @@ class CmsClientAccess extends \skeeks\cms\base\ActiveRecord
     public function validateScope($attribute)
     {
         if (!$this->cms_deal_id && !$this->cms_company_id) {
-            $this->addError($attribute, 'Нужно выбрать сделку или компанию.');
+            $this->addError($attribute, 'Нужно выбрать услугу или компанию.');
         }
     }
 

@@ -81,11 +81,11 @@ class ProjectDealMigration extends BaseObject
         if (isset($this->map[(int)$project->id])) {
             $deal = CmsDeal::findOne((int)$this->map[(int)$project->id]);
             if (!$deal) {
-                $row['reason'] = 'сделка из карты не найдена';
+                $row['reason'] = 'услуга из карты не найдена';
                 return $row;
             }
             if (!$this->sameOwner($project, $deal)) {
-                $row['reason'] = 'сделка из карты другого клиента';
+                $row['reason'] = 'услуга из карты другого клиента';
                 return $row;
             }
             $row['reason'] = 'по карте';
@@ -144,16 +144,16 @@ class ProjectDealMigration extends BaseObject
     protected function choose(CmsProject $project, array $candidates): array
     {
         if (!$candidates) {
-            return [null, 'у клиента нет подходящей сделки'];
+            return [null, 'у клиента нет подходящей услуги'];
         }
         $active = array_values(array_filter($candidates, function (CmsDeal $deal) {
             return (bool)$deal->is_active;
         }));
         if (count($active) === 1) {
-            return [$active[0], 'единственная активная сделка'];
+            return [$active[0], 'единственная активная услуга'];
         }
         if (!$active && count($candidates) === 1) {
-            return [$candidates[0], 'единственная сделка (не активна)'];
+            return [$candidates[0], 'единственная услуга (не активна)'];
         }
 
         $domain = static::domainOf((string)$project->name.' '.(string)$project->description);

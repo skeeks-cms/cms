@@ -67,7 +67,7 @@ class CmsLeadNoAnswerForm extends Model
             self::NEXT_TOMORROW => 'Перезвонить завтра в '.self::MORNING_HOUR.':00',
             self::NEXT_IN_2_DAYS => 'Перезвонить через 2 дня в '.self::MORNING_HOUR.':00',
             self::NEXT_CUSTOM => 'Перезвонить в другое время',
-            self::NEXT_REJECT => 'Закрыть лид: не удалось дозвониться',
+            self::NEXT_REJECT => 'Закрыть сделку: не удалось дозвониться',
         ];
     }
 
@@ -124,11 +124,11 @@ class CmsLeadNoAnswerForm extends Model
     public function validateLead($attribute)
     {
         if (!$this->lead instanceof CmsLead || $this->lead->status !== CmsLead::STATUS_IN_WORK) {
-            $this->addError($attribute, 'Отметить звонок можно только у лида в работе.');
+            $this->addError($attribute, 'Отметить звонок можно только у сделки в работе.');
             return;
         }
         if (!$this->lead->canBeWorkedBy((int)\Yii::$app->user->id)) {
-            $this->addError($attribute, 'Лид закреплён за другим менеджером.');
+            $this->addError($attribute, 'Сделка закреплена за другим менеджером.');
         }
     }
 

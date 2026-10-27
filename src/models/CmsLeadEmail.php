@@ -51,7 +51,7 @@ class CmsLeadEmail extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_lead_id' => 'Лид',
+            'cms_lead_id' => 'Сделка',
             'value' => 'Email',
             'name' => 'Описание',
             'sort' => 'Сортировка',

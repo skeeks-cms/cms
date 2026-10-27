@@ -123,7 +123,7 @@ class CmsLeadNoAnswerService
             $canceled++;
         }
 
-        return 'Лид закрыт: не удалось дозвониться.'.($canceled ? ' Отменено открытых задач: '.$canceled.'.' : '');
+        return 'Сделка закрыта: не удалось дозвониться.'.($canceled ? ' Отменено открытых задач: '.$canceled.'.' : '');
     }
 
     private function save(CmsTask $task): void

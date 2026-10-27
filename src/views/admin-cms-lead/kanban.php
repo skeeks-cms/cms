@@ -21,8 +21,8 @@ $userId = (int)Yii::$app->user->id;
 $isFiltered = $executorId || $q !== '';
 $total = array_sum(array_column($columns, 'total'));
 $settingsLinks = [
-    ['/cms/admin-cms-lead-stage', 'Этапы лидов', 'Шаги работы с лидом: колонки канбана между «Новые» и результатом.'],
-    ['/cms/admin-cms-lead-reject-reason', 'Причины отказа', 'Список причин, из которого менеджер выбирает при отказе по лиду.'],
+    ['/cms/admin-cms-lead-stage', 'Этапы сделок', 'Шаги работы со сделкой: колонки канбана между «Новые» и результатом.'],
+    ['/cms/admin-cms-lead-reject-reason', 'Причины отказа', 'Список причин, из которого менеджер выбирает при отказе по сделке.'],
 ];
 $missing = [];
 if ($setup !== null) {
@@ -36,15 +36,15 @@ if ($setup !== null) {
 ?>
 <form class="sx-lead-kanban__toolbar" method="get" action="<?= Html::encode(Url::to(['kanban'])); ?>" data-sx-lead-kanban-filters>
     <div class="sx-lead-kanban__scope">
-        <?= Html::a('Все лиды', ['kanban', 'q' => $q ?: null], [
+        <?= Html::a('Все сделки', ['kanban', 'q' => $q ?: null], [
             'class' => 'sx-button sx-button--sm '.(!$executorId ? 'sx-button--primary' : 'sx-button--secondary'),
         ]); ?>
-        <?= Html::a('Мои лиды', ['kanban', 'executor' => $userId, 'q' => $q ?: null], [
+        <?= Html::a('Мои сделки', ['kanban', 'executor' => $userId, 'q' => $q ?: null], [
             'class' => 'sx-button sx-button--sm '.($executorId === $userId ? 'sx-button--primary' : 'sx-button--secondary'),
         ]); ?>
         <?php if (count($managers) > 1) : ?>
             <?= Html::dropDownList('executor', $executorId !== $userId ? ($executorId ?: null) : null, $managers, [
-                'prompt' => 'Лиды сотрудника…',
+                'prompt' => 'Сделки сотрудника…',
                 'class' => 'sx-lead-kanban__control sx-lead-kanban__manager'.($executorId && $executorId !== $userId ? ' is-active' : ''),
                 'aria-label' => 'Ответственный сотрудник',
                 'data-sx-lead-kanban-submit' => true,
@@ -59,7 +59,7 @@ if ($setup !== null) {
         <?= Html::input('search', 'q', $q, [
             'class' => 'sx-lead-kanban__control',
             'placeholder' => 'Название, телефон, email',
-            'aria-label' => 'Поиск лидов',
+            'aria-label' => 'Поиск сделок',
             'maxlength' => 100,
         ]); ?>
     </label>
@@ -69,7 +69,7 @@ if ($setup !== null) {
 
     <?php if ($isAdmin) : ?>
         <details class="sx-lead-kanban__settings" data-sx-lead-kanban-menu>
-            <summary class="sx-button sx-button--sm sx-button--secondary" title="Настройки лидов" aria-label="Настройки лидов">
+            <summary class="sx-button sx-button--sm sx-button--secondary" title="Настройки сделок" aria-label="Настройки сделок">
                 <?= BackendIcon::render('settings', ['size' => 16]); ?>
             </summary>
             <div class="sx-lead-kanban__menu" role="menu">
@@ -84,9 +84,9 @@ if ($setup !== null) {
 <?php if ($missing) : ?>
     <div class="sx-surface sx-surface--raised sx-surface--padded sx-lead-kanban__setup">
         <div>
-            <h3 class="sx-surface__title">Настройте работу с лидами</h3>
+            <h3 class="sx-surface__title">Настройте работу со сделками</h3>
             <p class="sx-surface__hint">
-                Чтобы менеджеры вели лиды по шагам и указывали понятные причины отказа, заполните настройки.
+                Чтобы менеджеры вели сделки по шагам и указывали понятные причины отказа, заполните настройки.
                 Пока они пустые, канбан работает в упрощённом виде.
             </p>
         </div>
@@ -106,7 +106,7 @@ if ($setup !== null) {
         <?php if ($isFiltered) : ?>
             Ничего не найдено. Измените запрос или <?= Html::a('сбросьте фильтр', ['kanban']); ?>.
         <?php else : ?>
-            Лидов пока нет. Они появятся из форм на сайте, партнёрской программы, телефонии или после
+            Сделок пока нет. Они появятся из форм на сайте, партнёрской программы, телефонии или после
             <?= Html::a('ручного добавления', ['create'], ['data-pjax' => '0']); ?>.
         <?php endif; ?>
     </div>

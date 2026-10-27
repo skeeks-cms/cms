@@ -48,7 +48,7 @@ $renderStep = static function (array $step): string {
 $path = array_filter($steps, static fn(array $step) => !in_array($step['column'], [CmsLeadBoardService::COLUMN_SUCCESS, CmsLeadBoardService::COLUMN_REJECTED], true));
 $outcomes = array_diff_key($steps, $path);
 ?>
-<nav class="sx-lead-stage-bar" aria-label="Этапы лида" data-sx-lead-stage-bar
+<nav class="sx-lead-stage-bar" aria-label="Этапы сделки" data-sx-lead-stage-bar
      data-move-url="<?= Html::encode(Url::to(['/cms/admin-cms-lead/kanban-move'])); ?>"
      data-pk="<?= (int)$model->id; ?>">
     <ol class="sx-lead-stage-bar__path"><?= implode('', array_map($renderStep, $path)); ?></ol>

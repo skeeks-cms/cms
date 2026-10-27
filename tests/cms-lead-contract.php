@@ -34,7 +34,7 @@ $requiredModelFragments = [
     "['sx-log-id' => \$logId]",
     "'#sx-log-'.\$logId",
     'notifyManagersAboutPartnerComment()',
-    "'Вам назначен новый лид'",
+    "'Вам назначена новая сделка'",
     "'attribute_value_maps'",
     "'status' => self::statuses()",
     "'source_type' => self::sources()",
@@ -124,18 +124,18 @@ foreach (["self::STATUS_NEW => 'Новый'", "self::STATUS_SUCCESS => 'Успе
 
 $company = strpos($menu, "'label'    => \\Yii::t('skeeks/cms', 'Компании')");
 $client = strpos($menu, "'label'    => \\Yii::t('skeeks/cms', 'Клиенты')");
-$lead = strpos($menu, "'label'    => \\Yii::t('skeeks/cms', 'Лиды')");
+$lead = strpos($menu, "'label'    => \\Yii::t('skeeks/cms', 'Сделки')");
 if ($company === false || $client === false || $lead === false) {
     throw new RuntimeException('CRM menu entries are incomplete.');
 }
 if (!($company < $client && $client < $lead)
     || !preg_match("/'Компании'\)[\\s\\S]*?'priority'\s*=>\s*100/", $menu)
     || !preg_match("/'Клиенты'\)[\\s\\S]*?'priority'\s*=>\s*110/", $menu)
-    || !preg_match("/'Лиды'\)[\\s\\S]*?'priority'\s*=>\s*120/", $menu)
+    || !preg_match("/'Сделки'\)[\\s\\S]*?'priority'\s*=>\s*120/", $menu)
 ) {
     throw new RuntimeException('CRM menu order must be Companies, Clients, Leads.');
 }
-if (!preg_match("/'name'\s*=>\s*'cms\/admin-lead'[\s\S]*?'description'\s*=>\s*\['skeeks\/cms',\s*'Лиды'\]/", $permissions)) {
+if (!preg_match("/'name'\s*=>\s*'cms\/admin-lead'[\s\S]*?'description'\s*=>\s*\['skeeks\/cms',\s*'Сделки'\]/", $permissions)) {
     throw new RuntimeException('Lead section must expose the same explicit RBAC permission contract as companies and clients.');
 }
 if (strpos($form2Boundary, "'cms_site_id'") === false || strpos($form2Boundary, "'source_type'") === false) {
@@ -303,7 +303,7 @@ foreach ([
 ] as [$relatedController, $relation, $owner]) {
     foreach ([
         "'leads' => [",
-        "'name'     => 'Лиды'",
+        "'name'     => 'Сделки'",
         "'controllerRoute' => '/cms/admin-cms-lead'",
         $relation,
         "'isStandartBeforeRender' => false",
@@ -327,7 +327,7 @@ foreach ([
     "'log_type' => CmsLog::LOG_TYPE_COMMENT,",
     'if ($this->_creationActivityLog !== null)',
     'return $this->_creationActivityLog = $this->addSystemActivity(',
-    'throw new \\RuntimeException(\'Не удалось сохранить запись активности лида: \'',
+    'throw new \\RuntimeException(\'Не удалось сохранить запись активности сделки: \'',
 ] as $activityContract) {
     if (strpos($model, $activityContract) === false) {
         throw new RuntimeException('Lead system activity contract is incomplete: '.$activityContract);
@@ -359,8 +359,8 @@ foreach ([
     }
 }
 foreach ([
-    "\$actor.' добавил лид «'.\$name.'»'",
-    "\$actor.' создал лид «'.\$name.'»'",
+    "\$actor.' добавил сделку «'.\$name.'»'",
+    "\$actor.' создал сделку «'.\$name.'»'",
     'CmsUser::findOne($actorId)',
     'Html::encode((string)$actor->shortDisplayName)',
     'Html::encode((string)$this->name)',

@@ -89,8 +89,8 @@ taskBulkEditExpect(
     'The bulk form must accept a deal visible to the employee.'
 );
 taskBulkEditExpect(
-    strpos($form, "'Сделка должна относиться к выбранной компании.'") !== false
-        && strpos($form, "'Сделка должна быть оформлена на выбранного клиента.'") !== false,
+    strpos($form, "'Услуга должна относиться к выбранной компании.'") !== false
+        && strpos($form, "'Услуга должна быть оформлена на выбранного клиента.'") !== false,
     'The bulk deal must belong to the chosen company or client.'
 );
 taskBulkEditExpect(

@@ -42,7 +42,7 @@ class CmsTelephonyCallLinksForm extends Model
     public function attributeLabels()
     {
         return [
-            'cms_lead_id' => 'Лид',
+            'cms_lead_id' => 'Сделка',
             'cms_company_id' => 'Компания',
             'cms_user_id' => 'Клиент',
         ];

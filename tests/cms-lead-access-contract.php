@@ -21,7 +21,7 @@ $contracts = [
     'lead grid applies employee and site scope' => strpos($controller, 'dataProvider->query->forManager()->cmsSite()') !== false,
     'direct lead load applies employee scope' => strpos($controller, 'CmsLead::find()') !== false
         && strpos($controller, '->forManager()') !== false
-        && strpos($controller, "throw new NotFoundHttpException('Лид не найден.')") !== false,
+        && strpos($controller, "throw new NotFoundHttpException('Сделка не найдена.')") !== false,
     'recipients use the same scope as the grid' => strpos($lead, 'self::find()->forManager($worker)') !== false,
     'company creation uses scoped lead' => strpos($companyController, 'CmsLead::find()') !== false
         && strpos($companyController, '->forManager()') !== false

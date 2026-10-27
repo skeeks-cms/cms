@@ -229,7 +229,7 @@ CSS
                 </div>
             </div>
             <div class="sx-surface sx-deal-overview-item">
-                <div class="sx-deal-overview-label">Тип сделки</div>
+                <div class="sx-deal-overview-label">Тип услуги</div>
                 <div class="sx-deal-overview-value"><?= $formatValue($model->dealType ? $model->dealType->name : ''); ?></div>
             </div>
             <div class="sx-surface sx-deal-overview-item">

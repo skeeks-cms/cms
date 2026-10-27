@@ -682,7 +682,7 @@ class AdminUserController extends BackendModelStandartController
             'leads' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'priority' => 950,
-                'name'     => 'Лиды',
+                'name'     => 'Сделки',
                 'icon'     => 'fas fa-user-plus',
                 'controllerRoute' => '/cms/admin-cms-lead',
                 'relation'        => ['cms_user_id' => 'id'],
@@ -700,8 +700,8 @@ class AdminUserController extends BackendModelStandartController
                     $action = $event->sender;
                     $action->relatedIndexAction->backendShowings = false;
                     $action->relatedIndexAction->grid['emptyState'] = [
-                        'title' => 'У клиента пока нет лидов',
-                        'description' => 'Связанные с клиентом лиды появятся здесь.',
+                        'title' => 'У клиента пока нет сделок',
+                        'description' => 'Связанные с клиентом сделки появятся здесь.',
                         'icon' => 'fas fa-user-plus',
                     ];
                 },

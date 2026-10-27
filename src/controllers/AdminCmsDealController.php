@@ -58,7 +58,7 @@ class AdminCmsDealController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = \Yii::t('skeeks/cms', "Сделки");
+        $this->name = \Yii::t('skeeks/cms', "Услуги");
         $this->modelShowAttribute = "asText";
         $this->modelClassName = CmsDeal::class;
 
@@ -149,7 +149,7 @@ class AdminCmsDealController extends BackendModelStandartController
             //A resource of the deal moves to another deal of the same client; its history stays here.
             'move-resource' => [
                 'class'          => \skeeks\cms\backend\actions\BackendModelUpdateAction::class,
-                'name'           => 'Перенести в другую сделку',
+                'name'           => 'Перенести в другую услугу',
                 'isVisible'      => false,
                 'size'           => \skeeks\cms\backend\actions\BackendModelUpdateAction::SIZE_SMALL,
                 'buttons'        => ['save'],
@@ -161,9 +161,9 @@ class AdminCmsDealController extends BackendModelStandartController
                 'on initFormModels' => function (Event $event) {
                     $targets = array_keys($this->moveTargets());
                     $form = new \yii\base\DynamicModel(['to_deal_id' => null]);
-                    $form->setAttributeLabels(['to_deal_id' => 'В сделку']);
-                    $form->addRule(['to_deal_id'], 'required', ['message' => 'Выберите сделку']);
-                    $form->addRule(['to_deal_id'], 'in', ['range' => array_map('strval', $targets), 'message' => 'В эту сделку перенести нельзя']);
+                    $form->setAttributeLabels(['to_deal_id' => 'В услугу']);
+                    $form->addRule(['to_deal_id'], 'required', ['message' => 'Выберите услугу']);
+                    $form->addRule(['to_deal_id'], 'in', ['range' => array_map('strval', $targets), 'message' => 'В эту услугу перенести нельзя']);
                     $event->sender->formModels = ['move' => $form];
                 },
                 'on beforeSave' => function (Event $event) {
@@ -529,7 +529,7 @@ class AdminCmsDealController extends BackendModelStandartController
 
             /*"properties" => [
                 'class'        => BackendModelMultiDialogEditAction::class,
-                "name"         => "Свойства сделки",
+                "name"         => "Свойства услуги",
                 "viewDialog"   => null,
                 "eachCallback" => [$this, 'eachPactProperty'],
                 "eachAccessCallback" => function ($model) {
@@ -649,7 +649,7 @@ class AdminCmsDealController extends BackendModelStandartController
             [
                 'class'   => HtmlBlock::class,
                 'content' => Html::tag('div', Html::tag('p',
-                    'Тип сделки «'.Html::encode($type ? $type->name : '—').'» задаёт, что можно открыть клиенту. Здесь это можно только сузить для этой сделки; итог для человека — его права, но не больше открытого.'
+                    'Тип услуги «'.Html::encode($type ? $type->name : '—').'» задаёт, что можно открыть клиенту. Здесь это можно только сузить для этой услуги; итог для человека — его права, но не больше открытого.'
                 ), ['class' => 'col-12']),
             ],
             [
@@ -679,7 +679,7 @@ class AdminCmsDealController extends BackendModelStandartController
                 'class'   => HtmlBlock::class,
                 'content' => Html::tag('div',
                     Html::tag('p', Html::encode(($provider ? $provider->label() : $resource->type).' «'.$resource->title.'»'), ['style' => 'font-weight: 600;'])
-                    .Html::tag('p', 'Задачи этого ресурса останутся в текущей сделке как её история. Права людей клиента и уведомления будут считаться по новой сделке.'),
+                    .Html::tag('p', 'Задачи этого ресурса останутся в текущей услуге как её история. Права людей клиента и уведомления будут считаться по новой услуге.'),
                     ['class' => 'col-12']
                 ),
             ],
@@ -687,8 +687,8 @@ class AdminCmsDealController extends BackendModelStandartController
                 'class' => SelectField::class,
                 'items' => $targets,
                 'hint'  => $targets
-                    ? 'Сделки этого же клиента. '.Html::a('Создать сделку', $create, ['target' => '_blank', 'data-pjax' => 0])
-                    : 'У клиента нет других сделок. '.Html::a('Создать сделку', $create, ['target' => '_blank', 'data-pjax' => 0]),
+                    ? 'Услуги этого же клиента. '.Html::a('Создать услугу', $create, ['target' => '_blank', 'data-pjax' => 0])
+                    : 'У клиента нет других услуг. '.Html::a('Создать услугу', $create, ['target' => '_blank', 'data-pjax' => 0]),
             ],
         ];
     }
@@ -788,7 +788,7 @@ JS
 
             'doc' => [
                 'class'  => FieldSet::class,
-                'name'   => 'Сделка',
+                'name'   => 'Услуга',
                 'fields' => [
 
 

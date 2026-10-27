@@ -116,7 +116,7 @@ class CmsLeadBoardService
                 throw new \RuntimeException(implode(' ', $lead->getFirstErrors()));
             }
         } catch (StaleObjectException $e) {
-            throw new \RuntimeException('Лид уже изменён в другой вкладке. Обновите страницу.', 0, $e);
+            throw new \RuntimeException('Сделка уже изменена в другой вкладке. Обновите страницу.', 0, $e);
         }
 
         return true;
@@ -129,24 +129,24 @@ class CmsLeadBoardService
     public function denyReason(CmsLead $lead, string $column, int $actorId): ?string
     {
         if ($column === self::COLUMN_NEW) {
-            return 'Вернуть лид в «Новые» нельзя.';
+            return 'Вернуть сделку в «Новые» нельзя.';
         }
         if ($column === self::COLUMN_SUCCESS || $column === self::COLUMN_REJECTED) {
             return $lead->status === CmsLead::STATUS_IN_WORK && $lead->canBeWorkedBy($actorId)
                 ? null
-                : 'Завершить можно только лид в работе, закреплённый за вами.';
+                : 'Завершить можно только сделку в работе, закреплённую за вами.';
         }
         if (strpos($column, self::STAGE_PREFIX) !== 0) {
             return 'Неизвестная колонка.';
         }
         if ($lead->status === CmsLead::STATUS_NEW) {
-            return $lead->canBeClaimed || $lead->canBeWorkedBy($actorId) ? null : 'Лид уже закреплён за другим менеджером.';
+            return $lead->canBeClaimed || $lead->canBeWorkedBy($actorId) ? null : 'Сделка уже закреплена за другим менеджером.';
         }
         if ($lead->isTerminal) {
-            return $lead->canBeReopenedBy($actorId) ? null : 'Вернуть этот лид в работу может только ответственный или администратор.';
+            return $lead->canBeReopenedBy($actorId) ? null : 'Вернуть эту сделку в работу может только ответственный или администратор.';
         }
 
-        return $lead->canBeWorkedBy($actorId) ? null : 'Лид закреплён за другим менеджером.';
+        return $lead->canBeWorkedBy($actorId) ? null : 'Сделка закреплена за другим менеджером.';
     }
 
     /**
@@ -187,7 +187,7 @@ class CmsLeadBoardService
             $result[] = $step + [
                 'state' => $state,
                 'allowed' => $state !== 'current' && $this->denyReason($lead, $step['column'], $actorId) === null,
-                'confirm' => $lead->isTerminal ? 'Вернуть лид в работу?' : null,
+                'confirm' => $lead->isTerminal ? 'Вернуть сделку в работу?' : null,
             ];
         }
         foreach ([self::COLUMN_SUCCESS => CmsLead::STATUS_SUCCESS, self::COLUMN_REJECTED => CmsLead::STATUS_REJECTED] as $column => $status) {

@@ -28,7 +28,7 @@ class AdminCmsLeadStageController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = 'Этапы лидов';
+        $this->name = 'Этапы сделок';
         $this->modelShowAttribute = 'name';
         $this->modelClassName = CmsLeadStage::class;
         $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
@@ -43,7 +43,7 @@ class AdminCmsLeadStageController extends BackendModelStandartController
             'index' => [
                 'emptyState' => [
                     'title' => 'Этапов пока нет',
-                    'description' => 'Этапы делят статус «В работе» на шаги, например «Пытаемся связаться», «КП отправлено», «Думает». Они становятся колонками канбана лидов.',
+                    'description' => 'Этапы делят статус «В работе» на шаги, например «Пытаемся связаться», «КП отправлено», «Думает». Они становятся колонками канбана сделок.',
                     'icon' => 'fas fa-columns',
                     'action' => ['backendAction' => 'create', 'label' => 'Добавить этап'],
                 ],
@@ -73,7 +73,7 @@ class AdminCmsLeadStageController extends BackendModelStandartController
                             'value' => static fn(CmsLeadStage $model) => \Yii::$app->formatter->asInteger($model->sort),
                         ],
                         'countLeads' => [
-                            'label' => 'Лидов в работе',
+                            'label' => 'Сделок в работе',
                             'format' => 'raw',
                             'value' => static fn(CmsLeadStage $model) => Html::tag('span',
                                 Html::tag('strong', \Yii::$app->formatter->asInteger((int)$model->raw_row['countLeads'])),

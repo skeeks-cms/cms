@@ -53,7 +53,7 @@ class CmsLeadPhone extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_lead_id' => 'Лид',
+            'cms_lead_id' => 'Сделка',
             'value' => 'Телефон',
             'name' => 'Описание',
             'sort' => 'Сортировка',
@@ -71,7 +71,7 @@ class CmsLeadPhone extends ActiveRecord
             $query->andWhere(['<>', 'id', (int)$this->id]);
         }
         if ($query->exists()) {
-            $this->addError($attribute, 'Такой телефон уже добавлен к лиду.');
+            $this->addError($attribute, 'Такой телефон уже добавлен к сделке.');
         }
     }
 

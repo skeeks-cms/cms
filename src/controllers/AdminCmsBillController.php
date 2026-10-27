@@ -687,7 +687,7 @@ JS
                         ],
 
                         'deals' => [
-                            'label'  => 'Сделки',
+                            'label'  => 'Услуги',
                             'format' => 'raw',
                             'value'  => function (ShopBill $ShopBill) {
                                 if ($ShopBill->deals) {

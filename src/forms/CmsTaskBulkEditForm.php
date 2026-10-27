@@ -68,7 +68,7 @@ class CmsTaskBulkEditForm extends Model
             'cms_company_id' => 'Компания',
             'cms_user_id' => 'Клиент',
             'cms_project_id' => 'Проект',
-            'cms_deal_id' => 'Сделка (услуга)',
+            'cms_deal_id' => 'Услуга',
         ];
     }
 
@@ -85,22 +85,22 @@ class CmsTaskBulkEditForm extends Model
 
         $deal = CmsDeal::find()->forManager()->andWhere([CmsDeal::tableName().'.id' => (int)$this->{$attribute}])->one();
         if (!$deal) {
-            $this->addError($attribute, 'Сделка недоступна.');
+            $this->addError($attribute, 'Услуга недоступна.');
             return;
         }
 
         if ($this->hasValue($this->cms_company_id)) {
             if ((int)$deal->cms_company_id !== (int)$this->cms_company_id) {
-                $this->addError($attribute, 'Сделка должна относиться к выбранной компании.');
+                $this->addError($attribute, 'Услуга должна относиться к выбранной компании.');
             }
         } elseif ($this->hasValue($this->cms_user_id)) {
             if ($deal->cms_company_id || (int)$deal->cms_user_id !== (int)$this->cms_user_id) {
-                $this->addError($attribute, 'Сделка должна быть оформлена на выбранного клиента.');
+                $this->addError($attribute, 'Услуга должна быть оформлена на выбранного клиента.');
             }
         } elseif ($this->hasValue($this->cms_project_id)) {
             $project = CmsProject::findOne((int)$this->cms_project_id);
             if ($project && $project->cms_company_id && (int)$project->cms_company_id !== (int)$deal->cms_company_id) {
-                $this->addError($attribute, 'Сделка должна относиться к компании проекта.');
+                $this->addError($attribute, 'Услуга должна относиться к компании проекта.');
             }
         }
     }

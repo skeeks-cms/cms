@@ -20,7 +20,7 @@ class AdminCmsLeadAddressController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = 'Адреса лида';
+        $this->name = 'Адреса сделки';
         $this->modelShowAttribute = 'value';
         $this->modelClassName = CmsLeadAddress::class;
         $this->permissionName = 'cms/admin-lead';

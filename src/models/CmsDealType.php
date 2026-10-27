@@ -103,7 +103,7 @@ class CmsDealType extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'is_periodic' => 'Периодическая сделка?',
+            'is_periodic' => 'Периодическая услуга?',
             'period'      => 'Период',
             'name'        => 'Название',
             'description' => 'Комментарий',
@@ -116,9 +116,9 @@ class CmsDealType extends ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_periodic' => 'Сделки бывают разовые или постоянные',
-            'period'      => 'Период действия сделки',
-            'clientAreasCustom' => 'Без настройки клиенту можно открыть задачи, отчёты, документы, счета и управление услугой, а возможности дополнительных модулей закрыты. Сделка может только сузить то, что разрешено здесь.',
+            'is_periodic' => 'Услуги бывают разовые или постоянные',
+            'period'      => 'Период действия услуги',
+            'clientAreasCustom' => 'Без настройки клиенту можно открыть задачи, отчёты, документы, счета и управление услугой, а возможности дополнительных модулей закрыты. Услуга может только сузить то, что разрешено здесь.',
         ]);
     }
 

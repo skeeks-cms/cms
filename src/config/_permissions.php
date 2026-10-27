@@ -268,7 +268,7 @@ return [
         ],
         [
             'name'        => \skeeks\cms\rbac\CmsDealAreaRule::PERMISSION,
-            'description' => ['skeeks/cms', 'Области доступа клиента в своих услугах (сделках)'],
+            'description' => ['skeeks/cms', 'Области доступа клиента в своих услугах'],
             'ruleName'    => \skeeks\cms\rbac\CmsDealAreaRule::NAME,
         ],
 
@@ -330,7 +330,7 @@ return [
 
         [
             'name'        => 'cms/admin-lead',
-            'description' => ['skeeks/cms', 'Лиды'],
+            'description' => ['skeeks/cms', 'Сделки'],
         ],
         
         

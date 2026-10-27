@@ -45,7 +45,7 @@ BackendSurfaceWidget::begin([
                     <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
                 </div>
                 <?php if ($canLink && !$model->cms_user_id) : ?>
-                    <?= $linkButton(null, (int)$client->id, 'Привязать клиента', 'Привязать этого клиента к лиду?'); ?>
+                    <?= $linkButton(null, (int)$client->id, 'Привязать клиента', 'Привязать этого клиента к сделке?'); ?>
                 <?php endif; ?>
 
                 <?php if ($match['companies']) : ?>
@@ -60,13 +60,13 @@ BackendSurfaceWidget::begin([
                                     'label' => $company->asText,
                                 ]); ?>
                                 <?php if ((int)$model->cms_company_id === (int)$company->id) : ?>
-                                    <span class="sx-lead-match__reason">Уже привязана к лиду</span>
+                                    <span class="sx-lead-match__reason">Уже привязана к сделке</span>
                                 <?php elseif ($canLink && !$model->cms_company_id) : ?>
                                     <?= $linkButton(
                                         (int)$company->id,
                                         (int)$client->id,
                                         $model->cms_user_id ? 'Привязать компанию' : 'Привязать оба',
-                                        'Привязать к лиду клиента и связанную с ним компанию?'
+                                        'Привязать к сделке клиента и связанную с ним компанию?'
                                     ); ?>
                                 <?php endif; ?>
                             </div>
@@ -89,13 +89,13 @@ BackendSurfaceWidget::begin([
                     <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
                 </div>
                 <?php if ($canLink && !$model->cms_company_id) : ?>
-                    <?= $linkButton((int)$company->id, null, 'Привязать компанию', 'Привязать эту компанию к лиду?'); ?>
+                    <?= $linkButton((int)$company->id, null, 'Привязать компанию', 'Привязать эту компанию к сделке?'); ?>
                 <?php endif; ?>
             </article>
         <?php endforeach; ?>
 
         <?php if (!$canLink) : ?>
-            <p class="sx-lead-matches__notice">Возьмите лид в работу, чтобы привязать найденную запись.</p>
+            <p class="sx-lead-matches__notice">Возьмите сделку в работу, чтобы привязать найденную запись.</p>
         <?php endif; ?>
     </div>
 <?php BackendSurfaceWidget::end(); ?>

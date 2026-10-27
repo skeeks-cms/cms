@@ -55,9 +55,9 @@ JS
 );
 
 $sourceText = [
-    'owner'   => 'владелец сделки',
+    'owner'   => 'владелец услуги',
     'company' => 'из роли в компании',
-    'deal'    => 'выдано в сделке',
+    'deal'    => 'выдано в услуге',
 ];
 $levelText = static function (string $area, int $level) use ($dealAccess): string {
     return $level ? $dealAccess->levelName($area, $level) : 'Закрыто';
@@ -82,9 +82,9 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
         <?php foreach ($areas as $area => $config) : ?>
             <?php
             $info = $open[$area];
-            $title = $type ? 'Тип «'.$type->name.'» разрешает: '.mb_strtolower($levelText($area, $info['type'])) : 'Без типа сделки';
+            $title = $type ? 'Тип «'.$type->name.'» разрешает: '.mb_strtolower($levelText($area, $info['type'])) : 'Без типа услуги';
             if ($info['deal'] !== null && $info['deal'] < $info['type']) {
-                $title .= '. В этой сделке сужено до: '.mb_strtolower($levelText($area, $info['deal']));
+                $title .= '. В этой услуге сужено до: '.mb_strtolower($levelText($area, $info['deal']));
             }
             $class = 'sx-deal-open__chip';
             if (!$info['open']) {
@@ -107,7 +107,7 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
             <tr>
                 <th>Человек</th>
                 <?php foreach ($areas as $area => $config) : ?>
-                    <th class="<?= $open[$area]['open'] ? '' : 'is-closed'; ?>" title="<?= $open[$area]['open'] ? '' : 'Закрыто в этой сделке'; ?>"><?= Html::encode($config['name']); ?></th>
+                    <th class="<?= $open[$area]['open'] ? '' : 'is-closed'; ?>" title="<?= $open[$area]['open'] ? '' : 'Закрыто в этой услуге'; ?>"><?= Html::encode($config['name']); ?></th>
                 <?php endforeach; ?>
                 <th>Каналы</th>
                 <?php if ($notify->cells) : ?><th>Уведомления</th><?php endif; ?>
@@ -135,13 +135,13 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
                         <?php endif; ?>
                         <div class="sx-deal-people__grants">
                             <?php if ($person['owner']) : ?>
-                                <div class="sx-deal-grant"><span class="sx-deal-grant__text">Полный доступ: сделка оформлена на этого человека</span></div>
+                                <div class="sx-deal-grant"><span class="sx-deal-grant__text">Полный доступ: услуга оформлена на этого человека</span></div>
                             <?php endif; ?>
                             <?php foreach ($person['grants'] as $grant) : ?>
                                 <?php
                                 $covered = ($person['owner'] || $fullByCompany) && ($grant->cms_deal_id || !$grant->is_full);
                                 $editUrl = $canEdit ? $windowUrl(['/cms/admin-cms-client-access/update', 'pk' => $grant->id, 'deal' => $model->id]) : '';
-                                $text = Html::tag('span', $grant->cms_deal_id ? 'в сделке' : 'в компании', ['class' => 'sx-deal-badge'.($grant->cms_deal_id ? ' sx-deal-badge--success' : '')])
+                                $text = Html::tag('span', $grant->cms_deal_id ? 'в услуге' : 'в компании', ['class' => 'sx-deal-badge'.($grant->cms_deal_id ? ' sx-deal-badge--success' : '')])
                                     .' '.Html::encode($grant->roleAsText);
                                 if ($covered) {
                                     $text .= ' — не действует, пока есть полный доступ';
@@ -151,7 +151,7 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
                                 }
                                 ?>
                                 <div class="sx-deal-grant<?= $covered ? ' sx-deal-grant--covered' : ''; ?><?= $editUrl ? ' sx-deal-grant--editable' : ''; ?>"
-                                    <?= $editUrl ? 'data-sx-window="'.Html::encode($editUrl).'" title="'.Html::encode(($grant->cms_deal_id ? 'Изменить доступ в этой сделке' : 'Изменить доступ во всех услугах компании').': '.$grant->levelsAsText).'"' : ''; ?>>
+                                    <?= $editUrl ? 'data-sx-window="'.Html::encode($editUrl).'" title="'.Html::encode(($grant->cms_deal_id ? 'Изменить доступ в этой услуге' : 'Изменить доступ во всех услугах компании').': '.$grant->levelsAsText).'"' : ''; ?>>
                                     <span class="sx-deal-grant__text"><?= $text; ?></span>
                                     <?php if ($canEdit) : ?>
                                         <?= CrmContactBlockWidget::menu('/cms/admin-cms-client-access', (int)$grant->id, 'Изменить доступ'); ?>
@@ -166,17 +166,17 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
                         $from = $cell['source'] ? $sourceText[$cell['source']] : '';
                         $cut = '';
                         if ($cell['limit']) {
-                            $where = $cell['limit'] === 'deal' ? 'в сделке' : 'типом сделки';
+                            $where = $cell['limit'] === 'deal' ? 'в услуге' : 'типом услуги';
                             $cut = $cell['level'] ? 'сужено '.$where : 'закрыто '.$where;
                         }
                         $tip = $config['name'].': '.mb_strtolower($cell['level'] ? $dealAccess->levelName($area, $cell['level']) : 'нет доступа').'.';
                         if ($cell['grant']) {
-                            $tip .= ' Право: '.$cell['grant']->roleAsText.' ('.($cell['grant']->cms_deal_id ? 'выдано в этой сделке' : 'роль во всех услугах компании').').';
+                            $tip .= ' Право: '.$cell['grant']->roleAsText.' ('.($cell['grant']->cms_deal_id ? 'выдано в этой услуге' : 'роль во всех услугах компании').').';
                         } elseif ($cell['source'] === 'owner') {
-                            $tip .= ' Сделка оформлена на этого человека.';
+                            $tip .= ' Услуга оформлена на этого человека.';
                         }
                         if ($cell['limit']) {
-                            $tip .= ' По праву — '.mb_strtolower($dealAccess->levelName($area, $cell['granted'])).', но '.($cell['limit'] === 'deal' ? 'в этой сделке' : 'в типе сделки').' открыто: '.mb_strtolower($levelText($area, $cell['open'])).'.';
+                            $tip .= ' По праву — '.mb_strtolower($dealAccess->levelName($area, $cell['granted'])).', но '.($cell['limit'] === 'deal' ? 'в этой услуге' : 'в типе услуги').' открыто: '.mb_strtolower($levelText($area, $cell['open'])).'.';
                         }
                         ?>
                         <td>
@@ -195,7 +195,7 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
             <?php endforeach; ?>
             </tbody>
         </table>
-        <div class="sx-deal-people__legend">Наведите на клетку, чтобы увидеть, откуда право. Итог — право человека, но не больше того, что открыто в сделке.</div>
+        <div class="sx-deal-people__legend">Наведите на клетку, чтобы увидеть, откуда право. Итог — право человека, но не больше того, что открыто в услуге.</div>
         <?php if ($notify->handled) : ?>
             <?= $notify->footer; ?>
         <?php else : ?>
@@ -237,7 +237,7 @@ $levelText = static function (string $area, int $level) use ($dealAccess): strin
                         </div>
                     </div>
                     <?php if ($canEdit) : ?>
-                        <?= $button('Перенести в другую сделку', ['/cms/admin-cms-deal/move-resource', 'pk' => $model->id, 'type' => $resource->type, 'id' => $resource->id], 'forward'); ?>
+                        <?= $button('Перенести в другую услугу', ['/cms/admin-cms-deal/move-resource', 'pk' => $model->id, 'type' => $resource->type, 'id' => $resource->id], 'forward'); ?>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

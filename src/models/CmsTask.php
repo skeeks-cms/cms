@@ -584,11 +584,11 @@ class CmsTask extends ActiveRecord
 
             'cms_company_id' => 'Компания',
             'cms_user_id'    => 'Клиент',
-            'cms_deal_id'    => 'Сделка (услуга)',
-            'deal_resource_id' => 'Ресурс сделки',
+            'cms_deal_id'    => 'Услуга',
+            'deal_resource_id' => 'Ресурс услуги',
             'is_internal'    => 'Внутренняя: клиент не видит',
-            'dealResourceKey' => 'Ресурс сделки',
-            'cms_lead_id'    => 'Лид',
+            'dealResourceKey' => 'Ресурс услуги',
+            'cms_lead_id'    => 'Сделка',
             'parent_cms_task_id' => 'Связанная задача',
 
             'plan_start_at' => 'Планируемое начало',
@@ -898,7 +898,7 @@ class CmsTask extends ActiveRecord
 
         $deal = CmsDeal::findOne((int)$this->cms_deal_id);
         if (!$deal) {
-            $this->addError($attribute, 'Сделка не найдена.');
+            $this->addError($attribute, 'Услуга не найдена.');
             return;
         }
 
@@ -906,7 +906,7 @@ class CmsTask extends ActiveRecord
             if (!$this->cms_company_id) {
                 $this->cms_company_id = (int)$deal->cms_company_id;
             } elseif ((int)$this->cms_company_id !== (int)$deal->cms_company_id) {
-                $this->addError($attribute, 'Сделка относится к другой компании.');
+                $this->addError($attribute, 'Услуга относится к другой компании.');
                 return;
             }
         } elseif ($deal->cms_user_id && !$this->cms_company_id && !$this->cms_user_id && !$this->cms_project_id) {
@@ -919,7 +919,7 @@ class CmsTask extends ActiveRecord
         if ($linkChanged && ($this->deal_resource_type || $this->deal_resource_id)) {
             $resource = $this->getDealResource();
             if (!$resource || (int)$resource->dealId !== (int)$deal->id) {
-                $this->addError('deal_resource_id', 'Ресурс не относится к этой сделке.');
+                $this->addError('deal_resource_id', 'Ресурс не относится к этой услуге.');
             }
         }
     }

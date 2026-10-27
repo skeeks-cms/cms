@@ -181,7 +181,7 @@ class CmsTelephonyCall extends \skeeks\cms\models\Core
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_company_id' => 'Компания',
-            'cms_lead_id' => 'Лид',
+            'cms_lead_id' => 'Сделка',
 
             'cms_telephony_provider_id' => 'Провайдер телефонии',
 

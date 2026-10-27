@@ -291,7 +291,7 @@ CSS
             <?php BackendSurfaceWidget::begin($surfaceConfig(
                 $accessReady ? 'Люди клиента и доступы' : 'Контакты',
                 $accessReady
-                    ? 'Люди компании и что они видят в личном кабинете: полный доступ ко всем услугам или только выбранные услуги. Нажмите на человека, чтобы выдать роль в сделках.'
+                    ? 'Люди компании и что они видят в личном кабинете: полный доступ ко всем услугам или только выбранные услуги. Нажмите на человека, чтобы выдать роль в услугах.'
                     : 'Сотрудники или люди связанные с компанией. Они являются полноценными пользователями, которые могут авторизоваться на сайте и смотерть данные по этой компании в личном кабинете.'
             )); ?>
                     <?php // Person rows keep their avatar but share the contact row look of the card. ?>
@@ -485,7 +485,7 @@ JS
                         </div>
                         <div class="form-group sx-new-access-deals">
                             <?php if ($activeDeals) : ?>
-                                <label>Выдать роль в сделках<?= count($activeDeals) > 10 ? ' <span class="sx-deal-access__muted">('.count($activeDeals).')</span>' : ''; ?></label>
+                                <label>Выдать роль в услугах<?= count($activeDeals) > 10 ? ' <span class="sx-deal-access__muted">('.count($activeDeals).')</span>' : ''; ?></label>
                                 <div class="sx-new-access-deals__list">
                                     <?php foreach ($activeDeals as $deal) : ?>
                                         <div><label style="font-weight: 400;"><input type="checkbox" name="sx-access-deals[]" value="<?= (int)$deal->id; ?>"> <?= Html::encode($deal->name); ?></label></div>

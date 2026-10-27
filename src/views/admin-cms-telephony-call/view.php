@@ -123,7 +123,7 @@ if ($model->cms_record_file_id && $model->cmsRecordFile) {
             'options' => ['class' => 'sx-detail-view'],
             'attributes' => [
                 [
-                    'label' => 'Лид',
+                    'label' => 'Сделка',
                     'format' => 'raw',
                     'value' => $entityLink($model->lead, '/cms/admin-cms-lead'),
                 ],

@@ -147,7 +147,7 @@ HTML
                                 'class'    => SelectField::class,
                                 'label'    => "Готовый фильтр",
                                 'items'    => [
-                                    'overdue_deals'  => 'Есть просроченные сделки',
+                                    'overdue_deals'  => 'Есть просроченные услуги',
                                     'has_tasks'      => 'Есть дела и задачи',
                                     'has_tasks_for_me'      => 'Есть дела и задачи для меня',
                                     'not_paid_bills' => 'Есть неоплаченные счета',
@@ -439,7 +439,7 @@ HTML
 
                         'countDeals' => [
                             'format'               => 'raw',
-                            'label'                => 'Просроченные сделки',
+                            'label'                => 'Просроченные услуги',
                             'attribute'            => 'countDeals',
                             'value'                => function (CmsCompany $CmsTask) {
                                 if ($CmsTask->raw_row['countDeals']) {
@@ -659,7 +659,7 @@ HTML
             'deals' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'priority' => 300,
-                'name'     => 'Сделки',
+                'name'     => 'Услуги',
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
                 },
@@ -824,7 +824,7 @@ HTML
             'leads' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'priority' => 575,
-                'name'     => 'Лиды',
+                'name'     => 'Сделки',
                 'icon'     => 'fas fa-user-plus',
                 'controllerRoute' => '/cms/admin-cms-lead',
                 'relation'        => ['cms_company_id' => 'id'],
@@ -838,8 +838,8 @@ HTML
                     $action = $event->sender;
                     $action->relatedIndexAction->backendShowings = false;
                     $action->relatedIndexAction->grid['emptyState'] = [
-                        'title' => 'У компании пока нет лидов',
-                        'description' => 'Связанные с компанией лиды появятся здесь.',
+                        'title' => 'У компании пока нет сделок',
+                        'description' => 'Связанные с компанией сделки появятся здесь.',
                         'icon' => 'fas fa-user-plus',
                     ];
                 },
@@ -1444,7 +1444,7 @@ HTML
                         ->all();
                     //Every chosen service, or nothing: a person must not be added with less access than asked.
                     if (count($deals) !== count(array_unique($dealIds))) {
-                        throw new Exception("Часть выбранных услуг больше недоступна (сделка закрыта для вас или перенесена другому клиенту). Откройте окно заново и выберите услуги ещё раз.");
+                        throw new Exception("Часть выбранных услуг больше недоступна (услуга закрыта для вас или перенесена другому клиенту). Откройте окно заново и выберите услуги ещё раз.");
                     }
                     foreach ($deals as $deal) {
                         $grant = new \skeeks\cms\models\CmsClientAccess([
@@ -1453,7 +1453,7 @@ HTML
                             'cms_deal_role_id' => $roleId ?: null,
                         ]);
                         if (!$grant->save()) {
-                            throw new Exception("Не удалось выдать доступ в сделке «{$deal->name}»: ".implode('; ', $grant->getFirstErrors()));
+                            throw new Exception("Не удалось выдать доступ в услуге «{$deal->name}»: ".implode('; ', $grant->getFirstErrors()));
                         }
                     }
                 }

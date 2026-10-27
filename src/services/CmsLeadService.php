@@ -44,7 +44,7 @@ class CmsLeadService
         $transaction = $this->beginTransactionIfNeeded();
         try {
             if (!$lead->save()) {
-                throw new InvalidArgumentException('Не удалось создать лид: '.implode('; ', $lead->getFirstErrors()));
+                throw new InvalidArgumentException('Не удалось создать сделку: '.implode('; ', $lead->getFirstErrors()));
             }
             $this->saveContacts($lead, CmsLeadPhone::class, $phones);
             $this->saveContacts($lead, CmsLeadEmail::class, $emails);
@@ -133,7 +133,7 @@ class CmsLeadService
             $model->name = $contact['name'];
             $model->sort = $contact['sort'];
             if (!$model->save()) {
-                throw new InvalidArgumentException('Не удалось сохранить контакт лида: '.implode('; ', $model->getFirstErrors()));
+                throw new InvalidArgumentException('Не удалось сохранить контакт сделки: '.implode('; ', $model->getFirstErrors()));
             }
         }
     }

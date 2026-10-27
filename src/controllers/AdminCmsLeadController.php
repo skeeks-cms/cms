@@ -51,7 +51,7 @@ class AdminCmsLeadController extends BackendModelStandartController
 
     public function init()
     {
-        $this->name = 'Лиды';
+        $this->name = 'Сделки';
         $this->modelShowAttribute = 'name';
         $this->modelClassName = CmsLead::class;
         $this->modelDefaultAction = 'view';
@@ -76,10 +76,10 @@ class AdminCmsLeadController extends BackendModelStandartController
                 // v2: the "next step" column and filter are part of the defaults.
                 'configKey' => 'cms/leads-v2',
                 'emptyState' => [
-                    'title' => 'Лидов пока нет',
-                    'description' => 'Лиды появятся из форм, партнёрской программы, телефонии или после ручного добавления.',
+                    'title' => 'Сделок пока нет',
+                    'description' => 'Сделки появятся из форм, партнёрской программы, телефонии или после ручного добавления.',
                     'icon' => 'fas fa-user-plus',
-                    'action' => ['backendAction' => 'create', 'label' => 'Добавить лид'],
+                    'action' => ['backendAction' => 'create', 'label' => 'Добавить сделку'],
                 ],
                 'filters' => [
                     'visibleFilters' => array_merge(['q', 'status', 'cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], $utmAttributes),
@@ -179,7 +179,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'callback' => [$this, 'kanbanMove'],
             ],
             'create' => [
-                'name' => 'Новый лид',
+                'name' => 'Новая сделка',
                 'priority' => 30,
                 'fields' => [$this, 'editFields'],
                 'on beforeValidate' => static function (Event $event) {
@@ -198,7 +198,7 @@ class AdminCmsLeadController extends BackendModelStandartController
             ],
             'view' => [
                 'class' => BackendModelAction::class,
-                'name' => 'Карточка лида',
+                'name' => 'Карточка сделки',
                 'icon' => 'fa fa-eye',
                 'priority' => 10,
                 'callback' => fn() => $this->render('view', ['model' => $this->model]),
@@ -283,7 +283,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                         'class' => NumberField::class,
                         'step' => 0.01,
                         'elementOptions' => ['min' => 0.01],
-                        'hint' => 'Разовая сумма, на которую договорились с клиентом. Статус лида и начисление партнёру не меняются.',
+                        'hint' => 'Разовая сумма, на которую договорились с клиентом. Статус сделки и начисление партнёру не меняются.',
                     ],
                 ],
                 'accessCallback' => fn() => $this->model
@@ -566,7 +566,7 @@ JS
     {
         $response = new RequestResponse();
         if (!$response->isRequestAjaxPost()) {
-            throw new BadRequestHttpException('Лид переносится только на канбане.');
+            throw new BadRequestHttpException('Сделка переносится только на канбане.');
         }
 
         try {
@@ -574,7 +574,7 @@ JS
                 ->andWhere([CmsLead::tableName().'.id' => (int)\Yii::$app->request->post('pk')])
                 ->one();
             if (!$lead) {
-                throw new \RuntimeException('Лид не найден или недоступен вам.');
+                throw new \RuntimeException('Сделка не найдена или недоступна вам.');
             }
 
             $column = (string)\Yii::$app->request->post('column');
@@ -659,7 +659,7 @@ JS
                     ->limit(1)
                     ->one();
                 if (!$this->_model) {
-                    throw new NotFoundHttpException('Лид не найден.');
+                    throw new NotFoundHttpException('Сделка не найдена.');
                 }
             }
         }
@@ -670,11 +670,11 @@ JS
     public function claim()
     {
         if (!\Yii::$app->request->isPost) {
-            throw new BadRequestHttpException('Лид можно взять в работу только кнопкой из карточки.');
+            throw new BadRequestHttpException('Сделку можно взять в работу только кнопкой из карточки.');
         }
         try {
             if (!$this->model->canBeClaimed) {
-                throw new ConflictHttpException('Лид уже закреплён. Обновите карточку.');
+                throw new ConflictHttpException('Сделка уже закреплена. Обновите карточку.');
             }
             $this->model->executor_id = (int)\Yii::$app->user->id;
             $this->model->status = CmsLead::STATUS_IN_WORK;
@@ -682,7 +682,7 @@ JS
                 throw new \RuntimeException(implode('; ', $this->model->getFirstErrors()));
             }
         } catch (StaleObjectException $e) {
-            throw new ConflictHttpException('Лид уже закреплён другим менеджером.', 0, $e);
+            throw new ConflictHttpException('Сделка уже закреплена другим менеджером.', 0, $e);
         }
         return $this->redirect(['view', 'pk' => $this->model->id]);
     }
@@ -690,20 +690,20 @@ JS
     public function reopen()
     {
         if (!\Yii::$app->request->isPost) {
-            throw new BadRequestHttpException('Вернуть лид в работу можно только кнопкой из карточки.');
+            throw new BadRequestHttpException('Вернуть сделку в работу можно только кнопкой из карточки.');
         }
         try {
             if (!$this->model->canBeReopenedBy((int)\Yii::$app->user->id)) {
-                throw new ConflictHttpException('Лид уже возвращён в работу или недоступен вам. Обновите карточку.');
+                throw new ConflictHttpException('Сделка уже возвращена в работу или недоступна вам. Обновите карточку.');
             }
             $this->model->status = CmsLead::STATUS_IN_WORK;
             $this->model->processed_at = null;
             if (!$this->model->save()) {
                 throw new \RuntimeException(implode('; ', $this->model->getFirstErrors()));
             }
-            \Yii::$app->session->setFlash('success', 'Лид возвращён в работу.');
+            \Yii::$app->session->setFlash('success', 'Сделка возвращена в работу.');
         } catch (StaleObjectException $e) {
-            throw new ConflictHttpException('Лид уже изменён в другой вкладке. Обновите карточку.', 0, $e);
+            throw new ConflictHttpException('Сделка уже изменена в другой вкладке. Обновите карточку.', 0, $e);
         }
 
         return $this->redirect(['view', 'pk' => $this->model->id]);
@@ -741,7 +741,7 @@ JS
     public function matches()
     {
         if (!\Yii::$app->request->isAjax) {
-            throw new BadRequestHttpException('Совпадения загружаются из карточки лида.');
+            throw new BadRequestHttpException('Совпадения загружаются из карточки сделки.');
         }
         if ($this->model->cms_company_id && $this->model->cms_user_id) {
             return '';
@@ -764,12 +764,12 @@ JS
         $response = new RequestResponse();
         try {
             if (!$response->isRequestAjaxPost()) {
-                throw new \DomainException('SMS отправляется только из карточки лида.');
+                throw new \DomainException('SMS отправляется только из карточки сделки.');
             }
             $phone = trim((string)\Yii::$app->request->post('phone'));
             $message = trim((string)\Yii::$app->request->post('message'));
             if ($phone === '' || !$this->model->getPhones()->andWhere(['value' => $phone])->exists()) {
-                throw new \DomainException('Телефон не принадлежит этому лиду.');
+                throw new \DomainException('Телефон не принадлежит этой сделке.');
             }
             if ($message === '') {
                 throw new \DomainException('Не указано сообщение.');
@@ -793,7 +793,7 @@ JS
     public function linkIdentity()
     {
         if (!\Yii::$app->request->isPost) {
-            throw new BadRequestHttpException('Привязка выполняется только явным действием из карточки лида.');
+            throw new BadRequestHttpException('Привязка выполняется только явным действием из карточки сделки.');
         }
 
         try {
@@ -803,10 +803,10 @@ JS
                 (int)\Yii::$app->request->post('client_id')
             );
             \Yii::$app->session->setFlash('success', $changed
-                ? 'Существующие записи CRM привязаны к лиду.'
-                : 'Эти записи уже привязаны к лиду.');
+                ? 'Существующие записи CRM привязаны к сделке.'
+                : 'Эти записи уже привязаны к сделке.');
         } catch (StaleObjectException $e) {
-            \Yii::$app->session->setFlash('error', 'Лид изменился в другой вкладке. Обновите карточку.');
+            \Yii::$app->session->setFlash('error', 'Сделка изменилась в другой вкладке. Обновите карточку.');
         } catch (\DomainException $e) {
             \Yii::$app->session->setFlash('error', $e->getMessage());
         }
@@ -838,7 +838,7 @@ JS
         return [
             'lead' => [
                 'class' => FieldSet::class,
-                'name' => 'Данные лида',
+                'name' => 'Данные сделки',
                 'fields' => $fields,
             ],
         ];
@@ -923,7 +923,7 @@ JS
         return [
             'work' => [
                 'class' => FieldSet::class,
-                'name' => 'Работа с лидом',
+                'name' => 'Работа со сделкой',
                 'fields' => $fields,
             ],
         ];
