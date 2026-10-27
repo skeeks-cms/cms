@@ -80,4 +80,29 @@ taskBulkEditExpect(
     'Task bulk editing must initialize company, client and project contexts, including a project company.'
 );
 
+// "Сделка как услуга": the deal of the tasks, as in the single task form.
+$bulkFields = substr($controller, strpos($controller, 'public function bulkEditFields'));
+taskBulkEditExpect(
+    strpos($form, 'public $cms_deal_id;') !== false
+        && strpos($form, "[['cms_deal_id'], 'validateDeal']") !== false
+        && strpos($form, 'CmsDeal::find()->forManager()') !== false,
+    'The bulk form must accept a deal visible to the employee.'
+);
+taskBulkEditExpect(
+    strpos($form, "'Сделка должна относиться к выбранной компании.'") !== false
+        && strpos($form, "'Сделка должна быть оформлена на выбранного клиента.'") !== false,
+    'The bulk deal must belong to the chosen company or client.'
+);
+taskBulkEditExpect(
+    strpos($bulkFields, "'cms_deal_id' => [") !== false
+        && strpos($bulkFields, "'task_relation_close' =>") < strpos($bulkFields, "'cms_deal_id' => [")
+        && strpos($bulkFields, "'cms_deal_id' => [") < strpos($bulkFields, "'executor_id' => ["),
+    'The deal field must follow the relation block, like the single task form.'
+);
+taskBulkEditExpect(
+    strpos($controller, '$form->cms_deal_id && $model->hasAttribute(\'cms_deal_id\')') !== false
+        && strpos($controller, '$model->cms_company_id = (int)$deal->cms_company_id;') !== false,
+    'An empty deal keeps each task deal; a chosen deal moves the task to the deal company.'
+);
+
 echo "CMS task bulk edit contract: OK\n";

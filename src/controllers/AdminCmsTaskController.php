@@ -648,6 +648,31 @@ JS
                         }
                     }
 
+                    //The chosen deal; the task follows its company (or the owner of a personal deal), as in the single form.
+                    if ($form->cms_deal_id && $model->hasAttribute('cms_deal_id')) {
+                        $deal = CmsDeal::findOne((int)$form->cms_deal_id);
+                        $model->cms_deal_id = (int)$deal->id;
+                        if ($deal->cms_company_id) {
+                            if ($model->cms_project_id && ($project = CmsProject::findOne((int)$model->cms_project_id)) && (int)$project->cms_company_id !== (int)$deal->cms_company_id) {
+                                $model->cms_project_id = null;
+                            }
+                            $model->cms_company_id = (int)$deal->cms_company_id;
+                            $model->cms_user_id = null;
+                        } else {
+                            $model->cms_company_id = null;
+                            $model->cms_project_id = null;
+                            $model->cms_user_id = (int)$deal->cms_user_id;
+                        }
+                        //A resource of another deal does not stay on the task.
+                        if ($model->deal_resource_id) {
+                            $resource = $model->getDealResource();
+                            if (!$resource || (int)$resource->dealId !== (int)$deal->id) {
+                                $model->deal_resource_type = null;
+                                $model->deal_resource_id = null;
+                            }
+                        }
+                    }
+
                     if (!$model->save()) {
                         throw new \RuntimeException(implode(' ', $model->getFirstErrors()));
                     }
@@ -818,6 +843,13 @@ $('body')
         }
     });
 
+//Another company or client: the chosen deal no longer fits.
+$('body')
+    .off('.sxTaskBulkDeal')
+    .on('select2:select.sxTaskBulkDeal select2:unselect.sxTaskBulkDeal', '#{$companyInputId}, #{$clientInputId}', function() {
+        $('#cmstaskbulkeditform-cms_deal_id').val('').trigger('change');
+    });
+
 $('body').off('beforeSubmit.sxTaskBulkEdit', 'form').on('beforeSubmit.sxTaskBulkEdit', 'form', function() {
     if ($(this).find('#{$executorInputId}, #{$planDurationInputId}, #{$factDurationInputId}').length) {
         normalizeTaskBulkRelation();
@@ -836,7 +868,7 @@ if ($('#{$companyInputId}').val()) {
 JS
         );
 
-        return [
+        $fields = [
             'bulk_edit_hint' => [
                 'class' => HtmlBlock::class,
                 'content' => '<div class="col-12 text-muted form-group">Заполняйте только те поля, которые нужно изменить у выбранных задач.</div>',
@@ -911,6 +943,35 @@ JS
                 'class' => HtmlBlock::class,
                 'content' => '</div>',
             ],
+            //"Сделка как услуга": the same deal select as in the single task form.
+            'cms_deal_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
+                'hint' => 'Сделки выбранной компании или клиента. Задачи перейдут к компании сделки.',
+                'widgetConfig' => [
+                    'id' => 'cmstask-bulk-deal-select',
+                    'modelClass' => CmsDeal::class,
+                    'searchQuery' => function ($word = '') {
+                        $query = CmsDeal::find()->forManager();
+                        $companyId = (int)\Yii::$app->request->get('cms_company_id');
+                        $userId = (int)\Yii::$app->request->get('cms_user_id');
+                        if ($companyId) {
+                            $query->andWhere([CmsDeal::tableName().'.cms_company_id' => $companyId]);
+                        } elseif ($userId) {
+                            $query->andWhere([CmsDeal::tableName().'.cms_user_id' => $userId, CmsDeal::tableName().'.cms_company_id' => null]);
+                        }
+                        if ($word) {
+                            $query->andWhere(['like', CmsDeal::tableName().'.name', $word]);
+                        }
+                        return $query->orderBy([CmsDeal::tableName().'.is_active' => SORT_DESC, CmsDeal::tableName().'.id' => SORT_DESC]);
+                    },
+                    'pluginOptions' => [
+                        'ajax' => [
+                            'data' => new JsExpression('function(params) { var t = $("#' . $relationRootId . ' .sx-task-bulk-relation-tabs .btn.active").data("relation-type"); return {q: params.term, cms_company_id: t === "company" ? $("#' . $companyInputId . '").val() : "", cms_user_id: t === "client" ? $("#' . $clientInputId . '").val() : ""}; }'),
+                        ],
+                    ],
+                ],
+            ],
             'executor_id' => [
                 'class' => WidgetField::class,
                 'widgetClass' => AjaxSelectModel::class,
@@ -950,6 +1011,12 @@ JS
                 ],
             ],
         ];
+
+        if (!\skeeks\cms\models\queries\CmsTaskQuery::hasDealColumn()) {
+            unset($fields['cms_deal_id']);
+        }
+
+        return $fields;
     }
 
     public function actionReportExport($format = 'csv')
@@ -2606,9 +2673,9 @@ JS
             //Another company or client: the deal no longer fits; another deal: its resources are not listed yet.
             $this->view->registerJs(<<<JS
 $("body").on("select2:select select2:unselect", "#cmstask-cms_company_id, #cmstask-cms_user_id", function() {
-    $("#cmstask-deal-relation-select").val("").trigger("change");
+    $("#cmstask-cms_deal_id").val("").trigger("change");
 });
-$("body").on("change", "#cmstask-deal-relation-select", function() {
+$("body").on("change", "#cmstask-cms_deal_id", function() {
     $(".field-cmstask-dealresourcekey").slideUp().find("select").val("");
 });
 JS

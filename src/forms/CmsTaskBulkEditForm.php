@@ -8,6 +8,7 @@
 namespace skeeks\cms\forms;
 
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsProject;
 use skeeks\cms\models\CmsUser;
 use yii\base\Model;
@@ -25,6 +26,8 @@ class CmsTaskBulkEditForm extends Model
     public $cms_company_id;
     public $cms_user_id;
     public $cms_project_id;
+    /** @var int|null the deal (service) of the tasks; empty keeps each task's deal */
+    public $cms_deal_id;
 
     public function rules()
     {
@@ -37,18 +40,20 @@ class CmsTaskBulkEditForm extends Model
                     'cms_company_id',
                     'cms_user_id',
                     'cms_project_id',
+                    'cms_deal_id',
                 ],
                 'filter',
                 'filter' => function ($value) {
                     return $value === '' ? null : $value;
                 },
             ],
-            [['executor_id', 'cms_company_id', 'cms_user_id', 'cms_project_id'], 'integer', 'min' => 1],
+            [['executor_id', 'cms_company_id', 'cms_user_id', 'cms_project_id', 'cms_deal_id'], 'integer', 'min' => 1],
             [['plan_duration', 'fact_duration'], 'integer', 'min' => 0],
             [['executor_id'], 'validateExecutor'],
             [['cms_company_id'], 'validateCompany'],
             [['cms_user_id'], 'validateClient'],
             [['cms_project_id'], 'validateProject'],
+            [['cms_deal_id'], 'validateDeal'],
             [['cms_company_id'], 'validateRelation', 'skipOnEmpty' => false],
             [['executor_id'], 'validateChanges', 'skipOnEmpty' => false],
         ];
@@ -63,7 +68,41 @@ class CmsTaskBulkEditForm extends Model
             'cms_company_id' => 'Компания',
             'cms_user_id' => 'Клиент',
             'cms_project_id' => 'Проект',
+            'cms_deal_id' => 'Сделка (услуга)',
         ];
+    }
+
+    /**
+     * The deal must be visible to the employee and belong to the chosen company,
+     * client or project company. Tasks then follow the deal's company (see the
+     * controller), as the single task form does.
+     */
+    public function validateDeal($attribute)
+    {
+        if (!$this->hasValue($this->{$attribute}) || $this->hasErrors($attribute)) {
+            return;
+        }
+
+        $deal = CmsDeal::find()->forManager()->andWhere([CmsDeal::tableName().'.id' => (int)$this->{$attribute}])->one();
+        if (!$deal) {
+            $this->addError($attribute, 'Сделка недоступна.');
+            return;
+        }
+
+        if ($this->hasValue($this->cms_company_id)) {
+            if ((int)$deal->cms_company_id !== (int)$this->cms_company_id) {
+                $this->addError($attribute, 'Сделка должна относиться к выбранной компании.');
+            }
+        } elseif ($this->hasValue($this->cms_user_id)) {
+            if ($deal->cms_company_id || (int)$deal->cms_user_id !== (int)$this->cms_user_id) {
+                $this->addError($attribute, 'Сделка должна быть оформлена на выбранного клиента.');
+            }
+        } elseif ($this->hasValue($this->cms_project_id)) {
+            $project = CmsProject::findOne((int)$this->cms_project_id);
+            if ($project && $project->cms_company_id && (int)$project->cms_company_id !== (int)$deal->cms_company_id) {
+                $this->addError($attribute, 'Сделка должна относиться к компании проекта.');
+            }
+        }
     }
 
     public function hasRelationChange()
@@ -145,6 +184,7 @@ class CmsTaskBulkEditForm extends Model
             'cms_company_id',
             'cms_user_id',
             'cms_project_id',
+            'cms_deal_id',
         ] as $changeAttribute) {
             if ($this->hasValue($this->{$changeAttribute})) {
                 return;
