@@ -276,20 +276,66 @@ CSS
                 <?php BackendSurfaceWidget::end(); ?>
             <?php endif; ?>
 
+            <?php
+            //"Сделка как услуга": people of the client with their role in the company and grants in its deals.
+            $accessReady = \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady();
+            $canManageAccess = $accessReady && \Yii::$app->user->can("cms/admin-company/manage", ['model' => $model]);
+            $accessByUser = [];
+            if ($accessReady) {
+                \skeeks\cms\assets\admin\ClientAccessAsset::register($this);
+                foreach (\skeeks\cms\models\CmsClientAccess::find()->with('cmsDealRole')->andWhere(['cms_company_id' => (int)$model->id])->all() as $grant) {
+                    $accessByUser[(int)$grant->cms_user_id][] = $grant;
+                }
+            }
+            ?>
             <?php BackendSurfaceWidget::begin($surfaceConfig(
-                'Контакты',
-                'Сотрудники или люди связанные с компанией. Они являются полноценными пользователями, которые могут авторизоваться на сайте и смотерть данные по этой компании в личном кабинете.'
+                $accessReady ? 'Люди клиента и доступы' : 'Контакты',
+                $accessReady
+                    ? 'Люди компании и что они видят в личном кабинете: полный доступ ко всем услугам или только выбранные услуги. Нажмите на человека, чтобы выдать роль в сделках.'
+                    : 'Сотрудники или люди связанные с компанией. Они являются полноценными пользователями, которые могут авторизоваться на сайте и смотерть данные по этой компании в личном кабинете.'
             )); ?>
                     <?php // Person rows keep their avatar but share the contact row look of the card. ?>
                     <div class="sx-contact-list">
                         <?php foreach ($model->getCmsCompany2users()->orderBy(['sort' => SORT_ASC])->all() as $cmsCompany2users) : ?>
-                            <div class="sx-contact-row">
+                            <?php
+                            $access = '';
+                            $personUrl = '';
+                            if ($accessReady) {
+                                $grants = $accessByUser[(int)$cmsCompany2users->cms_user_id] ?? [];
+                                $companyGrant = null;
+                                $dealCount = 0;
+                                foreach ($grants as $grant) {
+                                    if ($grant->cms_deal_id) {
+                                        $dealCount++;
+                                    } else {
+                                        $companyGrant = $grant;
+                                    }
+                                }
+                                if ($companyGrant && $companyGrant->is_full) {
+                                    $badges = [Html::tag('span', 'Полный доступ ко всем услугам', ['class' => 'sx-deal-badge sx-deal-badge--accent'])];
+                                } else {
+                                    $badges = [];
+                                    if ($companyGrant) {
+                                        $badges[] = Html::tag('span', 'Во всех услугах: '.Html::encode($companyGrant->cmsDealRole ? $companyGrant->cmsDealRole->name : 'настроено вручную'), ['class' => 'sx-deal-badge sx-deal-badge--accent']);
+                                    }
+                                    $badges[] = Html::tag('span', $dealCount ? 'Выбранные услуги: '.$dealCount : ($companyGrant ? '' : 'Нет доступа к услугам'), ['class' => 'sx-deal-badge']);
+                                }
+                                $access = Html::tag('span', implode('', array_filter($badges, static function ($badge) {
+                                    return strip_tags($badge) !== '';
+                                })), ['class' => 'sx-company-person__access']);
+                                if ($canManageAccess) {
+                                    $personUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-company/client-person', 'pk' => $model->id, 'user' => $cmsCompany2users->cms_user_id])
+                                        ->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
+                                }
+                            }
+                            ?>
+                            <div class="sx-contact-row<?= $personUrl ? ' sx-company-person' : ''; ?>"<?= $personUrl ? ' data-sx-person="'.Html::encode($personUrl).'" title="Доступ к услугам компании"' : ''; ?>>
                                 <div class="sx-contact-body">
                                     <?= \skeeks\cms\widgets\admin\CmsUserViewWidget::widget([
                                         'cmsUser' => $cmsCompany2users->cmsUser,
-                                        'append'  => $cmsCompany2users->comment
+                                        'append'  => ($cmsCompany2users->comment
                                             ? Html::tag('span', Html::encode($cmsCompany2users->comment), ['class' => 'sx-contact-note'])
-                                            : '',
+                                            : '').$access,
                                     ]); ?>
                                 </div>
                                 <div class="sx-contact-actions">
@@ -299,6 +345,20 @@ CSS
                         <?php endforeach; ?>
                         <?php if (!$model->cmsCompany2users) : ?><div class="sx-contact-empty">Контактов пока нет</div><?php endif; ?>
                     </div>
+                    <?php if ($accessReady) : ?>
+                        <?php
+                        //A click on a person opens the window of their access; the "⋮" menu and links keep their own behavior.
+                        $this->registerJs(<<<JS
+$(document).off('click.sxCompanyPerson').on('click.sxCompanyPerson', '[data-sx-person]', function (e) {
+    if ($(e.target).closest('a, button, .sx-icon-action, [data-sx-ajax-actions], .dropdown-menu').length) {
+        return;
+    }
+    new sx.classes.backend.widgets.Action({isOpenNewWindow: true, url: $(this).data('sx-person')}).go();
+});
+JS
+                        );
+                        ?>
+                    <?php endif; ?>
 
                     <?php
                     $userClass = \Yii::$app->user->identityClass;
@@ -369,10 +429,10 @@ JS
                     );
 
                     $widget = \yii\bootstrap\Modal::begin([
-                        'header'       => "Добавление контакта",
+                        'header'       => $accessReady ? "Добавление человека" : "Добавление контакта",
                         'size'         => \yii\bootstrap\Modal::SIZE_DEFAULT,
                         'toggleButton' => [
-                            'label' => CrmContactBlockWidget::icon('plus').' Добавить контакт',
+                            'label' => CrmContactBlockWidget::icon('plus').($accessReady ? ' Добавить человека' : ' Добавить контакт'),
                             'class' => 'sx-button sx-button--secondary sx-button--sm sx-contact-add',
                         ],
                     ]); ?>
@@ -398,6 +458,46 @@ JS
 JS
                         ),
                     ]); ?>
+                    <?php if ($accessReady) : ?>
+                        <?php
+                        //Access of the new person: chosen before the person, because choosing a found person submits the form.
+                        $activeDeals = \skeeks\cms\models\CmsDeal::find()->forManager()
+                            ->andWhere([\skeeks\cms\models\CmsDeal::tableName().'.cms_company_id' => (int)$model->id, \skeeks\cms\models\CmsDeal::tableName().'.is_active' => 1])
+                            ->orderBy([\skeeks\cms\models\CmsDeal::tableName().'.id' => SORT_DESC])->all();
+                        $roles = \skeeks\cms\models\CmsDealRole::find()->andWhere(['is_active' => 1])->orderBy(['priority' => SORT_ASC])->all();
+                        $marketer = null;
+                        foreach ($roles as $role) {
+                            if ($role->code === \skeeks\cms\models\CmsDealRole::CODE_MARKETER) {
+                                $marketer = $role->id;
+                            }
+                        }
+                        $this->registerJs(<<<JS
+$('#sx-add-child-contact').on('change', '[name="sx-access"]', function () {
+    $('#sx-add-child-contact .sx-new-access-deals').toggle(this.value !== 'full');
+});
+JS
+                        );
+                        ?>
+                        <div class="form-group">
+                            <label>Доступ к услугам компании</label>
+                            <div><label style="font-weight: 400;"><input type="radio" name="sx-access" value="selected" checked> Только выбранные услуги</label></div>
+                            <div><label style="font-weight: 400;"><input type="radio" name="sx-access" value="full"> Полный доступ ко всем услугам, включая будущие</label></div>
+                        </div>
+                        <div class="form-group sx-new-access-deals">
+                            <?php if ($activeDeals) : ?>
+                                <label>Выдать роль в сделках<?= count($activeDeals) > 10 ? ' <span class="sx-deal-access__muted">('.count($activeDeals).')</span>' : ''; ?></label>
+                                <div class="sx-new-access-deals__list">
+                                    <?php foreach ($activeDeals as $deal) : ?>
+                                        <div><label style="font-weight: 400;"><input type="checkbox" name="sx-access-deals[]" value="<?= (int)$deal->id; ?>"> <?= Html::encode($deal->name); ?></label></div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?= Html::dropDownList('sx-access-role', $marketer, \yii\helpers\ArrayHelper::map($roles, 'id', 'name'), ['class' => 'form-control', 'style' => 'margin-top: 6px;']); ?>
+                                <div class="sx-deal-access__muted" style="margin-top: 4px;">Можно ничего не отмечать: человек будет в контактах без доступа к услугам.</div>
+                            <?php else : ?>
+                                <div class="sx-deal-access__muted">Активных сделок нет: человек будет в контактах без доступа к услугам.</div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="sx-new-contractor-fields">
                         <?php echo $form->field($newContact, 'phone'); ?>
                         <?php echo $form->field($newContact, 'email'); ?>

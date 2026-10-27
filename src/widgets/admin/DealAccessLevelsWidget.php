@@ -18,7 +18,9 @@ use yii\helpers\Json;
  * Areas come from DealAccess, so areas of packages appear by themselves.
  *
  * With $roleInputId the selects are filled from the chosen role; with
- * $fullInputId they are disabled while "Полный доступ" is on.
+ * $fullInputId they are disabled while "Полный доступ" is on (or, with
+ * $fullHides = false, shown only while that checkbox is on: "Настроить").
+ * $maxLevels limits the offered levels (a deal narrows what its type allows).
  */
 class DealAccessLevelsWidget extends Widget
 {
@@ -37,6 +39,15 @@ class DealAccessLevelsWidget extends Widget
     /** @var array|null area => level: what is open in the deal, shown as a hint */
     public $openLevels;
 
+    /** @var bool the levels hide while the checkbox $fullInputId is on; false — they show only while it is on */
+    public $fullHides = true;
+
+    /** @var array|null area => level: higher levels are not offered (a deal narrows what its type allows) */
+    public $maxLevels;
+
+    /** @var string|null label of level 0 */
+    public $noneLabel;
+
     public function run()
     {
         /** @var DealAccess $dealAccess */
@@ -45,8 +56,18 @@ class DealAccessLevelsWidget extends Widget
 
         $rows = '';
         foreach ($dealAccess->getAreaList() as $area => $config) {
-            $items = [0 => 'Нет'] + $config['levels'];
+            $levels = $config['levels'];
+            if ($this->maxLevels !== null) {
+                $max = (int)($this->maxLevels[$area] ?? 0);
+                $levels = array_filter($levels, static function ($level) use ($max) {
+                    return $level <= $max;
+                }, ARRAY_FILTER_USE_KEY);
+            }
+            $items = [0 => $this->noneLabel ?: 'Нет'] + $levels;
             $hint = $config['hint'] ? Html::tag('div', Html::encode($config['hint']), ['class' => 'sx-deal-levels__hint']) : '';
+            if ($this->maxLevels !== null && !$levels) {
+                $hint .= Html::tag('div', 'Закрыто в типе сделки', ['class' => 'sx-deal-levels__hint']);
+            }
             if ($this->openLevels !== null && (int)($this->openLevels[$area] ?? 0) < max(array_keys($config['levels']))) {
                 $open = (int)($this->openLevels[$area] ?? 0);
                 $hint .= Html::tag('div', $open ? 'В сделке открыто: '.mb_strtolower($dealAccess->levelName($area, $open)) : 'В сделке закрыто', ['class' => 'sx-deal-levels__hint sx-deal-levels__hint--warning']);
@@ -82,6 +103,7 @@ CSS
             'id'     => $id,
             'role'   => $this->roleInputId,
             'full'   => $this->fullInputId,
+            'hides'  => (bool)$this->fullHides,
             'roles'  => (object)$roles,
         ]);
         $this->view->registerJs(<<<JS
@@ -91,7 +113,7 @@ CSS
     var full = c.full ? document.getElementById(c.full) : null;
     var role = c.role ? document.getElementById(c.role) : null;
     function syncFull() {
-        box.classList.toggle('sx-deal-levels--disabled', !!(full && full.checked));
+        box.classList.toggle('sx-deal-levels--disabled', !!(full && (c.hides ? full.checked : !full.checked)));
     }
     if (full) { full.addEventListener('change', syncFull); syncFull(); }
     if (role) {

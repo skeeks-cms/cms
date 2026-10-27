@@ -100,7 +100,7 @@ $("#cmsdealtype-is_periodic").on("change", function() {
 });
 JS
         );
-        return [
+        $fields = [
             'name',
 
             'is_periodic' => [
@@ -120,6 +120,29 @@ JS
                 'content' => '</div>'
             ],
         ];
+
+        //"Сделка как услуга": the areas a deal of this type may open to the client.
+        if (\Yii::$app->has('dealAccess') && \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady()) {
+            /** @var CmsDealType $model */
+            $model = $action->model;
+            $fields['clientAreasCustom'] = [
+                'class'       => BoolField::class,
+                'allowNull'   => false,
+                'formElement' => BoolField::ELEMENT_CHECKBOX,
+            ];
+            $fields[] = [
+                'class'   => HtmlBlock::class,
+                'content' => \skeeks\cms\widgets\admin\DealAccessLevelsWidget::widget([
+                    'name'        => \yii\helpers\Html::getInputName($model, 'clientAreaLevels'),
+                    'levels'      => $model->clientAreaLevels,
+                    'fullInputId' => \yii\helpers\Html::getInputId($model, 'clientAreasCustom'),
+                    'fullHides'   => false,
+                    'noneLabel'   => 'Закрыто',
+                ]),
+            ];
+        }
+
+        return $fields;
     }
 
 

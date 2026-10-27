@@ -59,6 +59,12 @@ class AdminCmsCompany2userController extends BackendModelStandartController
                 'fields' => [$this, 'updateFields'],
                 'size'           => BackendModelUpdateAction::SIZE_SMALL,
                 'buttons'        => ['save'],
+                //The company and the person of the link are not changed here (the check in getModel() is about them).
+                'on beforeValidate' => function (\yii\base\Event $event) {
+                    $model = $event->sender->model;
+                    $model->cms_company_id = $model->getOldAttribute('cms_company_id');
+                    $model->cms_user_id = $model->getOldAttribute('cms_user_id');
+                },
                 /*"accessCallback" => function ($model) {
                     if ($this->model) {
                         return \Yii::$app->user->can("cms/admin-user/update", ['model' => $this->model]);
@@ -74,10 +80,33 @@ class AdminCmsCompany2userController extends BackendModelStandartController
         return $actions;
     }
 
+    /**
+     * The link gives the person access to the company's services (is_root = full
+     * access): it is shown, changed and removed only by who manages the company.
+     */
+    public function getModel()
+    {
+        $model = parent::getModel();
+        if ($model && !$model->isNewRecord) {
+            $company = $model->cmsCompany;
+            $visible = $company && \skeeks\cms\models\CmsCompany::find()->forManager()
+                ->andWhere([\skeeks\cms\models\CmsCompany::tableName().'.id' => (int)$company->id])->exists();
+            if (!$visible || !\Yii::$app->user->can('cms/admin-company/manage', ['model' => $company])) {
+                throw new \yii\web\ForbiddenHttpException('Нет доступа к этой компании.');
+            }
+        }
+        return $model;
+    }
+
     public function updateFields($action)
     {
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
+        //The form names the person of the saved link, not one from the request.
+        if (!$model->isNewRecord) {
+            $model->cms_company_id = $model->getOldAttribute('cms_company_id');
+            $model->cms_user_id = $model->getOldAttribute('cms_user_id');
+        }
 
         $result = [
             [

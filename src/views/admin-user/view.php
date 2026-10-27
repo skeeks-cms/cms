@@ -241,6 +241,11 @@ CSS
                 ]); ?>
             <?php endif; ?>
 
+            <?php // "Сделка как услуга": how we can reach a client person; packages add their channels. ?>
+            <?php if (!$model->is_worker) : ?>
+                <?= \skeeks\cms\widgets\admin\ClientChannelsWidget::widget(['user' => $model]); ?>
+            <?php endif; ?>
+
 
             <?php BackendSurfaceWidget::begin($surfaceConfig(
                 'Общие данные',

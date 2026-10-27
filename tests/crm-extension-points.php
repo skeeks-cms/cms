@@ -336,4 +336,50 @@ Event::off(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\wid
 crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/view.php'), 'CrmCardBlocksWidget::actions(') !== false,
     'The next step of a lead offers the actions of packages.');
 
+// «Каналы связи» of a client person: core emails and phones, channels and notes of packages, order by priority.
+\Yii::$app->db->createCommand('CREATE TABLE IF NOT EXISTS cms_user (id INTEGER PRIMARY KEY, is_worker INTEGER DEFAULT 0)')->execute();
+$channelPerson = new \skeeks\cms\models\CmsUser();
+$channelPerson->id = 9001;
+$channelPerson->populateRelation('cmsUserEmails', [new class(['value' => 'Ivan@Site.ru', 'is_approved' => 1]) extends \yii\base\Model {
+    public $value; public $is_approved;
+}]);
+$channelPerson->populateRelation('cmsUserPhones', [new class(['value' => '+7 (999) 111-22-33', 'is_approved' => 0]) extends \yii\base\Model {
+    public $value; public $is_approved;
+}]);
+$channelsHandler = static function (\skeeks\cms\widgets\admin\ClientChannelsEvent $e) {
+    $e->channels['email:ivan@site.ru']['notes'][] = 'отписан от рекламы';
+    $e->channels['bot:max'] = ['kind' => 'messenger', 'icon' => 'chat', 'label' => 'MAX', 'state' => 'off', 'notes' => ['не привязан'], 'priority' => 300];
+    $e->channels['app'] = ['kind' => 'app', 'label' => 'Приложение', 'state' => 'ok', 'priority' => 150];
+    $e->channels['broken'] = ['kind' => 'x'];
+};
+Event::on(\skeeks\cms\widgets\admin\ClientChannelsWidget::class, \skeeks\cms\widgets\admin\ClientChannelsWidget::EVENT_CHANNELS, $channelsHandler);
+$channels = \skeeks\cms\widgets\admin\ClientChannelsWidget::channels($channelPerson);
+Event::off(\skeeks\cms\widgets\admin\ClientChannelsWidget::class, \skeeks\cms\widgets\admin\ClientChannelsWidget::EVENT_CHANNELS, $channelsHandler);
+crmExtensionExpect(array_keys($channels) === ['email:ivan@site.ru', 'app', 'phone:79991112233', 'bot:max'],
+    'Channels: core email and phone keys, package channels by priority, a channel without a label is dropped.');
+crmExtensionExpect($channels['email:ivan@site.ru']['notes'] === ['подтверждён', 'отписан от рекламы'], 'A package adds notes to a core email.');
+crmExtensionExpect($channels['phone:79991112233']['notes'] === ['не подтверждён'], 'The phone says it is not confirmed.');
+crmExtensionExpect(\skeeks\cms\widgets\admin\ClientChannelsWidget::describe($channels['email:ivan@site.ru']) === 'Email Ivan@Site.ru: подтверждён, отписан от рекламы',
+    'A channel is described in one line for tooltips.');
+
+// The place of client subscriptions in «Доступ и уведомления»: empty without handlers, filled by a package.
+\Yii::$app->db->createCommand('CREATE TABLE IF NOT EXISTS cms_deal (id INTEGER PRIMARY KEY, name TEXT)')->execute();
+$notifyDeal = new \skeeks\cms\models\CmsDeal();
+$notify = \skeeks\cms\widgets\admin\DealAccessNotifyEvent::collect($notifyDeal, [5 => []]);
+crmExtensionExpect(!$notify->handled && $notify->cells === [], 'Without a notification package the block shows only the note.');
+$notifyHandler = static function (\skeeks\cms\widgets\admin\DealAccessNotifyEvent $e) {
+    foreach (array_keys($e->people) as $userId) {
+        $e->cells[$userId] = 'счета, задачи';
+    }
+};
+Event::on(\skeeks\cms\widgets\admin\DealAccessNotifyEvent::class, \skeeks\cms\widgets\admin\DealAccessNotifyEvent::EVENT_NOTIFY, $notifyHandler);
+$notify = \skeeks\cms\widgets\admin\DealAccessNotifyEvent::collect($notifyDeal, [5 => []]);
+Event::off(\skeeks\cms\widgets\admin\DealAccessNotifyEvent::class, \skeeks\cms\widgets\admin\DealAccessNotifyEvent::EVENT_NOTIFY, $notifyHandler);
+crmExtensionExpect($notify->handled && $notify->cells === [5 => 'счета, задачи'], 'A notification package fills the column per person.');
+$dealView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-deal/_client-access.php');
+crmExtensionExpect(strpos($dealView, 'DealAccessNotifyEvent::collect(') !== false && strpos($dealView, "ClientChannelsWidget::widget(['user' => \$person['user'], 'compact' => true])") !== false,
+    'The deal card asks packages for subscriptions and shows channels of participants.');
+crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/views/admin-user/view.php'), 'ClientChannelsWidget::widget(') !== false,
+    'The client card shows «Каналы связи».');
+
 echo "CRM extension points: OK\n";

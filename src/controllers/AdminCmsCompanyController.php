@@ -609,6 +609,18 @@ HTML
                 },
             ],
 
+            //"Сделка как услуга": the access of one person of the company to its services (?user=<id>).
+            'client-person' => [
+                'class'     => BackendModelAction::class,
+                'name'      => 'Доступ человека',
+                'isVisible' => false,
+                'callback'  => [$this, 'clientPerson'],
+                "accessCallback" => function () {
+                    return \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady()
+                        && \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                },
+            ],
+
             'add-log' => [
                 'class'     => BackendModelAction::class,
                 'isVisible' => false,
@@ -1355,6 +1367,18 @@ HTML
     }
 
 
+    public function clientPerson()
+    {
+        $link = CmsCompany2user::find()->with('cmsUser')->andWhere([
+            'cms_company_id' => (int)$this->model->id,
+            'cms_user_id'    => (int)\Yii::$app->request->get('user'),
+        ])->one();
+        if (!$link || !$link->cmsUser) {
+            throw new \yii\web\NotFoundHttpException('Этого человека нет в компании.');
+        }
+        return $this->render('client-person', ['link' => $link]);
+    }
+
     public function addUser()
     {
         $rr = new RequestResponse();
@@ -1363,6 +1387,14 @@ HTML
             $userClass = \Yii::$app->user->identityClass;
 
             if ($rr->isRequestAjaxPost()) {
+
+                //"Сделка как услуга": a new person gets access explicitly — by default only to the chosen services.
+                $accessReady = \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady();
+                $isFull = $accessReady && \Yii::$app->request->post('sx-access') === 'full';
+                $dealIds = $accessReady && !$isFull ? array_map('intval', (array)\Yii::$app->request->post('sx-access-deals', [])) : [];
+                $roleId = (int)\Yii::$app->request->post('sx-access-role');
+
+                $transaction = CmsCompany2user::getDb()->beginTransaction();
 
                 $user = null;
                 if ($exist_contact = \Yii::$app->request->post('sx-user-id')) {
@@ -1381,6 +1413,9 @@ HTML
                     $map = new CmsCompany2user();
                     $map->cms_company_id = $this->model->id;
                     $map->cms_user_id = $user->id;
+                    if ($accessReady) {
+                        $map->is_root = (int)$isFull;
+                    }
                     if (!$map->save()) {
                         throw new Exception("Не удалось добавить контакт: ".print_r($map->errors, true));
                     }
@@ -1392,6 +1427,9 @@ HTML
                         $map = new CmsCompany2user();
                         $map->cms_company_id = $this->model->id;
                         $map->cms_user_id = $user->id;
+                        if ($accessReady) {
+                            $map->is_root = (int)$isFull;
+                        }
                         if (!$map->save()) {
                             throw new Exception("Не удалось привязать контакт: ".print_r($map->errors, true));
                         }
@@ -1400,10 +1438,34 @@ HTML
                     }
                 }
 
+                if ($dealIds) {
+                    $deals = CmsDeal::find()->forManager()
+                        ->andWhere([CmsDeal::tableName().'.cms_company_id' => (int)$this->model->id, CmsDeal::tableName().'.id' => $dealIds])
+                        ->all();
+                    //Every chosen service, or nothing: a person must not be added with less access than asked.
+                    if (count($deals) !== count(array_unique($dealIds))) {
+                        throw new Exception("Часть выбранных услуг больше недоступна (сделка закрыта для вас или перенесена другому клиенту). Откройте окно заново и выберите услуги ещё раз.");
+                    }
+                    foreach ($deals as $deal) {
+                        $grant = new \skeeks\cms\models\CmsClientAccess([
+                            'cms_user_id'      => (int)$user->id,
+                            'cms_deal_id'      => (int)$deal->id,
+                            'cms_deal_role_id' => $roleId ?: null,
+                        ]);
+                        if (!$grant->save()) {
+                            throw new Exception("Не удалось выдать доступ в сделке «{$deal->name}»: ".implode('; ', $grant->getFirstErrors()));
+                        }
+                    }
+                }
+
+                $transaction->commit();
                 $rr->success = true;
             }
 
         } catch (\Exception $e) {
+            if (isset($transaction) && $transaction->isActive) {
+                $transaction->rollBack();
+            }
             $rr->success = false;
             $rr->message = $e->getMessage();
         }

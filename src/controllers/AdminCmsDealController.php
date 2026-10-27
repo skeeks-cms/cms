@@ -124,6 +124,54 @@ class AdminCmsDealController extends BackendModelStandartController
                     $e->sender->relatedIndexAction->backendShowings = false;
                 },
             ],
+            //"Сделка как услуга": what the deal opens to the client (only narrows what its type allows).
+            'client-open' => [
+                'class'          => \skeeks\cms\backend\actions\BackendModelUpdateAction::class,
+                'name'           => 'Что открыто клиенту',
+                'isVisible'      => false,
+                'size'           => \skeeks\cms\backend\actions\BackendModelUpdateAction::SIZE_SMALL,
+                'buttons'        => ['save'],
+                'successMessage' => 'Сохранено',
+                'fields'         => [$this, 'clientOpenFields'],
+                'accessCallback' => function () {
+                    return $this->canManageDealAccess();
+                },
+                'on initFormModels' => function (Event $event) {
+                    $form = new \yii\base\DynamicModel(['levels' => []]);
+                    $form->addRule(['levels'], 'safe');
+                    $event->sender->formModels = ['open' => $form];
+                },
+                'on beforeSave' => function (Event $event) {
+                    $event->sender->isSaveFormModels = false;
+                    \Yii::$app->get('dealAccess')->saveDealOpenLevels($this->model, (array)$event->sender->formModels['open']->levels);
+                },
+            ],
+            //A resource of the deal moves to another deal of the same client; its history stays here.
+            'move-resource' => [
+                'class'          => \skeeks\cms\backend\actions\BackendModelUpdateAction::class,
+                'name'           => 'Перенести в другую сделку',
+                'isVisible'      => false,
+                'size'           => \skeeks\cms\backend\actions\BackendModelUpdateAction::SIZE_SMALL,
+                'buttons'        => ['save'],
+                'successMessage' => 'Ресурс перенесён',
+                'fields'         => [$this, 'moveResourceFields'],
+                'accessCallback' => function () {
+                    return $this->canManageDealAccess() && $this->movedResource();
+                },
+                'on initFormModels' => function (Event $event) {
+                    $targets = array_keys($this->moveTargets());
+                    $form = new \yii\base\DynamicModel(['to_deal_id' => null]);
+                    $form->setAttributeLabels(['to_deal_id' => 'В сделку']);
+                    $form->addRule(['to_deal_id'], 'required', ['message' => 'Выберите сделку']);
+                    $form->addRule(['to_deal_id'], 'in', ['range' => array_map('strval', $targets), 'message' => 'В эту сделку перенести нельзя']);
+                    $event->sender->formModels = ['move' => $form];
+                },
+                'on beforeSave' => function (Event $event) {
+                    $event->sender->isSaveFormModels = false;
+                    $resource = $this->movedResource();
+                    \Yii::$app->get('dealAccess')->moveResource($resource->type, (int)$resource->id, CmsDeal::findOne((int)$event->sender->formModels['move']->to_deal_id));
+                },
+            ],
             'log' => [
                 'class' => BackendModelLogAction::class,
             ],
@@ -537,6 +585,112 @@ class AdminCmsDealController extends BackendModelStandartController
     public function view()
     {
         return $this->render($this->action->id);
+    }
+
+    /**
+     * Access settings and the composition of the deal change only for a deal the
+     * employee sees, after the tables of "Сделка как услуга" exist.
+     */
+    public function canManageDealAccess(): bool
+    {
+        $model = $this->model;
+        return $model
+            && \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady()
+            && CmsDeal::find()->forManager()->andWhere([CmsDeal::tableName().'.id' => (int)$model->id])->exists();
+    }
+
+    /**
+     * The resource of this deal named by ?type=&id= (move-resource).
+     */
+    public function movedResource(): ?\skeeks\cms\deal\DealResource
+    {
+        $type = (string)\Yii::$app->request->get('type');
+        $id = (int)\Yii::$app->request->get('id');
+        if (!$this->model || $type === '' || !$id || !\Yii::$app->has('dealAccess')) {
+            return null;
+        }
+        $resource = \Yii::$app->get('dealAccess')->resource($type, $id);
+        return $resource && (int)$resource->dealId === (int)$this->model->id ? $resource : null;
+    }
+
+    /**
+     * Deals of the same client (company, or the person of a personal deal) a resource may move to.
+     *
+     * @return array deal id => label, active deals first
+     */
+    public function moveTargets(): array
+    {
+        $model = $this->model;
+        $query = CmsDeal::find()->forManager()->with('dealType')
+            ->andWhere(['!=', CmsDeal::tableName().'.id', (int)$model->id])
+            ->orderBy([CmsDeal::tableName().'.is_active' => SORT_DESC, CmsDeal::tableName().'.id' => SORT_DESC]);
+        if ($model->cms_company_id) {
+            $query->andWhere([CmsDeal::tableName().'.cms_company_id' => (int)$model->cms_company_id]);
+        } elseif ($model->cms_user_id) {
+            $query->andWhere([CmsDeal::tableName().'.cms_company_id' => null, CmsDeal::tableName().'.cms_user_id' => (int)$model->cms_user_id]);
+        } else {
+            return [];
+        }
+        $result = [];
+        foreach ($query->all() as $deal) {
+            $result[(int)$deal->id] = $deal->name.($deal->dealType ? ' — '.$deal->dealType->name : '').($deal->is_active ? '' : ' (не активна)');
+        }
+        return $result;
+    }
+
+    public function clientOpenFields($action)
+    {
+        /** @var \skeeks\cms\deal\DealAccess $dealAccess */
+        $dealAccess = \Yii::$app->get('dealAccess');
+        $info = $dealAccess->openInfo($this->model);
+        $type = $this->model->dealType;
+
+        return [
+            [
+                'class'   => HtmlBlock::class,
+                'content' => Html::tag('div', Html::tag('p',
+                    'Тип сделки «'.Html::encode($type ? $type->name : '—').'» задаёт, что можно открыть клиенту. Здесь это можно только сузить для этой сделки; итог для человека — его права, но не больше открытого.'
+                ), ['class' => 'col-12']),
+            ],
+            [
+                'class'   => HtmlBlock::class,
+                'content' => \skeeks\cms\widgets\admin\DealAccessLevelsWidget::widget([
+                    'name'      => Html::getInputName($action->formModels['open'], 'levels'),
+                    'levels'    => array_map(static function ($area) { return $area['open']; }, $info),
+                    'maxLevels' => array_map(static function ($area) { return $area['type']; }, $info),
+                    'noneLabel' => 'Закрыто',
+                ]),
+            ],
+        ];
+    }
+
+    public function moveResourceFields($action)
+    {
+        $resource = $this->movedResource();
+        $provider = \Yii::$app->get('dealAccess')->getProvider($resource->type);
+        $targets = $this->moveTargets();
+        $create = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+            '/cms/admin-cms-deal/create',
+            'CmsDeal' => array_filter(['cms_company_id' => $this->model->cms_company_id, 'cms_user_id' => $this->model->cms_company_id ? null : $this->model->cms_user_id]),
+        ])->enableEmptyLayout()->url;
+
+        return [
+            [
+                'class'   => HtmlBlock::class,
+                'content' => Html::tag('div',
+                    Html::tag('p', Html::encode(($provider ? $provider->label() : $resource->type).' «'.$resource->title.'»'), ['style' => 'font-weight: 600;'])
+                    .Html::tag('p', 'Задачи этого ресурса останутся в текущей сделке как её история. Права людей клиента и уведомления будут считаться по новой сделке.'),
+                    ['class' => 'col-12']
+                ),
+            ],
+            'move.to_deal_id' => [
+                'class' => SelectField::class,
+                'items' => $targets,
+                'hint'  => $targets
+                    ? 'Сделки этого же клиента. '.Html::a('Создать сделку', $create, ['target' => '_blank', 'data-pjax' => 0])
+                    : 'У клиента нет других сделок. '.Html::a('Создать сделку', $create, ['target' => '_blank', 'data-pjax' => 0]),
+            ],
+        ];
     }
 
     protected function registerClientSwitcher($model, $modelId)

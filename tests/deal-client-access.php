@@ -18,9 +18,16 @@ namespace {
     use skeeks\cms\models\CmsTask;
     use skeeks\cms\models\CmsUser;
 
-    $app = new \yii\console\Application(['id' => 'deal-access-test', 'basePath' => __DIR__, 'components' => [
+    // Feed entries are collected instead of written into cms_log.
+    class TestDealAccess extends DealAccess
+    {
+        public $log = [];
+        public function writeDealLog(\skeeks\cms\models\CmsDeal $deal, string $comment): void { $this->log[] = $comment; }
+    }
+
+    $app =new \yii\console\Application(['id' => 'deal-access-test', 'basePath' => __DIR__, 'components' => [
         'db'         => ['class' => \yii\db\Connection::class, 'dsn' => 'sqlite::memory:'],
-        'dealAccess' => ['class' => DealAccess::class, 'areas' => ['chat' => ['name' => 'Чат', 'levels' => [10 => 'Читать', 20 => 'Писать']]]],
+        'dealAccess' => ['class' => \TestDealAccess::class, 'areas' => ['chat' => ['name' => 'Чат', 'levels' => [10 => 'Читать', 20 => 'Писать']]]],
     ]]);
     $db = $app->db;
     foreach ([
@@ -35,7 +42,7 @@ namespace {
         'cms_client_access_area' => 'id INTEGER PRIMARY KEY, cms_client_access_id INTEGER, area TEXT, level INTEGER',
         'cms_deal_type_area'     => 'id INTEGER PRIMARY KEY, cms_deal_type_id INTEGER, area TEXT, level INTEGER',
         'cms_deal_area'          => 'id INTEGER PRIMARY KEY, cms_deal_id INTEGER, area TEXT, level INTEGER',
-        'cms_project2user'       => 'id INTEGER PRIMARY KEY, cms_project_id INTEGER, cms_user_id INTEGER',
+        'cms_project2user'       =>'id INTEGER PRIMARY KEY, cms_project_id INTEGER, cms_user_id INTEGER',
         'cms_task'               => 'id INTEGER PRIMARY KEY, name TEXT, created_by INTEGER, cms_project_id INTEGER, cms_company_id INTEGER, cms_user_id INTEGER, cms_deal_id INTEGER, is_internal INTEGER DEFAULT 0',
     ] as $table => $columns) {
         $db->createCommand("CREATE TABLE $table ($columns)")->execute();
@@ -157,5 +164,55 @@ namespace {
     $check('project participant: only tasks without a deal', $tasks(7), [7]);
     $check('stranger tasks', $tasks(6), []);
 
-    echo "OK: levels as grant ∩ deal/type openness, company-wide and deal grants, owner of a personal deal, contacts without grants, package areas, lists without duplicates, recipients, client task visibility (internal and company-only tasks hidden, comment level)\n";
+    // explain(): the card's answer agrees with the SQL levels for every person and deal, and names the origin.
+    $deal = function ($id) { return \skeeks\cms\models\CmsDeal::find()->andWhere(['cms_deal.id' => $id])->one(); };
+    $agree = function ($label) use ($da, $deal, $check) {
+        foreach ([10, 11, 20, 30] as $dealId) {
+            foreach ($da->explain($deal($dealId)) as $userId => $person) {
+                $check("$label explain = levels, user $userId deal $dealId", array_map(function ($a) { return $a['level']; }, $person['areas']), $da->levels($userId, $dealId));
+            }
+        }
+    };
+    $agree('base');
+    $people = $da->explain($deal(10));
+    $check('explain people of deal 10', array_keys($people), [1, 3, 2]);
+    $check('director source', $people[1]['areas']['tasks']['source'], 'company');
+    $check('marketer source', $people[2]['areas']['tasks']['source'], 'deal');
+    $check('director manage cut by type', [$people[1]['areas']['manage']['level'], $people[1]['areas']['manage']['limit']], [0, 'type']);
+    $people11 = $da->explain($deal(11));
+    $check('marketer tasks cut by deal', [$people11[2]['areas']['tasks']['level'], $people11[2]['areas']['tasks']['limit']], [10, 'deal']);
+    // A deal grant of a person with company-wide full access is covered: the origin is the company role.
+    $db->createCommand()->insert('cms_client_access', ['id' => 50, 'cms_user_id' => 1, 'cms_company_id' => 100, 'cms_deal_id' => 10, 'scope_key' => 'd:10', 'is_full' => 0])->execute();
+    $db->createCommand()->insert('cms_client_access_area', ['cms_client_access_id' => 50, 'area' => 'tasks', 'level' => 30])->execute();
+    $check('covered deal grant', $da->explain($deal(10))[1]['areas']['tasks']['source'], 'company');
+    $agree('covered deal grant');
+    $db->createCommand()->delete('cms_client_access', ['id' => 50])->execute();
+    $db->createCommand()->delete('cms_client_access_area', ['cms_client_access_id' => 50])->execute();
+    $owner = $da->explain($deal(30));
+    $check('owner of personal deal', [$owner[4]['owner'], $owner[4]['areas']['billing']['source']], [true, 'owner']);
+
+    // openInfo(): type ceiling, deal narrowing, package area closed without type settings.
+    $info = $da->openInfo($deal(11));
+    $check('open 11 tasks', [$info['tasks']['type'], $info['tasks']['deal'], $info['tasks']['open'], $info['tasks']['limit']], [30, 10, 10, 'deal']);
+    $check('open 11 chat', [$info['chat']['open'], $info['chat']['limit'], $info['chat']['typeSet']], [0, 'type', false]);
+    $check('open 10 manage', [$da->openInfo($deal(10))['manage']['open'], $da->openInfo($deal(10))['manage']['typeSet']], [0, true]);
+
+    // Saving: a deal only narrows (a level above the type is not stored), a type may close everything.
+    $da->saveDealOpenLevels($deal(10), ['tasks' => 20, 'reports' => 10, 'manage' => 20]);
+    $check('deal 10 rows', $db->createCommand('SELECT area, level FROM cms_deal_area WHERE cms_deal_id = 10')->queryAll(), [['area' => 'tasks', 'level' => '20']]);
+    $check('deal 10 log', array_pop($da->log), 'Изменено, что открыто клиенту: Задачи: комментировать.');
+    $agree('after deal narrowing');
+    $da->saveDealOpenLevels($deal(10), []);
+    $check('deal 10 back to type', (int)$db->createCommand('SELECT COUNT(*) FROM cms_deal_area WHERE cms_deal_id = 10')->queryScalar(), 0);
+    $da->saveTypeOpenLevels(2, []);
+    $check('type 2 closes everything', array_values(array_map(function ($a) { return $a['open']; }, $da->openInfo($deal(11)))), [0, 0, 0, 0, 0, 0]);
+    $agree('closed type');
+    $da->saveTypeOpenLevels(2, ['manage' => 15, 'chat' => 20]);
+    $check('type 2 levels capped', $da->typeOpenLevels(2), ['tasks' => 0, 'reports' => 0, 'documents' => 0, 'billing' => 0, 'manage' => 10, 'chat' => 20]);
+    $agree('package area opened by type');
+    $da->saveTypeOpenLevels(2, null);
+    $check('type 2 without settings', $da->typeOpenLevels(2), null);
+    $agree('restored');
+
+    echo "OK: levels as grant ∩ deal/type openness, company-wide and deal grants, owner of a personal deal, contacts without grants, package areas, lists without duplicates, recipients, client task visibility (internal and company-only tasks hidden, comment level), explain() = levels() with origins, openInfo, saving type and deal openness\n";
 }

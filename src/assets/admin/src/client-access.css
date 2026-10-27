@@ -1,0 +1,418 @@
+/*
+ * "Сделка как услуга" in CRM cards (ClientAccessAsset): what a deal opens to
+ * the client, client people with their effective rights and where they come
+ * from, the deal composition, resources, the people of a company and the
+ * channels of a client person. Colors come from the semantic --sx-color-*
+ * tokens, so light and dark themes need nothing here.
+ */
+
+/* Header of a deal card section with its actions on the right. */
+.sx-deal-access__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    margin-bottom: 12px;
+}
+
+.sx-deal-access__head .sx-deal-section-title {
+    margin: 0;
+}
+
+.sx-deal-access__subtitle {
+    margin: 18px 0 8px;
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sx-deal-access__subtitle:first-of-type {
+    margin-top: 0;
+}
+
+.sx-deal-access__muted {
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+/* What is open: one chip per access area. */
+.sx-deal-open {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.sx-deal-open__chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 3px 10px;
+    border: 1px solid var(--sx-color-border);
+    border-radius: 999px;
+    background: var(--sx-color-surface);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.sx-deal-open__chip b {
+    font-weight: 600;
+}
+
+.sx-deal-open__chip--closed {
+    border-style: dashed;
+    color: var(--sx-color-text-subtle);
+    background: transparent;
+}
+
+.sx-deal-open__chip--narrowed {
+    border-color: var(--sx-color-warning);
+}
+
+/* People of the deal: a matrix person × area. */
+.sx-deal-people {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+}
+
+.sx-deal-people th {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--sx-color-border);
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    vertical-align: bottom;
+}
+
+.sx-deal-people th.is-closed {
+    color: var(--sx-color-text-subtle);
+    font-weight: 400;
+}
+
+.sx-deal-people td {
+    padding: 8px;
+    border-bottom: 1px solid var(--sx-color-border);
+    vertical-align: top;
+}
+
+.sx-deal-people tr:last-child td {
+    border-bottom: 0;
+}
+
+.sx-deal-people__person {
+    min-width: 180px;
+}
+
+.sx-deal-people__grants {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+}
+
+.sx-deal-grant {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    margin: 0 -6px;
+    padding: 2px 6px;
+    border-radius: var(--sx-radius-control);
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+}
+
+.sx-deal-grant--editable {
+    cursor: pointer;
+}
+
+.sx-deal-grant--editable:hover {
+    background: var(--sx-color-surface-hover, var(--sx-color-surface-muted));
+}
+
+.sx-deal-grant__text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.sx-deal-grant--covered .sx-deal-grant__text {
+    opacity: 0.6;
+}
+
+.sx-deal-grant .sx-icon-action {
+    display: inline-flex;
+    color: var(--sx-color-text-muted);
+    cursor: pointer;
+}
+
+.sx-deal-badge {
+    display: inline-block;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
+    font-size: 11px;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+.sx-deal-badge--accent {
+    background: var(--sx-color-accent-soft);
+    color: var(--sx-color-text);
+}
+
+.sx-deal-badge--success {
+    background: var(--sx-color-success-soft);
+    color: var(--sx-color-success-on-soft, var(--sx-color-text));
+}
+
+.sx-deal-badge--warning {
+    background: var(--sx-color-warning-soft);
+    color: var(--sx-color-warning-on-soft, var(--sx-color-text));
+}
+
+/* A cell: the level, under it where it comes from. */
+.sx-deal-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    cursor: help;
+}
+
+.sx-deal-cell__level {
+    color: var(--sx-color-text);
+    font-weight: 500;
+}
+
+.sx-deal-cell__from {
+    color: var(--sx-color-text-muted);
+    font-size: 11px;
+}
+
+.sx-deal-cell--none .sx-deal-cell__level {
+    color: var(--sx-color-text-subtle);
+    font-weight: 400;
+}
+
+.sx-deal-cell--cut .sx-deal-cell__from {
+    color: var(--sx-color-warning-on-surface, var(--sx-color-warning));
+}
+
+.sx-deal-cell__area {
+    display: none;
+}
+
+.sx-deal-people__legend {
+    margin-top: 8px;
+    color: var(--sx-color-text-subtle);
+    font-size: 12px;
+}
+
+.sx-deal-notify-stub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px dashed var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+/* On a narrow screen a person is a card with a list of areas. */
+@media (max-width: 760px) {
+    .sx-deal-people,
+    .sx-deal-people tbody,
+    .sx-deal-people tr,
+    .sx-deal-people td {
+        display: block;
+        width: 100%;
+    }
+
+    .sx-deal-people thead {
+        display: none;
+    }
+
+    .sx-deal-people tr {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--sx-color-border);
+    }
+
+    .sx-deal-people tr:last-child {
+        border-bottom: 0;
+    }
+
+    .sx-deal-people td {
+        padding: 2px 0;
+        border: 0;
+    }
+
+    .sx-deal-people td.sx-deal-people__person {
+        padding-bottom: 6px;
+    }
+
+    .sx-deal-cell {
+        display: grid;
+        grid-template-columns: minmax(110px, 40%) minmax(0, 1fr);
+        column-gap: 10px;
+    }
+
+    .sx-deal-cell__area {
+        display: block;
+        grid-row: span 2;
+        color: var(--sx-color-text-muted);
+    }
+
+    .sx-deal-cell__level,
+    .sx-deal-cell__from {
+        grid-column: 2;
+    }
+}
+
+/* Lists of the deal card (resources). */
+.sx-deal-items {
+    display: grid;
+    gap: 2px;
+}
+
+@media (hover: hover) {
+    .sx-deal-grant .sx-icon-action {
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+
+    .sx-deal-grant:hover .sx-icon-action,
+    .sx-deal-grant:focus-within .sx-icon-action {
+        opacity: 1;
+    }
+}
+
+/* Resources of the deal. */
+.sx-deal-resource {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    margin: 0 -8px;
+    padding: 8px;
+    border-radius: var(--sx-radius-control);
+}
+
+.sx-deal-resource:hover {
+    background: var(--sx-color-surface-hover, var(--sx-color-surface-muted));
+}
+
+.sx-deal-resource__title {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+/* Channels of a client person. */
+.sx-client-channels-compact {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.sx-client-channel-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
+}
+
+.sx-client-channel-icon--ok {
+    background: var(--sx-color-success-soft);
+    color: var(--sx-color-success-on-soft, var(--sx-color-success));
+}
+
+.sx-client-channel-icon--warning {
+    background: var(--sx-color-warning-soft);
+    color: var(--sx-color-warning-on-soft, var(--sx-color-warning));
+}
+
+.sx-client-channel-icon--danger {
+    background: var(--sx-color-danger-soft);
+    color: var(--sx-color-danger-on-soft, var(--sx-color-danger));
+}
+
+.sx-client-channel-icon--off {
+    background: transparent;
+    border: 1px dashed var(--sx-color-border);
+    color: var(--sx-color-text-subtle);
+}
+
+.sx-contact-value.sx-client-channel--off {
+    color: var(--sx-color-text-subtle);
+    font-weight: 400;
+}
+
+.sx-client-channels-none {
+    color: var(--sx-color-text-subtle);
+    font-size: 12px;
+}
+
+/* People of a company: a row shows the role in the company. */
+.sx-company-person {
+    cursor: pointer;
+}
+
+.sx-company-person__access {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+}
+
+/* Adding a person: every active service of the company, scrolled when long. */
+.sx-new-access-deals__list {
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* The window of a person in a company. */
+.sx-person-access__deals {
+    display: grid;
+    gap: 2px;
+}
+
+.sx-person-access__deal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    margin: 0 -8px;
+    padding: 8px;
+    border-radius: var(--sx-radius-control);
+}
+
+.sx-person-access__deal:hover {
+    background: var(--sx-color-surface-hover, var(--sx-color-surface-muted));
+}
+
+.sx-person-access__deal-name {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.sx-person-access__deal--inactive .sx-person-access__deal-name {
+    color: var(--sx-color-text-subtle);
+}
+
+.sx-person-access__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}

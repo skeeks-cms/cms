@@ -387,6 +387,207 @@ class DealAccess extends Component
     }
 
     /**
+     * The highest declared level of the area not above $level.
+     */
+    public function capLevel(string $area, int $level): int
+    {
+        $result = self::LEVEL_NONE;
+        foreach (array_keys($this->getAreaList()[$area]['levels'] ?? []) as $value) {
+            if ($value <= $level) {
+                $result = (int)$value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * What the deal type allows to open: area => level, or null when the type
+     * has no settings (core areas open, package areas closed).
+     */
+    public function typeOpenLevels(?int $typeId): ?array
+    {
+        $rows = $typeId ? (new Query())->select(['area', 'level'])->from('{{%cms_deal_type_area}}')->where(['cms_deal_type_id' => $typeId])->all() : [];
+        if (!$rows) {
+            return null;
+        }
+        $result = array_fill_keys(array_keys($this->getAreaList()), self::LEVEL_NONE);
+        foreach ($rows as $row) {
+            if (isset($result[$row['area']])) {
+                $result[$row['area']] = $this->capLevel((string)$row['area'], (int)$row['level']);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * How far each area is open in the deal and why, counted the same way as
+     * openCondition() but from two reads, for cards and forms.
+     *
+     * @return array area => ['type' => level allowed by the type, 'typeSet' => the type has settings,
+     *               'deal' => level the deal narrowed to or null, 'open' => effective level,
+     *               'limit' => null|'type'|'deal' what keeps it below the maximum]
+     */
+    public function openInfo(CmsDeal $deal): array
+    {
+        $typeLevels = $this->typeOpenLevels($deal->cms_deal_type_id ? (int)$deal->cms_deal_type_id : null);
+        $dealRows = (new Query())->select(['level', 'area'])->from('{{%cms_deal_area}}')->where(['cms_deal_id' => (int)$deal->id])->indexBy('area')->column();
+
+        $result = [];
+        foreach ($this->getAreaList() as $area => $config) {
+            $type = $typeLevels === null ? ($config['openByDefault'] ? $config['max'] : self::LEVEL_NONE) : (int)$typeLevels[$area];
+            $narrow = array_key_exists($area, $dealRows) ? $this->capLevel($area, (int)$dealRows[$area]) : null;
+            $open = $narrow === null ? $type : min($type, $narrow);
+            $limit = null;
+            if ($open < $config['max']) {
+                $limit = $narrow !== null && $narrow < $type ? 'deal' : 'type';
+            }
+            $result[$area] = ['type' => $type, 'typeSet' => $typeLevels !== null, 'deal' => $narrow, 'open' => $open, 'limit' => $limit];
+        }
+        return $result;
+    }
+
+    /**
+     * Saves what the deal type allows to open. Null removes the settings (core
+     * areas open, package areas closed); an array stores every area, closed
+     * ones as 0, so a type can close everything.
+     */
+    public function saveTypeOpenLevels(int $typeId, ?array $levels): void
+    {
+        $db = CmsDeal::getDb();
+        $transaction = $db->beginTransaction();
+        try {
+            $db->createCommand()->delete('{{%cms_deal_type_area}}', ['cms_deal_type_id' => $typeId])->execute();
+            if ($levels !== null) {
+                $rows = [];
+                foreach (array_keys($this->getAreaList()) as $area) {
+                    $rows[] = [$typeId, $area, $this->capLevel($area, (int)($levels[$area] ?? 0))];
+                }
+                $db->createCommand()->batchInsert('{{%cms_deal_type_area}}', ['cms_deal_type_id', 'area', 'level'], $rows)->execute();
+            }
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Saves what the deal itself opens: only levels below what the type allows
+     * are stored (a deal narrows, never widens). Writes the change into the
+     * deal feed.
+     *
+     * @param array $levels area => wanted level
+     */
+    public function saveDealOpenLevels(CmsDeal $deal, array $levels): void
+    {
+        $before = $this->openInfo($deal);
+        $db = CmsDeal::getDb();
+        $transaction = $db->beginTransaction();
+        try {
+            $db->createCommand()->delete('{{%cms_deal_area}}', ['cms_deal_id' => (int)$deal->id])->execute();
+            $rows = [];
+            foreach ($before as $area => $info) {
+                $wanted = $this->capLevel($area, (int)($levels[$area] ?? $info['type']));
+                if ($wanted < $info['type']) {
+                    $rows[] = [(int)$deal->id, $area, $wanted];
+                }
+            }
+            if ($rows) {
+                $db->createCommand()->batchInsert('{{%cms_deal_area}}', ['cms_deal_id', 'area', 'level'], $rows)->execute();
+            }
+
+            $changes = [];
+            foreach ($this->openInfo($deal) as $area => $info) {
+                if ($info['open'] !== $before[$area]['open']) {
+                    $changes[] = $this->areaName($area).': '.mb_strtolower($info['open'] ? $this->levelName($area, $info['open']) : 'закрыто');
+                }
+            }
+            if ($changes) {
+                $this->writeDealLog($deal, 'Изменено, что открыто клиенту: '.implode('; ', $changes).'.');
+            }
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Effective rights of every client person in the deal with their origin:
+     * the same answer as levels(), counted from dealGrants() and openInfo() in
+     * PHP so a card does not run a query per area and level.
+     *
+     * @return array user id => [
+     *   'user' => CmsUser|null, 'owner' => bool, 'grants' => CmsClientAccess[],
+     *   'areas' => area => ['level' => effective, 'granted' => level before openness,
+     *              'source' => null|'owner'|'company'|'deal', 'grant' => CmsClientAccess|null,
+     *              'open' => open level, 'limit' => null|'type'|'deal' (only when it cut the grant)]
+     * ]
+     */
+    public function explain(CmsDeal $deal, ?array $grants = null): array
+    {
+        $grants = $grants ?? $this->dealGrants($deal);
+        $open = $this->openInfo($deal);
+
+        $people = [];
+        if (!$deal->cms_company_id && $deal->cms_user_id) {
+            $people[(int)$deal->cms_user_id] = ['user' => $deal->user, 'owner' => true, 'grants' => []];
+        }
+        foreach ($grants as $grant) {
+            $userId = (int)$grant->cms_user_id;
+            if (!isset($people[$userId])) {
+                $people[$userId] = ['user' => $grant->cmsUser, 'owner' => false, 'grants' => []];
+            }
+            $people[$userId]['grants'][] = $grant;
+        }
+
+        foreach ($people as $userId => $person) {
+            //Full access (owner, company-wide full grant) covers the other grants: it is named as the origin.
+            $covering = $person['owner'];
+            foreach ($person['grants'] as $grant) {
+                if (!$grant->cms_deal_id && $grant->is_full) {
+                    $covering = true;
+                }
+            }
+            $areas = [];
+            foreach ($this->getAreaList() as $area => $config) {
+                $granted = self::LEVEL_NONE;
+                $source = null;
+                $from = null;
+                if ($person['owner']) {
+                    $granted = $config['max'];
+                    $source = 'owner';
+                }
+                foreach ($person['grants'] as $grant) {
+                    $level = $grant->is_full ? $config['max'] : $this->capLevel($area, (int)($grant->getLevels()[$area] ?? 0));
+                    //A tie: the covering company-wide full grant wins; without full access a deal grant wins
+                    //over a company-wide one, being what was set for this service.
+                    $tieWins = $covering
+                        ? (!$grant->cms_deal_id && $grant->is_full && $source !== 'owner')
+                        : ($grant->cms_deal_id && $source === 'company');
+                    if ($level > $granted || ($level === $granted && $level > 0 && $tieWins)) {
+                        $granted = $level;
+                        $source = $grant->cms_deal_id ? 'deal' : 'company';
+                        $from = $grant;
+                    }
+                }
+                $level = min($granted, $open[$area]['open']);
+                $areas[$area] = [
+                    'level'   => $level,
+                    'granted' => $granted,
+                    'source'  => $granted ? $source : null,
+                    'grant'   => $from,
+                    'open'    => $open[$area]['open'],
+                    'limit'   => $granted > $level ? $open[$area]['limit'] : null,
+                ];
+            }
+            $people[$userId]['areas'] = $areas;
+        }
+
+        return $people;
+    }
+
+    /**
      * People who may use the area of the deal at least at $level: recipients of
      * notifications (У4), people of a working chat.
      *

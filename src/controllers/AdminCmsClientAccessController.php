@@ -116,6 +116,13 @@ class AdminCmsClientAccessController extends BackendModelStandartController
                 $model->levels = $role ? $role->getLevels() : [];
             }
         }
+        //Before the people of the company or the deal are read: the scope from the request may be foreign.
+        $this->authorizeScope($model);
+        if ($originDeal = (int)\Yii::$app->request->get('deal')) {
+            if (!CmsDeal::find()->forManager()->andWhere([CmsDeal::tableName().'.id' => $originDeal])->exists()) {
+                throw new ForbiddenHttpException('Нет доступа к этой сделке.');
+            }
+        }
 
         $deal = $model->cms_deal_id ? CmsDeal::findOne((int)$model->cms_deal_id) : null;
         $companyId = $deal ? (int)$deal->cms_company_id : (int)$model->cms_company_id;
@@ -163,7 +170,7 @@ class AdminCmsClientAccessController extends BackendModelStandartController
             $fields['cms_user_id'] = [
                 'class'   => HtmlBlock::class,
                 'content' => Html::tag('div',
-                    Html::tag('label', 'Человек').Html::tag('div', Html::encode($person ? $person->shortDisplayName : '#'.$model->cms_user_id), ['class' => 'sx-deal-access-person']),
+                    Html::tag('div', Html::encode($person ? $person->shortDisplayName : '#'.$model->cms_user_id), ['class' => 'sx-deal-access-person']),
                     ['class' => 'col-12 form-group']
                 ),
             ];
