@@ -23,8 +23,9 @@ trait ClientDataGuard
     abstract protected function clientDataColumn(): string;
 
     /**
-     * Phones and emails: a new row may be added on every level
-     * (CrmAccess::canAddClientContact()), existing ones are changed from "edit".
+     * Phones and emails: "Свои сделки" adds a new row from his deal only
+     * (?lead_id=, CrmAccess::canAddClientContact()), existing ones are changed
+     * from "edit".
      */
     protected function clientDataAddable(): bool
     {
@@ -75,7 +76,9 @@ trait ClientDataGuard
         $userId = (int)\Yii::$app->user->id;
         foreach ([\Yii::$app->request->get($formName), \Yii::$app->request->post($formName)] as $data) {
             $id = (int)($data[$column] ?? 0);
-            if ($id > 0 && !($this->clientDataAddable() ? $access->canAddClientContact($userId, [$code, $id]) : $access->canEditClientRecord($userId, [$code, $id]))) {
+            // A new phone or email of "Свои сделки" comes from his deal: ?lead_id= of the deal contact block.
+            $leadId = (int)\Yii::$app->request->get('lead_id') ?: null;
+            if ($id > 0 && !($this->clientDataAddable() ? $access->canAddClientContact($userId, [$code, $id], $leadId) : $access->canEditClientRecord($userId, [$code, $id]))) {
                 return false;
             }
         }

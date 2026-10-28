@@ -564,21 +564,29 @@ class CrmAccess extends Component
     }
 
     /**
-     * May the employee add a new phone or email to a company or a person: every
-     * level, "Свои сделки" included (the contact block of his deal, contacts of
-     * the deal copied to the card); changing and removing existing ones is
-     * canEditClientRecord(). The duplicate check works as for everyone.
+     * May the employee add a new phone or email to a company or a person.
+     * "edit" and above — anywhere. "Свои сделки" — only from his own deal of
+     * this client ($leadId: the contact block of the deal, contacts of the deal
+     * copied to the card, the API with cms_lead_id): a deal of the client that
+     * he works on. Changing and removing existing ones is canEditClientRecord().
+     * The duplicate check works as for everyone.
      *
      * @param \yii\base\Model|array $model a model or [record code, record id]
+     * @param int|null $leadId the deal the contact is added from
      */
-    public function canAddClientContact($user, $model): bool
+    public function canAddClientContact($user, $model, ?int $leadId = null): bool
     {
         $record = is_array($model) ? $model : self::clientRecordOf($model);
         if ($record === null || $this->canEditClientRecord($user, $record)) {
             return true;
         }
+        if (!$leadId || $this->clientDataLevel($user, $record[0], (int)$record[1]) === null) {
+            return false;
+        }
+        $lead = CmsLead::findOne($leadId);
+        $column = $record[0] === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id';
 
-        return $this->clientDataLevel($user, $record[0], (int)$record[1]) !== null;
+        return $lead && (int)$lead->$column === (int)$record[1] && $lead->canBeWorkedBy($this->userId($user));
     }
 
     /**

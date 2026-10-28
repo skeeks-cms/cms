@@ -3,6 +3,7 @@
 namespace skeeks\cms\crm;
 
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsDepartment;
 use skeeks\cms\models\CmsCompany2manager;
 use skeeks\cms\models\CmsCompany2user;
 use skeeks\cms\models\CmsCompanyEmail;
@@ -156,7 +157,7 @@ class LeadTriage
         $form = new LeadIdentityForm([$part.'_mode' => LeadIdentityForm::MODE_FOREIGN, $part.'_ref' => $ref, 'foreign_comment' => $comment]);
         $siteId = \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site ? (int)\Yii::$app->skeeks->site->id : null;
         $result = $this->createLead(new CmsLead(['cms_site_id' => $siteId, 'description' => $comment]), $form, $actorId);
-        $result['message'] = 'Сделка №'.(int)$result['lead']->id.' создана на вас, у вас доступ «Свои сделки» к клиенту, основному ответственному отправлено уведомление.';
+        $result['message'] = 'Сделка №'.(int)$result['lead']->id.' создана на вас, у вас доступ «Свои сделки» к клиенту. Основной ответственный получил уведомление.';
 
         return $result;
     }
@@ -707,13 +708,17 @@ class LeadTriage
         if ($identity['foreign']) {
             [$recordCode, $recordId] = [$identity['foreign'][0], (int)$identity['foreign'][1]];
             if ((int)$lead->executor_id === $actorId) {
-                // The actor works with the client on his deal: the level "Свои сделки" at once.
+                // «Работать с этим клиентом»: the deal is the actor's, the level "Свои сделки" at once, no request
+                // (owner's decision 28.10.2026): the main responsible and his leaders are notified; the level is
+                // raised in «Доступ» of the client.
                 $this->access->grantLink($recordCode, $recordId, $actorId, CrmAccess::LEVEL_DEAL);
+                $this->notifyWorkWithClient($lead, $recordCode, $recordId, $actorId);
+            } else {
+                // An incoming request of a client «по согласованию»: the deal went to the main responsible, the actor asks.
+                $identity['request'] = (new CrmAccessRequests($this->access))->request(
+                    $actorId, $recordCode, $recordId, CmsCrmAccessRequest::KIND_WORK, (int)$lead->id, $form->foreign_comment
+                );
             }
-            // The main responsible (and his leaders) learn it and may raise the level or decline.
-            $identity['request'] = (new CrmAccessRequests($this->access))->request(
-                $actorId, $recordCode, $recordId, CmsCrmAccessRequest::KIND_WORK, (int)$lead->id, $form->foreign_comment
-            );
         }
 
         $new = $identity['newCompany']
@@ -739,7 +744,7 @@ class LeadTriage
             }
             $created = $identity && $identity['newCompany'] && (int)$identity['newCompany']->id === (int)$lead->cms_company_id;
 
-            return $created || $this->access->canAddClientContact($actorId, [CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id]);
+            return $created || $this->access->canAddClientContact($actorId, [CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id], (int)$lead->id);
         }
         if ($target === 'client') {
             if (!$lead->cms_user_id) {
@@ -747,7 +752,7 @@ class LeadTriage
             }
             $created = $identity && $identity['newClient'] && (int)$identity['newClient']->id === (int)$lead->cms_user_id;
 
-            return $created || $this->access->canAddClientContact($actorId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id]);
+            return $created || $this->access->canAddClientContact($actorId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id], (int)$lead->id);
         }
 
         return false;
@@ -908,6 +913,31 @@ class LeadTriage
                 'eventKey' => 'lead.assigned:'.(int)$lead->id.':'.(int)$lead->executor_id,
             ]);
         }
+    }
+
+    /**
+     * «Работать с этим клиентом»: the main responsible of the client and his
+     * leaders learn that another employee works with the client on his deal
+     * (the client in the text, the deal as the link; no grammatical gender).
+     */
+    private function notifyWorkWithClient(CmsLead $lead, string $recordCode, int $recordId, int $actorId): void
+    {
+        $mainId = $this->access->mainResponsibleId($recordCode, $recordId);
+        if (!$mainId) {
+            return;
+        }
+        $recipients = array_values(array_diff(array_unique(array_merge([$mainId], CmsDepartment::leaderIdsOf($mainId))), [$actorId]));
+        if (!$recipients) {
+            return;
+        }
+        $record = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne($recordId) : CmsUser::findOne($recordId);
+        $client = $record instanceof CmsCompany ? (string)$record->name : ($record ? (string)$record->shortDisplayName : '№'.$recordId);
+        \Yii::$app->notifications->notify($recipients, 'lead.delegated', [
+            'name' => $this->name($actorId).': работа с клиентом «'.$client.'» по своей сделке',
+            'comment' => (string)$lead->name,
+            'model' => $lead,
+            'eventKey' => 'lead.delegated:'.(int)$lead->id.':'.(int)$lead->executor_id,
+        ]);
     }
 
     /** The responsible of the company learns that another employee leads its deal. */

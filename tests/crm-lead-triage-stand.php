@@ -209,9 +209,14 @@ try {
     $check((int)$lead->executor_id === (int)$other->id && (int)$lead->cms_company_id === (int)$company->id, 'the deal is the employee\'s and linked to the company');
     $check(CrmAccess::instance()->linkLevel($other->id, 'company', (int)$company->id) === CrmAccess::LEVEL_DEAL, 'the employee gets "Свои сделки" at once');
     $check(CrmAccess::instance()->mainResponsibleId('company', (int)$company->id) === (int)$owner->id, 'the main responsible stays');
-    $request = $result['request'];
-    $check($request instanceof CmsCrmAccessRequest && $request->isPending && $request->kind === CmsCrmAccessRequest::KIND_WORK
-        && (int)$request->owner_id === (int)$owner->id && (int)$request->cms_lead_id === (int)$lead->id, 'a request to the main responsible with the deal');
+    $check(empty($result['request']) && !CmsCrmAccessRequest::find()->andWhere(['requester_id' => $other->id, 'record_code' => 'company', 'record_id' => $company->id])->exists(),
+        '«Работать с этим клиентом» sends no request: the deal is created at once');
+    $told = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'event_key' => 'lead.delegated:'.(int)$lead->id.':'.(int)$other->id])->one();
+    $check($told && $told->name === $other->shortDisplayName.': работа с клиентом «'.$company->name.'» по своей сделке'
+        && $told->model instanceof CmsLead && (int)$told->model_id === (int)$lead->id, 'the main responsible is notified: the client in the text, the deal as the link');
+    // The request mechanics (an incoming request of a client «по согласованию» uses the same service).
+    $request = (new CrmAccessRequests())->request((int)$other->id, 'company', (int)$company->id, CmsCrmAccessRequest::KIND_WORK, (int)$lead->id);
+    $check($request->isPending && (int)$request->owner_id === (int)$owner->id && (int)$request->cms_lead_id === (int)$lead->id, 'a request to the main responsible with the deal');
     // The common format of CRM notifications: the event as text, the client as the record link.
     $asked = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'kind' => 'crm.access_request', 'event_key' => 'crm.access_request:'.(int)$request->id])->one();
     $check($asked && $asked->name === $other->shortDisplayName.': работа с клиентом «'.$company->name.'» по своей сделке, запрос уровня доступа'
@@ -422,7 +427,8 @@ try {
         '"deal": the company form, a phone edit and delete, adding a person are refused (403)');
     $check($actionAllowed('cms/admin-cms-company', $company, 'view'), '"deal" opens the company card');
     // "deal" adds a new phone or email (the contact block of his deal), changes no existing one.
-    $check($levelAccess->canAddClientContact($other->id, ['company', (int)$company->id]), '"deal" adds a new phone or email to the company');
+    $check(!$levelAccess->canAddClientContact($other->id, ['company', (int)$company->id]), '"deal" does not add a phone from the company card');
+    $check($levelAccess->canAddClientContact($other->id, ['company', (int)$company->id], (int)$lead->id), '"deal" adds a new phone or email from his deal');
     $check(!$levelAccess->canEditClientRecord($other->id, $companyPhone), '"deal" does not change an existing phone');
     // Other deals of the company and the proposals of them are hidden; the company and its feed are not.
     $ownersLead = new CmsLead(['name' => 'Чужая '.$uniq, 'cms_site_id' => $siteId, 'cms_company_id' => $company->id, 'executor_id' => $owner->id, 'status' => CmsLead::STATUS_IN_WORK]);
@@ -719,7 +725,91 @@ try {
         }
     }
 
-    echo 'OK crm-lead-triage-stand: '.$checks." checks\n";
 } finally {
     $transaction->rollBack();
 }
+
+// --- П2а+ by real HTTP requests: the session of an employee with "Свои сделки" (as a live user).
+// The fixture is committed (the web requests use their own connection) and removed at the end.
+// TEST_HTTP_BASE (default http://nginx) and TEST_HTTP_HOST (default localhost:8080) point to the local site.
+$httpUser = CmsUser::findOne((int)(getenv('TEST_DEAL_USER_ID') ?: 1663)) ?: $other;
+$fixture = [];
+try {
+    $httpCompany = new CmsCompany(['name' => 'HTTP-проверка уровней '.$uniq]);
+    $httpCompany->save(false);
+    $fixture[] = $httpCompany;
+    (new CmsCompany2manager(['cms_company_id' => $httpCompany->id, 'cms_user_id' => $admin->id]))->save(false);
+    CmsCompany2manager::updateAll(['is_main' => 1, 'access_level' => CrmAccess::LEVEL_FULL], ['cms_company_id' => $httpCompany->id, 'cms_user_id' => $admin->id]);
+    (new CmsCompany2manager(['cms_company_id' => $httpCompany->id, 'cms_user_id' => $httpUser->id]))->save(false);
+    CmsCompany2manager::updateAll(['is_main' => 0, 'access_level' => CrmAccess::LEVEL_DEAL], ['cms_company_id' => $httpCompany->id, 'cms_user_id' => $httpUser->id]);
+    $httpPhone = new CmsCompanyPhone(['cms_company_id' => $httpCompany->id, 'value' => '+7 913 '.substr($uniq, 0, 3).'-'.substr($uniq, 3, 2).'-55']);
+    $httpPhone->save(false);
+    $httpLead = new CmsLead(['name' => 'HTTP-сделка '.$uniq, 'cms_site_id' => $siteId, 'cms_company_id' => $httpCompany->id, 'executor_id' => $httpUser->id, 'status' => CmsLead::STATUS_IN_WORK]);
+    $httpLead->save(false);
+    $fixture[] = $httpLead;
+
+    $base = rtrim(getenv('TEST_HTTP_BASE') ?: 'http://nginx', '/');
+    $jar = tempnam(sys_get_temp_dir(), 'crm-http');
+    $http = static function (string $path, array $post = null) use ($base, $jar) {
+        $curl = curl_init($base.$path);
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $jar, CURLOPT_COOKIEFILE => $jar, CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTPHEADER => array_merge(['Host: '.(getenv('TEST_HTTP_HOST') ?: 'localhost:8080')], $post !== null ? ['X-Requested-With: XMLHttpRequest'] : []),
+        ]);
+        if ($post !== null) {
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
+        }
+        $body = (string)curl_exec($curl);
+        $code = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        return [$code, $body];
+    };
+    $http('/site?id='.(int)$httpUser->id);
+    [$code, $card] = $http('/~sxx/cms/admin-cms-company/view?pk='.(int)$httpCompany->id);
+    $check($code === 200 && strpos($card, (string)$httpUser->shortDisplayName) !== false, 'HTTP: the session is the employee\'s, the company card opens');
+    $check(strpos($card, 'admin-cms-company-phone/create') === false && strpos($card, 'Изменить телефон') === false
+        && strpos($card, 'admin-cms-company-address/create') === false && strpos($card, 'crm-access-add') === false,
+        'HTTP: the company card of "deal" has no add, edit or access buttons');
+    preg_match('/name="csrf-param" content="([^"]+)"/', $card, $param);
+    preg_match('/name="csrf-token" content="([^"]+)"/', $card, $token);
+    $csrf = $param && $token ? [$param[1] => html_entity_decode($token[1])] : [];
+    foreach ([
+        'the phone edit form' => '/~sxx/cms/admin-cms-company-phone/update?pk='.(int)$httpPhone->id,
+        'a new phone from the card' => '/~sxx/cms/admin-cms-company-phone/create?CmsCompanyPhone%5Bcms_company_id%5D='.(int)$httpCompany->id,
+        'a new address' => '/~sxx/cms/admin-cms-company-address/create?CmsCompanyAddress%5Bcms_company_id%5D='.(int)$httpCompany->id,
+        'a new link' => '/~sxx/cms/admin-cms-company-link/create?CmsCompanyLink%5Bcms_company_id%5D='.(int)$httpCompany->id,
+        'the company form' => '/~sxx/cms/admin-cms-company/update?pk='.(int)$httpCompany->id,
+        'adding a person' => '/~sxx/cms/admin-cms-company/add-user?pk='.(int)$httpCompany->id,
+        'requisites' => '/~sxx/cms/admin-cms-company-contractor/create?company_id='.(int)$httpCompany->id,
+        'adding an employee' => '/~sxx/cms/admin-cms-company/crm-access-add?pk='.(int)$httpCompany->id,
+    ] as $what => $path) {
+        [$code] = $http($path);
+        $check($code === 403, 'HTTP "deal": '.$what.' — 403');
+    }
+    [$code] = $http('/~sxx/cms/admin-cms-company-phone/create?CmsCompanyPhone%5Bcms_company_id%5D='.(int)$httpCompany->id,
+        $csrf + ['CmsCompanyPhone' => ['cms_company_id' => $httpCompany->id, 'value' => '+7 913 '.substr($uniq, 0, 3).'-'.substr($uniq, 3, 2).'-66']]);
+    $check($code === 403 && !CmsCompanyPhone::find()->andWhere(['cms_company_id' => $httpCompany->id])->andWhere(['like', 'value', '-66'])->exists(),
+        'HTTP "deal": a phone posted from the card is refused and not saved');
+    [$code] = $http('/~sxx/cms/admin-cms-company-phone/delete?pk='.(int)$httpPhone->id, $csrf);
+    $check($code === 403 && CmsCompanyPhone::find()->andWhere(['id' => $httpPhone->id])->exists(), 'HTTP "deal": deleting a phone is refused');
+    [$code, $leadCard] = $http('/~sxx/cms/admin-cms-lead/view?pk='.(int)$httpLead->id);
+    $check($code === 200 && strpos($leadCard, 'lead_id='.(int)$httpLead->id) !== false && strpos($leadCard, 'Изменить телефон') === false,
+        'HTTP "deal": the own deal offers «Добавить телефон» from the deal, no edit of the company phones');
+    [$code] = $http('/~sxx/cms/admin-cms-company-phone/create?CmsCompanyPhone%5Bcms_company_id%5D='.(int)$httpCompany->id.'&lead_id='.(int)$httpLead->id);
+    $check($code === 200, 'HTTP "deal": a new phone from the own deal opens');
+    @unlink($jar);
+} finally {
+    foreach (array_reverse($fixture) as $record) {
+        if ($record instanceof CmsLead) {
+            CmsLead::deleteAll(['id' => $record->id]);
+        } else {
+            CmsCompanyPhone::deleteAll(['cms_company_id' => $record->id]);
+            CmsCompany2manager::deleteAll(['cms_company_id' => $record->id]);
+            CmsCompany::deleteAll(['id' => $record->id]);
+        }
+    }
+}
+
+echo 'OK crm-lead-triage-stand: '.$checks." checks\n";
