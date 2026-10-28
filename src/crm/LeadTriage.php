@@ -726,11 +726,18 @@ class LeadTriage
                 // «Взять в работу» (П2д): a free client of the general pool — the actor becomes its main
                 // responsible ("full"), no request and no notification; the next one gets «Работать с этим клиентом».
                 $this->access->setMain($recordCode, $recordId, $actorId);
+                CrmAccessLog::write(CrmAccessLog::TAKE, $recordCode, $recordId,
+                    ['actor_id' => $actorId, 'user_id' => $actorId, 'level_to' => CrmAccess::LEVEL_FULL, 'cms_lead_id' => (int)$lead->id]);
             } elseif ((int)$lead->executor_id === $actorId) {
                 // «Работать с этим клиентом»: the deal is the actor's, the level "Свои сделки" at once, no request
                 // (owner's decision 28.10.2026): the main responsible and his leaders are notified; the level is
                 // raised in «Доступ» of the client.
+                $levelBefore = $this->access->linkLevel($actorId, $recordCode, $recordId);
                 $this->access->grantLink($recordCode, $recordId, $actorId, CrmAccess::LEVEL_DEAL);
+                if ($levelBefore === null) {
+                    CrmAccessLog::write(CrmAccessLog::WORK, $recordCode, $recordId,
+                        ['actor_id' => $actorId, 'user_id' => $actorId, 'level_to' => CrmAccess::LEVEL_DEAL, 'cms_lead_id' => (int)$lead->id]);
+                }
                 $this->notifyWorkWithClient($lead, $recordCode, $recordId, $actorId);
             } else {
                 // An incoming request of a client «по согласованию»: the deal went to the main responsible, the actor asks.

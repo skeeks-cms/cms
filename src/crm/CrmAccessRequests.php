@@ -84,6 +84,10 @@ class CrmAccessRequests
         if (!$request->save()) {
             throw new \DomainException('Не удалось отправить запрос: '.implode('; ', $request->getFirstErrors()));
         }
+        CrmAccessLog::write(CrmAccessLog::REQUEST, $recordCode, $recordId, [
+            'actor_id' => $requesterId, 'user_id' => $requesterId, 'level_to' => $request->hasAttribute('level') ? $request->level : null,
+            'cms_lead_id' => $leadId, 'request_id' => (int)$request->id, 'comment' => $comment,
+        ]);
 
         $recipients = $this->access->requestDeciderIds($request);
         if ($recipients) {
@@ -154,6 +158,10 @@ class CrmAccessRequests
             }
             throw $e;
         }
+        CrmAccessLog::write($approve ? CrmAccessLog::REQUEST_APPROVED : CrmAccessLog::REQUEST_DECLINED, (string)$request->record_code, (int)$request->record_id, [
+            'actor_id' => $actorId, 'user_id' => (int)$request->requester_id, 'level_to' => $approve ? $request->level : null,
+            'cms_lead_id' => $request->cms_lead_id ? (int)$request->cms_lead_id : null, 'request_id' => (int)$request->id, 'comment' => $comment,
+        ]);
 
         // The bold link line: the deal of the request, else the client when the requester sees it;
         // a client hidden from the requester stays in the text, masked as in a match.
@@ -195,6 +203,8 @@ class CrmAccessRequests
             throw new \DomainException('Запрос уже решён. Обновите страницу.');
         }
         $request->refresh();
+        CrmAccessLog::write(CrmAccessLog::REQUEST_CANCELLED, (string)$request->record_code, (int)$request->record_id,
+            ['actor_id' => $actorId, 'user_id' => $actorId, 'request_id' => (int)$request->id]);
     }
 
     /**
@@ -221,6 +231,8 @@ class CrmAccessRequests
                 continue;
             }
             $closed++;
+            CrmAccessLog::write(CrmAccessLog::REQUEST_OBSOLETE, (string)$request->record_code, (int)$request->record_id,
+                ['actor_id' => null, 'user_id' => (int)$request->requester_id, 'request_id' => (int)$request->id]);
             $requesterId = (int)$request->requester_id;
             $record = $request->record;
             // By the links of the client, not by forManager(): it needs the web user, the migration runs in the console.
@@ -261,6 +273,10 @@ class CrmAccessRequests
         // becomes the main one — never the requester, who gets exactly the level chosen.
         if (CrmAccess::mainReady() && $this->access->mainResponsibleId((string)$request->record_code, (int)$request->record_id) === null && $actorId !== $requesterId) {
             $this->access->setMain((string)$request->record_code, (int)$request->record_id, $actorId);
+            CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, (string)$request->record_code, (int)$request->record_id, [
+                'actor_id' => $actorId, 'user_id' => $actorId, 'level_to' => CrmAccess::LEVEL_FULL, 'request_id' => (int)$request->id,
+                'comment' => 'одобрил запрос №'.(int)$request->id.', у клиента не было основного',
+            ]);
         }
         $this->access->grantLink((string)$request->record_code, (int)$request->record_id, $requesterId, $level);
         $levelText = mb_strtolower(CrmAccess::levels()[$level] ?? $level, 'UTF-8');

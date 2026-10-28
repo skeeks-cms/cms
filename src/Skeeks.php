@@ -92,6 +92,12 @@ class Skeeks extends Component implements BootstrapInterface
             \skeeks\cms\source\RecordSources::attach();
         }
 
+        // The journal of the access to clients: its events in the client feeds (crm\CrmAccessLog).
+        if (!isset($this->logRenderers[\skeeks\cms\crm\CrmAccessLog::LOG_TYPE])) {
+            $this->logRenderers[\skeeks\cms\crm\CrmAccessLog::LOG_TYPE] = \skeeks\cms\log\AccessLogRenderer::class;
+        }
+        $this->setActivityLogTypes([\skeeks\cms\crm\CrmAccessLog::LOG_TYPE]);
+
         // П2д: the protection of a client follows its payments (cms-shop, when installed) and services.
         $protection = static function (callable $callback) {
             try {

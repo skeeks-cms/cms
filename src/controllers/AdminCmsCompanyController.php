@@ -966,6 +966,8 @@ HTML
             'transfer' => $this->clientTransferAction(),
             'crm-access' => $this->clientAccessAction(),
             'crm-take' => $this->clientTakeAction(),
+            // The journal of the access to clients: a tab of the section («Список», «Импорт», «Добавить», «Доступы»).
+            'crm-access-log' => $this->clientAccessLogAction(),
             'crm-access-add' => $this->clientAccessAddAction(),
         ]);
     }

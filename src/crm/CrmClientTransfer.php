@@ -73,7 +73,12 @@ class CrmClientTransfer
 
         $transaction = CmsLead::getDb()->beginTransaction();
         try {
+            $previousMain = $this->access->mainResponsibleId($recordCode, $recordId);
             $this->access->setMain($recordCode, $recordId, $newUserId, CrmAccess::LEVEL_EDIT);
+            CrmAccessLog::write(CrmAccessLog::TRANSFER, $recordCode, $recordId, [
+                'actor_id' => $actorId, 'user_id' => $newUserId, 'level_to' => CrmAccess::LEVEL_FULL,
+                'comment' => $previousMain && ($was = CmsUser::findOne($previousMain)) ? 'прежний основной — '.$was->shortDisplayName.', у него «Свои сделки и данные компании»' : null,
+            ]);
 
             $work = $this->openWork($recordCode, $recordId);
             $leads = 0;

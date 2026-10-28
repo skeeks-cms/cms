@@ -4,6 +4,7 @@ namespace skeeks\cms\controllers\traits;
 
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\crm\CrmAccess;
+use skeeks\cms\crm\CrmAccessLog;
 use skeeks\cms\crm\CrmClientTransfer;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCompany;
@@ -86,6 +87,65 @@ trait ClientTransferActions
     }
 
     /**
+     * «Доступы» — a tab of «Компании» (the journal of the access to clients,
+     * crm\CrmAccessLog): every employee of the CRM sees the events he may see.
+     */
+    public function clientAccessLogAction(): array
+    {
+        return [
+            'class' => \skeeks\cms\backend\ViewBackendAction::class,
+            'name' => 'Доступы',
+            'icon' => 'fas fa-user-shield',
+            'priority' => 1100,
+            'callback' => [$this, 'clientAccessLog'],
+            'accessCallback' => static fn() => CrmAccessLog::ready() && CrmAccess::mainReady(),
+        ];
+    }
+
+    public function clientAccessLog()
+    {
+        $request = \Yii::$app->request;
+        $userId = (int)\Yii::$app->user->id;
+        $table = \skeeks\cms\models\CmsCrmAccessLog::tableName();
+        $waiting = (int)\skeeks\cms\models\CmsCrmAccessLog::find()->andWhere(CrmAccessLog::waitingCondition($userId))->count();
+        $filters = [
+            'scope' => (string)$request->get('scope', $waiting ? 'waiting' : 'all'),
+            'event' => (string)$request->get('event', ''),
+            'employee' => (int)$request->get('employee', 0),
+            'company' => (int)$request->get('company', 0),
+            'dates' => (string)$request->get('dates', ''),
+        ];
+        $query = \skeeks\cms\models\CmsCrmAccessLog::find()->with(['actor', 'user', 'lead', 'request']);
+        if (($visible = CrmAccessLog::visibleCondition($userId)) !== null) {
+            $query->andWhere($visible);
+        }
+        if ($filters['scope'] === 'waiting') {
+            $query->andWhere(CrmAccessLog::waitingCondition($userId));
+        }
+        if (isset(CrmAccessLog::events()[$filters['event']])) {
+            $query->andWhere([$table.'.event' => $filters['event']]);
+        }
+        if ($filters['employee']) {
+            $query->andWhere(['or', [$table.'.actor_id' => $filters['employee']], [$table.'.user_id' => $filters['employee']]]);
+        }
+        if ($filters['company']) {
+            $query->andWhere([$table.'.record_code' => CmsCrmAccessRequest::RECORD_COMPANY, $table.'.record_id' => $filters['company']]);
+        }
+        if ($filters['dates'] && ($range = \skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget::parseRange($filters['dates']))) {
+            $query->andWhere(['between', $table.'.created_at', (int)$range[0], (int)$range[1]]);
+        }
+
+        return $this->render('@skeeks/cms/views/crm/access-log', [
+            'provider' => new \yii\data\ActiveDataProvider([
+                'query' => $query->orderBy([$table.'.created_at' => SORT_DESC, $table.'.id' => SORT_DESC]),
+                'pagination' => ['pageSize' => 50],
+            ]),
+            'filters' => $filters,
+            'waiting' => $waiting,
+        ]);
+    }
+
+    /**
      * «Взять в работу» of a card of the general pool (П2д): the employee becomes
      * the main responsible ("full"), no request, no notification; the card opens
      * in full. A protected client without employees is assigned by a leader or
@@ -125,6 +185,7 @@ trait ClientTransferActions
             return $response;
         }
         $access->setMain($code, $id, $actorId);
+        CrmAccessLog::write(CrmAccessLog::TAKE, $code, $id, ['actor_id' => $actorId, 'user_id' => $actorId, 'level_to' => CrmAccess::LEVEL_FULL]);
         $response->success = true;
         $response->message = 'Клиент взят в работу: вы его основной ответственный.';
 
@@ -184,6 +245,7 @@ trait ClientTransferActions
             throw new \DomainException('Этот сотрудник уже работает с клиентом: измените его уровень в списке.');
         }
         $access->grantLink($code, $id, $userId, $level);
+        CrmAccessLog::write(CrmAccessLog::GRANT, $code, $id, ['actor_id' => (int)\Yii::$app->user->id, 'user_id' => $userId, 'level_to' => $level]);
     }
 
     public function clientAccessAction(): array
@@ -230,11 +292,16 @@ trait ClientTransferActions
                         $response->message = 'Клиент возвращён в общий пул: его возьмёт в работу первый сотрудник, который его найдёт.';
                         break;
                     case 'level':
+                        $levelBefore = $access->linkLevel((int)$request->post('user_id'), $code, $id);
                         $access->setLevel($code, $id, (int)$request->post('user_id'), (string)$request->post('level'));
+                        CrmAccessLog::write(CrmAccessLog::LEVEL, $code, $id, ['actor_id' => $actorId, 'user_id' => (int)$request->post('user_id'),
+                            'level_from' => $levelBefore, 'level_to' => (string)$request->post('level')]);
                         $response->message = 'Уровень доступа изменён.';
                         break;
                     case 'remove':
+                        $levelBefore = $access->linkLevel((int)$request->post('user_id'), $code, $id);
                         $access->removeLink($code, $id, (int)$request->post('user_id'));
+                        CrmAccessLog::write(CrmAccessLog::REMOVE, $code, $id, ['actor_id' => $actorId, 'user_id' => (int)$request->post('user_id'), 'level_from' => $levelBefore]);
                         $response->message = 'Сотрудник больше не работает с клиентом.';
                         break;
                     case 'add':
@@ -258,7 +325,19 @@ trait ClientTransferActions
         $canTransfer = $access->canTransferClient($actorId, $code, $id);
         $myLevel = $access->clientDataLevel($actorId, $code, $id);
 
+        // The history of the access to this client (the journal), what the viewer may see.
+        $history = [];
+        if (CrmAccessLog::ready()) {
+            $historyQuery = \skeeks\cms\models\CmsCrmAccessLog::find()->with(['actor', 'user', 'lead', 'request'])
+                ->andWhere(['record_code' => $code, 'record_id' => $id])->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC])->limit(100);
+            if (($visible = CrmAccessLog::visibleCondition($actorId)) !== null && !$canManage) {
+                $historyQuery->andWhere($visible);
+            }
+            $history = $historyQuery->all();
+        }
+
         return $this->render('@skeeks/cms/views/crm/access', [
+            'history' => $history,
             'model' => $this->model,
             'employees' => $employees,
             'leaders' => $mainId ? $access->names(CmsDepartment::leaderIdsOf($mainId)) : [],

@@ -208,6 +208,8 @@ class CrmProtection
             foreach ([$billBy, (int)$payment->created_by] as $candidate) {
                 if ($candidate > 0 && CmsUser::find()->andWhere(['id' => $candidate, 'is_worker' => 1, 'is_active' => 1])->exists()) {
                     $access->setMain($code, $id, $candidate);
+                    CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $code, $id, ['actor_id' => null, 'user_id' => $candidate,
+                        'level_to' => CrmAccess::LEVEL_FULL, 'shop_payment_id' => (int)$payment->id, 'comment' => 'первый платёж клиента без основного']);
                     break;
                 }
             }
@@ -229,11 +231,13 @@ class CrmProtection
         if ($state !== self::FREE) {
             throw new \DomainException('Клиент под защитой — его нельзя вернуть в общий пул. Сначала переключите защиту на «Авто», и она должна истечь.');
         }
+        $mainBefore = CrmAccess::instance()->mainResponsibleId($recordCode, $recordId);
         if ($recordCode === CmsCrmAccessRequest::RECORD_COMPANY) {
             CmsCompany2manager::deleteAll(['cms_company_id' => $recordId]);
         } else {
             CmsUser2manager::deleteAll(['client_id' => $recordId]);
         }
+        CrmAccessLog::write(CrmAccessLog::POOL, $recordCode, $recordId, ['actor_id' => $actorId, 'user_id' => $mainBefore]);
     }
 
     /**
@@ -298,6 +302,8 @@ class CrmProtection
         foreach ($plan as $row) {
             if ($row['user_id'] && CrmAccess::instance()->mainResponsibleId($row['code'], (int)$row['id']) === null) {
                 CrmAccess::instance()->setMain($row['code'], (int)$row['id'], (int)$row['user_id']);
+                CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $row['code'], (int)$row['id'], ['actor_id' => null, 'user_id' => (int)$row['user_id'],
+                    'level_to' => CrmAccess::LEVEL_FULL, 'comment' => 'защищённый клиент без основного: '.$row['source']]);
                 $count++;
             }
         }

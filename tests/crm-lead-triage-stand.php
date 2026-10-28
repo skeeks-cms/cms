@@ -841,6 +841,44 @@ try {
         $check(CrmAccess::instance()->mainResponsibleId('company', (int)$bare->id) === null
             && CrmAccess::instance()->linkLevel($other->id, 'company', (int)$bare->id) === CrmAccess::LEVEL_DEAL,
             'a "deal" link never becomes the main one automatically (ensureMain)');
+
+        // The journal of the access: every event is kept, seen by whom it concerns.
+        if (\skeeks\cms\crm\CrmAccessLog::ready()) {
+            $journal = static fn(CmsCompany $company, string $event) => \skeeks\cms\models\CmsCrmAccessLog::find()
+                ->andWhere(['record_code' => 'company', 'record_id' => $company->id, 'event' => $event])->one();
+            $took = $journal($pool, \skeeks\cms\crm\CrmAccessLog::TAKE);
+            $check($took && (int)$took->user_id === (int)$other->id && $took->level_to === CrmAccess::LEVEL_FULL, 'the journal: «Взять в работу» from the pool');
+            $check((bool)$journal($pool, \skeeks\cms\crm\CrmAccessLog::POOL), 'the journal: «Вернуть в общий пул»');
+            $paidMain = $journal($pool, \skeeks\cms\crm\CrmAccessLog::MAIN_AUTO);
+            $check($paidMain && (int)$paidMain->user_id === (int)$owner->id && $paidMain->shop_payment_id, 'the journal: the main responsible by the first payment');
+            $asked = $journal($orphan, \skeeks\cms\crm\CrmAccessLog::REQUEST);
+            $approved = $journal($orphan, \skeeks\cms\crm\CrmAccessLog::REQUEST_APPROVED);
+            $approverMain = $journal($orphan, \skeeks\cms\crm\CrmAccessLog::MAIN_AUTO);
+            $check($asked && $approved && $approved->level_to === CrmAccess::LEVEL_DEAL && (int)$approved->user_id === (int)$other->id
+                && $approverMain && (int)$approverMain->user_id === (int)$admin->id, 'the journal: the request, its approval with the level, the approver as the main one');
+            $check(\skeeks\cms\models\CmsLog::find()->andWhere(['model_code' => $orphan->skeeksModelCode, 'model_id' => $orphan->id, 'log_type' => \skeeks\cms\crm\CrmAccessLog::LOG_TYPE])->count() >= 2,
+                'every event is a record of the client feed');
+            $sees = static function ($user, $log) {
+                $query = \skeeks\cms\models\CmsCrmAccessLog::find()->andWhere([\skeeks\cms\models\CmsCrmAccessLog::tableName().'.id' => $log->id]);
+                if (($condition = \skeeks\cms\crm\CrmAccessLog::visibleCondition($user)) !== null) {
+                    $query->andWhere($condition);
+                }
+
+                return $query->exists();
+            };
+            $check($sees($other, $took) && $sees($admin, $approved), 'the employee sees his events, an administrator — all');
+            $strangerLog = null;
+            foreach ($plain as $candidate) {
+                if (!in_array((int)$candidate->id, [(int)$owner->id, (int)$other->id], true) && !CmsDepartment::subordinateIds((int)$candidate->id)
+                    && !CrmAccess::instance()->isAdmin($candidate)) {
+                    $strangerLog = $candidate;
+                    break;
+                }
+            }
+            if ($strangerLog) {
+                $check(!$sees($strangerLog, $took), 'another employee does not see the events of a client not his');
+            }
+        }
     }
 
     // --- leaders ---

@@ -22,6 +22,7 @@
  * @var array $work leads (CmsLead[]), tasks (CmsTask[]) for the transfer
  * @var skeeks\cms\models\CmsCrmAccessRequest[] $requests pending requests about the client
  * @var string|null $myLevel the viewer's own level in words
+ * @var skeeks\cms\models\CmsCrmAccessLog[] $history the journal of the access to this client
  */
 
 use skeeks\cms\assets\admin\LeadIdentityAsset;
@@ -220,5 +221,16 @@ $workerSearch = static function ($word = '') {
             Работать с клиентом только по согласованию с основным ответственным
         </label>
     <?php BackendSurfaceWidget::end(); ?>
+    <?php endif; ?>
+    <?php if (!empty($history)) : ?>
+        <?php BackendSurfaceWidget::begin([
+            'title' => 'История доступа',
+            'titleTag' => 'h2',
+            'hint' => 'Кто, когда и на каком основании получал доступ к этому клиенту. Весь журнал — во вкладке «Доступы» раздела «Компании».',
+            'raised' => true,
+            'responsive' => true,
+        ]); ?>
+            <?= $this->render('@skeeks/cms/views/crm/_access-log-table', ['events' => $history, 'withClient' => false]); ?>
+        <?php BackendSurfaceWidget::end(); ?>
     <?php endif; ?>
 </div>
