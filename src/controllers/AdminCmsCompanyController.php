@@ -349,7 +349,8 @@ HTML
                          * @var $query CmsCompanyQuery
                          */
                         $query = $e->sender->dataProvider->query;
-                        $query->forManager();
+                        // П2д: the companies of the employee and the general pool.
+                        \skeeks\cms\crm\CrmAccess::applyClientVisibility($query);
                     },
 
                     'defaultOrder' => [
@@ -619,7 +620,9 @@ HTML
                 'icon'     => 'fa fa-user',
                 "callback" => [$this, 'view'],
                 "accessCallback" => function () {
-                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                    // П2д: a company of the general pool opens read only for every CRM employee.
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model])
+                        || ($this->model && \skeeks\cms\crm\CrmAccess::instance()->canSeePool((int)\Yii::$app->user->id, 'company', (int)$this->model->id));
                 },
             ],
 
@@ -962,6 +965,7 @@ HTML
             // П2а: a leader or an administrator gives the client to another employee.
             'transfer' => $this->clientTransferAction(),
             'crm-access' => $this->clientAccessAction(),
+            'crm-take' => $this->clientTakeAction(),
             'crm-access-add' => $this->clientAccessAddAction(),
         ]);
     }

@@ -770,6 +770,22 @@ try {
         $poolRef = $access2d->candidateRef('company', (int)$pool->id);
         $presentedPool = $access2d->presentCandidate(['type' => 'company', 'id' => (int)$pool->id], false, $other);
         $check(!empty($presentedPool['canTake']) && empty($presentedPool['byApproval']), 'a match of the pool offers «Взять в работу»');
+        // Every CRM employee sees the pool in the lists and its card, read only; deals and the like stay hidden.
+        $check($access2d->inPool('company', (int)$pool->id) && $access2d->canSeePool($other->id, 'company', (int)$pool->id), 'the pool is seen by every CRM employee');
+        $listed = CmsCompany::find()->andWhere([CmsCompany::tableName().'.id' => $pool->id]);
+        CrmAccess::applyClientVisibility($listed, $other);
+        $check($listed->exists() && !CmsCompany::find()->forManager($other)->andWhere([CmsCompany::tableName().'.id' => $pool->id])->exists(),
+            'the lists show the pool (applyClientVisibility), forManager() of deals, bills and payments does not');
+        $as($other);
+        $check($actionAllowed('cms/admin-cms-company', $pool, 'view') && $actionAllowed('cms/admin-cms-company', $pool, 'crm-take')
+            && !$actionAllowed('cms/admin-cms-company', $pool, 'update') && !$actionAllowed('cms/admin-cms-company', $pool, 'deals')
+            && !$actionAllowed('cms/admin-cms-company', $pool, 'bills') && !$actionAllowed('cms/admin-cms-company', $pool, 'payments'),
+            'a card of the pool: the profile and «Взять в работу», no edit, no deals, bills or payments');
+        $poolFeed = $access2d->feedCondition($other, $pool);
+        $check($poolFeed !== null && strpos(json_encode($poolFeed), 'CmsLead') === false, 'the feed of the pool: the client\'s own records only');
+        $filteredPool = CmsCompany::find()->andWhere(['id' => $pool->id]);
+        $access2d->applyResponsibleFilter($filteredPool, 'company', 'pool', CmsCompany::tableName().'.id', (int)$other->id);
+        $check($filteredPool->exists() && isset(CrmAccess::responsibleFilterItems()['pool']), 'the filter «Общий пул»');
         $as($other);
         $taken = (new LeadTriage())->workWithClient($poolRef, (int)$other->id);
         $check($access2d->mainResponsibleId('company', (int)$pool->id) === (int)$other->id && empty($taken['request'])
@@ -865,9 +881,10 @@ try {
         [$code] = $http($path);
         $check($code === 403, 'HTTP "deal": '.$what.' — 403');
     }
+    $postedPhone = '+7 913 '.substr($uniq, 0, 3).'-'.substr($uniq, 3, 2).'-66';
     [$code] = $http('/~sxx/cms/admin-cms-company-phone/create?CmsCompanyPhone%5Bcms_company_id%5D='.(int)$httpCompany->id,
-        $csrf + ['CmsCompanyPhone' => ['cms_company_id' => $httpCompany->id, 'value' => '+7 913 '.substr($uniq, 0, 3).'-'.substr($uniq, 3, 2).'-66']]);
-    $check($code === 403 && !CmsCompanyPhone::find()->andWhere(['cms_company_id' => $httpCompany->id])->andWhere(['like', 'value', '-66'])->exists(),
+        $csrf + ['CmsCompanyPhone' => ['cms_company_id' => $httpCompany->id, 'value' => $postedPhone]]);
+    $check($code === 403 && (int)CmsCompanyPhone::find()->andWhere(['cms_company_id' => $httpCompany->id])->count() === 1,
         'HTTP "deal": a phone posted from the card is refused and not saved');
     [$code] = $http('/~sxx/cms/admin-cms-company-phone/delete?pk='.(int)$httpPhone->id, $csrf);
     $check($code === 403 && CmsCompanyPhone::find()->andWhere(['id' => $httpPhone->id])->exists(), 'HTTP "deal": deleting a phone is refused');
@@ -879,6 +896,24 @@ try {
         'HTTP "deal": a deal of a company has no requisites or links of its own, those of the company are read only');
     [$code] = $http('/~sxx/cms/admin-cms-company-phone/create?CmsCompanyPhone%5Bcms_company_id%5D='.(int)$httpCompany->id.'&lead_id='.(int)$httpLead->id);
     $check($code === 200, 'HTTP "deal": a new phone from the own deal opens');
+    // The general pool: a company without employees, seen and taken into work by the employee.
+    if (\skeeks\cms\crm\CrmProtection::ready()) {
+        $httpPool = new CmsCompany(['name' => 'HTTP-пул '.$uniq]);
+        $httpPool->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $httpPool->id]);
+        $fixture[] = $httpPool;
+        [$code, $poolCard] = $http('/~sxx/cms/admin-cms-company/view?pk='.(int)$httpPool->id);
+        $check($code === 200 && strpos($poolCard, 'Взять в работу') !== false && strpos($poolCard, 'admin-cms-company/update?') === false
+            && strpos($poolCard, 'admin-cms-company-phone/create') === false, 'HTTP: a company of the pool opens read only with «Взять в работу»');
+        [$code] = $http('/~sxx/cms/admin-cms-company/bills?pk='.(int)$httpPool->id);
+        $check($code === 403, 'HTTP: the bills of a company of the pool are hidden');
+        [$code, $taken] = $http('/~sxx/cms/admin-cms-company/crm-take?pk='.(int)$httpPool->id, $csrf);
+        $check($code === 200 && strpos($taken, '"success":true') !== false
+            && CrmAccess::instance()->mainResponsibleId('company', (int)$httpPool->id) === (int)$httpUser->id, 'HTTP: «Взять в работу» makes the employee the main responsible');
+        [$code, $poolCard] = $http('/~sxx/cms/admin-cms-company/view?pk='.(int)$httpPool->id);
+        $check($code === 200 && strpos($poolCard, 'Взять в работу') === false && strpos($poolCard, 'admin-cms-company-phone/create') !== false,
+            'HTTP: after taking it the card opens in full');
+    }
     @unlink($jar);
 } finally {
     foreach (array_reverse($fixture) as $record) {

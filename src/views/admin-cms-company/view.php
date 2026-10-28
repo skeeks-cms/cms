@@ -463,6 +463,8 @@ JS
         </div>
 
         <div class="sx-detail-layout__main sx-surface-stack">
+            <?php // П2д: a client of the general pool — «Взять в работу» at the top (views/crm/_pool-banner.php). ?>
+            <?= $this->render('@skeeks/cms/views/crm/_pool-banner', ['model' => $model, 'controllerRoute' => '/'.$this->context->uniqueId]); ?>
 
             <?
             $this->registerCss(<<<CSS

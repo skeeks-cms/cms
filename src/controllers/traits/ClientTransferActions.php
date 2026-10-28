@@ -85,6 +85,52 @@ trait ClientTransferActions
 
     }
 
+    /**
+     * «Взять в работу» of a card of the general pool (П2д): the employee becomes
+     * the main responsible ("full"), no request, no notification; the card opens
+     * in full. A protected client without employees is assigned by a leader or
+     * an administrator.
+     */
+    public function clientTakeAction(): array
+    {
+        return [
+            'class' => BackendModelAction::class,
+            'name' => 'Взять в работу',
+            'isVisible' => false,
+            'callback' => [$this, 'clientTake'],
+            'accessCallback' => function () {
+                [$code, $id] = $this->transferRecord();
+
+                return $id && CrmAccess::instance()->canSeePool((int)\Yii::$app->user->id, $code, $id);
+            },
+        ];
+    }
+
+    public function clientTake()
+    {
+        [$code, $id] = $this->transferRecord();
+        $viewUrl = Url::current([0 => '/'.$this->uniqueId.'/view']);
+        if (!\Yii::$app->request->isPost) {
+            return $this->redirect($viewUrl);
+        }
+        $response = new RequestResponse();
+        $access = CrmAccess::instance();
+        $actorId = (int)\Yii::$app->user->id;
+        if (!$access->canTakeIntoWork($code, $id)) {
+            $response->success = false;
+            $response->message = $access->inPool($code, $id)
+                ? 'Клиент под защитой: назначить ответственного может руководитель или администратор.'
+                : 'Клиента уже взял в работу другой сотрудник. Обновите страницу.';
+
+            return $response;
+        }
+        $access->setMain($code, $id, $actorId);
+        $response->success = true;
+        $response->message = 'Клиент взят в работу: вы его основной ответственный.';
+
+        return $response;
+    }
+
     /** «+ Добавить сотрудника»: a small form in the standard backend window (the tab and the card block). */
     public function clientAccessAddAction(): array
     {

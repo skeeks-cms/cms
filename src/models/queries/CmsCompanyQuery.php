@@ -56,6 +56,34 @@ class CmsCompanyQuery extends CmsActiveQuery
 
         return $this;
     }
+
+    /**
+     * П2д: the companies the employee sees plus the general pool — companies
+     * without any employee (no main responsible), seen by every CRM employee
+     * read only until one takes it into work (crm\CrmAccess::applyClientVisibility()).
+     * For lists, the search of a card and the API only: deals, bills, payments and
+     * other records of a company keep forManager().
+     */
+    public function forManagerOrPool(User $user = null)
+    {
+        if ($user === null) {
+            $user = \Yii::$app->user->identity;
+            $isCanAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        } else {
+            $isCanAdmin = \Yii::$app->authManager->checkAccess($user->id, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        }
+        if (!$user || $isCanAdmin) {
+            return $this;
+        }
+        $managers = [(int)$user->id];
+        if ($subordinates = $user->subordinates) {
+            $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
+        }
+        $this->joinWith("managers as managers");
+        $this->andWhere(['or', ["managers.id" => $managers], ['managers.id' => null]]);
+
+        return $this;
+    }
     
     /**
      * Поиск компаний доступных клиенту

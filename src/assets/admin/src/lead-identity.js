@@ -526,10 +526,10 @@
         var control = $(this);
         var op = control.data('sxCrmAccess');
         // Buttons act on click (remove, add), the level select and the flag on change.
-        if ((op === 'remove' || op === 'add' || op === 'pool') !== (event.type === 'click')) {
+        if ((op === 'remove' || op === 'add' || op === 'pool' || op === 'take') !== (event.type === 'click')) {
             return;
         }
-        if ((op === 'remove' || op === 'pool') && !window.confirm(control.data('sxConfirm'))) {
+        if ((op === 'remove' || op === 'pool' || op === 'take') && !window.confirm(control.data('sxConfirm'))) {
             return false;
         }
         var data = {op: op, user_id: control.data('userId') || '', level: op === 'level' ? control.val() : '',
@@ -550,7 +550,7 @@
                 if (op === 'remove') {
                     control.closest('li').remove();
                 }
-                if (op === 'add' || op === 'pool' || op === 'protection') {
+                if (op === 'add' || op === 'pool' || op === 'protection' || op === 'take') {
                     window.location.reload();
                 }
             } else {

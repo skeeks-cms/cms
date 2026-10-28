@@ -390,7 +390,7 @@ class CrmAccess extends Component
     /** Ready filters of the company and client lists by the main responsible. */
     public static function responsibleFilterItems(): array
     {
-        $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_responsible' => 'Без ответственного'] : [];
+        $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_responsible' => 'Без ответственного', 'pool' => 'Общий пул'] : [];
         if (CrmProtection::ready()) {
             // П2д: the protection of the client.
             foreach (CrmProtection::states() as $state => $name) {
@@ -421,6 +421,12 @@ class CrmAccess extends Component
         $links = $class::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($idColumn)]);
         if ($value === 'my_main') {
             $query->andWhere(['exists', $links->andWhere([$userColumn => $viewerId, 'is_main' => 1])]);
+        } elseif ($value === 'pool') {
+            // П2д: no employee and not protected — taken into work by whoever finds it first.
+            $query->andWhere(['not exists', $links]);
+            if (CrmProtection::ready()) {
+                $query->andWhere([substr($idColumn, 0, (int)strrpos($idColumn, '.')).'.crm_protection' => CrmProtection::FREE]);
+            }
         } else {
             $query->andWhere(['not exists', $links]);
         }
@@ -461,6 +467,47 @@ class CrmAccess extends Component
         $record = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne($recordId) : CmsUser::findOne($recordId);
 
         return $record && $record->hasAttribute('crm_access_by_approval') && (bool)$record->crm_access_by_approval;
+    }
+
+    /**
+     * The general pool (П2д): a client without any employee (no main
+     * responsible). Every CRM employee sees it read only — its data and its own
+     * feed, no deals, services, bills, payments, documents or projects — until
+     * one takes it into work.
+     */
+    public function inPool(string $recordCode, int $recordId): bool
+    {
+        if (!self::mainReady() || $recordId <= 0) {
+            return false;
+        }
+        [$class, $recordColumn] = self::linkTable($recordCode);
+        if ($recordCode === CmsCrmAccessRequest::RECORD_CLIENT && (int)CmsUser::find()->select('is_worker')->andWhere(['id' => $recordId])->scalar()) {
+            return false;
+        }
+
+        return !$class::find()->andWhere([$recordColumn => $recordId])->exists();
+    }
+
+    /** A CRM employee (the right to the companies or clients section) sees a record of the pool. */
+    public function canSeePool($user, string $recordCode, int $recordId): bool
+    {
+        $userId = $this->userId($user);
+        $permission = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms/admin-company' : 'cms/admin-user';
+
+        return $userId > 0 && \Yii::$app->authManager->checkAccess($userId, $permission) && $this->inPool($recordCode, $recordId);
+    }
+
+    /**
+     * One visibility of the lists and the search of companies and clients (and
+     * the API): what the employee sees plus the general pool.
+     */
+    public static function applyClientVisibility(\yii\db\ActiveQuery $query, $user = null): void
+    {
+        if (method_exists($query, 'forManagerOrPool') && self::mainReady()) {
+            $query->forManagerOrPool($user);
+        } elseif (method_exists($query, 'forManager')) {
+            $query->forManager($user);
+        }
     }
 
     /**
@@ -669,6 +716,12 @@ class CrmAccess extends Component
             return null;
         }
         $level = $this->clientDataLevel($user, $code[0], (int)$code[1]);
+        if ($level === null && !$this->isAdmin($user) && $this->inPool($code[0], (int)$code[1])) {
+            // The general pool: the client's own records only, until somebody takes it.
+            $table = \skeeks\cms\models\CmsLog::tableName();
+
+            return ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]];
+        }
         if ($level === null || self::levelRank($level) >= self::levelRank(self::LEVEL_EDIT)) {
             return null;
         }

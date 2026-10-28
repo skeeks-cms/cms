@@ -267,7 +267,8 @@ class AdminUserController extends BackendModelStandartController
                             $query->groupBy([CmsUser::tableName().".id"]);
                         }
 
-                        $query->forManager();
+                        // П2д: the clients of the employee and the general pool.
+                        \skeeks\cms\crm\CrmAccess::applyClientVisibility($query);
 
                         $query->cmsSite();
                     },
@@ -479,7 +480,9 @@ class AdminUserController extends BackendModelStandartController
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                    // П2д: a client of the general pool opens read only for every CRM employee.
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model])
+                        || ($this->model && \skeeks\cms\crm\CrmAccess::instance()->canSeePool((int)\Yii::$app->user->id, 'client', (int)$this->model->id));
                 },
             ],
 
@@ -867,6 +870,7 @@ class AdminUserController extends BackendModelStandartController
             // П2а: a leader or an administrator gives the client to another employee.
             'transfer' => $this->clientTransferAction(),
             'crm-access' => $this->clientAccessAction(),
+            'crm-take' => $this->clientTakeAction(),
             'crm-access-add' => $this->clientAccessAddAction(),
             'duplicate-check' => $this->duplicateCheckAction(),
             'duplicate-request' => $this->duplicateRequestAction(),

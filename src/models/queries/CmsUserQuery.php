@@ -159,6 +159,39 @@ class CmsUserQuery extends CmsActiveQuery
      * @param User|null $user
      * @return $this
      */
+    /**
+     * П2д: the clients the employee sees plus client persons of the general pool
+     * (no employee of their own), read only until one takes it into work. For
+     * the client list, its card and the API only.
+     */
+    public function forManagerOrPool(User $user = null)
+    {
+        if ($user === null) {
+            $user = \Yii::$app->user->identity;
+            $isCanAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        } else {
+            $isCanAdmin = \Yii::$app->authManager->checkAccess($user->id, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        }
+        if (!$user || $isCanAdmin) {
+            return $this;
+        }
+        $managers = [(int)$user->id];
+        if ($subordinates = $user->subordinates) {
+            $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
+        }
+        $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
+        $this->joinWith("companiesAll as companies");
+        $this->joinWith("managers as managers");
+        $this->andWhere([
+            'or',
+            ["managers.id" => $managers],
+            ["companies.id" => $cmsCompanyQuery],
+            ['and', ['managers.id' => null], [$this->getPrimaryTableName().'.is_worker' => 0]],
+        ]);
+
+        return $this;
+    }
+
     public function forManager(User $user = null)
     {
         if ($user === null) {
