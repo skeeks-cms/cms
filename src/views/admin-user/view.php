@@ -437,32 +437,28 @@ JS
                 'options' => ['class' => 'sx-surface-stack sx-activity-thread'],
             ]); ?>
 
-                <?php BackendSurfaceWidget::begin([
-                    'title'      => 'Добавить комментарий',
-                    'titleTag'   => 'h3',
-                    'raised'     => true,
-                    'responsive' => true,
+                <?php // One block of actions over the feed, as in the deal card; a task, a call and a letter — for a client, not an employee. ?>
+                <?php echo \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget([
+                    'model'      => $model,
+                    'commentUrl' => ['/cms/admin-cms-log/add-comment'],
+                    'actions'    => $model->is_worker ? [] : (\Yii::$app->user->can('cms/admin-task') ? ['task' => ['label' => 'Задача', 'icon' => 'plus', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        '/cms/admin-cms-task/create', 'CmsTask' => ['cms_user_id' => $model->id],
+                    ])->enableEmptyLayout()->enableNoActions()->url]] : [])
+                        + \skeeks\cms\widgets\admin\CrmCardActionsWidget::contactTabs($model, $model->cmsUserPhones, $model->cmsUserEmails),
                 ]); ?>
-                            <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                                'model' => $model,
-                            ]); ?>
-                <?php BackendSurfaceWidget::end(); ?>
 
-                <?php // Pinned comments under the form, as in the company and deal cards. ?>
-                <?php $pinnedUserCommentsQuery = $model->getUserLogs()->comments()->pinned(); ?>
-                <?php if ($pinnedUserCommentsQuery->count()) : ?>
-                    <?php BackendSurfaceWidget::begin($surfaceConfig('Закрепленные комментарии')); ?>
-                        <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                            'query'                => $pinnedUserCommentsQuery,
-                            'is_show_model'        => false,
-                            'is_show_pin_controls' => true,
-                            'is_raised'             => false,
-                        ]); ?>
-                    <?php BackendSurfaceWidget::end(); ?>
+                <?php // Pinned entries once, right under the block, marked as in the feed; the feed below skips them. ?>
+                <?php $pinnedUserLogsQuery = $model->getUserLogs()->activity()->pinned(); ?>
+                <?php if ($pinnedUserLogsQuery->count()) : ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                        'query'                => $pinnedUserLogsQuery,
+                        'is_show_model'        => false,
+                        'is_show_pin_controls' => true,
+                    ]); ?>
                 <?php endif; ?>
 
                         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                            'query'         => $model->getUserLogs()->activity(),
+                            'query'         => $model->getUserLogs()->activity()->notPinned(),
                             'is_show_model' => false,
                             'is_show_pin_controls' => true,
                         ]); ?>

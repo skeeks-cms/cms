@@ -28,12 +28,17 @@
     // Tabs that do not fit the row go into "Ещё" (their hidden copies there are shown).
     var fit = function (block) {
         var row = block.querySelector(".sx-crm-actions__tabs");
-        var more = block.querySelector("[data-sx-crm-actions-menu]");
+        var more = block.querySelector("[data-sx-crm-actions-more]");
         if (!row || !more) {
             return;
         }
-        var tabs = Array.prototype.slice.call(row.querySelectorAll("[data-sx-crm-actions-fit]"));
+        var tabs = Array.prototype.slice.call(row.querySelectorAll(":scope > [data-sx-crm-actions-fit]"));
         var copies = Array.prototype.slice.call(more.querySelectorAll("[data-sx-crm-actions-copy]"));
+        // A tab with a choice has a copy per item of the choice.
+        var copiesOf = function (tab) {
+            var id = tab.getAttribute("data-sx-crm-actions-fit");
+            return copies.filter(function (copy) { return copy.getAttribute("data-sx-crm-actions-copy") === id; });
+        };
         var own = more.querySelectorAll(".sx-crm-actions__menu-item:not([data-sx-crm-actions-copy])").length;
         tabs.forEach(function (tab) { tab.hidden = false; });
         copies.forEach(function (copy) { copy.hidden = true; });
@@ -52,7 +57,8 @@
         var moved = 0;
         for (var i = tabs.length - 1; i >= 0 && used() > width; i--) {
             tabs[i].hidden = true;
-            copies[i].hidden = false;
+            tabs[i].removeAttribute("open");
+            copiesOf(tabs[i]).forEach(function (copy) { copy.hidden = false; });
             moved++;
         }
         more.hidden = !moved && !own;

@@ -73,6 +73,11 @@
     background: var(--sx-menu-background, var(--sx-color-surface-raised));
     box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
 }
+/* A choice under a tab (several phones) opens to the right of it, "Ещё" — to the left. */
+.sx-crm-actions__more:not([data-sx-crm-actions-more]) > .sx-crm-actions__menu {
+    left: 0;
+    right: auto;
+}
 .sx-crm-actions__menu-item {
     display: flex;
     align-items: center;
