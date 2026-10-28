@@ -83,8 +83,8 @@ trait ClientTransferActions
     {
         return [
             'class' => BackendModelAction::class,
-            'name' => 'Доступ к клиенту',
-            'icon' => 'fas fa-user-lock',
+            'name' => 'Доступ',
+            'icon' => 'svg:lock',
             'priority' => 890,
             'callback' => [$this, 'clientAccess'],
             'accessCallback' => function () {
