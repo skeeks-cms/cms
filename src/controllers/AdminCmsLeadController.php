@@ -490,12 +490,7 @@ JS
         $userId = (int)\Yii::$app->user->id;
         $managers = $this->kanbanManagers();
 
-        // `mine=1` is the historical "my leads" link; an employee outside the
-        // viewer's scope is ignored rather than revealing an empty board.
-        $executorId = (int)$request->get('executor') ?: ($request->get('mine') ? $userId : 0);
-        if ($executorId && !isset($managers[$executorId])) {
-            $executorId = 0;
-        }
+        $executorId = static::boardExecutor($request->get('executor'), $userId, $managers);
         $q = mb_substr(trim((string)$request->get('q')), 0, 100);
 
         $isAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
@@ -531,6 +526,20 @@ JS
                 'rejectReasons' => CmsLeadRejectReason::siteHasReasons($siteId),
             ] : null,
         ]);
+    }
+
+    /**
+     * Whose deals the kanban shows: no `executor` — the viewer («Мои сделки»,
+     * the default from the menu; the historical `mine=1` lands here too),
+     * `executor=all` or the empty choice of the dropdown — all available
+     * (0), an id — that employee. An employee outside the viewer's scope
+     * ($managers) is ignored rather than revealing an empty board.
+     */
+    public static function boardExecutor($executor, int $userId, array $managers): int
+    {
+        $executorId = $executor === null ? $userId : (int)$executor;
+
+        return $executorId && isset($managers[$executorId]) ? $executorId : 0;
     }
 
     /**

@@ -289,6 +289,16 @@ try {
     $check(strpos($viewSource, "\$this->render('_client'") !== false && strpos($viewSource, '$requestData = !$model->company && !$model->client;') !== false,
         'the deal card renders «Клиент» and hides «…из обращения» once a client is linked');
 
+    // The kanban from the menu opens on «Мои сделки»; «Все сделки» and another employee are explicit.
+    $board = [skeeks\cms\controllers\AdminCmsLeadController::class, 'boardExecutor'];
+    $managers = [7 => 'Я', 8 => 'Подчинённый'];
+    $check($board(null, 7, $managers) === 7 && $board('all', 7, $managers) === 0 && $board('', 7, $managers) === 0
+        && $board('8', 7, $managers) === 8 && $board('9', 7, $managers) === 0,
+        'the kanban: no executor — mine, «all» or empty — all, a subordinate kept, a foreign employee ignored');
+    $kanbanSource = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/kanban.php');
+    $check(strpos($kanbanSource, "\$link(['executor' => 'all'])") !== false && strpos($kanbanSource, "\$executorId === \$userId ? null : (\$executorId ?: 'all')") !== false,
+        'the kanban links keep «Все сделки» while switching the pipeline or the filters');
+
     echo 'OK crm-lead-pipelines-stand: '.$checks." checks\n";
 } finally {
     $transaction->rollBack();

@@ -28,14 +28,16 @@ $userId = (int)Yii::$app->user->id;
 $pipelineId = $pipeline ? (int)$pipeline->id : null;
 $source = (string)($filters['source_type'] ?? '');
 $noTask = !empty($filters[CmsLeadBoardService::FILTER_NO_TASK]);
+// The board opens on «Мои сделки» (no `executor`); «Все сделки» is `executor=all`.
 $isFiltered = $executorId || $q !== '' || $source !== '' || $noTask;
+$isDefault = $executorId === $userId && $q === '' && $source === '' && !$noTask;
 $total = array_sum(array_column($columns, 'total'));
 // Every link of the toolbar keeps the chosen pipeline and the other filters.
-$link = static function (array $change) use ($pipelineId, $executorId, $q, $source, $noTask): array {
+$link = static function (array $change) use ($pipelineId, $executorId, $userId, $q, $source, $noTask): array {
     return array_filter(array_merge([
         'kanban',
         'pipeline' => $pipelineId,
-        'executor' => $executorId ?: null,
+        'executor' => $executorId === $userId ? null : ($executorId ?: 'all'),
         'q' => $q !== '' ? $q : null,
         'source' => $source !== '' ? $source : null,
         'no_task' => $noTask ? 1 : null,
@@ -105,10 +107,10 @@ foreach ($columns as $column) {
         'onclick' => $openWindow($createUrl()),
     ]); ?>
     <div class="sx-lead-kanban__scope">
-        <?= Html::a('Все сделки', $link(['executor' => null]), [
+        <?= Html::a('Все сделки', $link(['executor' => 'all']), [
             'class' => 'sx-button sx-button--sm '.(!$executorId ? 'sx-button--primary' : 'sx-button--secondary'),
         ]); ?>
-        <?= Html::a('Мои сделки', $link(['executor' => $userId]), [
+        <?= Html::a('Мои сделки', $link(['executor' => null]), [
             'class' => 'sx-button sx-button--sm '.($executorId === $userId ? 'sx-button--primary' : 'sx-button--secondary'),
         ]); ?>
         <?php if (count($managers) > 1) : ?>
@@ -118,8 +120,8 @@ foreach ($columns as $column) {
                 'aria-label' => 'Ответственный сотрудник',
                 'data-sx-lead-kanban-submit' => true,
             ]); ?>
-        <?php elseif ($executorId) : ?>
-            <?= Html::hiddenInput('executor', $executorId); ?>
+        <?php elseif ($executorId !== $userId) : ?>
+            <?= Html::hiddenInput('executor', $executorId ?: 'all'); ?>
         <?php endif; ?>
         <?= Html::dropDownList('source', $source !== '' ? $source : null, CmsLead::sources(), [
             'prompt' => 'Источник…',
@@ -145,7 +147,7 @@ foreach ($columns as $column) {
             'maxlength' => 100,
         ]); ?>
     </label>
-    <?php if ($isFiltered) : ?>
+    <?php if (!$isDefault) : ?>
         <?= Html::a('Сбросить', ['kanban', 'pipeline' => $pipelineId], ['class' => 'sx-button sx-button--sm sx-button--secondary']); ?>
     <?php endif; ?>
 
@@ -199,7 +201,7 @@ foreach ($columns as $column) {
 <?php if (!$total) : ?>
     <div class="sx-lead-kanban__empty">
         <?php if ($isFiltered) : ?>
-            Ничего не найдено. Измените запрос или <?= Html::a('сбросьте фильтр', ['kanban', 'pipeline' => $pipelineId]); ?>.
+            Ничего не найдено. Измените запрос или <?= Html::a('посмотрите все сделки', ['kanban', 'pipeline' => $pipelineId, 'executor' => 'all']); ?>.
         <?php else : ?>
             Сделок пока нет. Они появятся из форм на сайте, партнёрской программы, телефонии или после
             <?= Html::a('ручного добавления', $createUrl(), ['data-pjax' => '0', 'onclick' => $openWindow($createUrl())]); ?>.
