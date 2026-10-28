@@ -256,6 +256,12 @@ class AdminCmsCrmAccessLogController extends BackendModelStandartController
     public static function clientLink(CmsCrmAccessLog $log): string
     {
         $record = $log->getRecord();
+        // A client the viewer does not see (an event of his subordinate on a foreign client) is not named.
+        $userId = (int)\Yii::$app->user->id;
+        $access = CrmAccess::instance();
+        if ($record && !($record instanceof CmsCompany ? $access->canSeeCompany($userId, (int)$record->id) : $access->canSeeClient($userId, (int)$record->id))) {
+            return 'клиент из базы';
+        }
         if ($record instanceof CmsCompany) {
             return BackendEntityLink::widget(['controllerId' => '/cms/admin-cms-company', 'modelId' => (int)$record->id, 'action' => 'view', 'label' => (string)$record->name]);
         }
@@ -269,10 +275,11 @@ class AdminCmsCrmAccessLogController extends BackendModelStandartController
     public static function ground(CmsCrmAccessLog $log): string
     {
         $grounds = array_filter([
-            $log->request_id ? BackendEntityLink::widget([
-                'controllerId' => '/cms/admin-cms-crm-access-request', 'modelId' => (int)$log->request_id, 'action' => 'view',
-                'label' => 'Запрос №'.(int)$log->request_id,
-            ]) : null,
+            $log->request_id ? ($log->request && CrmAccess::instance()->canSeeRequest((int)\Yii::$app->user->id, $log->request)
+                ? BackendEntityLink::widget([
+                    'controllerId' => '/cms/admin-cms-crm-access-request', 'modelId' => (int)$log->request_id, 'action' => 'view',
+                    'label' => 'Запрос №'.(int)$log->request_id,
+                ]) : Html::encode('Запрос №'.(int)$log->request_id)) : null,
             $log->cms_lead_id ? Requests::leadLink($log->lead) : null,
             $log->shop_payment_id ? Html::encode('Платёж №'.(int)$log->shop_payment_id) : null,
             $log->comment ? Html::encode((string)$log->comment) : null,

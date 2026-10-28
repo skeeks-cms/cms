@@ -1050,6 +1050,39 @@ try {
         $check(CrmAccess::instance()->clientDataLevel($leader, 'company', (int)$foreign->id) === CrmAccess::LEVEL_FULL
             && CrmAccess::instance()->canManageAccess($leader, 'company', (int)$foreign->id) && count($leadsSeen()) === 2,
             'the subordinate is the main responsible: the leader gets "full", manages the access, sees every deal');
+
+        // A request: decided by the main responsible and his leaders, never by the requester's leader.
+        $toMe = static fn(CmsUser $user, CmsCrmAccessRequest $request) => CmsCrmAccessRequest::find()
+            ->andWhere(CrmAccess::instance()->requestsCondition($user, CrmAccess::REQUESTS_TO_ME))->andWhere([CmsCrmAccessRequest::tableName().'.id' => $request->id])->exists();
+        $stranger = new CmsCompany(['name' => 'Чужой клиент запроса '.$uniq]);
+        $stranger->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $stranger->id]);
+        CrmAccess::instance()->setMain('company', (int)$stranger->id, (int)$admin->id, CrmAccess::LEVEL_EDIT);
+        $subRequest = (new CrmAccessRequests())->request((int)$subordinate->id, 'company', (int)$stranger->id, CmsCrmAccessRequest::KIND_WORK);
+        // The main one when it was sent was the requester himself (owner_id): it does not make his leader a decider.
+        CmsCrmAccessRequest::updateAll(['owner_id' => $subordinate->id], ['id' => $subRequest->id]);
+        $subRequest->refresh();
+        $check(!CrmAccess::instance()->canDecideRequest($leader, $subRequest) && !$toMe($leader, $subRequest)
+            && !in_array((int)$leader->id, CrmAccess::instance()->requestDeciderIds($subRequest), true),
+            'the leader of the requester does not decide the request, nor sees it in «Ждут моего решения»');
+        $subLog = \skeeks\cms\models\CmsCrmAccessLog::find()->andWhere(['request_id' => $subRequest->id, 'event' => \skeeks\cms\crm\CrmAccessLog::REQUEST])->one();
+        if ($subLog && !CrmAccess::instance()->canSeeCompany($leader, (int)$stranger->id)) {
+            $as($leader);
+            $check(\skeeks\cms\controllers\AdminCmsCrmAccessLogController::clientLink($subLog) === 'клиент из базы'
+                && strpos(\skeeks\cms\controllers\AdminCmsCrmAccessLogController::decisionButtons($subLog), 'data-sx-crm-request-decide') === false,
+                'the leader of the requester reads the event without the client name and without decision buttons');
+            $as($admin);
+        }
+        $requester = in_array((int)$other->id, [(int)$leader->id, (int)$subordinate->id], true) ? $owner : $other;
+        if (!in_array((int)$requester->id, [(int)$leader->id, (int)$subordinate->id], true)) {
+            $own = new CmsCompany(['name' => 'Клиент подчинённого '.$uniq]);
+            $own->save(false);
+            CmsCompany2manager::deleteAll(['cms_company_id' => $own->id]);
+            CrmAccess::instance()->setMain('company', (int)$own->id, (int)$subordinate->id, CrmAccess::LEVEL_EDIT);
+            $ownRequest = (new CrmAccessRequests())->request((int)$requester->id, 'company', (int)$own->id, CmsCrmAccessRequest::KIND_WORK);
+            $check(CrmAccess::instance()->canDecideRequest($leader, $ownRequest) && $toMe($leader, $ownRequest),
+                'the leader of the main responsible decides the request');
+        }
     }
 
     // --- leaders ---

@@ -1230,15 +1230,20 @@ class CrmAccess extends Component
             $decides = ['not', [$table.'.id' => null]];
         } else {
             $ids = array_values(array_unique(array_merge([$userId], array_map('intval', CmsDepartment::subordinateIds($userId)))));
+            // deciderIds() in SQL: he or his subordinate is the current main one, or — a record without a main
+            // one — has the level "full" on it.
             $main = static function (string $class, string $recordColumn, string $userColumn, string $code) use ($table, $ids) {
-                return ['and', [$table.'.record_code' => $code], ['exists', $class::find()->select('id')->andWhere([
-                    $recordColumn => new \yii\db\Expression($table.'.record_id'), 'is_main' => 1, $userColumn => $ids,
-                ])]];
+                $links = static fn() => $class::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($table.'.record_id')]);
+
+                return ['and', [$table.'.record_code' => $code], ['or',
+                    ['exists', $links()->andWhere(['is_main' => 1, $userColumn => $ids])],
+                    ['and', ['not exists', $links()->andWhere(['is_main' => 1])],
+                        ['exists', $links()->andWhere([$userColumn => $ids, 'access_level' => self::LEVEL_FULL])]],
+                ]];
             };
             $decides = ['or',
                 $main(CmsCompany2manager::class, 'cms_company_id', 'cms_user_id', CmsCrmAccessRequest::RECORD_COMPANY),
                 $main(CmsUser2manager::class, 'client_id', 'worker_id', CmsCrmAccessRequest::RECORD_CLIENT),
-                [$table.'.owner_id' => $ids],
             ];
         }
         if ($scope === self::REQUESTS_TO_ME) {
@@ -1273,14 +1278,13 @@ class CrmAccess extends Component
 
     private function deciderIds(CmsCrmAccessRequest $request): array
     {
-        // The main responsible decides; a record without one — its "full" employees.
+        // The current main responsible decides; a record without one — its "full" employees. Their leaders
+        // too, not the requester's ones. `owner_id` (the main one when the request was sent) does not count:
+        // the main one may have changed, and it may be the requester himself (owner's decision 29.10.2026).
         $mainId = $this->mainResponsibleId((string)$request->record_code, (int)$request->record_id);
         $owners = $mainId ? [$mainId] : ($request->record_code === CmsCrmAccessRequest::RECORD_COMPANY
             ? $this->companyResponsibleIds((int)$request->record_id)
             : $this->clientResponsibleIds((int)$request->record_id));
-        if ($request->owner_id) {
-            $owners[] = (int)$request->owner_id;
-        }
         $ids = $owners;
         foreach (array_unique($owners) as $ownerId) {
             $ids = array_merge($ids, CmsDepartment::leaderIdsOf($ownerId));
