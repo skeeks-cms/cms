@@ -818,6 +818,31 @@ try {
         }
     }
 
+    // A protected client without a main responsible: the request, the approval with "Свои сделки" —
+    // the requester gets exactly "deal", the one who approved becomes the main responsible.
+    if (\skeeks\cms\crm\CrmProtection::ready()) {
+        $orphan = new CmsCompany(['name' => 'Без основного '.$uniq]);
+        $orphan->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $orphan->id]);
+        CrmAccess::instance()->setApprovalRequired('company', (int)$orphan->id, true);
+        $check(!CrmAccess::instance()->canTakeIntoWork('company', (int)$orphan->id), 'a protected client without a main responsible is not taken into work');
+        $as($other);
+        $orphanWork = (new LeadTriage())->workWithClient(CrmAccess::instance()->candidateRef('company', (int)$orphan->id), (int)$other->id);
+        $check($orphanWork['lead'] === null && $orphanWork['request'] instanceof CmsCrmAccessRequest, 'it sends a request');
+        (new CrmAccessRequests())->decide($orphanWork['request'], true, (int)$admin->id, null, CrmAccess::LEVEL_DEAL);
+        $check(CrmAccess::instance()->linkLevel($other->id, 'company', (int)$orphan->id) === CrmAccess::LEVEL_DEAL
+            && CrmAccess::instance()->mainResponsibleId('company', (int)$orphan->id) === (int)$admin->id,
+            'approved with "Свои сделки": the requester gets exactly "deal", the one who approved is the main responsible');
+        // An automatic choice of the main one never raises a level.
+        $bare = new CmsCompany(['name' => 'Только сделки '.$uniq]);
+        $bare->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $bare->id]);
+        CrmAccess::instance()->grantLink('company', (int)$bare->id, (int)$other->id, CrmAccess::LEVEL_DEAL);
+        $check(CrmAccess::instance()->mainResponsibleId('company', (int)$bare->id) === null
+            && CrmAccess::instance()->linkLevel($other->id, 'company', (int)$bare->id) === CrmAccess::LEVEL_DEAL,
+            'a "deal" link never becomes the main one automatically (ensureMain)');
+    }
+
     // --- leaders ---
     foreach (CmsDepartment::find()->all() as $department) {
         foreach (CmsDepartment::subordinateIds((int)$department->worker_id) as $subordinateId) {

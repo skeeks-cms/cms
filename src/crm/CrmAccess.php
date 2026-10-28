@@ -245,11 +245,14 @@ class CrmAccess extends Component
             return;
         }
         $record = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne($recordId) : CmsUser::findOne($recordId);
+        // Only a link that already is "full" becomes the main one: an automatic choice never raises a level
+        // (an employee given "Свои сделки" on a client without a main must not get it in full).
+        $full = self::levelsReady() ? ['access_level' => self::LEVEL_FULL] : [];
         $link = null;
         if ($record && $record->created_by) {
-            $link = $class::find()->andWhere([$recordColumn => $recordId, $userColumn => (int)$record->created_by])->one();
+            $link = $class::find()->andWhere([$recordColumn => $recordId, $userColumn => (int)$record->created_by])->andWhere($full)->one();
         }
-        $link = $link ?: $class::find()->andWhere([$recordColumn => $recordId])->orderBy(['id' => SORT_ASC])->one();
+        $link = $link ?: $class::find()->andWhere([$recordColumn => $recordId])->andWhere($full)->orderBy(['id' => SORT_ASC])->one();
         if ($link) {
             $class::updateAll(['is_main' => 1, 'access_level' => self::LEVEL_FULL], ['id' => (int)$link->id]);
         }

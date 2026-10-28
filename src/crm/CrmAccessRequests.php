@@ -257,6 +257,11 @@ class CrmAccessRequests
         $lead = $request->cms_lead_id ? CmsLead::findOne((int)$request->cms_lead_id) : null;
 
         $level = $request->hasAttribute('level') && $request->level ? (string)$request->level : CrmAccess::LEVEL_DEAL;
+        // A client without a main responsible (a protected one left without employees): the one who approves
+        // becomes the main one — never the requester, who gets exactly the level chosen.
+        if (CrmAccess::mainReady() && $this->access->mainResponsibleId((string)$request->record_code, (int)$request->record_id) === null && $actorId !== $requesterId) {
+            $this->access->setMain((string)$request->record_code, (int)$request->record_id, $actorId);
+        }
         $this->access->grantLink((string)$request->record_code, (int)$request->record_id, $requesterId, $level);
         $levelText = mb_strtolower(CrmAccess::levels()[$level] ?? $level, 'UTF-8');
         if ($lead && !$lead->isTerminal && (int)$lead->executor_id !== $requesterId) {

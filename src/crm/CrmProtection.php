@@ -236,6 +236,75 @@ class CrmProtection
         }
     }
 
+    /**
+     * Protected clients without a main responsible and who becomes it (a paying
+     * client always has one): the creator of the bill of its last incoming
+     * payment, else who registered that payment, else the creator of its last
+     * active service, else the first administrator. Only active employees.
+     *
+     * @return array[] code, id, name, user_id, user, source
+     */
+    public function mainPlan(): array
+    {
+        if (!self::ready() || !CrmAccess::mainReady()) {
+            return [];
+        }
+        $access = CrmAccess::instance();
+        $admins = $access->adminIds();
+        $worker = static fn($id) => $id && CmsUser::find()->andWhere(['id' => (int)$id, 'is_worker' => 1, 'is_active' => 1])->exists() ? (int)$id : null;
+        $payment = '\skeeks\cms\shop\models\ShopPayment';
+        $bill = '\skeeks\cms\shop\models\ShopBill';
+        $plan = [];
+        foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
+            [$linkClass, $recordColumn] = CrmAccess::linkTable($code);
+            $column = $code === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id';
+            $records = $class::find()->andWhere(['crm_protection' => [self::PROTECTED, self::ALWAYS]])
+                ->andWhere(['not exists', $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($class::tableName().'.id')])->andWhere(['is_main' => 1])])
+                ->orderBy(['id' => SORT_ASC])->all();
+            foreach ($records as $record) {
+                $userId = null;
+                $source = '';
+                $last = class_exists($payment) ? $payment::find()->andWhere([$column => (int)$record->id, 'is_debit' => 1])
+                    ->orderBy(new \yii\db\Expression('COALESCE(operation_at, created_at) DESC'))->one() : null;
+                if ($last && class_exists($bill) && ($userId = $worker($bill::find()->select('created_by')->andWhere(['shop_payment_id' => (int)$last->id])->scalar()))) {
+                    $source = 'счёт последнего платежа';
+                } elseif ($last && ($userId = $worker($last->created_by))) {
+                    $source = 'последний платёж';
+                } elseif ($userId = $worker(CmsDeal::find()->select('created_by')->andWhere([$column => (int)$record->id, 'is_active' => 1])->orderBy(['id' => SORT_DESC])->scalar())) {
+                    $source = 'действующая услуга';
+                } elseif ($admins) {
+                    $userId = $admins[0];
+                    $source = 'администратор по умолчанию';
+                }
+                $user = $userId ? CmsUser::findOne($userId) : null;
+                $plan[] = [
+                    'code' => $code,
+                    'id' => (int)$record->id,
+                    'name' => $record instanceof CmsCompany ? (string)$record->name : (string)$record->shortDisplayName,
+                    'user_id' => $userId,
+                    'user' => $user ? (string)$user->shortDisplayName : '—',
+                    'source' => $source ?: 'никого нет',
+                ];
+            }
+        }
+
+        return $plan;
+    }
+
+    /** Applies mainPlan(): the chosen employee becomes the main responsible ("full"). */
+    public function applyMainPlan(array $plan): int
+    {
+        $count = 0;
+        foreach ($plan as $row) {
+            if ($row['user_id'] && CrmAccess::instance()->mainResponsibleId($row['code'], (int)$row['id']) === null) {
+                CrmAccess::instance()->setMain($row['code'], (int)$row['id'], (int)$row['user_id']);
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
     /** «Под защитой до 15.03.2027: последний платёж 15.03.2026» and the like. */
     public static function describe(string $recordCode, int $recordId): string
     {
