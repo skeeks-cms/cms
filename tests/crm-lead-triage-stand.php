@@ -797,6 +797,9 @@ try {
     [$code, $leadCard] = $http('/~sxx/cms/admin-cms-lead/view?pk='.(int)$httpLead->id);
     $check($code === 200 && strpos($leadCard, 'lead_id='.(int)$httpLead->id) !== false && strpos($leadCard, 'Изменить телефон') === false,
         'HTTP "deal": the own deal offers «Добавить телефон» from the deal, no edit of the company phones');
+    $check(strpos($leadCard, 'admin-cms-lead-contractor/create') === false && strpos($leadCard, 'admin-cms-lead-link/create') === false
+        && strpos($leadCard, 'admin-cms-company-contractor/create') === false && strpos($leadCard, 'admin-cms-company-link/create') === false,
+        'HTTP "deal": a deal of a company has no requisites or links of its own, those of the company are read only');
     [$code] = $http('/~sxx/cms/admin-cms-company-phone/create?CmsCompanyPhone%5Bcms_company_id%5D='.(int)$httpCompany->id.'&lead_id='.(int)$httpLead->id);
     $check($code === 200, 'HTTP "deal": a new phone from the own deal opens');
     @unlink($jar);

@@ -449,9 +449,27 @@ CSS
             ]);
             }
 
-            if ($canWork) {
-                $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => $leadId]));
-                $this->registerJs(<<<JS
+            $contractorItems = static fn(array $contractors, callable $actions): array => array_map(static fn($contractor) => [
+                'label' => $contractor->contractor_type ? $contractor->getTypeAsText() : 'Реквизиты',
+                'value' => BackendEntityLink::widget([
+                    'controllerId' => '/cms/admin-cms-contractor',
+                    'modelId' => $contractor->id,
+                    'content' => Html::encode($contractor->asText),
+                ]),
+                'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
+                'actions' => $actions($contractor),
+            ], $contractors);
+            $linkItems = static fn(array $links, callable $actions): array => array_map(static fn($link) => [
+                'label' => $link->name ?: $link->linkTypeAsText ?: 'Ссылка',
+                'value' => Html::a(Html::encode($link->url), $link->url, ['target' => '_blank', 'rel' => 'noopener noreferrer', 'data-pjax' => '0']),
+                'actions' => $actions($link),
+            ], $links);
+
+            if ($requestData) {
+                // П2г: requisites and links of a request without a client; they go to the company created or found on sorting.
+                if ($canWork) {
+                    $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => $leadId]));
+                    $this->registerJs(<<<JS
 $(document).off('click.sxLeadContractor').on('click.sxLeadContractor', '[data-sx-lead-contractor-detach]', function () {
     if (!confirm('Убрать эти реквизиты из сделки? Сами реквизиты останутся в базе.')) {
         return false;
@@ -463,44 +481,66 @@ $(document).off('click.sxLeadContractor').on('click.sxLeadContractor', '[data-sx
     return false;
 });
 JS
-                );
-            }
-            // Full contractor form with "fill by INN"; an INN already in the base is only linked.
-            echo CrmContactBlockWidget::widget([
-                'title' => 'Реквизиты',
-                'hint' => 'Реквизиты организации или ИП для счетов и договоров. Если такой ИНН уже есть в базе, реквизиты просто привязываются. При создании компании они переносятся в неё.',
-                'icon' => 'id-card',
-                'items' => array_map(static fn($contractor) => [
-                    'label' => $contractor->contractor_type ? $contractor->getTypeAsText() : 'Реквизиты',
-                    'value' => BackendEntityLink::widget([
-                        'controllerId' => '/cms/admin-cms-contractor',
-                        'modelId' => $contractor->id,
-                        'content' => Html::encode($contractor->asText),
-                    ]),
-                    'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
-                    'actions' => $canWork
+                    );
+                }
+                // Full contractor form with "fill by INN"; an INN already in the base is only linked.
+                echo CrmContactBlockWidget::widget([
+                    'title' => 'Реквизиты из обращения',
+                    'hint' => 'Реквизиты организации или ИП, с которыми пришла сделка. Если такой ИНН уже есть в базе, реквизиты просто привязываются. При разборе они переносятся в компанию; когда у сделки появится компания или клиент, здесь будут их реквизиты.',
+                    'icon' => 'id-card',
+                    'items' => $contractorItems($model->contractors, static fn($contractor) => $canWork
                         ? CrmContactBlockWidget::iconButton('close', 'Убрать из сделки', ['data-sx-lead-contractor-detach' => (int)$contractor->id])
-                        : '',
-                ], $model->contractors),
-                'emptyText' => 'Реквизитов пока нет',
-                'addLabel' => 'Добавить реквизиты',
-                'addRoute' => $canWork ? ['/cms/admin-cms-lead-contractor/create', 'lead_id' => $leadId] : null,
-            ]);
+                        : ''),
+                    'emptyText' => 'Реквизитов пока нет',
+                    'addLabel' => 'Добавить реквизиты',
+                    'addRoute' => $canWork ? ['/cms/admin-cms-lead-contractor/create', 'lead_id' => $leadId] : null,
+                ]);
 
-            echo CrmContactBlockWidget::widget([
-                'title' => 'Ссылки',
-                'hint' => 'Сайт и соцсети клиента. При создании компании ссылки переносятся в неё.',
-                'icon' => 'link',
-                'items' => array_map(static fn($link) => [
-                    'label' => $link->name ?: $link->linkTypeAsText ?: 'Ссылка',
-                    'value' => Html::a(Html::encode($link->url), $link->url, ['target' => '_blank', 'rel' => 'noopener noreferrer', 'data-pjax' => '0']),
-                    'actions' => $menu('/cms/admin-cms-lead-link', (int)$link->id, 'Изменить ссылку'),
-                ], $model->links),
-                'emptyText' => 'Ссылок пока нет',
-                'addLabel' => 'Добавить ссылку',
-                'addRoute' => $canWork ? ['/cms/admin-cms-lead-link/create', 'CmsLeadLink' => ['cms_lead_id' => $leadId]] : null,
-                'addSize' => 'small',
-            ]);
+                echo CrmContactBlockWidget::widget([
+                    'title' => 'Ссылки из обращения',
+                    'hint' => 'Сайт и соцсети клиента из обращения. При разборе ссылки переносятся в компанию; когда у сделки появится компания, здесь будут её ссылки.',
+                    'icon' => 'link',
+                    'items' => $linkItems($model->links, static fn($link) => $menu('/cms/admin-cms-lead-link', (int)$link->id, 'Изменить ссылку')),
+                    'emptyText' => 'Ссылок пока нет',
+                    'addLabel' => 'Добавить ссылку',
+                    'addRoute' => $canWork ? ['/cms/admin-cms-lead-link/create', 'CmsLeadLink' => ['cms_lead_id' => $leadId]] : null,
+                    'addSize' => 'small',
+                ]);
+            } else {
+                // П2г: a deal of a client has no requisites or links of its own — those of the company (or the person)
+                // are shown and changed there, by the access levels (from "edit"; "Свои сделки" reads them).
+                $clientRecord = $model->company ?: $model->client;
+                $canEditClient = \skeeks\cms\crm\CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $clientRecord);
+                $clientMenu = static fn(string $controllerId, int $id, string $title): string => $canEditClient
+                    ? CrmContactBlockWidget::menu($controllerId, $id, $title)
+                    : '';
+                echo CrmContactBlockWidget::widget([
+                    'title' => 'Реквизиты',
+                    'hint' => $model->company
+                        ? 'Реквизиты компании «'.$model->company->name.'» для счетов и договоров. Меняются в компании: с уровнем доступа «Свои сделки и данные компании» и выше.'
+                        : 'Реквизиты клиента для счетов и договоров. Меняются в карточке клиента: с уровнем доступа «Свои сделки и данные компании» и выше.',
+                    'icon' => 'id-card',
+                    'items' => $contractorItems($model->company ? $model->company->contractors : $model->client->cmsContractors,
+                        static fn($contractor) => $clientMenu('/cms/admin-cms-contractor', (int)$contractor->id, 'Изменить реквизиты')),
+                    'emptyText' => 'Реквизитов пока нет',
+                    'addLabel' => 'Добавить реквизиты',
+                    'addRoute' => $canEditClient
+                        ? ($model->company ? ['/cms/admin-cms-company-contractor/create', 'company_id' => (int)$model->company->id] : ['/cms/admin-cms-user-contractor/create', 'user_id' => (int)$model->client->id])
+                        : null,
+                ]);
+                if ($model->company) {
+                    echo CrmContactBlockWidget::widget([
+                        'title' => 'Ссылки',
+                        'hint' => 'Сайт и соцсети компании «'.$model->company->name.'». Меняются в компании: с уровнем доступа «Свои сделки и данные компании» и выше.',
+                        'icon' => 'link',
+                        'items' => $linkItems($model->company->links, static fn($link) => $clientMenu('/cms/admin-cms-company-link', (int)$link->id, 'Изменить ссылку')),
+                        'emptyText' => 'Ссылок пока нет',
+                        'addLabel' => 'Добавить ссылку',
+                        'addRoute' => $canEditClient ? ['/cms/admin-cms-company-link/create', 'CmsCompanyLink' => ['cms_company_id' => (int)$model->company->id]] : null,
+                        'addSize' => 'small',
+                    ]);
+                }
+            }
             ?>
 
             <?php // Blocks of other packages (КП and others), CrmCardBlocksWidget::EVENT_BLOCKS. ?>
