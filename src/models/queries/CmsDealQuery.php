@@ -42,17 +42,12 @@ class CmsDealQuery extends CmsActiveQuery
         //Если нет прав админа, нужно показать только доступные сделки
         if (!$isCanAdmin) {
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
-            $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
-
-            //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
-            $this->andWhere([
-                'or',
-                //Связь клиентов с менеджерами
-                [self::getPrimaryTableName() . ".cms_company_id" => $cmsCompanyQuery],
-                //Искать конткты по всем доступным компаниям
-                [self::getPrimaryTableName() . ".cms_user_id" => $cmsUserQuery],
-            ]);
+            // A client seen in full, or "своё" for the level "Свои сделки" (CrmAccess::clientRecordCondition()).
+            $access = \skeeks\cms\crm\CrmAccess::instance();
+            $table = self::getPrimaryTableName();
+            $this->andWhere($access->clientRecordCondition($user, $table, [
+                [$table.'.created_by' => $access->ownerIds($user)],
+            ]));
         }
 
         return $this;

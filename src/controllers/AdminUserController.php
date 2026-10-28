@@ -643,6 +643,14 @@ class AdminUserController extends BackendModelStandartController
 
                     ArrayHelper::removeValue($visibleColumns, 'cms_user_id');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+                    // The bills the employee sees (ShopBillQuery::forManager(): "своё" for "Свои сделки").
+                    $relationInit = $action->relatedIndexAction->grid['on init'] ?? null;
+                    $action->relatedIndexAction->grid['on init'] = function (Event $e) use ($relationInit) {
+                        if ($relationInit) {
+                            $relationInit($e);
+                        }
+                        $e->sender->dataProvider->query->forManager();
+                    };
 
                 },
 

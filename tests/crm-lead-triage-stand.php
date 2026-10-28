@@ -789,7 +789,20 @@ try {
             'an administrator: a company of the pool opens in full (deals, bills, payments, edit, the whole feed)');
         $as($other);
         $poolFeed = $access2d->feedCondition($other, $pool);
-        $check($poolFeed !== null && strpos(json_encode($poolFeed), 'CmsLead') === false, 'the feed of the pool: the client\'s own records only');
+        // The model codes the feed condition takes (subqueries of record visibility do not count).
+        $feedCodes = static function ($condition) use (&$feedCodes): array {
+            $codes = [];
+            foreach (is_array($condition) ? $condition : [] as $key => $value) {
+                if (is_string($key) && substr($key, -11) === '.model_code') {
+                    $codes = array_merge($codes, (array)$value);
+                } elseif (is_array($value)) {
+                    $codes = array_merge($codes, $feedCodes($value));
+                }
+            }
+
+            return $codes;
+        };
+        $check($poolFeed !== null && $feedCodes($poolFeed) === [$pool->skeeksModelCode], 'the feed of the pool: the client\'s own records only');
         $filteredPool = CmsCompany::find()->andWhere(['id' => $pool->id]);
         $access2d->applyResponsibleFilter($filteredPool, 'company', 'pool', CmsCompany::tableName().'.id', (int)$other->id);
         $check($filteredPool->exists() && isset(CrmAccess::responsibleFilterItems()['pool']), 'the filter «Общий пул»');

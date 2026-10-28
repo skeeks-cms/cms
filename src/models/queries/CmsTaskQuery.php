@@ -57,15 +57,15 @@ class CmsTaskQuery extends CmsActiveQuery
                 $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
             }
 
-            $condition = [
-                "or",
-                [self::getPrimaryTableName() . ".cms_project_id" => CmsProject::find()->forManager($user)->select(CmsProject::tableName() . '.id')],
-                [self::getPrimaryTableName() . ".cms_company_id" => CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id')],
-                [self::getPrimaryTableName() . ".cms_user_id" => CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id')],
-                //Свои задачи и задачи подчиненных: исполнитель или постановщик
-                [self::getPrimaryTableName() . ".executor_id" => array_values($managers)],
-                [self::getPrimaryTableName() . ".created_by" => array_values($managers)],
-            ];
+            // A client seen in full, or "своё" for the level "Свои сделки" (CrmAccess::clientRecordCondition()):
+            // own tasks and of the subordinates (executor or author), tasks of his deals.
+            $table = self::getPrimaryTableName();
+            $condition = \skeeks\cms\crm\CrmAccess::instance()->clientRecordCondition($user, $table, [
+                [$table . ".cms_project_id" => CmsProject::find()->forManager($user)->select(CmsProject::tableName() . '.id')],
+                [$table . ".executor_id" => array_values($managers)],
+                [$table . ".created_by" => array_values($managers)],
+                [$table . ".cms_lead_id" => \skeeks\cms\models\CmsLead::find()->forManager($user)->select(\skeeks\cms\models\CmsLead::tableName() . '.id')],
+            ]);
             if (static::hasDealColumn()) {
                 $condition[] = [self::getPrimaryTableName() . ".cms_deal_id" => CmsDeal::find()->forManager($user)->select(CmsDeal::tableName() . '.id')];
             }

@@ -724,6 +724,82 @@ class CrmAccess extends Component
     }
 
     /**
+     * Who counts as "the employee himself" in the "своё" rule: he and his
+     * subordinates (a leader sees the work of his department).
+     *
+     * @param \skeeks\cms\models\User|int $user
+     * @return int[]
+     */
+    public function ownerIds($user): array
+    {
+        $userId = $this->userId($user);
+
+        return array_values(array_unique(array_merge([$userId], array_map('intval', CmsDepartment::subordinateIds($userId)))));
+    }
+
+    /**
+     * One visibility of the client records that are not deals — services
+     * (CmsDeal), bills, payments, documents, tasks, proposals (owner's decision
+     * 28.10.2026): a record of a company or a person is seen when the client is
+     * seen with the level "edit" or above (clientDataLevel(): a link
+     * "edit"/"full" of him or a subordinate, a person of such a company without
+     * an own link), or when the record is "своё" — the $own conditions of the
+     * caller (created by him or his subordinates, he is the executor or the
+     * responsible, it is tied to his deal). With "Свои сделки" the other
+     * records of the client are hidden. Not for administrators: the
+     * forManager() scopes return before.
+     *
+     * @param \skeeks\cms\models\User|int $user
+     * @param string $table the table (or alias) with cms_company_id and cms_user_id
+     * @param array $own extra OR conditions of "своё"
+     * @return array a where condition
+     */
+    public function clientRecordCondition($user, string $table, array $own = [], string $companyColumn = 'cms_company_id', string $userColumn = 'cms_user_id'): array
+    {
+        $identity = $this->identity($user);
+        $companies = CmsCompany::find()->forManager($identity)->select(CmsCompany::tableName().'.id');
+        $dealOnly = $this->dealOnlyCompanyIds($user);
+        if ($dealOnly === null) {
+            return array_merge(['or',
+                [$table.'.'.$companyColumn => $companies],
+                [$table.'.'.$userColumn => CmsUser::find()->forManager($identity)->select(CmsUser::tableName().'.id')],
+            ], $own);
+        }
+        $companies->andWhere(['not in', CmsCompany::tableName().'.id', $dealOnly]);
+
+        return array_merge(['or',
+            [$table.'.'.$companyColumn => $companies],
+            $this->fullClientCondition($user, $table.'.'.$userColumn, $companies),
+        ], $own);
+    }
+
+    /**
+     * People seen with the level "edit" or above (clientDataLevel() in SQL):
+     * an own or a subordinate's link "edit"/"full", or no own link and a
+     * company of the person seen in full.
+     */
+    private function fullClientCondition($user, string $column, \yii\db\ActiveQuery $fullCompanies): array
+    {
+        $userId = $this->userId($user);
+        $ownerIds = $this->ownerIds($user);
+        $subordinates = array_values(array_diff($ownerIds, [$userId]));
+        $condition = ['or',
+            [$column => CmsUser2manager::find()->select('client_id')
+                ->andWhere(['worker_id' => $userId, 'access_level' => [self::LEVEL_EDIT, self::LEVEL_FULL]])],
+            ['and',
+                ['not in', $column, CmsUser2manager::find()->select('client_id')->andWhere(['worker_id' => $userId])],
+                [$column => CmsCompany2user::find()->select('cms_user_id')->andWhere(['cms_company_id' => $fullCompanies])],
+            ],
+        ];
+        if ($subordinates) {
+            $condition[] = [$column => CmsUser2manager::find()->select('client_id')
+                ->andWhere(['worker_id' => $subordinates, 'access_level' => [self::LEVEL_EDIT, self::LEVEL_FULL]])];
+        }
+
+        return $condition;
+    }
+
+    /**
      * The feed of a company or a person for the level "Свои сделки" (П2а+,
      * owner's decision 28.10.2026): the records of the client itself (calls,
      * letters, chats, comments — the communication his deal needs), the
@@ -747,7 +823,7 @@ class CrmAccess extends Component
             // The general pool: the client's own records only, until somebody takes it.
             $table = \skeeks\cms\models\CmsLog::tableName();
 
-            return ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]];
+            return $this->clientOwnFeedCondition($user, $record, $table);
         }
         if ($level === null || self::levelRank($level) >= self::levelRank(self::LEVEL_EDIT)) {
             return null;
@@ -757,11 +833,39 @@ class CrmAccess extends Component
         $ownLeads = CmsLead::find()->forManager($identity)->select(CmsLead::tableName().'.id')
             ->andWhere([CmsLead::tableName().($record instanceof CmsCompany ? '.cms_company_id' : '.cms_user_id') => (int)$record->id]);
         $condition = ['or',
-            ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]],
+            $this->clientOwnFeedCondition($user, $record, $table),
             ['and', [$table.'.model_code' => (new CmsLead())->skeeksModelCode], [$table.'.model_id' => $ownLeads]],
             ['and', [$table.'.model_code' => (new \skeeks\cms\models\CmsTask())->skeeksModelCode],
                 [$table.'.model_id' => \skeeks\cms\models\CmsTask::find()->select('id')->andWhere(['cms_lead_id' => $ownLeads])]],
         ];
+        return $condition;
+    }
+
+    /**
+     * The records of the client itself in a limited feed. Entries another
+     * record writes there (a proposal of the company — ProposalFeed) are not
+     * "the client's own": a log type whose renderer implements
+     * CmsLogFeedVisibilityInterface shows only the entries of records the
+     * employee sees (a proposal without a deal or of a service is "своё" only).
+     */
+    private function clientOwnFeedCondition($user, $record, string $table): array
+    {
+        $condition = ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]];
+        if (!\Yii::$app->has('skeeks')) {
+            return $condition;
+        }
+        $skeeks = \Yii::$app->skeeks;
+        $identity = $this->identity($user);
+        foreach (array_keys((array)$skeeks->logRenderers) as $logType) {
+            $renderer = $skeeks->getLogRenderer($logType);
+            if ($renderer instanceof \skeeks\cms\log\CmsLogFeedVisibilityInterface && $identity) {
+                $condition[] = ['or',
+                    ['not', [$table.'.log_type' => (string)$logType]],
+                    $renderer->feedVisibleCondition($identity, $table),
+                ];
+            }
+        }
+
         return $condition;
     }
 

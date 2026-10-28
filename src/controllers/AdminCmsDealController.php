@@ -51,6 +51,9 @@ use yii\web\ForbiddenHttpException;
  */
 class AdminCmsDealController extends BackendModelStandartController
 {
+    // A card opens only a record the employee sees (forManager()), otherwise 404.
+    use \skeeks\cms\controllers\traits\ManagerScopedModel;
+
     /**
      * За сколько до окончания сделка подсвечивается как истекающая.
      */
