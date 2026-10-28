@@ -387,9 +387,46 @@ try {
     $opened = CmsWebNotify::find()->andWhere(['cms_user_id' => $other->id, 'event_key' => 'crm.access_decided:'.(int)$access->id])->one();
     $check($opened && $opened->name === 'Одобрен запрос: работа с клиентом, уровень «Свои сделки и данные компании»'
         && $opened->model instanceof CmsLead && (int)$opened->model_id === (int)$created->id, 'approval notification: the level and the new deal');
-    $check(CrmAccess::instance()->canSeeCompany($other->id, (int)$company->id), 'a level below "full" works as full for now');
+    $check(CrmAccess::instance()->canSeeCompany($other->id, (int)$company->id), 'a level below "full" sees the company');
     $check(CrmAccess::instance()->defaultExecutorId((int)$company->id, null, (int)$other->id) === (int)$other->id, 'a linked employee takes a new deal himself');
     $check(!in_array((int)$other->id, CrmAccess::instance()->companyResponsibleIds((int)$company->id), true), '"edit" is not a "full" responsible');
+
+    // --- П2а+: what each level may do with the company data ---
+    $levelAccess = CrmAccess::instance();
+    $companyPhone = CmsCompanyPhone::find()->andWhere(['cms_company_id' => $company->id])->one();
+    $actionAllowed = static function (string $route, $model, string $action) {
+        [$controller] = Yii::$app->createController($route);
+        $controller->setModel($model);
+        $callback = $controller->actions()[$action]['accessCallback'] ?? null;
+
+        return is_callable($callback) ? (bool)$callback() : (bool)$callback;
+    };
+    $setLevel = static fn(CmsUser $user, string $level) => CmsCompany2manager::updateAll(['access_level' => $level],
+        ['cms_company_id' => $company->id, 'cms_user_id' => $user->id]);
+    // "edit": the data of the company, not the responsible employees.
+    $as($other);
+    $check($levelAccess->canEditClientData($other->id, 'company', (int)$company->id) && $levelAccess->canEditClientRecord($other->id, $companyPhone),
+        '"edit" changes the company data and its phones');
+    $check($actionAllowed('cms/admin-cms-company', $company, 'update') && $actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'delete'),
+        '"edit": the company form and deleting a phone are allowed');
+    $check(!$levelAccess->canManageAccess($other->id, 'company', (int)$company->id) && !$actionAllowed('cms/admin-cms-company', $company, 'delete'),
+        '"edit" does not manage the responsible employees and does not delete the company');
+    // "deal": sees and contacts the client, changes nothing of its data.
+    $setLevel($other, CrmAccess::LEVEL_DEAL);
+    $check($levelAccess->canSeeCompany($other->id, (int)$company->id) && $levelAccess->clientDataLevel($other->id, 'company', (int)$company->id) === CrmAccess::LEVEL_DEAL,
+        '"deal" sees the company');
+    $check(!$levelAccess->canEditClientData($other->id, 'company', (int)$company->id) && !$levelAccess->canEditClientRecord($other->id, $companyPhone),
+        '"deal" does not change the company data');
+    $check(!$actionAllowed('cms/admin-cms-company', $company, 'update') && !$actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'update')
+        && !$actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'delete') && !$actionAllowed('cms/admin-cms-company', $company, 'add-user'),
+        '"deal": the company form, a phone edit and delete, adding a person are refused (403)');
+    $check($actionAllowed('cms/admin-cms-company', $company, 'view'), '"deal" opens the company card');
+    // "full" (the main responsible): everything.
+    $as($owner);
+    $check($levelAccess->canEditClientData($owner->id, 'company', (int)$company->id) && $levelAccess->canManageAccess($owner->id, 'company', (int)$company->id)
+        && $actionAllowed('cms/admin-cms-company', $company, 'update') && $actionAllowed('cms/admin-cms-company', $company, 'delete')
+        && $actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'delete'), '"full": the data, the accesses and deleting are allowed');
+    $setLevel($other, CrmAccess::LEVEL_EDIT);
     // An incoming request of a client «по согласованию» does not wait: it goes to the main responsible.
     if ($third2 = $plain[3] ?? null) {
         $as($third2);

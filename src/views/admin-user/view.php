@@ -286,15 +286,17 @@ CSS
 
             <?php
             $approvedNote = static fn($contact) => $contact->is_approved ? 'Подтверждён клиентом' : 'Не подтверждён';
+            // П2а+: "Свои сделки" sees the data and contacts the client; changing it — "edit", "full", a leader, an administrator.
+            $canEditData = \skeeks\cms\crm\CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $model);
             echo CrmContactBlockWidget::widget([
                 'title' => 'Телефоны',
                 'hint' => 'У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию.',
                 'icon' => 'phone',
                 'surface' => $contactSurface,
-                'items' => CrmContactBlockWidget::phoneItems($model->cmsUserPhones, '/cms/admin-user-phone', $model, ['note' => $approvedNote]),
+                'items' => CrmContactBlockWidget::phoneItems($model->cmsUserPhones, '/cms/admin-user-phone', $model, ['note' => $approvedNote, 'editable' => $canEditData]),
                 'emptyText' => 'Телефонов пока нет',
                 'addLabel' => 'Добавить телефон',
-                'addRoute' => ['/cms/admin-user-phone/create', 'CmsUserPhone' => ['cms_user_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-user-phone/create', 'CmsUserPhone' => ['cms_user_id' => $model->id]] : null,
                 'addSize' => 'small',
             ]);
 
@@ -303,10 +305,10 @@ CSS
                 'hint' => 'У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию.',
                 'icon' => 'mail',
                 'surface' => $contactSurface,
-                'items' => CrmContactBlockWidget::emailItems($model->cmsUserEmails, '/cms/admin-user-email', $model, ['note' => $approvedNote]),
+                'items' => CrmContactBlockWidget::emailItems($model->cmsUserEmails, '/cms/admin-user-email', $model, ['note' => $approvedNote, 'editable' => $canEditData]),
                 'emptyText' => 'Email пока нет',
                 'addLabel' => 'Добавить email',
-                'addRoute' => ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => $model->id]] : null,
                 'addSize' => 'small',
             ]);
 
@@ -324,11 +326,11 @@ CSS
                         $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
                         $address->comment ?: null,
                     ])),
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-user-address', (int)$address->id, 'Изменить адрес'),
+                    'actions' => $canEditData ? CrmContactBlockWidget::menu('/cms/admin-user-address', (int)$address->id, 'Изменить адрес') : '',
                 ], $model->cmsUserAddresses),
                 'emptyText' => 'Адресов пока нет',
                 'addLabel' => 'Добавить адрес',
-                'addRoute' => ['/cms/admin-user-address/create', 'CmsUserAddress' => ['cms_user_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-user-address/create', 'CmsUserAddress' => ['cms_user_id' => $model->id]] : null,
             ]);
             ?>
 
@@ -370,11 +372,13 @@ CSS
                         ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
                     ]);
                     ?>
+                    <?php if ($canEditData) : ?>
                     <button type="button" class="sx-contact-add" onclick='<?= new \yii\web\JsExpression(<<<JS
                new sx.classes.backend.widgets.Action({$actionData}).go(); return false;
 JS
                     ); ?>'><?= CrmContactBlockWidget::icon('edit'); ?> Редактировать
                     </button>
+                    <?php endif; ?>
             <?php BackendSurfaceWidget::end(); ?>
 
             <?php
@@ -392,11 +396,11 @@ JS
                         'content' => Html::encode($contractor->asText),
                     ]),
                     'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-contractor', (int)$contractor->id, 'Изменить реквизиты'),
+                    'actions' => $canEditData ? CrmContactBlockWidget::menu('/cms/admin-cms-contractor', (int)$contractor->id, 'Изменить реквизиты') : '',
                 ], $model->cmsContractors),
                 'emptyText' => 'Реквизитов пока нет',
                 'addLabel' => 'Добавить реквизиты',
-                'addRoute' => ['/cms/admin-cms-user-contractor/create', 'user_id' => $model->id],
+                'addRoute' => $canEditData ? ['/cms/admin-cms-user-contractor/create', 'user_id' => $model->id] : null,
             ]);
             ?>
 

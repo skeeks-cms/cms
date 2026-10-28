@@ -31,7 +31,9 @@ class AdminCmsUserContractorController extends AdminCmsContractorAttachControlle
 
     protected function canAttach(ActiveRecord $owner): bool
     {
-        return \Yii::$app->user->can('cms/admin-user/manage', ['model' => $owner]);
+        // П2а+: requisites are the client data — "edit", "full", a leader, an administrator.
+        return \Yii::$app->user->can('cms/admin-user/manage', ['model' => $owner])
+            && \skeeks\cms\crm\CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $owner);
     }
 
     protected function isAttached(ActiveRecord $owner, CmsContractor $contractor): bool

@@ -95,6 +95,26 @@ class AdminUserController extends BackendModelStandartController
         parent::init();
     }
 
+    /** П2а+: the data of a client person — "edit", "full", a leader, an administrator (employees: their own rules). */
+    protected function canEditClient($user): bool
+    {
+        return $user && \skeeks\cms\crm\CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $user);
+    }
+
+    /** П2а+: responsible employees of a client — the main responsible, his leaders, an administrator. */
+    protected function canManageClientAccess($user): bool
+    {
+        return $user && ($user->is_worker || \skeeks\cms\crm\CrmAccess::instance()->canManageAccess((int)\Yii::$app->user->id,
+                \skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT, (int)$user->id));
+    }
+
+    /** П2а+: removing a client person — the level "full"; employees: their own rules. */
+    protected function canDeleteClient($user): bool
+    {
+        return $user && ($user->is_worker || \skeeks\cms\crm\CrmAccess::instance()->clientDataLevel((int)\Yii::$app->user->id,
+                \skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT, (int)$user->id) === \skeeks\cms\crm\CrmAccess::LEVEL_FULL);
+    }
+
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
@@ -779,7 +799,17 @@ class AdminUserController extends BackendModelStandartController
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]) && $this->canEditClient($this->model);
+                },
+                // П2а+: responsible employees are changed by who manages the accesses, not by "edit".
+                'on beforeValidate' => function (\yii\base\Event $event) {
+                    $model = $event->sender->model;
+                    $posted = \Yii::$app->request->post($model->formName());
+                    if (is_array($posted) && array_key_exists('managers', $posted) && !$this->canManageClientAccess($model)) {
+                        $model->getValidators()->append(\yii\validators\Validator::createValidator(static function () use ($model) {
+                            $model->addError('managers', 'Ответственных меняют основной ответственный, его руководитель или администратор: «Доступ к клиенту» в карточке.');
+                        }, $model, ['managers']));
+                    }
                 },
             ],
 
@@ -787,6 +817,9 @@ class AdminUserController extends BackendModelStandartController
                 'class'     => BackendModelUpdateAction::class,
                 "callback"  => [$this, 'updateEav'],
                 'isVisible' => false,
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]) && $this->canEditClient($this->model);
+                },
             ],
 
             'delete' => [
@@ -796,7 +829,7 @@ class AdminUserController extends BackendModelStandartController
                         return false;
                     }
 
-                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]) && $this->canDeleteClient($this->model);
                 },
 
             ],
@@ -805,7 +838,7 @@ class AdminUserController extends BackendModelStandartController
             "activate-multi" => [
                 'class'              => BackendModelMultiActivateAction::class,
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]) && $this->canEditClient($model);
                 },
                 "accessCallback"     => function () {
                     return \Yii::$app->user->can("cms/admin-user/manage");
@@ -815,7 +848,7 @@ class AdminUserController extends BackendModelStandartController
             "deactivate-multi" => [
                 'class'              => BackendModelMultiDeactivateAction::class,
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]) && $this->canEditClient($model);
                 },
                 "accessCallback"     => function () {
                     return \Yii::$app->user->can("cms/admin-user/manage");
@@ -824,7 +857,7 @@ class AdminUserController extends BackendModelStandartController
 
             "delete-multi" => [
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $model]) && $this->canDeleteClient($model);
                 },
                 "accessCallback"     => function () {
                     return \Yii::$app->user->can("cms/admin-user/manage");
@@ -1027,6 +1060,7 @@ JS
                 'alias',
 
 
+                // П2а+: shown to who manages the accesses of the client (unset below otherwise).
                 'managers' => [
                     'class'        => WidgetField::class,
                     'widgetClass'  => AjaxSelectModel::class,
@@ -1047,6 +1081,10 @@ JS
             ];
         }
 
+
+        if (isset($result['managers']) && $this->model && !$this->model->isNewRecord && !$this->canManageClientAccess($this->model)) {
+            unset($result['managers']);
+        }
 
         if ((\Yii::$app->user->can("cms/admin-user/manage-advanced", ['model' => $this->model]))
             || \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROOT_ACCESS)) {

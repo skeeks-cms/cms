@@ -23,6 +23,14 @@ use yii\helpers\ArrayHelper;
  */
 class AdminUserPhoneController extends BackendModelStandartController
 {
+    // П2а+: rows are changed only by who may edit the client (CrmAccess::canEditClientRecord()).
+    use \skeeks\cms\controllers\traits\ClientDataGuard;
+
+    protected function clientDataColumn(): string
+    {
+        return 'cms_user_id';
+    }
+
     public function init()
     {
         $this->name = "Управление телефонами";
@@ -118,7 +126,7 @@ class AdminUserPhoneController extends BackendModelStandartController
             ],
         ]);
 
-        return $actions;
+        return $this->guardClientData($actions);
     }
 
     public function updateFields($action)

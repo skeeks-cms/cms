@@ -279,7 +279,9 @@ CSS
             <?php
             //"Сделка как услуга": people of the client with their role in the company and grants in its deals.
             $accessReady = \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady();
-            $canManageAccess = $accessReady && \Yii::$app->user->can("cms/admin-company/manage", ['model' => $model]);
+            // П2а+: "Свои сделки" sees the data and contacts the client; changing it — "edit", "full", a leader, an administrator.
+            $canEditData = \skeeks\cms\crm\CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $model);
+            $canManageAccess = $accessReady && $canEditData && \Yii::$app->user->can("cms/admin-company/manage", ['model' => $model]);
             $accessByUser = [];
             if ($accessReady) {
                 \skeeks\cms\assets\admin\ClientAccessAsset::register($this);
@@ -339,7 +341,7 @@ CSS
                                     ]); ?>
                                 </div>
                                 <div class="sx-contact-actions">
-                                    <?= CrmContactBlockWidget::menu('/cms/admin-cms-company2user', (int)$cmsCompany2users->id, 'Изменить контакт'); ?>
+                                    <?= $canEditData ? CrmContactBlockWidget::menu('/cms/admin-cms-company2user', (int)$cmsCompany2users->id, 'Изменить контакт') : ''; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -360,7 +362,7 @@ JS
                         ?>
                     <?php endif; ?>
 
-                    <?= $this->render('_add-person', ['model' => $model, 'accessReady' => $accessReady]); ?>
+                    <?= $canEditData ? $this->render('_add-person', ['model' => $model, 'accessReady' => $accessReady]) : ''; ?>
 
 
             <?php BackendSurfaceWidget::end(); ?>
@@ -373,10 +375,10 @@ JS
                 'hint' => 'У компании может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию.',
                 'icon' => 'phone',
                 'surface' => $contactSurface,
-                'items' => CrmContactBlockWidget::phoneItems($model->phones, '/cms/admin-cms-company-phone', $model),
+                'items' => CrmContactBlockWidget::phoneItems($model->phones, '/cms/admin-cms-company-phone', $model, ['editable' => $canEditData]),
                 'emptyText' => 'Телефонов пока нет',
                 'addLabel' => 'Добавить телефон',
-                'addRoute' => ['/cms/admin-cms-company-phone/create', 'CmsCompanyPhone' => ['cms_company_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-cms-company-phone/create', 'CmsCompanyPhone' => ['cms_company_id' => $model->id]] : null,
                 'addSize' => 'small',
             ]);
 
@@ -385,10 +387,10 @@ JS
                 'hint' => 'У компании может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию.',
                 'icon' => 'mail',
                 'surface' => $contactSurface,
-                'items' => CrmContactBlockWidget::emailItems($model->emails, '/cms/admin-cms-company-email', $model),
+                'items' => CrmContactBlockWidget::emailItems($model->emails, '/cms/admin-cms-company-email', $model, ['editable' => $canEditData]),
                 'emptyText' => 'Email пока нет',
                 'addLabel' => 'Добавить email',
-                'addRoute' => ['/cms/admin-cms-company-email/create', 'CmsCompanyEmail' => ['cms_company_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-cms-company-email/create', 'CmsCompanyEmail' => ['cms_company_id' => $model->id]] : null,
                 'addSize' => 'small',
             ]);
 
@@ -406,11 +408,11 @@ JS
                         $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
                         $address->comment ?: null,
                     ])),
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-company-address', (int)$address->id, 'Изменить адрес'),
+                    'actions' => $canEditData ? CrmContactBlockWidget::menu('/cms/admin-cms-company-address', (int)$address->id, 'Изменить адрес') : '',
                 ], $model->addresses),
                 'emptyText' => 'Адресов пока нет',
                 'addLabel' => 'Добавить адрес',
-                'addRoute' => ['/cms/admin-cms-company-address/create', 'CmsCompanyAddress' => ['cms_company_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-cms-company-address/create', 'CmsCompanyAddress' => ['cms_company_id' => $model->id]] : null,
             ]);
 
             // Full contractor form with "fill by INN"; an INN already in the base is only linked.
@@ -427,11 +429,11 @@ JS
                         'content' => Html::encode($contractor->asText),
                     ]),
                     'note' => $contractor->inn ? 'ИНН '.$contractor->inn : null,
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-contractor', (int)$contractor->id, 'Изменить реквизиты'),
+                    'actions' => $canEditData ? CrmContactBlockWidget::menu('/cms/admin-cms-contractor', (int)$contractor->id, 'Изменить реквизиты') : '',
                 ], $model->contractors),
                 'emptyText' => 'Реквизитов пока нет',
                 'addLabel' => 'Добавить реквизиты',
-                'addRoute' => ['/cms/admin-cms-company-contractor/create', 'company_id' => $model->id],
+                'addRoute' => $canEditData ? ['/cms/admin-cms-company-contractor/create', 'company_id' => $model->id] : null,
             ]);
 
             echo CrmContactBlockWidget::widget([
@@ -442,11 +444,11 @@ JS
                 'items' => array_map(static fn($link) => [
                     'label' => $link->name ?: $link->linkTypeAsText ?: 'Ссылка',
                     'value' => Html::a(Html::encode($link->url), $link->url, ['target' => '_blank', 'rel' => 'noopener noreferrer', 'data-pjax' => '0']),
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-cms-company-link', (int)$link->id, 'Изменить ссылку'),
+                    'actions' => $canEditData ? CrmContactBlockWidget::menu('/cms/admin-cms-company-link', (int)$link->id, 'Изменить ссылку') : '',
                 ], $model->links),
                 'emptyText' => 'Ссылок пока нет',
                 'addLabel' => 'Добавить ссылку',
-                'addRoute' => ['/cms/admin-cms-company-link/create', 'CmsCompanyLink' => ['cms_company_id' => $model->id]],
+                'addRoute' => $canEditData ? ['/cms/admin-cms-company-link/create', 'CmsCompanyLink' => ['cms_company_id' => $model->id]] : null,
                 'addSize' => 'small',
             ]);
             ?>

@@ -27,6 +27,14 @@ use yii\helpers\ArrayHelper;
  */
 class AdminCmsCompanyLinkController extends BackendModelStandartController
 {
+    // П2а+: rows are changed only by who may edit the client (CrmAccess::canEditClientRecord()).
+    use \skeeks\cms\controllers\traits\ClientDataGuard;
+
+    protected function clientDataColumn(): string
+    {
+        return 'cms_company_id';
+    }
+
     public function init()
     {
         $this->name = "Управление ссылками";
@@ -82,7 +90,7 @@ class AdminCmsCompanyLinkController extends BackendModelStandartController
             ],
         ]);
 
-        return $actions;
+        return $this->guardClientData($actions);
     }
 
     public function updateFields($action)

@@ -80,6 +80,26 @@ class AdminCmsCompanyController extends BackendModelStandartController
     /**
      * @inheritdoc
      */
+    /** П2а+: the company data (name, requisites, people, contacts) — "edit", "full", a leader, an administrator. */
+    protected function canEditCompany($company): bool
+    {
+        return $company && \skeeks\cms\crm\CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $company);
+    }
+
+    /** П2а+: responsible employees and levels — the main responsible, his leaders, an administrator. */
+    protected function canManageCompanyAccess($company): bool
+    {
+        return $company && \skeeks\cms\crm\CrmAccess::instance()->canManageAccess((int)\Yii::$app->user->id,
+                \skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY, (int)$company->id);
+    }
+
+    /** П2а+: removing a company — the level "full" (the main responsible, a leader, an administrator). */
+    protected function canDeleteCompany($company): bool
+    {
+        return $company && \skeeks\cms\crm\CrmAccess::instance()->clientDataLevel((int)\Yii::$app->user->id,
+                \skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY, (int)$company->id) === \skeeks\cms\crm\CrmAccess::LEVEL_FULL;
+    }
+
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
@@ -608,7 +628,7 @@ HTML
                 'isVisible' => false,
                 'callback'  => [$this, 'addContractor'],
                 "accessCallback" => function () {
-                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]) && $this->canEditCompany($this->model);
                 },
             ],
 
@@ -617,7 +637,7 @@ HTML
                 'isVisible' => false,
                 'callback'  => [$this, 'addUser'],
                 "accessCallback" => function () {
-                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]) && $this->canEditCompany($this->model);
                 },
             ],
 
@@ -629,7 +649,7 @@ HTML
                 'callback'  => [$this, 'clientPerson'],
                 "accessCallback" => function () {
                     return \skeeks\cms\models\queries\CmsDealQuery::dealAccessReady()
-                        && \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                        && \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]) && $this->canEditCompany($this->model);
                 },
             ],
 
@@ -676,14 +696,24 @@ HTML
             "update" => [
                 'fields' => [$this, 'updateFields'],
                 "accessCallback" => function () {
-                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]) && $this->canEditCompany($this->model);
+                },
+                // П2а+: responsible employees are changed by who manages the accesses, not by "edit".
+                'on beforeValidate' => function (Event $event) {
+                    $model = $event->sender->model;
+                    $posted = \Yii::$app->request->post($model->formName());
+                    if (is_array($posted) && array_key_exists('managers', $posted) && !$this->canManageCompanyAccess($model)) {
+                        $model->getValidators()->append(\yii\validators\Validator::createValidator(static function () use ($model) {
+                            $model->addError('managers', 'Ответственных меняют основной ответственный, его руководитель или администратор: «Доступ к клиенту» в карточке.');
+                        }, $model, ['managers']));
+                    }
                 },
             ],
 
-            //generateAccessActions is off: deleting needs the same access to the company as editing
+            //generateAccessActions is off; П2а+: deleting a client — the level "full" only
             "delete" => [
                 "accessCallback" => function () {
-                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]) && $this->canDeleteCompany($this->model);
                 },
             ],
             "delete-multi" => [
@@ -691,7 +721,7 @@ HTML
                     return \Yii::$app->user->can($this->permissionName);
                 },
                 "eachAccessCallback" => function ($model) {
-                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $model]);
+                    return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $model]) && $this->canDeleteCompany($model);
                 },
             ],
 
@@ -1266,6 +1296,11 @@ HTML
             ],
 
         ];
+
+        if (!$model->isNewRecord && !$this->canManageCompanyAccess($model)) {
+            // П2а+: "edit" changes the data, not the responsible employees («Доступ к клиенту»).
+            unset($mainFieldSet['managers']);
+        }
 
         if ($model->isNewRecord) {
             // П2а: phone and email right after the name; while they are filled the CRM shows if the company exists.

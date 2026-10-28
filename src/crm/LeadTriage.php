@@ -654,8 +654,10 @@ class LeadTriage
             $newClient = $client;
         }
 
-        // A contact person of the deal's company is linked to it (also an existing one the actor sees).
+        // A contact person of the deal's company is linked to it (also an existing one the actor sees);
+        // П2а+: people of an existing company are its data — "Свои сделки" does not add them.
         if ($companyId && $clientId && !$foreign
+            && ($newCompany || $this->access->canEditClientData($actorId, CmsCrmAccessRequest::RECORD_COMPANY, $companyId))
             && !CmsCompany2user::find()->andWhere(['cms_company_id' => $companyId, 'cms_user_id' => $clientId])->exists()) {
             $link = new CmsCompany2user(['cms_company_id' => $companyId, 'cms_user_id' => $clientId]);
             if (!$link->save()) {
@@ -724,8 +726,9 @@ class LeadTriage
 
     /**
      * One rule for every way a contact of the request goes to a client card:
-     * the card must be the deal's company or person, visible to the actor or
-     * created by him in this very operation.
+     * the card must be the deal's company or person, created by the actor in
+     * this very operation or one he may edit (П2а+: "Свои сделки" sees the
+     * card but does not add to it — CrmAccess::canEditClientData()).
      */
     private function mayCopyTo(CmsLead $lead, string $target, ?array $identity, int $actorId): bool
     {
@@ -735,7 +738,7 @@ class LeadTriage
             }
             $created = $identity && $identity['newCompany'] && (int)$identity['newCompany']->id === (int)$lead->cms_company_id;
 
-            return $created || $this->access->canSeeCompany($actorId, (int)$lead->cms_company_id);
+            return $created || $this->access->canEditClientData($actorId, CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id);
         }
         if ($target === 'client') {
             if (!$lead->cms_user_id) {
@@ -743,7 +746,7 @@ class LeadTriage
             }
             $created = $identity && $identity['newClient'] && (int)$identity['newClient']->id === (int)$lead->cms_user_id;
 
-            return $created || $this->access->canSeeClient($actorId, (int)$lead->cms_user_id);
+            return $created || $this->access->canEditClientRecord($actorId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id]);
         }
 
         return false;

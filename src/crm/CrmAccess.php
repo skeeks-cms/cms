@@ -4,6 +4,7 @@ namespace skeeks\cms\crm;
 
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsCompany2manager;
+use skeeks\cms\models\CmsCompany2user;
 use skeeks\cms\models\CmsCrmAccessRequest;
 use skeeks\cms\models\CmsDepartment;
 use skeeks\cms\models\CmsLead;
@@ -32,8 +33,9 @@ class CrmAccess extends Component
      * deals in it), "edit" — plus the company data (phones, emails, contact
      * persons, addresses, requisites), "full" — everything, accesses included.
      * Exactly one link is the main responsible (`is_main`, always "full").
-     * Hiding by the levels is П2а+ (after П2б): until then "deal" and "edit"
-     * work as "full" and are only shown.
+     * The levels are enforced (П2а+): clientDataLevel(), canEditClientData()
+     * and canEditClientRecord() decide every form, contact tab, card button and
+     * controller action of the client data.
      */
     public const LEVEL_DEAL = 'deal';
     public const LEVEL_EDIT = 'edit';
@@ -443,32 +445,112 @@ class CrmAccess extends Component
     }
 
     /**
-     * Levels below "full" are only shown until П2а+: then this becomes true and
-     * every check by the level (canEditClientData() and the others) starts to refuse.
+     * The levels decide (П2а+). False only for a site that wants the old
+     * behaviour back: every level then works as "full".
      */
-    public bool $enforceLevels = false;
+    public bool $enforceLevels = true;
 
     /**
-     * May the employee change the data of a company or a person — phones,
-     * emails, people, addresses (П2г): an administrator, a link "edit" or "full",
-     * a leader who sees it through a subordinate. "Свои сделки" may not, once
-     * the levels are enforced; until then it works as "full".
+     * The level the employee works with a company or a person on: null when he
+     * does not see it; "full" for an administrator and for a leader who sees it
+     * through a subordinate. A person without an own link takes the best level
+     * of the employee's links to the person's companies (people of a company
+     * are its data).
      */
-    public function canEditClientData($user, string $recordCode, int $recordId): bool
+    public function clientDataLevel($user, string $recordCode, int $recordId): ?string
     {
         $visible = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY
             ? $this->canSeeCompany($user, $recordId)
             : $this->canSeeClient($user, $recordId);
         if (!$visible) {
-            return false;
+            return null;
         }
         if (!$this->enforceLevels || $this->isAdmin($user) || !self::levelsReady()) {
+            return self::LEVEL_FULL;
+        }
+        $userId = $this->userId($user);
+        $records = [[$recordCode, $recordId]];
+        if ($recordCode === CmsCrmAccessRequest::RECORD_CLIENT && $this->linkLevel($userId, $recordCode, $recordId) === null) {
+            foreach (CmsCompany2user::find()->select('cms_company_id')->andWhere(['cms_user_id' => $recordId])->column() as $companyId) {
+                $records[] = [CmsCrmAccessRequest::RECORD_COMPANY, (int)$companyId];
+            }
+        }
+        $subordinates = array_map('intval', CmsDepartment::subordinateIds($userId));
+        $best = null;
+        foreach ($records as [$code, $id]) {
+            // A client of a subordinate: the leader works on it without limits.
+            if ($subordinates && array_intersect($this->linkedIds($code, $id, null), $subordinates)) {
+                return self::LEVEL_FULL;
+            }
+            $level = $this->linkLevel($userId, $code, $id);
+            if (self::levelRank($level) > self::levelRank($best)) {
+                $best = $level;
+            }
+        }
+
+        // Visible without an own link or a subordinate's one (the evidence of a deal and the like): as "deal".
+        return $best ?? self::LEVEL_DEAL;
+    }
+
+    /**
+     * May the employee change the data of a company or a person — the name,
+     * requisites, phones, emails, addresses, links, people: "edit" and "full",
+     * an administrator, a leader for the clients of his subordinates. "Свои
+     * сделки" sees and contacts the client but changes nothing of it.
+     * Responsible employees and levels are canManageAccess().
+     */
+    public function canEditClientData($user, string $recordCode, int $recordId): bool
+    {
+        return self::levelRank($this->clientDataLevel($user, $recordCode, $recordId)) >= self::levelRank(self::LEVEL_EDIT);
+    }
+
+    /**
+     * The same for a model of the client data: a company, a person, or a row
+     * with `cms_company_id` / `cms_user_id` (phones, emails, addresses, links,
+     * people of a company). An employee or the user himself is not client data:
+     * true, their own rules decide.
+     *
+     * @param \yii\base\Model|array $model a model or [record code, record id]
+     */
+    public function canEditClientRecord($user, $model): bool
+    {
+        $record = is_array($model) ? $model : self::clientRecordOf($model);
+        if ($record === null) {
             return true;
         }
-        $level = $this->linkLevel($user, $recordCode, $recordId);
+        [$code, $id] = $record;
+        if ($id <= 0) {
+            return true;
+        }
+        if ($code === CmsCrmAccessRequest::RECORD_CLIENT) {
+            $person = CmsUser::findOne($id);
+            if (!$person || $person->is_worker || $id === $this->userId($user)) {
+                return true;
+            }
+        }
 
-        // No own link while visible: a client of a subordinate — the leader sees it as "full".
-        return $level === null || self::levelRank($level) >= self::levelRank(self::LEVEL_EDIT);
+        return $this->canEditClientData($user, $code, $id);
+    }
+
+    /** [record code, record id] of a client model or of a row of its data; null — not client data. */
+    public static function clientRecordOf($model): ?array
+    {
+        if ($model instanceof CmsCompany) {
+            return [CmsCrmAccessRequest::RECORD_COMPANY, (int)$model->id];
+        }
+        if ($model instanceof CmsUser) {
+            return [CmsCrmAccessRequest::RECORD_CLIENT, (int)$model->id];
+        }
+        if ($model instanceof \yii\db\ActiveRecord) {
+            if ($model->hasAttribute('cms_company_id') && $model->cms_company_id) {
+                return [CmsCrmAccessRequest::RECORD_COMPANY, (int)$model->cms_company_id];
+            }
+            if ($model->hasAttribute('cms_user_id') && $model->cms_user_id) {
+                return [CmsCrmAccessRequest::RECORD_CLIENT, (int)$model->cms_user_id];
+            }
+        }
+
+        return null;
     }
 
     /**

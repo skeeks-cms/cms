@@ -24,6 +24,14 @@ use yii\helpers\ArrayHelper;
  */
 class AdminUserAddressController extends BackendModelStandartController
 {
+    // П2а+: rows are changed only by who may edit the client (CrmAccess::canEditClientRecord()).
+    use \skeeks\cms\controllers\traits\ClientDataGuard;
+
+    protected function clientDataColumn(): string
+    {
+        return 'cms_user_id';
+    }
+
     public function init()
     {
         $this->name = "Управление адресами";
@@ -81,7 +89,7 @@ class AdminUserAddressController extends BackendModelStandartController
             ],
         ]);
 
-        return $actions;
+        return $this->guardClientData($actions);
     }
 
 
