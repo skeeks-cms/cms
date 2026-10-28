@@ -1060,30 +1060,14 @@ JS
                 'alias',
 
 
-                // П2а+: shown to who manages the accesses of the client (unset below otherwise).
-                'managers' => [
-                    'class'        => WidgetField::class,
-                    'widgetClass'  => AjaxSelectModel::class,
-                    'widgetConfig' => [
-                        'modelClass'  => CmsUser::class,
-                        'multiple'    => true,
-                        'searchQuery' => function ($word = '') {
-                            $query = CmsUser::find()->isWorker();
-                            if ($word) {
-                                if ($word) {
-                                    $query->search($word);
-                                }
-                            }
-                            return $query;
-                        },
-                    ],
-                ],
+                // П2а+: responsible employees live in «Доступ», not in the form.
             ];
         }
 
 
-        if (isset($result['managers']) && $this->model && !$this->model->isNewRecord && !$this->canManageClientAccess($this->model)) {
-            unset($result['managers']);
+        if ($this->model && $this->model->isNewRecord && !$this->model->is_worker && !$this->model->managers) {
+            // A new client is the author's, as a new company (the main responsible; «Доступ» changes it).
+            $this->model->managers = [\Yii::$app->user->id];
         }
 
         if ((\Yii::$app->user->can("cms/admin-user/manage-advanced", ['model' => $this->model]))

@@ -8,17 +8,23 @@ use skeeks\cms\crm\CrmClientTransfer;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsCrmAccessRequest;
+use skeeks\cms\models\CmsDepartment;
+use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsUser;
 use yii\helpers\Url;
 
 /**
- * «Передать клиента» and «Доступ к клиенту» in the company and client cards
- * (П2а). Transfer — a change of the main responsible by an administrator or a
- * leader (crm\CrmClientTransfer). Access — the main responsible first, the
- * employees with their levels, «Доступ только по согласованию»; changed by the
- * main responsible, his leaders and administrators (CrmAccess::canManageAccess()).
- * Both are shown only where the client has employees, so a simple site without
- * CRM work sees nothing new.
+ * «Доступ» in the company and client cards (П2а+): everything about who works
+ * with the client in one tab — the main responsible and «Передать клиента»
+ * (a change of the main responsible by an administrator or a leader,
+ * crm\CrmClientTransfer; the former main stays with "edit"), the employees
+ * with their levels and where the access comes from, «Добавить сотрудника»,
+ * «Доступ только по согласованию», pending requests about the client. Changed
+ * by the main responsible, his leaders and administrators
+ * (CrmAccess::canManageAccess()); others see it read only with their own
+ * level. The tab is shown only where the client has employees (or to who may
+ * transfer it), so a simple site without CRM work sees nothing new. The old
+ * «Передать клиента» address opens «Доступ»; it still takes the transfer post.
  */
 trait ClientTransferActions
 {
@@ -29,9 +35,15 @@ trait ClientTransferActions
             'name' => 'Передать клиента',
             'icon' => 'fas fa-people-arrows',
             'priority' => 900,
+            // «Передать клиента» is a block of «Доступ» now.
+            'isVisible' => false,
             'callback' => [$this, 'clientTransfer'],
             'accessCallback' => function () {
                 [$code, $id] = $this->transferRecord();
+                if (!\Yii::$app->request->isPost) {
+                    // The old address only leads to «Доступ» (which decides what the viewer sees).
+                    return (bool)$id;
+                }
 
                 return $id && CrmAccess::instance()->canTransferClient((int)\Yii::$app->user->id, $code, $id)
                     && ($code === CmsCrmAccessRequest::RECORD_COMPANY
@@ -45,6 +57,10 @@ trait ClientTransferActions
     {
         [$code, $id] = $this->transferRecord();
         $service = new CrmClientTransfer();
+        $accessUrl = Url::current([0 => '/'.$this->uniqueId.'/crm-access']);
+        if (!\Yii::$app->request->isPost) {
+            return $this->redirect($accessUrl);
+        }
         if (\Yii::$app->request->isPost) {
             $response = new RequestResponse();
             try {
@@ -57,7 +73,7 @@ trait ClientTransferActions
                     (array)\Yii::$app->request->post('keep_tasks', [])
                 );
                 $response->success = true;
-                $response->data = ['redirect' => Url::current()];
+                $response->data = ['redirect' => $accessUrl];
                 \Yii::$app->session->setFlash('success', $response->message);
             } catch (\DomainException $e) {
                 $response->success = false;
@@ -67,16 +83,6 @@ trait ClientTransferActions
             return $response;
         }
 
-        $access = CrmAccess::instance();
-
-        return $this->render('@skeeks/cms/views/crm/transfer', [
-            'model' => $this->model,
-            'recordCode' => $code,
-            'responsible' => $access->names($code === CmsCrmAccessRequest::RECORD_COMPANY
-                ? $access->companyResponsibleIds($id, null)
-                : $access->clientResponsibleIds($id, null)),
-            'work' => $service->openWork($code, $id),
-        ]);
     }
 
     public function clientAccessAction(): array
@@ -90,7 +96,8 @@ trait ClientTransferActions
             'accessCallback' => function () {
                 [$code, $id] = $this->transferRecord();
 
-                return $id && CrmAccess::mainReady() && CrmAccess::instance()->accessList($code, $id);
+                return $id && CrmAccess::mainReady() && (CrmAccess::instance()->accessList($code, $id)
+                    || CrmAccess::instance()->canTransferClient((int)\Yii::$app->user->id, $code, $id));
             },
         ];
     }
@@ -121,6 +128,21 @@ trait ClientTransferActions
                         $access->removeLink($code, $id, (int)$request->post('user_id'));
                         $response->message = 'Сотрудник больше не работает с клиентом.';
                         break;
+                    case 'add':
+                        $userId = (int)$request->post('user_id');
+                        $level = (string)$request->post('level');
+                        if (!isset(CrmAccess::levels()[$level])) {
+                            throw new \DomainException('Выберите уровень доступа.');
+                        }
+                        if (!CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $userId, CmsUser::tableName().'.is_active' => 1])->exists()) {
+                            throw new \DomainException('Выберите сотрудника.');
+                        }
+                        if ($access->linkLevel($userId, $code, $id) !== null) {
+                            throw new \DomainException('Этот сотрудник уже работает с клиентом: измените его уровень в списке.');
+                        }
+                        $access->grantLink($code, $id, $userId, $level);
+                        $response->message = 'Сотрудник добавлен.';
+                        break;
                     default:
                         throw new \DomainException('Неизвестное действие.');
                 }
@@ -133,12 +155,34 @@ trait ClientTransferActions
             return $response;
         }
 
+        $employees = $access->accessList($code, $id);
+        // Where an access comes from: «Работать с этим клиентом» leaves "deal" to who has a deal of the client.
+        $dealOwners = array_map('intval', CmsLead::find()->select('executor_id')->distinct()
+            ->andWhere([$code === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id' => $id])
+            ->andWhere(['not', ['executor_id' => null]])->column());
+        foreach ($employees as &$employee) {
+            $employee['origin'] = $employee['main'] ? 'основной ответственный'
+                : ($employee['level'] === CrmAccess::LEVEL_DEAL && in_array($employee['id'], $dealOwners, true) ? 'по своей сделке' : 'выдан вручную');
+        }
+        unset($employee);
+        $mainId = $access->mainResponsibleId($code, $id);
+        $canTransfer = $access->canTransferClient($actorId, $code, $id);
+        $myLevel = $access->clientDataLevel($actorId, $code, $id);
+
         return $this->render('@skeeks/cms/views/crm/access', [
             'model' => $this->model,
-            'employees' => $access->accessList($code, $id),
+            'employees' => $employees,
+            'leaders' => $mainId ? $access->names(CmsDepartment::leaderIdsOf($mainId)) : [],
             'canManage' => $canManage,
             'approval' => $access->approvalRequired($code, $id),
-            'canTransfer' => $access->canTransferClient($actorId, $code, $id),
+            'canTransfer' => $canTransfer,
+            'transferUrl' => Url::current([0 => '/'.$this->uniqueId.'/transfer']),
+            'work' => $canTransfer ? (new CrmClientTransfer())->openWork($code, $id) : ['leads' => [], 'tasks' => []],
+            'requests' => CmsCrmAccessRequest::find()->andWhere([
+                'record_code' => $code, 'record_id' => $id,
+                'status' => CmsCrmAccessRequest::STATUS_PENDING, 'kind' => CmsCrmAccessRequest::KIND_WORK,
+            ])->orderBy(['id' => SORT_DESC])->all(),
+            'myLevel' => $mainId === $actorId ? 'основной ответственный' : ($myLevel ? mb_strtolower(CrmAccess::levels()[$myLevel] ?? $myLevel, 'UTF-8') : null),
         ]);
     }
 

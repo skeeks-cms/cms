@@ -525,7 +525,8 @@
     $(document).on('change click', '[data-sx-crm-access]', function (event) {
         var control = $(this);
         var op = control.data('sxCrmAccess');
-        if ((op === 'remove') !== (event.type === 'click')) {
+        // Buttons act on click (remove, add), the level select and the flag on change.
+        if ((op === 'remove' || op === 'add') !== (event.type === 'click')) {
             return;
         }
         if (op === 'remove' && !window.confirm(control.data('sxConfirm'))) {
@@ -533,6 +534,10 @@
         }
         var data = {op: op, user_id: control.data('userId') || '', level: op === 'level' ? control.val() : '',
             value: op === 'approval' ? (control.prop('checked') ? 1 : 0) : ''};
+        if (op === 'add') {
+            data.user_id = $(control.data('userInput')).val() || '';
+            data.level = $(control.data('levelInput')).val() || '';
+        }
         data[yii.getCsrfParam()] = yii.getCsrfToken();
         $.ajax({url: control.data('url'), method: 'POST', data: data, dataType: 'json',
             headers: {'X-Requested-With': 'XMLHttpRequest'}
@@ -541,6 +546,9 @@
                 sx.notify.success(response.message);
                 if (op === 'remove') {
                     control.closest('li').remove();
+                }
+                if (op === 'add') {
+                    window.location.reload();
                 }
             } else {
                 sx.notify.error(response && response.message ? response.message : 'Не удалось изменить доступ.');

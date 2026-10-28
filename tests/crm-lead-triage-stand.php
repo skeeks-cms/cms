@@ -505,6 +505,20 @@ try {
         && $actionAllowed('cms/admin-cms-company', $company, 'update') && $actionAllowed('cms/admin-cms-company', $company, 'delete')
         && $actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'delete'), '"full": the data, the accesses and deleting are allowed');
     $check($actionAllowed('cms/admin-cms-contractor', $requisites, 'update'), '"full": the requisites are changed');
+    // «Доступ» is one tab; the company form posts no employees, people or requisites and never rewrites them.
+    $companyActions = $actionAllowed('cms/admin-cms-company', $company, 'crm-access');
+    [$companyController] = Yii::$app->createController('cms/admin-cms-company');
+    $companyController->setModel($company);
+    $check($companyActions && ($companyController->actions()['transfer']['isVisible'] ?? true) === false,
+        '«Передать клиента» is a block of «Доступ», not a tab of its own');
+    $linksBefore = CmsCompany2manager::find()->select(['cms_user_id', 'access_level', 'is_main'])->andWhere(['cms_company_id' => $company->id])->orderBy(['cms_user_id' => SORT_ASC])->asArray()->all();
+    $peopleBefore = \skeeks\cms\models\CmsCompany2user::find()->select('cms_user_id')->andWhere(['cms_company_id' => $company->id])->column();
+    $formCompany = CmsCompany::findOne($company->id);
+    $formCompany->load(['CmsCompany' => ['name' => $company->name.' (форма)', 'description' => 'Сохранено формой']]);
+    $check($formCompany->save(), 'the company form saves without the employees field');
+    $linksAfter = CmsCompany2manager::find()->select(['cms_user_id', 'access_level', 'is_main'])->andWhere(['cms_company_id' => $company->id])->orderBy(['cms_user_id' => SORT_ASC])->asArray()->all();
+    $check($linksAfter == $linksBefore && \skeeks\cms\models\CmsCompany2user::find()->select('cms_user_id')->andWhere(['cms_company_id' => $company->id])->column() == $peopleBefore,
+        'saving the form keeps the employees, their levels, the main responsible and the people');
     $setLevel($other, CrmAccess::LEVEL_EDIT);
     // An incoming request of a client «по согласованию» does not wait: it goes to the main responsible.
     if ($third2 = $plain[3] ?? null) {

@@ -1241,66 +1241,10 @@ HTML
                     },*/
                 ],
             ],
-            'users'      => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => AjaxSelectModel::class,
-                'widgetConfig' => [
-                    'modelClass'  => CmsUser::class,
-                    'multiple'    => true,
-                    'searchQuery' => function ($word = '') {
-                        $query = CmsUser::find()->forManager();
-                        if ($word) {
-                            if ($word) {
-                                $query->search($word);
-                            }
-                        }
-                        return $query;
-                    },
-                ],
-            ],
-
-            'managers' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => AjaxSelectModel::class,
-                'widgetConfig' => [
-                    'modelClass'  => CmsUser::class,
-                    'multiple'    => true,
-                    'searchQuery' => function ($word = '') {
-                        $query = CmsUser::find()->isWorker();
-                        if ($word) {
-                            if ($word) {
-                                $query->search($word);
-                            }
-                        }
-                        return $query;
-                    },
-                ],
-            ],
-
-            'contractors' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => AjaxSelectModel::class,
-                'widgetConfig' => [
-                    'modelClass'  => CmsContractor::class,
-                    'multiple'    => true,
-                    'searchQuery' => function ($word = '') {
-                        $query = CmsContractor::find()->forManager();
-                        if ($word) {
-                            if ($word) {
-                                $query->search($word);
-                            }
-                        }
-                        return $query;
-                    },
-                ],
-            ],
+            // П2а+: people and contacts live in «Профиль», employees in «Доступ», requisites in their tab;
+            // the form does not post these relations, so it never rewrites them (RelationalBehavior).
 
         ];
-
-        if (!$model->isNewRecord && !$this->canManageCompanyAccess($model)) {
-            // П2а+: "edit" changes the data, not the responsible employees («Доступ к клиенту»).
-            unset($mainFieldSet['managers']);
-        }
 
         if ($model->isNewRecord) {
             // П2а: phone and email right after the name; while they are filled the CRM shows if the company exists.
