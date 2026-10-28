@@ -5,6 +5,10 @@
  * other employees' deals, services (CmsDeal), bills, payments, documents, proposals and tasks
  * that are not tied to his own deals; a protected client without his link is not visible at all;
  * a client of the general pool shows its data and its own feed only, until «Взять в работу».
+ * People (owner's decision 29.10.2026): a person of a company is its data, seen with the level of
+ * the company (the best of several); his personal orders — deals, services, bills, payments,
+ * documents, proposals where he is the customer — only through his own access, no level of the
+ * company opens them, even "full"; a person without a company has his own protection and pool.
  *
  * The audit commits a fixture marked «Аудит: …» (the web requests use their own connection),
  * walks the site by real HTTP as the employee (sections, cards, tabs, feeds, autocomplete,
@@ -318,6 +322,52 @@ try {
     $comment($A, 'комментарий компании', ['cms_company_id' => $A->id]);
     $comment($own, 'комментарий своей сделки', ['cms_company_id' => $A->id]);
 
+    // ============ people (owner's decision 29.10.2026, ARCHITECTURE.md п. 11): the data of a person are seen
+    // through his companies, his personal orders — only through his own access ============
+    $human = static function (string $what, array $companies, ?int $mainId, string $protection = null) use ($name, $siteId, $link, $db) {
+        $model = new CmsUser(['first_name' => $name($what), 'last_name' => 'Аудитов', 'cms_site_id' => $siteId,
+            'auth_key' => Yii::$app->security->generateRandomString()]);
+        $model->save(false);
+        CmsUser2manager::deleteAll(['client_id' => $model->id]);
+        if ($mainId) {
+            $link(CmsUser2manager::class, 'client_id', (int)$model->id, $mainId, CrmAccess::LEVEL_FULL, 1);
+        }
+        foreach ($companies as $companyId) {
+            (new CmsCompany2user(['cms_company_id' => $companyId, 'cms_user_id' => $model->id]))->save(false);
+        }
+        if ($protection !== null) {
+            $db->createCommand()->update('cms_user', ['crm_protection' => $protection], ['id' => $model->id])->execute();
+        }
+        return $model;
+    };
+    // В: a contact person of A with personal orders of the administrator
+    $V = $human('Клиент В', [(int)$A->id], (int)$admin->id);
+    $leadV = $lead($name('личная сделка В'), ['cms_user_id' => $V->id], (int)$admin->id, 923377);
+    $serviceV = new CmsDeal(['name' => $name('личная услуга В'), 'description' => '', 'cms_user_id' => $V->id, 'cms_deal_type_id' => 13,
+        'start_at' => time() - 86400, 'amount' => 4323, 'currency_code' => 'RUB', 'is_periodic' => 0, 'is_active' => 1]);
+    $serviceV->save(false);
+    $billV = $bill(['cms_user_id' => $V->id], 92337.71, 'личный счёт В');
+    $db->createCommand()->insert('cms_deal2bill', ['shop_bill_id' => $billV->id, 'cms_deal_id' => $serviceV->id, 'created_at' => time()])->execute();
+    $payV = $payment(['cms_user_id' => $V->id], 82337.71, 'личный платёж В');
+    $docV = $document(['cms_user_id' => $V->id], 'личный документ В');
+    $kpV = $proposal(['cms_user_id' => $V->id], 'личное КП В');
+    $comment($leadV, 'комментарий личной сделки В', ['cms_user_id' => $V->id]);
+    $comment($billV, 'комментарий личного счёта В', ['cms_user_id' => $V->id]);
+    $comment($V, 'комментарий клиента В', ['cms_user_id' => $V->id]);
+    // Г: a person without a company, protected by his personal payment, no link with the employee
+    $G = $human('Клиент Г', [], (int)$admin->id, 'always');
+    $payG = $payment(['cms_user_id' => $G->id], 82340.74, 'личный платёж Г');
+    // Д: a person without a company of the general pool
+    $D = $human('Клиент Д', [], null);
+    $leadD = $lead($name('сделка клиента Д'), ['cms_user_id' => $D->id], (int)$admin->id);
+    $billD = $bill(['cms_user_id' => $D->id], 92339.73, 'счёт клиента Д');
+    // Е: a person of two companies — "Свои сделки" in one, "edit" in the other
+    $E1 = $company('Компания Е1', [[(int)$admin->id, CrmAccess::LEVEL_FULL, 1], [(int)$worker->id, CrmAccess::LEVEL_DEAL, 0]]);
+    $E2 = $company('Компания Е2', [[(int)$admin->id, CrmAccess::LEVEL_FULL, 1], [(int)$worker->id, CrmAccess::LEVEL_EDIT, 0]]);
+    $E = $human('Клиент Е', [(int)$E1->id, (int)$E2->id], (int)$admin->id);
+    echo "people: В {$V->id} (lead {$leadV->id}, service {$serviceV->id}, bill {$billV->id}, payment {$payV->id}, document {$docV->id}, КП $kpV),"
+        ." Г {$G->id} (payment {$payG->id}), Д {$D->id} (lead {$leadD->id}, bill {$billD->id}), Е {$E->id} (companies {$E1->id}/{$E2->id})\n";
+
     echo "fixture: company A {$A->id}, pool {$pool->id}, protected {$protected->id}, person {$person->id}; leads own {$own->id} foreign {$foreign->id};"
         ." service {$service->id}; bill {$billA->id}; payment {$payA->id}; document {$docA->id}; proposals $kpForeign/$kpCompany/$kpService/$kpOwn;"
         ." tasks {$taskForeign->id}/{$taskCompany->id}/{$taskService->id}/{$taskOwn->id}; call $callId; letters $letterForeign/$letterService/$letterCompany\n";
@@ -332,7 +382,7 @@ try {
         // ============ HTTP as the employee ============
         $base = rtrim(getenv('TEST_HTTP_BASE') ?: 'http://nginx', '/');
         $jar = tempnam(sys_get_temp_dir(), 'crm-leak');
-        $http = static function (string $path, array $post = null, bool $ajax = false) use ($base, $jar) {
+        $http = static function (string $path, array $post = null, bool $ajax = false) use ($base, &$jar) {
             $curl = curl_init($base.$path);
             curl_setopt_array($curl, [
                 CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $jar, CURLOPT_COOKIEFILE => $jar, CURLOPT_TIMEOUT => 60,
@@ -384,7 +434,7 @@ try {
             'задача чужой сделки' => ['admin-cms-task', $taskForeign->id], 'задача без сделки' => ['admin-cms-task', $taskCompany->id],
             'защищённая компания' => ['admin-cms-company', $protected->id],
         ];
-        $found = static function (string $body, array $keys = null) use ($foreignMarkers, $routes): array {
+        $found = static function (string $body, array $keys = null) use (&$foreignMarkers, &$routes): array {
             $hits = [];
             foreach ($foreignMarkers as $key => $marker) {
                 if ($keys !== null && !in_array($key, $keys, true)) {
@@ -544,8 +594,8 @@ try {
         $closed('Защищённая: звонок по ссылке', '/~sxx/cms/admin-cms-telephony-call/view?pk='.$callProt, '');
         $closed('Защищённая: письмо по ссылке', '/~sxx/cmsCommunication/admin-cms-comm-message/view?pk='.$letterProt, '');
         // the duplicate search names the client but must not open it
-        [$code, $dup] = $http('/~sxx/cms/admin-cms-company/duplicate-check?name='.urlencode($protected->name), null, true);
-        $report('Поиск повторов: защищённая компания', 'GET duplicate-check?name= → '.$code,
+        [$code, $dup] = $http('/~sxx/cms/admin-cms-company/duplicate-check?for=company&q='.urlencode($protected->name), null, true);
+        $report('Поиск повторов: защищённая компания', 'GET duplicate-check?q= → '.$code,
             (bool)preg_match('~admin-cms-company/view[^"\']*pk(?:=|%3D)'.$protected->id.'(?!\d)~', $dup), 'по договору — только название и ответственный');
 
         // --- autocomplete of the forms: every AjaxSelect of the create forms, asked for the audit records ---
@@ -643,6 +693,137 @@ try {
             $report('MCP '.$name, 'executeTool '.http_build_query($args).($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
         }
     }
+
+    // ============ people: В's personal orders stay closed with any level of the company A, even "full" ============
+    $foreignMarkers = [
+        'личная сделка В' => $leadV->name, 'личная услуга В' => $serviceV->name, 'личный счёт В' => '92 337', 'личный платёж В' => '82 337',
+        'личный документ В' => $docV->description, 'личное КП В' => AUDIT_PREFIX.'личное КП В '.$uniq, 'сумма сделки В' => '923 377',
+        'коммент. личной сделки В' => AUDIT_PREFIX.'комментарий личной сделки В '.$uniq, 'коммент. личного счёта В' => AUDIT_PREFIX.'комментарий личного счёта В '.$uniq,
+        'клиент Г' => $G->first_name, 'платёж Г' => '82 340', 'сделка Д' => $leadD->name, 'счёт Д' => '92 339',
+    ];
+    $routes = [
+        'личная сделка В' => ['admin-cms-lead', $leadV->id], 'личная услуга В' => ['admin-cms-deal', $serviceV->id],
+        'личный счёт В' => ['admin-cms-bill', $billV->id], 'личный платёж В' => ['admin-payment', $payV->id],
+        'личный документ В' => ['admin-cms-document', $docV->id], 'личное КП В' => ['admin-cms-proposal', $kpV],
+        'клиент Г' => ['admin-user', $G->id], 'платёж Г' => ['admin-payment', $payG->id],
+        'сделка Д' => ['admin-cms-lead', $leadD->id], 'счёт Д' => ['admin-cms-bill', $billD->id],
+    ];
+    $personV = ['личная сделка В', 'личная услуга В', 'личный счёт В', 'личный платёж В', 'личный документ В', 'личное КП В', 'сумма сделки В',
+        'коммент. личной сделки В', 'коммент. личного счёта В'];
+    CmsCompany2manager::updateAll(['access_level' => CrmAccess::LEVEL_DEAL], ['cms_company_id' => $A->id, 'cms_user_id' => $worker->id]);
+    $mustSeeClient = static function (string $place, string $path, string $marker) use ($http, $report) {
+        [$code, $body] = $http($path);
+        $report($place.' (должно быть видно)', 'GET '.$path.' → '.$code, false, $code === 200 && mb_strpos($body, $marker) !== false ? '' : 'НЕ ВИДНО — проверить');
+        return [$code, $body];
+    };
+    $mustFail = static function (string $place, string $how, bool $ok, string $why) use (&$results, &$levelTag) {
+        $results[] = [$levelTag.$place, $how, $ok ? 'ok' : 'FAIL', $ok ? '' : $why];
+    };
+    foreach ([CrmAccess::LEVEL_DEAL, CrmAccess::LEVEL_EDIT, CrmAccess::LEVEL_FULL] as $auditLevel) {
+        $levelTag = 'Люди ['.$auditLevel.'] ';
+        CmsCompany2manager::updateAll(['access_level' => $auditLevel], ['cms_company_id' => $A->id, 'cms_user_id' => $worker->id]);
+        $jar = tempnam(sys_get_temp_dir(), 'crm-leak');
+        $http('/site?id='.(int)$worker->id);
+
+        // В is seen as a contact of A, with the level of A for his data
+        $mustSeeClient('Клиент В: карточка', '/~sxx/cms/admin-user/view?pk='.$V->id, $V->first_name);
+        $mustSeeClient('Клиент В: лента, комментарий клиента', '/~sxx/cms/admin-user/view?pk='.$V->id, AUDIT_PREFIX.'комментарий клиента В '.$uniq);
+        $mustSeeClient('Компания А: В среди людей', '/~sxx/cms/admin-cms-company/view?pk='.$A->id, $V->first_name);
+        [$code] = $http('/~sxx/cms/admin-user/update?pk='.$V->id);
+        $mayEdit = $auditLevel !== CrmAccess::LEVEL_DEAL;
+        $mustFail('Клиент В: правка данных', 'GET admin-user/update → '.$code, ($code === 200) === $mayEdit, $mayEdit ? 'правка не открывается' : 'правка открывается');
+
+        // ... but none of his personal orders
+        foreach (['view' => 'Профиль и лента', 'leads' => 'Сделки', 'bills' => 'Счета', 'payments' => 'Платежи', 'tasks' => 'Задачи', 'log' => 'Журнал', 'crm-access' => 'Доступ'] as $tab => $label) {
+            $page('Клиент В: вкладка «'.$label.'»', '/~sxx/cms/admin-user/'.$tab.'?pk='.$V->id, $personV);
+        }
+        foreach (['view' => 'Профиль и лента', 'leads' => 'Сделки', 'deals' => 'Услуги', 'bills' => 'Счета', 'documents' => 'Документы',
+                     'payments' => 'Платежи', 'tasks' => 'Задачи', 'log' => 'Журнал'] as $tab => $label) {
+            $page('Компания А: вкладка «'.$label.'», личное В', '/~sxx/cms/admin-cms-company/'.$tab.'?pk='.$A->id, $personV);
+        }
+        foreach (['Сделки: канбан' => '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode('Аудит'), 'Сделки: таблица' => '/~sxx/cms/admin-cms-lead/index',
+                     'Услуги' => '/~sxx/cms/admin-cms-deal/index', 'Счета' => '/~sxx/cms/admin-cms-bill/index', 'Платежи' => '/~sxx/shop/admin-payment/index',
+                     'Документы' => '/~sxx/cms/admin-cms-document/index', 'Предложения' => '/~sxx/cmsProposal/admin-cms-proposal/index',
+                     'Клиенты' => '/~sxx/cms/admin-user/index'] as $place => $path) {
+            $page('Раздел «'.$place.'»', $path);
+        }
+        foreach ([
+                     'Личная сделка В' => '/~sxx/cms/admin-cms-lead/view?pk='.$leadV->id,
+                     'Личная услуга В' => '/~sxx/cms/admin-cms-deal/view?pk='.$serviceV->id,
+                     'Личный счёт В' => '/~sxx/cms/admin-cms-bill/view?pk='.$billV->id,
+                     'Личный счёт В: изменить' => '/~sxx/cms/admin-cms-bill/update?pk='.$billV->id,
+                     'Личный платёж В' => '/~sxx/shop/admin-payment/view?pk='.$payV->id,
+                     'Личный документ В' => '/~sxx/cms/admin-cms-document/view?pk='.$docV->id,
+                     'Личное КП В' => '/~sxx/cmsProposal/admin-cms-proposal/view?pk='.$kpV,
+                 ] as $place => $path) {
+            $closed($place, $path, '');
+        }
+        @unlink($jar);
+
+        foreach (['cms_lead_get' => $leadV->id, 'cms_deal_get' => $serviceV->id, 'shop_bill_get' => $billV->id, 'shop_payment_get' => $payV->id,
+                     'shop_document_get' => $docV->id, 'cms_proposal_get' => $kpV] as $name => $id) {
+            [$status] = $tool($name, ['id' => $id]);
+            $report('MCP '.$name.' (личное В)', 'executeTool id='.$id, $status === 'ok', $status === 'ok' ? 'вернул запись' : '');
+        }
+        foreach ([
+                     'cms_user_get' => ['id' => $V->id], 'cms_lead_list' => ['q' => $uniq], 'cms_deal_list' => ['cms_user_id' => $V->id],
+                     'shop_bill_list' => ['cms_user_id' => $V->id], 'shop_payment_list' => ['cms_user_id' => $V->id],
+                     'shop_document_list' => ['cms_user_id' => $V->id], 'cms_proposal_list' => ['cms_user_id' => $V->id],
+                     'cms_company_get' => ['id' => $A->id], 'cms_company_timeline_get' => ['id' => $A->id],
+                     'cms_crm_history_get' => ['record_type' => 'client', 'record_id' => $V->id, 'limit' => 100],
+                     'cms_crm_client_overview_get' => ['record_type' => 'client', 'record_id' => $V->id],
+                     'cms_crm_client_overview_list' => ['record_type' => 'client', 'q' => $uniq],
+                 ] as $name => $args) {
+            [$status, $out] = $tool($name, $args);
+            $hits = $status === 'ok' ? $found($json($out), $personV) : [];
+            $report('MCP '.$name.' (личное В)', 'executeTool '.http_build_query($args).($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
+        }
+    }
+    CmsCompany2manager::updateAll(['access_level' => CrmAccess::LEVEL_DEAL], ['cms_company_id' => $A->id, 'cms_user_id' => $worker->id]);
+
+    // ============ Г, Д, Е: do not depend on the level of A ============
+    $levelTag = 'Люди ';
+    $jar = tempnam(sys_get_temp_dir(), 'crm-leak');
+    $http('/site?id='.(int)$worker->id);
+    // Г: a protected person without a link — not in the list, the card is closed, the duplicate search only names him
+    foreach (['view', 'leads', 'bills', 'payments', 'tasks', 'log', 'crm-access', 'update'] as $tab) {
+        $closed('Клиент Г (защищён): '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$G->id, '');
+    }
+    $closed('Клиент Г: личный платёж по ссылке', '/~sxx/shop/admin-payment/view?pk='.$payG->id, '');
+    [$code, $dup] = $http('/~sxx/cms/admin-user/duplicate-check?for=client&q='.urlencode($G->first_name), null, true);
+    $report('Поиск повторов: клиент Г', 'GET admin-user/duplicate-check?for=client&q= → '.$code,
+        (bool)preg_match('~admin-user/view[^"\']*pk(?:=|%3D)'.$G->id.'(?!\d)~', $dup) || (bool)$found($dup, ['платёж Г']),
+        mb_strpos($dup, $G->first_name) === false ? 'Г не найден по имени — проверка слабая' : 'по договору — только название и ответственный');
+    [$code, $dup] = $http('/~sxx/cms/admin-cms-company/duplicate-check?for=client&q='.urlencode($G->first_name), null, true);
+    $report('Поиск повторов из формы компании: клиент Г', 'GET admin-cms-company/duplicate-check?for=client&q= → '.$code,
+        (bool)preg_match('~admin-user/view[^"\']*pk(?:=|%3D)'.$G->id.'(?!\d)~', $dup) || (bool)$found($dup, ['платёж Г']), '');
+    // Д: the pool — his data and «Взять в работу», not his deal and bill
+    [$code, $card] = $mustSeeClient('Клиент Д (пул): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
+    $mustFail('Клиент Д (пул): кнопка «Взять в работу»', 'GET view → '.$code, $code === 200 && mb_strpos($card, 'Взять в работу') !== false, 'кнопки нет');
+    $hits = $code === 200 ? $found($card, ['сделка Д', 'счёт Д']) : [];
+    $report('Клиент Д (пул): карточка без чужого', 'GET view → '.$code, (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
+    foreach (['leads', 'bills', 'payments', 'tasks', 'log'] as $tab) {
+        $closed('Клиент Д (пул): вкладка '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$D->id, '');
+    }
+    $closed('Клиент Д (пул): сделка по ссылке', '/~sxx/cms/admin-cms-lead/view?pk='.$leadD->id, '');
+    $closed('Клиент Д (пул): счёт по ссылке', '/~sxx/cms/admin-cms-bill/view?pk='.$billD->id, '');
+    // Е: two companies, "deal" and "edit" — the best one, "edit", changes his data
+    $mustSeeClient('Клиент Е: карточка', '/~sxx/cms/admin-user/view?pk='.$E->id, $E->first_name);
+    [$code] = $http('/~sxx/cms/admin-user/update?pk='.$E->id);
+    $mustFail('Клиент Е (deal + edit): правка данных', 'GET admin-user/update → '.$code, $code === 200, 'правка не открывается — лучший уровень не учтён');
+    @unlink($jar);
+    foreach (['cms_user_get' => ['id' => $G->id], 'shop_payment_get' => ['id' => $payG->id], 'cms_lead_get' => ['id' => $leadD->id], 'shop_bill_get' => ['id' => $billD->id]] as $name => $args) {
+        [$status] = $tool($name, $args);
+        $report('MCP '.$name.' ('.($name === 'cms_user_get' || $name === 'shop_payment_get' ? 'клиент Г' : 'клиент Д').')', 'executeTool id='.$args['id'], $status === 'ok', $status === 'ok' ? 'вернул запись' : '');
+    }
+    foreach (['cms_user_list' => ['q' => $uniq], 'cms_crm_client_overview_list' => ['record_type' => 'client', 'q' => $uniq],
+                 'cms_crm_history_get' => ['record_type' => 'client', 'record_id' => $G->id, 'limit' => 50]] as $name => $args) {
+        [$status, $out] = $tool($name, $args);
+        $hits = $status === 'ok' ? $found($json($out), ['клиент Г', 'платёж Г', 'сделка Д', 'счёт Д']) : [];
+        $report('MCP '.$name.' (Г, Д)', 'executeTool '.http_build_query($args).($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
+    }
+    [$status, $out] = $tool('cms_user_get', ['id' => $E->id]);
+    $mustFail('MCP cms_user_get (клиент Е)', 'executeTool id='.$E->id, $status === 'ok', 'не отдаёт: '.mb_substr((string)$out, 0, 80));
 } finally {
     if (getenv('AUDIT_KEEP')) {
         echo "AUDIT_KEEP: the fixture is kept; remove it with AUDIT_CLEAN=1\n";
@@ -657,7 +838,7 @@ foreach ($results as [$place, $how, $status, $detail]) {
 }
 echo count($results).' places, '.count($leaks)." leaks\n";
 if ($leaks) {
-    fwrite(STDERR, 'FAIL: '.count($leaks)." leaks of «Свои сделки» / «edit»\n");
+    fwrite(STDERR, 'FAIL: '.count($leaks)." leaks of «Свои сделки» / «edit» / personal orders of people\n");
     exit(1);
 }
 echo "OK crm-leak-audit\n";
