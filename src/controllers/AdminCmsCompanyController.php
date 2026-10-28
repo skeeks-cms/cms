@@ -837,6 +837,8 @@ HTML
                 'class'    => BackendGridModelRelatedAction::class,
                 'priority' => 550,
                 'name'     => 'Проекты',
+                // Not a tab of the card any more (tasks by company projects are phased out); the section stays.
+                'isVisible' => false,
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
                 },
@@ -863,12 +865,13 @@ HTML
 
             'leads' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 575,
+                // The second tab, right after «Профиль»; «Новая сделка» opens the deal form
+                // with this company chosen (LeadTriageActions::presetCreateCompany()).
+                'priority' => 5,
                 'name'     => 'Сделки',
                 'icon'     => 'fas fa-user-plus',
                 'controllerRoute' => '/cms/admin-cms-lead',
                 'relation'        => ['cms_company_id' => 'id'],
-                'isStandartBeforeRender' => false,
                 'accessCallback' => function () {
                     return \Yii::$app->user->can('cms/admin-company/manage', ['model' => $this->model])
                         && \Yii::$app->user->can('cms/admin-lead');

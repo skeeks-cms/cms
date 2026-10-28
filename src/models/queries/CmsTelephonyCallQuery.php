@@ -60,8 +60,8 @@ class CmsTelephonyCallQuery extends CmsActiveQuery
                 "or",
                 [self::getPrimaryTableName() . ".cms_company_id" => CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id')],
                 [self::getPrimaryTableName() . ".cms_user_id" => CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id')],
-                [self::getPrimaryTableName() . ".executor_id" => $user->id],
-                [self::getPrimaryTableName() . ".created_by" => $user->id],
+                // The call has no executor_id / created_by columns: its employee is cms_worker_user_id.
+                [self::getPrimaryTableName() . ".cms_worker_user_id" => $managers],
             ]);
         }
 

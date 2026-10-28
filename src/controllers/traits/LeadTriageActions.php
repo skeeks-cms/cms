@@ -50,7 +50,7 @@ trait LeadTriageActions
                 'fields' => [$this, 'createFields'],
                 'activeFormConfig' => ['clientCallback' => $this->createFormCallback()],
                 'on '.BackendModelCreateAction::EVENT_INIT_FORM_MODELS => function (Event $event) {
-                    $event->sender->formModels['identity'] = new LeadIdentityForm(['executor_id' => (int)\Yii::$app->user->id]);
+                    $event->sender->formModels['identity'] = $this->presetCreateCompany(new LeadIdentityForm(['executor_id' => (int)\Yii::$app->user->id]));
                 },
                 'on '.BackendModelCreateAction::EVENT_BEFORE_VALIDATE => function (Event $event) {
                     $this->checkCreateIdentity($event->sender);
@@ -260,6 +260,24 @@ JS
         }
 
         return $fields;
+    }
+
+    /**
+     * «Новая сделка» from the tab «Сделки» of a company card
+     * (`CmsLead[cms_company_id]`, BackendGridModelRelatedAction): the company
+     * is chosen in «Кто это» in advance, only if the employee sees it. The
+     * posted form replaces it, and LeadTriage checks the choice as usual.
+     */
+    protected function presetCreateCompany(LeadIdentityForm $form): LeadIdentityForm
+    {
+        $preset = (array)\Yii::$app->request->get((new CmsLead())->formName());
+        $companyId = (int)($preset['cms_company_id'] ?? 0);
+        if ($companyId && CrmAccess::instance()->canSeeCompany((int)\Yii::$app->user->id, $companyId)) {
+            $form->company_mode = LeadIdentityForm::MODE_EXISTING;
+            $form->company_id = $companyId;
+        }
+
+        return $form;
     }
 
     /** @var array|null identity of the deal being created (LeadTriage::prepareNewLead()) */
