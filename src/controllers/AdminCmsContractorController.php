@@ -247,29 +247,12 @@ HTML
     }
 
     /**
-     * П2а+: requisites of a client are changed from the level "edit": refused
-     * when the employee works on one of their companies or people with
-     * "Свои сделки" only. Clients he does not see do not block (as before).
+     * П2а+: requisites are changed only with the right to edit every client and
+     * deal they belong to — one rule with the API (CrmAccess::canEditContractor()).
      */
     protected function canEditContractor($contractor): bool
     {
-        if (!$contractor) {
-            return true;
-        }
-        $access = \skeeks\cms\crm\CrmAccess::instance();
-        $userId = (int)\Yii::$app->user->id;
-        $records = array_map(static fn($id) => [\skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY, (int)$id],
-            \skeeks\cms\models\CmsCompany2contractor::find()->select('cms_company_id')->andWhere(['cms_contractor_id' => (int)$contractor->id])->column());
-        foreach ($contractor->users as $user) {
-            $records[] = [\skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT, (int)$user->id];
-        }
-        foreach ($records as $record) {
-            if ($access->clientDataLevel($userId, $record[0], $record[1]) !== null && !$access->canEditClientRecord($userId, $record)) {
-                return false;
-            }
-        }
-
-        return true;
+        return !$contractor || \skeeks\cms\crm\CrmAccess::instance()->canEditContractor((int)\Yii::$app->user->id, $contractor);
     }
 
     public function updateFields($action)

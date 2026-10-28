@@ -787,6 +787,45 @@ class CrmAccess extends Component
     }
 
     /**
+     * Requisites (CmsContractor) are shared data of every client they belong
+     * to: changed only when the employee may edit each of them
+     * (canEditClientRecord(): "edit" and above; a client he does not see
+     * counts as no right — one visible link never opens shared data) and works
+     * on each deal they are attached to. The screen and the API ask here.
+     * Requisites of nobody stay open, as before.
+     *
+     * @param \skeeks\cms\models\CmsContractor|int $contractor
+     */
+    public function canEditContractor($user, $contractor): bool
+    {
+        $id = (int)(is_object($contractor) ? $contractor->id : $contractor);
+        if ($id <= 0 || $this->isAdmin($user)) {
+            return true;
+        }
+        $records = [];
+        foreach (\skeeks\cms\models\CmsCompany2contractor::find()->select('cms_company_id')->andWhere(['cms_contractor_id' => $id])->column() as $companyId) {
+            $records[] = [CmsCrmAccessRequest::RECORD_COMPANY, (int)$companyId];
+        }
+        foreach (\skeeks\cms\models\CmsContractorMap::find()->select('cms_user_id')->andWhere(['cms_contractor_id' => $id])->column() as $clientId) {
+            $records[] = [CmsCrmAccessRequest::RECORD_CLIENT, (int)$clientId];
+        }
+        foreach ($records as $record) {
+            if (!$this->canEditClientRecord($user, $record)) {
+                return false;
+            }
+        }
+        $leadIds = \skeeks\cms\models\CmsLead2contractor::find()->select('cms_lead_id')->andWhere(['cms_contractor_id' => $id])->column();
+        foreach ($leadIds ? CmsLead::find()->andWhere(['id' => $leadIds])->all() : [] as $lead) {
+            // A closed deal keeps its requisites for bills: its responsible still edits them.
+            if (!$lead->isManagedBy($this->userId($user)) && !$this->canWorkLead($user, $lead)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * May the employee add a new phone or email to a company or a person.
      * "edit" and above — anywhere. "Свои сделки" — only from his own deal of
      * this client ($leadId: the contact block of the deal, contacts of the deal
