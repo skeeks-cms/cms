@@ -458,8 +458,10 @@ JS
                 <?php endif; ?>
 
                         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                            'query'         => $model->getUserLogs()->activity()->notPinned(),
+                            // His deals' records too, signed by the deal (CmsLogListWidget::$ownModel).
+                            'query'         => $model->getCardLogs()->activity()->notPinnedOf($model),
                             'is_show_model' => false,
+                            'ownModel'      => $model,
                             'is_show_pin_controls' => true,
                         ]); ?>
 

@@ -66,6 +66,7 @@ $logListClass = $widget->is_show_model
     'viewParams'   => [
         'is_show_pin_controls' => (bool)$widget->is_show_pin_controls,
         'is_raised'            => (bool)$widget->is_raised,
+        'ownModel'             => $widget->ownModel,
     ],
     'emptyText'    => false,
     'options'      => [

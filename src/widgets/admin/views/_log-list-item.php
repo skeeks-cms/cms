@@ -20,6 +20,7 @@ use yii\helpers\Html;
 $log = $model;
 $entry = $log->entry();
 $is_show_pin_controls = isset($is_show_pin_controls) ? (bool)$is_show_pin_controls : false;
+$ownModel = $ownModel ?? null;
 $is_raised = isset($is_raised) ? (bool)$is_raised : true;
 
 $surfaceClass = 'sx-surface sx-surface--padded sx-item sx-log-item sx-log-entry';
@@ -73,6 +74,13 @@ foreach ([['model', 'model_code', 'sx-model'], ['subModel', 'sub_model_code', ''
     }
     $controllerId = ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->$codeAttribute, 'controller']);
     $label = (string)$record->asText;
+    // A record of another model in a card feed (a deal of the company) keeps its link visible.
+    if ($class === 'sx-model' && $ownModel && ($log->model_code !== $ownModel->skeeksModelCode || (int)$log->model_id !== (int)$ownModel->id)) {
+        $class = 'sx-model-other';
+        // «Сделка №927 Ромашка»: the kind and the number of the record it belongs to.
+        $kind = (string)ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$log->$codeAttribute, 'name_one'], '');
+        $label = trim($kind.' №'.(int)$record->id.' '.(string)$record->asText);
+    }
     $meta[] = Html::tag('span', $controllerId
         ? BackendEntityLink::widget([
             'controllerId' => $controllerId,

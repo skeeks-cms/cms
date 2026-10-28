@@ -20,6 +20,56 @@ use skeeks\cms\rbac\CmsManager;
 class CmsLogQuery extends CmsActiveQuery
 {
     /**
+     * The records of the deals (CmsLead) of a company or a client person for
+     * its card feed, as in Bitrix24. A letter, a call, a proposal event or a
+     * visit written to the client and to its deal is shown once: the deal
+     * record is skipped when the client has the same record — the same
+     * `data`, or for letters and calls the same `data.id` (a call on the
+     * company keeps more fields). Who sees which deals is
+     * crm\CrmAccess::feedCondition() of the card.
+     *
+     * @param CmsCompany|\skeeks\cms\models\User $record
+     */
+    public static function clientDealsCondition($record): array
+    {
+        $table = CmsLog::tableName();
+        // An explicit list (a client has few deals): the (model_code, model_id) index is used, not a scan by model_code.
+        $leads = array_map('intval', \skeeks\cms\models\CmsLead::find()->select('id')
+            ->andWhere([$record instanceof CmsCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id])->column());
+        if (!$leads) {
+            return ['and', '0=1'];
+        }
+        $twinId = static fn(string $alias) => "JSON_UNQUOTE(JSON_EXTRACT($alias.data, '$.id'))";
+        $twin = (new \yii\db\Query())->select(new \yii\db\Expression('1'))->from(['twin' => $table])
+            ->andWhere(['twin.model_code' => $record->skeeksModelCode, 'twin.model_id' => (int)$record->id])
+            ->andWhere('twin.log_type = '.$table.'.log_type')
+            // Only the events written to both (comments and changes are never twins; their data is often "[]").
+            ->andWhere([$table.'.log_type' => [CmsLog::LOG_TYPE_PHONE_CALL, 'message', 'proposal', 'comm_visit']])
+            ->andWhere(['or',
+                'twin.data = '.$table.'.data',
+                ['and', [$table.'.log_type' => [CmsLog::LOG_TYPE_PHONE_CALL, 'message']], $twinId('twin').' = '.$twinId($table)],
+            ]);
+
+        return ['and',
+            [$table.'.model_code' => (new \skeeks\cms\models\CmsLead())->skeeksModelCode],
+            [$table.'.model_id' => $leads],
+            ['not exists', $twin],
+        ];
+    }
+
+    /**
+     * Not pinned records of the card itself: the records of its deals stay in
+     * the feed even when pinned in their deal (pinned ones of the card are
+     * shown above it).
+     *
+     * @param CmsCompany|\skeeks\cms\models\User $record
+     */
+    public function notPinnedOf($record)
+    {
+        return $this->andWhere(['or', ['is_pinned' => 0], ['is_pinned' => null], ['<>', CmsLog::tableName().'.model_code', $record->skeeksModelCode]]);
+    }
+
+    /**
      * @param string|array $types
      * @return $this
      */

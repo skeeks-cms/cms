@@ -191,6 +191,26 @@ class User
         }
     }
 
+    /**
+     * The feed of the card of a client person: own records and the records of
+     * his deals (CmsLogQuery::clientDealsCondition()), by the level of the
+     * current employee.
+     *
+     * @return queries\CmsLogQuery
+     */
+    public function getCardLogs()
+    {
+        $table = CmsLog::tableName();
+        $q = CmsLog::find()->andWhere(['or',
+            ['and', [$table.'.model_code' => $this->skeeksModelCode], [$table.'.model_id' => $this->id]],
+            queries\CmsLogQuery::clientDealsCondition($this),
+        ]);
+        $this->limitFeed($q);
+        $q->multiple = true;
+
+        return $q;
+    }
+
     public function getUserLogs() {
         $q = CmsLog::find()
             ->andWhere([
@@ -241,6 +261,8 @@ class User
                 ['model_code' => (new ShopBonusTransaction())->skeeksModelCode],
                 ['model_id' => $this->getBonusTransactions()->select(['id'])],
             ])
+            // The records of his deals, as in the card feed.
+            ->orWhere(queries\CmsLogQuery::clientDealsCondition($this))
 
             ->orderBy(['created_at' => SORT_DESC]);
         $this->limitFeed($q);

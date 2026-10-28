@@ -72,6 +72,26 @@ class CmsCompany extends ActiveRecord
         }
     }
 
+    /**
+     * The feed of the card: the company's own records and the records of its
+     * deals (CmsLogQuery::clientDealsCondition()), by the level of the
+     * current employee (crm\CrmAccess::feedCondition()).
+     *
+     * @return queries\CmsLogQuery
+     */
+    public function getCardLogs()
+    {
+        $table = CmsLog::tableName();
+        $q = CmsLog::find()->andWhere(['or',
+            ['and', [$table.'.model_code' => $this->skeeksModelCode], [$table.'.model_id' => $this->id]],
+            queries\CmsLogQuery::clientDealsCondition($this),
+        ]);
+        $this->limitFeed($q);
+        $q->multiple = true;
+
+        return $q;
+    }
+
     public function getCompanyLogs() {
         $q = CmsLog::find()
             ->andWhere([
@@ -122,6 +142,8 @@ class CmsCompany extends ActiveRecord
                 ['model_code' => (new CmsProject())->skeeksModelCode],
                 ['model_id' => $this->getProjects()->select(['id'])],
             ])
+            // The records of its deals, as in the card feed.
+            ->orWhere(queries\CmsLogQuery::clientDealsCondition($this))
             ->orderBy(['created_at' => SORT_DESC]);
         $this->limitFeed($q);
 

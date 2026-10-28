@@ -477,6 +477,27 @@ try {
     $leadNote = $feedLog($ownersLead, 'Комментарий сделки '.$uniq);
     $check(!$levelAccess->canPinLog($other->id, $leadNote) && $levelAccess->canPinLog($owner->id, $leadNote),
         'a deal comment is pinned by who works on the deal');
+    // The card feed: the client's records and its deals' records (as in Bitrix24), each deal record once.
+    $ownLeadNote = $feedLog($lead, 'В своей сделке '.$uniq);
+    $twinData = ['id' => 800000000 + (int)$uniq];
+    $twinOnCompany = new \skeeks\cms\models\CmsLog(['model_code' => $company->skeeksModelCode, 'model_id' => $company->id, 'log_type' => 'message', 'data' => $twinData]);
+    $twinOnCompany->save(false);
+    $twinOnLead = new \skeeks\cms\models\CmsLog(['model_code' => $lead->skeeksModelCode, 'model_id' => $lead->id, 'log_type' => 'message', 'data' => $twinData]);
+    $twinOnLead->save(false);
+    \skeeks\cms\models\CmsLog::updateAll(['is_pinned' => 1], ['id' => $ownLeadNote->id]);
+    $cardIds = static fn() => array_map('intval', CmsCompany::findOne($company->id)->getCardLogs()->notPinnedOf(CmsCompany::findOne($company->id))
+        ->select(\skeeks\cms\models\CmsLog::tableName().'.id')->column());
+    $as($owner);
+    $card = $cardIds();
+    $check(in_array((int)$companyNote->id, $card, true), 'the card feed shows the company records');
+    $check(in_array((int)$leadNote->id, $card, true) && in_array((int)$ownLeadNote->id, $card, true), 'the card feed shows the records of all its deals');
+    $check(in_array((int)$twinOnCompany->id, $card, true) && !in_array((int)$twinOnLead->id, $card, true),
+        'a letter written to the company and to its deal is shown once');
+    $check(in_array((int)$ownLeadNote->id, $card, true), 'a record pinned in its deal stays in the company feed');
+    $as($other);
+    $card = $cardIds();
+    $check(in_array((int)$ownLeadNote->id, $card, true) && !in_array((int)$leadNote->id, $card, true) && in_array((int)$companyNote->id, $card, true),
+        '"deal": the card feed shows his deal records, not the records of another deal');
     $as($other);
     // "full" (the main responsible): everything.
     $as($owner);

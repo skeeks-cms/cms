@@ -19,6 +19,15 @@ class CmsLogListWidget extends Widget
 
     public $is_show_model = true;
 
+    /**
+     * The record of the card the feed belongs to: with is_show_model = false
+     * only its link is hidden, the records of other models (its deals) keep
+     * theirs — «Сделка №927 Ромашка».
+     *
+     * @var \yii\db\ActiveRecord|null
+     */
+    public $ownModel = null;
+
     public $is_show_pin_controls = false;
 
     public $is_raised = true;
