@@ -386,7 +386,7 @@ class CrmAccess extends Component
         return [
             self::LEVEL_DEAL => 'Карточка клиента, звонки и письма, всё по своим сделкам',
             self::LEVEL_EDIT => 'Плюс правка данных: телефоны, e-mail, люди, адреса, реквизиты',
-            self::LEVEL_FULL => 'Всё, включая удаление клиента',
+            self::LEVEL_FULL => 'Плюс все сделки, услуги, счета, платежи и документы клиента, удаление',
         ];
     }
 
@@ -698,10 +698,22 @@ class CrmAccess extends Component
     }
 
     /**
+     * Sees the whole client — all deals, services, bills, payments, documents,
+     * tasks, proposals and the whole feed: the level "full" only (owner's
+     * decision 29.10.2026). "edit" is "Свои сделки" plus changing the client
+     * data (canEditClientData()), not more.
+     */
+    public static function seesWholeClient(?string $level): bool
+    {
+        return $level === self::LEVEL_FULL;
+    }
+
+    /**
      * Companies whose deals the employee does not see except his own: the best
-     * link of him and his subordinates is "Свои сделки" (П2а+; a leader is
-     * limited as his best subordinate, clientDataLevel()); "своё" are then the
-     * deals of him and his subordinates.
+     * link of him and his subordinates is "Свои сделки" or "edit" — not
+     * "full" (seesWholeClient(); П2а+, a leader is limited as his best
+     * subordinate, clientDataLevel()); "своё" are then the deals of him and his
+     * subordinates.
      * Lists of deals and of records tied to deals (proposals) exclude the
      * other deals of these companies; the company itself, its data and its
      * feed stay visible. Null — nothing to exclude (levels off, no migration).
@@ -717,10 +729,10 @@ class CrmAccess extends Component
         $ownerIds = array_values(array_unique(array_merge([$userId], array_map('intval', CmsDepartment::subordinateIds($userId)))));
 
         return CmsCompany2manager::find()->alias('dealOnly')->select('dealOnly.cms_company_id')
-            ->andWhere(['dealOnly.cms_user_id' => $ownerIds, 'dealOnly.access_level' => self::LEVEL_DEAL])
+            ->andWhere(['dealOnly.cms_user_id' => $ownerIds, 'dealOnly.access_level' => [self::LEVEL_DEAL, self::LEVEL_EDIT]])
             ->andWhere(['not exists', CmsCompany2manager::find()->alias('wider')->select('wider.id')
                 ->andWhere('wider.cms_company_id = dealOnly.cms_company_id')
-                ->andWhere(['wider.cms_user_id' => $ownerIds, 'wider.access_level' => [self::LEVEL_EDIT, self::LEVEL_FULL]])]);
+                ->andWhere(['wider.cms_user_id' => $ownerIds, 'wider.access_level' => self::LEVEL_FULL])]);
     }
 
     /**
@@ -741,12 +753,12 @@ class CrmAccess extends Component
      * One visibility of the client records that are not deals — services
      * (CmsDeal), bills, payments, documents, tasks, proposals (owner's decision
      * 28.10.2026): a record of a company or a person is seen when the client is
-     * seen with the level "edit" or above (clientDataLevel(): a link
-     * "edit"/"full" of him or a subordinate, a person of such a company without
-     * an own link), or when the record is "своё" — the $own conditions of the
+     * seen in full (seesWholeClient(): a link "full" of him or a subordinate, a
+     * person of such a company without an own link), or when the record is
+     * "своё" — the $own conditions of the
      * caller (created by him or his subordinates, he is the executor or the
-     * responsible, it is tied to his deal). With "Свои сделки" the other
-     * records of the client are hidden. Not for administrators: the
+     * responsible, it is tied to his deal). With "Свои сделки" and "edit" the
+     * other records of the client are hidden. Not for administrators: the
      * forManager() scopes return before.
      *
      * @param \skeeks\cms\models\User|int $user
@@ -774,9 +786,9 @@ class CrmAccess extends Component
     }
 
     /**
-     * People seen with the level "edit" or above (clientDataLevel() in SQL):
-     * an own or a subordinate's link "edit"/"full", or no own link and a
-     * company of the person seen in full.
+     * People seen in full (seesWholeClient() of clientDataLevel() in SQL): an
+     * own or a subordinate's link "full", or no own link and a company of the
+     * person seen in full.
      */
     private function fullClientCondition($user, string $column, \yii\db\ActiveQuery $fullCompanies): array
     {
@@ -785,7 +797,7 @@ class CrmAccess extends Component
         $subordinates = array_values(array_diff($ownerIds, [$userId]));
         $condition = ['or',
             [$column => CmsUser2manager::find()->select('client_id')
-                ->andWhere(['worker_id' => $userId, 'access_level' => [self::LEVEL_EDIT, self::LEVEL_FULL]])],
+                ->andWhere(['worker_id' => $userId, 'access_level' => self::LEVEL_FULL])],
             ['and',
                 ['not in', $column, CmsUser2manager::find()->select('client_id')->andWhere(['worker_id' => $userId])],
                 [$column => CmsCompany2user::find()->select('cms_user_id')->andWhere(['cms_company_id' => $fullCompanies])],
@@ -793,21 +805,22 @@ class CrmAccess extends Component
         ];
         if ($subordinates) {
             $condition[] = [$column => CmsUser2manager::find()->select('client_id')
-                ->andWhere(['worker_id' => $subordinates, 'access_level' => [self::LEVEL_EDIT, self::LEVEL_FULL]])];
+                ->andWhere(['worker_id' => $subordinates, 'access_level' => self::LEVEL_FULL])];
         }
 
         return $condition;
     }
 
     /**
-     * The feed of a company or a person for the level "Свои сделки" (П2а+,
+     * The feed of a company or a person for the levels "Свои сделки" and "edit" (П2а+,
      * owner's decision 28.10.2026): the records of the client itself (calls,
      * letters, chats, comments — the communication his deal needs), the
      * records of his own deals and of the tasks tied to them (a proposal writes
      * its events to the feed of its deal or client, it has no feed of its own).
      * Hidden: other deals, services (CmsDeal), projects, bills, payments, tasks
-     * and proposals not tied to his deals. Null — no limit ("edit", "full", a
-     * leader, an administrator, an employee card, or the client is not seen).
+     * and proposals not tied to his deals. Null — no limit ("full", a leader
+     * through a "full" subordinate, an administrator, an employee card, or the
+     * client is not seen).
      *
      * @param \skeeks\cms\models\CmsCompany|User $record
      * @return array|null a where condition for CmsLog::find()
@@ -825,7 +838,7 @@ class CrmAccess extends Component
 
             return $this->clientOwnFeedCondition($user, $record, $table);
         }
-        if ($level === null || self::levelRank($level) >= self::levelRank(self::LEVEL_EDIT)) {
+        if ($level === null || self::seesWholeClient($level)) {
             return null;
         }
         $table = \skeeks\cms\models\CmsLog::tableName();

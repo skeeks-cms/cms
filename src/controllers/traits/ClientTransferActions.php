@@ -308,8 +308,8 @@ trait ClientTransferActions
             'approval' => $access->approvalRequired($code, $id),
             'protectionReady' => \skeeks\cms\crm\CrmProtection::ready(),
             'protectionState' => \skeeks\cms\crm\CrmProtection::state($code, $id),
-            // The reason names payments and services: not for "deal" (it sees neither), nor a card of the pool.
-            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id, $canManage || in_array($myLevel, [CrmAccess::LEVEL_EDIT, CrmAccess::LEVEL_FULL], true)),
+            // The reason names payments and services: only for who sees the whole client ("full"), not a card of the pool.
+            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id, $canManage || CrmAccess::seesWholeClient($myLevel)),
             'canTransfer' => $canTransfer,
             'transferUrl' => Url::current([0 => '/'.$this->uniqueId.'/transfer']),
             'work' => $canTransfer ? (new CrmClientTransfer())->openWork($code, $id) : ['leads' => [], 'tasks' => []],
