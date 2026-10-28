@@ -428,8 +428,9 @@ class CrmAccess extends Component
         } elseif ($value === 'no_main') {
             $query->andWhere(['not exists', $links->andWhere(['is_main' => 1])]);
         } elseif ($value === 'pool') {
-            // П2д: no employee and not protected — taken into work by whoever finds it first.
+            // П2д: no employee, not protected and no history — taken into work by whoever finds it first.
             $query->andWhere(['not exists', $links]);
+            $query->andWhere(['not', self::historyCondition($recordCode, $idColumn)]);
             if (CrmProtection::ready()) {
                 $query->andWhere([substr($idColumn, 0, (int)strrpos($idColumn, '.')).'.crm_protection' => CrmProtection::FREE]);
             }
@@ -514,9 +515,59 @@ class CrmAccess extends Component
             return false;
         }
 
+        // A client with a history always has a main responsible (owner's decision 29.10.2026).
+        if (self::hasHistory($recordCode, $recordId)) {
+            return false;
+        }
+
         // A person of a company that has employees is its data, not a free client.
         return $recordCode !== CmsCrmAccessRequest::RECORD_CLIENT
             || !self::personCompanyLinks((string)(int)$recordId)->exists();
+    }
+
+    /**
+     * The history of a client (owner's decision 29.10.2026): a payment, a bill,
+     * a service or a deal ever — not counting an incoming deal not sorted yet
+     * (STATUS_NEW). Of a person — his personal ones (without a company). The
+     * general pool holds only clients without a history (an import, a bot);
+     * a client with a history always has a main responsible
+     * (CrmProtection::historyMainCandidate()).
+     *
+     * @param string $idColumn the column with the record id, e.g. "cms_company.id"
+     * @param int|null $exceptLeadId a deal not counted (the one being created for the client)
+     * @return array a where condition: the record has a history
+     */
+    public static function historyCondition(string $recordCode, string $idColumn, ?int $exceptLeadId = null): array
+    {
+        $isCompany = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY;
+        $column = $isCompany ? 'cms_company_id' : 'cms_user_id';
+        $records = static function (string $table, string $alias, array $extra = []) use ($isCompany, $column, $idColumn): \yii\db\Query {
+            $query = (new \yii\db\Query())->select(new \yii\db\Expression('1'))->from([$alias => $table])
+                ->andWhere($alias.'.'.$column.' = '.$idColumn)->andWhere($extra);
+            if (!$isCompany) {
+                $query->andWhere([$alias.'.cms_company_id' => null]);
+            }
+
+            return $query;
+        };
+        $condition = ['or',
+            ['exists', $records('{{%cms_deal}}', 'historyService')],
+            ['exists', $records('{{%cms_lead}}', 'historyLead', ['and', ['<>', 'historyLead.status', CmsLead::STATUS_NEW],
+                $exceptLeadId ? ['<>', 'historyLead.id', $exceptLeadId] : []])],
+        ];
+        $db = \Yii::$app->db;
+        foreach (['{{%shop_payment}}' => 'historyPayment', '{{%shop_bill}}' => 'historyBill'] as $table => $alias) {
+            if ($db->getTableSchema($table) !== null) {
+                $condition[] = ['exists', $records($table, $alias)];
+            }
+        }
+
+        return $condition;
+    }
+
+    public static function hasHistory(string $recordCode, int $recordId, ?int $exceptLeadId = null): bool
+    {
+        return $recordId > 0 && (new \yii\db\Query())->andWhere(self::historyCondition($recordCode, (string)(int)$recordId, $exceptLeadId))->exists();
     }
 
     /**
@@ -564,6 +615,8 @@ class CrmAccess extends Component
     {
         return self::mainReady() && $recordId > 0 && $this->mainResponsibleId($recordCode, $recordId) === null
             && !$this->approvalRequired($recordCode, $recordId)
+            // A client with a history is never taken: he has a main responsible by his history.
+            && !self::hasHistory($recordCode, $recordId)
             // A person of a company with employees is taken through the company.
             && ($recordCode !== CmsCrmAccessRequest::RECORD_CLIENT || !self::personCompanyLinks((string)(int)$recordId)->exists());
     }

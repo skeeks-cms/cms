@@ -80,7 +80,9 @@ class CmsCompanyQuery extends CmsActiveQuery
             $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
         }
         $this->joinWith("managers as managers");
-        $this->andWhere(['or', ["managers.id" => $managers], ['managers.id' => null]]);
+        // The pool: no employee and no history (a company with a history has a main responsible).
+        $this->andWhere(['or', ["managers.id" => $managers], ['and', ['managers.id' => null],
+            ['not', \skeeks\cms\crm\CrmAccess::historyCondition('company', $this->getPrimaryTableName().'.id')]]]);
 
         return $this;
     }

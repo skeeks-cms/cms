@@ -941,6 +941,43 @@ try {
         }
     }
 
+    // The general pool holds only clients without a history; one with a history always has a main responsible.
+    if (CrmAccess::mainReady() && \skeeks\cms\crm\CrmProtection::ready() && class_exists(\skeeks\cms\shop\models\ShopPayment::class)) {
+        $fresh = new CmsCompany(['name' => 'Без истории '.$uniq]);
+        $fresh->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $fresh->id]);
+        (new CmsLead(['name' => 'Неразобранное '.$uniq, 'cms_site_id' => $siteId, 'cms_company_id' => $fresh->id, 'status' => CmsLead::STATUS_NEW]))->save(false);
+        $check(CrmAccess::instance()->inPool('company', (int)$fresh->id) && CrmAccess::instance()->canTakeIntoWork('company', (int)$fresh->id),
+            'a company without a history (an unsorted incoming deal only) is in the pool');
+        $veteran = new CmsCompany(['name' => 'С давним платежом '.$uniq]);
+        $veteran->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $veteran->id]);
+        $oldPayment = new \skeeks\cms\shop\models\ShopPayment(['cms_site_id' => $siteId, 'cms_company_id' => $veteran->id, 'is_debit' => 1, 'amount' => 1000,
+            'currency_code' => 'RUB', 'operation_at' => time() - 86400 * 800]);
+        $oldPayment->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $veteran->id]);
+        \skeeks\cms\models\CmsCompany::updateAll(['crm_protection' => 'free'], ['id' => $veteran->id]);
+        $inPoolList = static function (CmsCompany $company) use ($owner) {
+            $query = CmsCompany::find()->andWhere([CmsCompany::tableName().'.id' => $company->id]);
+            CrmAccess::instance()->applyResponsibleFilter($query, 'company', 'pool', CmsCompany::tableName().'.id', (int)$owner->id);
+
+            return $query->exists();
+        };
+        $check(!CrmAccess::instance()->inPool('company', (int)$veteran->id) && !CrmAccess::instance()->canTakeIntoWork('company', (int)$veteran->id)
+            && !$inPoolList($veteran) && $inPoolList($fresh), 'a company with an old payment is not in the pool and is not taken into work');
+        $check(in_array((int)$veteran->id, array_column(array_filter((new \skeeks\cms\crm\CrmProtection())->historyMainPlan((int)$admin->id),
+            static fn($row) => $row['code'] === 'company'), 'id'), true), 'the plan gives it a main responsible by its history');
+        $as($other);
+        $worked = (new LeadTriage())->workWithClient(CrmAccess::instance()->candidateRef('company', (int)$veteran->id), (int)$other->id);
+        $check($worked['lead'] && CrmAccess::instance()->mainResponsibleId('company', (int)$veteran->id) !== null
+            && CrmAccess::instance()->mainResponsibleId('company', (int)$veteran->id) !== (int)$other->id
+            && CrmAccess::instance()->linkLevel($other, 'company', (int)$veteran->id) === CrmAccess::LEVEL_DEAL,
+            '«Работать с этим клиентом»: the deal at once, the level "Свои сделки", the main one by the history');
+        $check(!\skeeks\cms\shop\models\ShopPayment::find()->forManager($other)->andWhere([\skeeks\cms\shop\models\ShopPayment::tableName().'.id' => $oldPayment->id])->exists()
+            && CrmAccess::instance()->feedCondition($other, $veteran) !== null, 'the old payments and the whole history stay hidden from "Свои сделки"');
+        $as($admin);
+    }
+
     // A client person is equal to a company: his data by his companies too, his personal orders by the access to him only.
     if (CrmAccess::mainReady() && \skeeks\cms\crm\CrmProtection::ready()) {
         $personCompany = new CmsCompany(['name' => 'Компания человека '.$uniq]);

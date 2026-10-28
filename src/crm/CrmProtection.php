@@ -257,31 +257,14 @@ class CrmProtection
         }
         $access = CrmAccess::instance();
         $admins = $access->adminIds();
-        $worker = static fn($id) => $id && CmsUser::find()->andWhere(['id' => (int)$id, 'is_worker' => 1, 'is_active' => 1])->exists() ? (int)$id : null;
-        $payment = '\skeeks\cms\shop\models\ShopPayment';
-        $bill = '\skeeks\cms\shop\models\ShopBill';
         $plan = [];
         foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
             [$linkClass, $recordColumn] = CrmAccess::linkTable($code);
-            $column = $code === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id';
             $records = $class::find()->andWhere(['crm_protection' => [self::PROTECTED, self::ALWAYS]])
                 ->andWhere(['not exists', $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($class::tableName().'.id')])->andWhere(['is_main' => 1])])
                 ->orderBy(['id' => SORT_ASC])->all();
             foreach ($records as $record) {
-                $userId = null;
-                $source = '';
-                $last = class_exists($payment) ? $payment::find()->andWhere([$column => (int)$record->id, 'is_debit' => 1])
-                    ->orderBy(new \yii\db\Expression('COALESCE(operation_at, created_at) DESC'))->one() : null;
-                if ($last && class_exists($bill) && ($userId = $worker($bill::find()->select('created_by')->andWhere(['shop_payment_id' => (int)$last->id])->scalar()))) {
-                    $source = 'счёт последнего платежа';
-                } elseif ($last && ($userId = $worker($last->created_by))) {
-                    $source = 'последний платёж';
-                } elseif ($userId = $worker(CmsDeal::find()->select('created_by')->andWhere([$column => (int)$record->id, 'is_active' => 1])->orderBy(['id' => SORT_DESC])->scalar())) {
-                    $source = 'действующая услуга';
-                } elseif ($admins) {
-                    $userId = $admins[0];
-                    $source = 'администратор по умолчанию';
-                }
+                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $admins ? (int)$admins[0] : null, 'администратор по умолчанию');
                 $user = $userId ? CmsUser::findOne($userId) : null;
                 $plan[] = [
                     'code' => $code,
@@ -298,6 +281,113 @@ class CrmProtection
     }
 
     public const OLD_BASE_COMMENT = 'Назначен основным: старая база без ответственного';
+
+    /** The default main responsible of a client with a history and nobody by it (owner's decision 29.10.2026). */
+    public const HISTORY_FALLBACK_USER_ID = 1;
+
+    /**
+     * Who becomes the main responsible of a client by its history: the creator
+     * of the bill of its last incoming payment, else who registered that
+     * payment, else the creator of its last service (an active one first),
+     * else $fallbackId. Only active employees. Of a person — his personal
+     * payments and services.
+     *
+     * @return array [user id or null, the ground in words]
+     */
+    public function mainCandidate(string $code, int $id, ?int $fallbackId, string $fallbackSource): array
+    {
+        $worker = static fn($userId) => $userId && CmsUser::find()->andWhere(['id' => (int)$userId, 'is_worker' => 1, 'is_active' => 1])->exists() ? (int)$userId : null;
+        $column = $code === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id';
+        $personal = $code === CmsCrmAccessRequest::RECORD_COMPANY ? [] : ['cms_company_id' => null];
+        $payment = '\skeeks\cms\shop\models\ShopPayment';
+        $bill = '\skeeks\cms\shop\models\ShopBill';
+        $last = class_exists($payment) ? $payment::find()->andWhere([$column => $id, 'is_debit' => 1])->andWhere($personal)
+            ->orderBy(new \yii\db\Expression('COALESCE(operation_at, created_at) DESC'))->one() : null;
+        if ($last && class_exists($bill) && ($userId = $worker($bill::find()->select('created_by')->andWhere(['shop_payment_id' => (int)$last->id])->scalar()))) {
+            return [$userId, 'счёт последнего платежа'];
+        }
+        if ($last && ($userId = $worker($last->created_by))) {
+            return [$userId, 'последний платёж'];
+        }
+        $service = CmsDeal::find()->select('created_by')->andWhere([$column => $id])->andWhere($personal)->orderBy(['is_active' => SORT_DESC, 'id' => SORT_DESC])->scalar();
+        if ($userId = $worker($service)) {
+            return [$userId, 'последняя услуга'];
+        }
+
+        return [$worker($fallbackId), $fallbackSource];
+    }
+
+    /**
+     * Clients with a history and without a main responsible (owner's decision
+     * 29.10.2026: such a client always has one) and who becomes it,
+     * mainCandidate() with the fallback employee.
+     *
+     * @return array[] code, id, name, user_id, user, source
+     */
+    public function historyMainPlan(int $fallbackId = self::HISTORY_FALLBACK_USER_ID): array
+    {
+        if (!CrmAccess::mainReady()) {
+            return [];
+        }
+        $plan = [];
+        foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
+            [$linkClass, $recordColumn] = CrmAccess::linkTable($code);
+            $table = $class::tableName();
+            $query = $class::find()->andWhere(CrmAccess::historyCondition($code, $table.'.id'))
+                ->andWhere(['not exists', $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($table.'.id'), 'is_main' => 1])])
+                ->orderBy([$table.'.id' => SORT_ASC]);
+            if ($code === CmsCrmAccessRequest::RECORD_CLIENT) {
+                $query->andWhere([$table.'.is_worker' => 0]);
+            }
+            foreach ($query->each(200) as $record) {
+                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, 'по умолчанию');
+                $user = $userId ? CmsUser::findOne($userId) : null;
+                $plan[] = [
+                    'code' => $code,
+                    'id' => (int)$record->id,
+                    'name' => $record instanceof CmsCompany ? (string)$record->name : (string)$record->shortDisplayName,
+                    'user_id' => $userId,
+                    'user' => $user ? (string)$user->shortDisplayName : '—',
+                    'source' => $source,
+                ];
+            }
+        }
+
+        return $plan;
+    }
+
+    /** Applies historyMainPlan(): the main responsible with the ground in the journal of the access. */
+    public function applyHistoryMainPlan(array $plan): int
+    {
+        $count = 0;
+        foreach ($plan as $row) {
+            if ($row['user_id'] && CrmAccess::instance()->mainResponsibleId($row['code'], (int)$row['id']) === null) {
+                $this->setHistoryMain($row['code'], (int)$row['id'], (int)$row['user_id'], (string)$row['source']);
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /** One client with a history and no main one (a deal of «Работать с этим клиентом» comes first). */
+    public function assignHistoryMain(string $code, int $id): ?int
+    {
+        [$userId, $source] = $this->mainCandidate($code, $id, self::HISTORY_FALLBACK_USER_ID, 'по умолчанию');
+        if ($userId && CrmAccess::instance()->mainResponsibleId($code, $id) === null) {
+            $this->setHistoryMain($code, $id, $userId, $source);
+        }
+
+        return $userId;
+    }
+
+    private function setHistoryMain(string $code, int $id, int $userId, string $source): void
+    {
+        $levelBefore = CrmAccess::instance()->linkLevel($userId, $code, $id);
+        CrmAccess::instance()->setMain($code, $id, $userId);
+        CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $code, $id, ['actor_id' => null, 'user_id' => $userId, 'level_from' => $levelBefore,
+            'level_to' => CrmAccess::LEVEL_FULL, 'comment' => 'клиент с историей без основного: '.$source]);
+    }
 
     /**
      * Client persons of the old base in the general pool (owner's decision

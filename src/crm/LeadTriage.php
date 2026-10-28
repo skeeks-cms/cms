@@ -722,6 +722,12 @@ class LeadTriage
 
         if ($identity['foreign']) {
             [$recordCode, $recordId] = [$identity['foreign'][0], (int)$identity['foreign'][1]];
+            if ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null
+                && \skeeks\cms\crm\CrmAccess::hasHistory($recordCode, $recordId, (int)$lead->id)) {
+                // A client with a history and still without a main one: the main one by the history first
+                // (owner's decision 29.10.2026), the actor works on his deal below.
+                (new CrmProtection())->assignHistoryMain($recordCode, $recordId);
+            }
             if ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null) {
                 // «Взять в работу» (П2д): a free client of the general pool — the actor becomes its main
                 // responsible ("full"), no request and no notification; the next one gets «Работать с этим клиентом».

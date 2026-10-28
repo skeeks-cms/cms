@@ -188,7 +188,9 @@ class CmsUserQuery extends CmsActiveQuery
             ["managers.id" => $managers],
             ["companies.id" => $cmsCompanyQuery],
             ['and', ['managers.id' => null], [$this->getPrimaryTableName().'.is_worker' => 0],
-                ['not exists', \skeeks\cms\crm\CrmAccess::personCompanyLinks($this->getPrimaryTableName().'.id')]],
+                ['not exists', \skeeks\cms\crm\CrmAccess::personCompanyLinks($this->getPrimaryTableName().'.id')],
+                // A person with a history has a main responsible, he is not in the pool.
+                ['not', \skeeks\cms\crm\CrmAccess::historyCondition('client', $this->getPrimaryTableName().'.id')]],
         ]);
 
         return $this;

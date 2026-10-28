@@ -14,6 +14,8 @@ use yii\console\ExitCode;
  *   php yii cms/crm/assign-main --apply # assign them (a paying client always has a main responsible)
  *   php yii cms/crm/assign-old-clients --user=1 --before=2026-10-29          # old persons of the pool: the plan only
  *   php yii cms/crm/assign-old-clients --user=1 --before=2026-10-29 --apply  # make the employee their main responsible
+ *   php yii cms/crm/assign-history-main [--user=1]          # clients with a history and no main responsible: the plan only
+ *   php yii cms/crm/assign-history-main [--user=1] --apply  # assign: by the last payment or service, else --user
  */
 class CrmController extends Controller
 {
@@ -32,7 +34,54 @@ class CrmController extends Controller
     public function options($actionID)
     {
         return array_merge(parent::options($actionID), $actionID === 'protection' ? ['all'] : [], $actionID === 'assign-main' ? ['apply'] : [],
-            $actionID === 'assign-old-clients' ? ['apply', 'user', 'before'] : []);
+            $actionID === 'assign-old-clients' ? ['apply', 'user', 'before'] : [], $actionID === 'assign-history-main' ? ['apply', 'user'] : []);
+    }
+
+    /**
+     * Clients with a history — a payment, a bill, a service or a deal ever,
+     * not an unsorted incoming deal — and without a main responsible (owner's
+     * decision 29.10.2026: such a client always has one, it is not in the
+     * general pool). The main one: by the last payment or service, else --user
+     * (Семенов Александр by default). Each one is written to the journal.
+     */
+    public function actionAssignHistoryMain()
+    {
+        $fallback = (int)($this->user ?: CrmProtection::HISTORY_FALLBACK_USER_ID);
+        $service = new CrmProtection();
+        $plan = $service->historyMainPlan($fallback);
+        $byCode = [];
+        $bySource = [];
+        $byUser = [];
+        foreach ($plan as $row) {
+            $byCode[$row['code']] = ($byCode[$row['code']] ?? 0) + 1;
+            $bySource[$row['source']] = ($bySource[$row['source']] ?? 0) + 1;
+            $byUser[$row['user']] = ($byUser[$row['user']] ?? 0) + 1;
+        }
+        $this->stdout('Клиенты с историей без основного ответственного: '.count($plan)
+            .' (компаний '.($byCode['company'] ?? 0).', людей '.($byCode['client'] ?? 0).")
+");
+        $this->stdout("По основанию:
+");
+        foreach ($bySource as $source => $count) {
+            $this->stdout("  {$source}: {$count}
+");
+        }
+        arsort($byUser);
+        $this->stdout("Кому:
+");
+        foreach ($byUser as $user => $count) {
+            $this->stdout("  {$user}: {$count}
+");
+        }
+        if ($this->apply) {
+            $this->stdout('Назначено: '.$service->applyHistoryMainPlan($plan)."
+");
+        } else {
+            $this->stdout("Ничего не записано. Записать: --apply
+");
+        }
+
+        return ExitCode::OK;
     }
 
     /**
