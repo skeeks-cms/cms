@@ -184,7 +184,6 @@ class Skeeks extends Component implements BootstrapInterface
 
         });
         // П2д: a presentation or a КП sent from a deal of «Исходящие продажи» and its first view move the deal.
-        \skeeks\cms\crm\OutboundSales::subscribe();
 
         //Уведомления для пользователей
         Event::on(CmsLog::class, BaseActiveRecord::EVENT_AFTER_INSERT, function (Event $event) {

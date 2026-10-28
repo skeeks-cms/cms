@@ -256,12 +256,6 @@ class LeadTriage
                 $client = (string)$user->shortDisplayName;
             }
         }
-        // П2д: a deal with «Услуга» is «Услуга — Компания» (outbound sales: the service is what tells deals apart).
-        $service = $lead->cms_deal_type_id && CmsLead::dealTypeReady() && ($type = \skeeks\cms\models\CmsDealType::findOne((int)$lead->cms_deal_type_id))
-            ? trim((string)$type->name) : '';
-        if ($service !== '') {
-            return mb_substr(implode(' — ', array_filter([$service, $client])), 0, 255);
-        }
         $source = trim((string)$lead->source_name);
         if ($source === '' && $lead->source_type && $lead->source_type !== CmsLead::SOURCE_MANUAL) {
             $source = (string)(CmsLead::sources()[$lead->source_type] ?? '');
@@ -632,13 +626,6 @@ class LeadTriage
                 $row = new CmsCompanyEmail(['cms_company_id' => (int)$company->id, 'value' => mb_strtolower($email, 'UTF-8'), 'sort' => 100 + $index, 'duplicate_reason' => (string)$form->duplicate_reason]);
                 if (!$row->save()) {
                     throw new \DomainException('Email компании: '.implode('; ', $row->getFirstErrors()));
-                }
-            }
-            // П2д: the site of a company found by a manager goes to its links.
-            if (($site = LeadIdentityForm::siteUrl($form->company_site)) !== '') {
-                $row = new \skeeks\cms\models\CmsCompanyLink(['cms_company_id' => (int)$company->id, 'url' => $site, 'name' => 'Сайт']);
-                if (!$row->save()) {
-                    throw new \DomainException('Сайт компании: '.implode('; ', $row->getFirstErrors()));
                 }
             }
             $companyId = (int)$company->id;
