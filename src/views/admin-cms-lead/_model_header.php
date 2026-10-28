@@ -21,6 +21,12 @@ if ($model->executor) {
     );
 }
 $statusContent .= CmsLeadStatusWidget::widget(['lead' => $model, 'showStage' => true, 'stageInline' => true]);
+// One amount at a time: «Сумма» for an open or rejected deal; a successful one shows «Сумма сделки» in its status.
+if ($model->status !== CmsLead::STATUS_SUCCESS && $model->amountAsText !== '') {
+    $statusContent .= Html::tag('span', 'Сумма '.Html::encode($model->amountAsText), ['class' => 'sx-status', 'title' => 'Ожидаемая сумма сделки']);
+} elseif ($model->expectedAmountNote !== '') {
+    $statusContent .= Html::tag('span', Html::encode($model->expectedAmountNote), ['class' => 'sx-collection-cell__secondary']);
+}
 $status = Html::tag('div', $statusContent, ['class' => 'sx-lead-header__status-row']);
 
 $this->registerCss(<<<CSS
@@ -48,15 +54,35 @@ $this->registerCss(<<<CSS
 CSS
 );
 
-if ($model->canBeClaimed) {
-    $toolbar[] = Html::beginForm(['/cms/admin-cms-lead/claim', 'pk' => $model->id], 'post', [
-        'class' => 'sx-model-header__toolbar-form',
-    ])
-        .Html::submitButton('<i class="fas fa-anchor" aria-hidden="true"></i> Взять в работу', [
-            'class' => 'sx-button sx-button--primary sx-button--sm',
-            'data-confirm' => 'Закрепить сделку за вами?',
+$windowLink = static function (string $label, array $route, string $variant = 'secondary', ?string $size = null): string {
+    $url = (string)BackendUrlHelper::createByParams($route)->enableEmptyLayout()->enableNoActions()->url;
+    $action = ['isOpenNewWindow' => true, 'url' => $url];
+    if ($size) {
+        $action['size'] = $size;
+    }
+
+    return Html::a($label, $url, [
+        'class' => 'sx-button sx-button--'.$variant.' sx-button--sm',
+        'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode($action).').go(); return false;',
+    ]);
+};
+$access = \skeeks\cms\crm\CrmAccess::instance();
+$userId = (int)Yii::$app->user->id;
+
+if ($model->status === CmsLead::STATUS_NEW && $access->canTriage($userId, $model)) {
+    // As before П2а, one click takes the deal (a simple site needs nothing more);
+    // «Разобрать»: who it is, add to an open deal, support or spam.
+    if ($model->canBeClaimed) {
+        $toolbar[] = Html::beginForm(['/cms/admin-cms-lead/claim', 'pk' => $model->id], 'post', [
+            'class' => 'sx-model-header__toolbar-form',
         ])
-        .Html::endForm();
+            .Html::submitButton('<i class="fas fa-anchor" aria-hidden="true"></i> Взять в работу', [
+                'class' => 'sx-button sx-button--primary sx-button--sm',
+                'data-confirm' => 'Закрепить сделку за вами?',
+            ])
+            .Html::endForm();
+    }
+    $toolbar[] = $windowLink('<i class="fas fa-inbox" aria-hidden="true"></i> Разобрать', ['/cms/admin-cms-lead/triage', 'pk' => $model->id], $model->canBeClaimed ? 'secondary' : 'primary');
 } elseif ($model->canBeReopenedBy((int)Yii::$app->user->id)) {
     $toolbar[] = Html::beginForm(['/cms/admin-cms-lead/reopen', 'pk' => $model->id], 'post', [
         'class' => 'sx-model-header__toolbar-form',
@@ -78,32 +104,12 @@ if ($model->canBeClaimed) {
         ]);
     }
 } elseif ($canWork && $model->status === CmsLead::STATUS_IN_WORK) {
-    $currentPanelLink = static function (string $label, string $url): string {
-        $action = Json::encode(['isOpenNewWindow' => true, 'url' => $url]);
-
-        return Html::a($label, $url, [
-            'class' => 'sx-button sx-button--secondary sx-button--sm',
-            'onclick' => 'new sx.classes.backend.widgets.Action('.$action.').go(); return false;',
-        ]);
-    };
-
-    if (!$model->cms_company_id) {
-        $companyUrl = (string)BackendUrlHelper::createByParams([
-            '/cms/admin-cms-lead-company/create',
-            'lead_id' => $model->id,
-            'CmsCompany' => ['name' => $model->name, 'description' => $model->description],
-        ])->enableEmptyLayout()->enableNoActions()->url;
-        $toolbar[] = $currentPanelLink('Создать компанию', $companyUrl);
+    if (!$model->cms_company_id || !$model->cms_user_id) {
+        $toolbar[] = $windowLink('<i class="fas fa-user-plus" aria-hidden="true"></i> Клиент сделки', ['/cms/admin-cms-lead/identity', 'pk' => $model->id]);
     }
-
-    if (!$model->cms_user_id) {
-        $clientUrl = (string)BackendUrlHelper::createByParams([
-            '/cms/admin-cms-lead-client/create',
-            'lead_id' => $model->id,
-            'CmsUser' => ['first_name' => $model->name, 'email' => $model->mainEmail ? $model->mainEmail->value : null],
-        ])->enableEmptyLayout()->enableNoActions()->url;
-        $toolbar[] = $currentPanelLink('Создать клиента', $clientUrl);
-    }
+}
+if (!$model->isTerminal && $model->status !== CmsLead::STATUS_NEW && $access->canAssignLead($userId, $model)) {
+    $toolbar[] = $windowLink('<i class="fas fa-share" aria-hidden="true"></i> Сменить ответственного', ['/cms/admin-cms-lead/assign', 'pk' => $model->id], 'secondary', 'small');
 }
 
 echo BackendModelHeader::widget([

@@ -62,6 +62,9 @@ use yii\web\Response;
  */
 class AdminUserController extends BackendModelStandartController
 {
+    use \skeeks\cms\controllers\traits\ClientTransferActions;
+    use \skeeks\cms\controllers\traits\CrmDuplicateCheckActions;
+
     public function init()
     {
         $this->name = "Клиенты";
@@ -100,6 +103,7 @@ class AdminUserController extends BackendModelStandartController
                 "filters" => [
                     "visibleFilters" => [
                         'q',
+                        'crmResponsible',
                         'is_active',
                         'role',
                         'isOnline',
@@ -116,11 +120,13 @@ class AdminUserController extends BackendModelStandartController
                             ['q', 'safe'],
                             ['isOnline', 'safe'],
                             ['role', 'safe'],
+                            ['crmResponsible', 'safe'],
                         ],
                         'attributeDefines' => [
                             'q',
                             'role',
                             'isOnline',
+                            'crmResponsible',
                         ],
 
                         'fields' => [
@@ -153,6 +159,19 @@ class AdminUserController extends BackendModelStandartController
                                 },
                             ],
                             
+                            // П2а: «Мои клиенты (основной)», «Без ответственного».
+                            'crmResponsible' => [
+                                'class'    => SelectField::class,
+                                'label'    => 'Ответственный',
+                                'items'    => \skeeks\cms\crm\CrmAccess::responsibleFilterItems(),
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    if ($e->field->value) {
+                                        \skeeks\cms\crm\CrmAccess::instance()->applyResponsibleFilter($e->dataProvider->query, 'client',
+                                            (string)$e->field->value, CmsUser::tableName().'.id', (int)\Yii::$app->user->id);
+                                    }
+                                },
+                            ],
+
                             'isOnline' => [
                                 'class'    => SelectField::class,
                                 'multiple' => false,
@@ -811,6 +830,12 @@ class AdminUserController extends BackendModelStandartController
                     return \Yii::$app->user->can("cms/admin-user/manage");
                 },
             ],
+
+            // П2а: a leader or an administrator gives the client to another employee.
+            'transfer' => $this->clientTransferAction(),
+            'crm-access' => $this->clientAccessAction(),
+            'duplicate-check' => $this->duplicateCheckAction(),
+            'duplicate-request' => $this->duplicateRequestAction(),
         ]);
 
 
@@ -945,6 +970,8 @@ JS
                     );
                 },
             ],
+            // П2а: while the name, email and phone are filled the CRM shows if the contact exists.
+            'crm_duplicate_check' => $this->duplicateCheckField('client'),
         ];
     }
 

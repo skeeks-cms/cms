@@ -38,7 +38,7 @@ class CmsCompany2manager extends \skeeks\cms\base\ActiveRecord
             [['cms_company_id', 'cms_user_id'], 'integer'],
             [['cms_company_id', 'cms_user_id'], 'required'],
             [['cms_company_id', 'cms_user_id'], 'unique', 'targetAttribute' => ['cms_company_id', 'cms_user_id']],
-        ]);
+        ], \skeeks\cms\crm\CrmAccess::levelRules());
     }
 
 
@@ -77,5 +77,18 @@ class CmsCompany2manager extends \skeeks\cms\base\ActiveRecord
     public function getCmsCompany()
     {
         return $this->hasOne(CmsCompany::class, ['id' => 'cms_company_id']);
+    }
+
+    /** The client keeps exactly one main responsible (crm\CrmAccess::ensureMain()). */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_COMPANY, (int)$this->cms_company_id);
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_COMPANY, (int)$this->cms_company_id);
     }
 }

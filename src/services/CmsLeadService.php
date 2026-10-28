@@ -36,6 +36,8 @@ class CmsLeadService
         if ($sourceRef !== null && $sourceRef !== '') {
             $existing = CmsLead::find()->fromSource($sourceType, $sourceRef, $siteId)->one();
             if ($existing) {
+                // A request added to another deal: the repeated event goes on there.
+                $existing = $existing->resolveMerged();
                 $this->syncContacts($existing, $phones, $emails);
                 return $existing;
             }
@@ -68,6 +70,7 @@ class CmsLeadService
             if ($sourceRef !== null && $sourceRef !== '') {
                 $existing = CmsLead::find()->fromSource($sourceType, $sourceRef, $siteId)->one();
                 if ($existing) {
+                    $existing = $existing->resolveMerged();
                     $this->syncContacts($existing, $phones, $emails);
                     return $existing;
                 }

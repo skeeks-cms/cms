@@ -7,6 +7,10 @@ $controller = file_get_contents(__DIR__.'/../src/controllers/TelephonyController
 $companyView = file_get_contents(__DIR__.'/../src/views/admin-cms-company/view.php');
 $clientView = file_get_contents(__DIR__.'/../src/views/admin-user/view.php');
 $leadView = file_get_contents(__DIR__.'/../src/views/admin-cms-lead/view.php');
+$contactBlock = file_get_contents(__DIR__.'/../src/widgets/admin/CrmContactBlockWidget.php');
+// П2г: the company and client cards render their phones through the shared rows of the contact block.
+$sharedCall = static fn(string $view): bool => strpos($view, 'sx-telephony-btn') !== false
+    || (strpos($view, 'CrmContactBlockWidget::phoneItems(') !== false && strpos($contactBlock, "'class' => 'sx-telephony-btn'") !== false);
 
 $checks = [
     'polling uses recursive timeouts' => strpos($script, 'setTimeout(function ()') !== false,
@@ -28,8 +32,8 @@ $checks = [
     'child windows only forward call buttons' => strpos($widget, ".off('click.sxTelephony', '.sx-telephony-btn')") !== false,
     'unconfigured users receive an informational notification in the active card' => strpos($widget, "Json::htmlEncode('Телефония не настроена. Обратитесь к администратору.')") !== false
         && preg_match('/if \(!\$telephonyUser\).*?currentSx\.notify\.info\(\{\$message\}\)/s', $widget) === 1,
-    'company client and lead cards expose the shared call action' => strpos($companyView, 'sx-telephony-btn') !== false
-        && strpos($clientView, 'sx-telephony-btn') !== false
+    'company client and lead cards expose the shared call action' => $sharedCall($companyView)
+        && $sharedCall($clientView)
         && strpos($leadView, 'sx-telephony-btn') !== false,
     'call panel sits above backend action windows' => strpos($styles, 'var(--sx-backend-window-z-index, 100000) + 10') !== false,
 ];

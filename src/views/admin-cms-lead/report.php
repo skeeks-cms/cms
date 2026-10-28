@@ -6,6 +6,11 @@
  * @var string $period "dd.mm.yyyy - dd.mm.yyyy"
  * @var string $source
  * @var array $report from CmsLeadReportService::build()
+ * @var array $funnel from CmsLeadFunnelReportService::build()
+ * @var skeeks\cms\models\CmsLeadPipeline[] $pipelines
+ * @var skeeks\cms\models\CmsLeadPipeline|null $pipeline
+ * @var string[] $managers
+ * @var int $executorId
  */
 
 use skeeks\cms\assets\admin\LeadReportAsset;
@@ -88,13 +93,29 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
                     'options' => ['class' => 'form-control', 'placeholder' => 'Период'],
                 ]); ?>
             </label>
+            <?php if (count($pipelines) > 1) : ?>
+                <label class="sx-lead-report__filter">
+                    <span class="sx-lead-report__filter-label">Воронка</span>
+                    <?= Html::dropDownList('pipeline', $pipeline ? (int)$pipeline->id : null, \yii\helpers\ArrayHelper::map($pipelines, 'id', 'name'), ['class' => 'form-control']); ?>
+                </label>
+            <?php endif; ?>
             <label class="sx-lead-report__filter">
                 <span class="sx-lead-report__filter-label">Источник</span>
                 <?= Html::dropDownList('source_type', $source, ['' => 'Все источники'] + CmsLead::sources(), ['class' => 'form-control']); ?>
             </label>
+            <?php if (count($managers) > 1) : ?>
+                <label class="sx-lead-report__filter">
+                    <span class="sx-lead-report__filter-label">Ответственный</span>
+                    <?= Html::dropDownList('executor', $executorId ?: null, ['' => 'Все сотрудники'] + $managers, ['class' => 'form-control']); ?>
+                </label>
+            <?php endif; ?>
             <button type="submit" class="sx-button sx-button--primary">Показать</button>
         <?= Html::endForm(); ?>
     <?php BackendSurfaceWidget::end(); ?>
+
+    <?php if ($funnel['ready']) : ?>
+        <?= $this->render('_funnel-report', ['funnel' => $funnel, 'pipeline' => $pipeline, 'period' => $period]); ?>
+    <?php endif; ?>
 
     <?php if (!$total['leads']) : ?>
         <?php BackendSurfaceWidget::begin(['raised' => true]); ?>

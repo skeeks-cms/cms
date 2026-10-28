@@ -91,6 +91,21 @@ return [
             'class' => \skeeks\cms\deal\DealAccess::class,
         ],
 
+        //Employee rights in the CRM (who sorts, works on, assigns a deal; what of a client is visible).
+        'crmAccess' => [
+            'class' => \skeeks\cms\crm\CrmAccess::class,
+        ],
+
+        //The one duplicate check of companies, people and deals (publicMailDomains, legalForms).
+        'crmMatcher' => [
+            'class' => \skeeks\cms\crm\CrmMatcher::class,
+        ],
+
+        //Settings of the site CRM: «Повторы клиентов» (strict / free).
+        'crmSettings' => [
+            'class' => \skeeks\cms\crm\CrmSettings::class,
+        ],
+
         //Notifications of employees and clients: kinds of events, categories, channels, personal settings.
         'notifications' => [
             'class' => \skeeks\cms\notify\Notifications::class,

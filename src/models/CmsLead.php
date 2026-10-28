@@ -23,10 +23,28 @@ class CmsLead extends Core
     public $partner_reward_value;
     /** Source ingestion persists contacts before selecting notification recipients. */
     public $deferManagerNotifications = false;
+    /**
+     * Batch writers (imports) send one notification for the whole batch: the
+     * lead lifecycle then sends neither "assigned" nor "new" notifications.
+     */
+    public $suppressNotifications = false;
+    /** An empty name is filled from the client and the source (the deal form). */
+    public $autoName = false;
     public const STATUS_NEW = 'new';
     public const STATUS_IN_WORK = 'in_work';
     public const STATUS_SUCCESS = 'success';
     public const STATUS_REJECTED = 'rejected';
+
+    /**
+     * How sorting an unsorted deal ended when it was not a sale (П2а). The deal
+     * is closed as rejected, but is not a lost sale and stays out of the report.
+     */
+    public const TRIAGE_MERGED = 'merged';
+    public const TRIAGE_SUPPORT = 'support';
+    public const TRIAGE_SPAM = 'spam';
+
+    /** Fired after a deal is sorted: TriageEvent (result, target lead, task). */
+    public const EVENT_TRIAGED = 'triaged';
 
     public const UTM_ATTRIBUTES = [
         'utm_source',
@@ -79,6 +97,7 @@ class CmsLead extends Core
                 ],
                 'relation_map' => [
                     'cms_lead_stage_id' => 'stage',
+                    'cms_lead_pipeline_id' => 'pipeline',
                     'cms_lead_reject_reason_id' => 'rejectReasonItem',
                 ],
             ],
@@ -87,7 +106,7 @@ class CmsLead extends Core
 
     public function rules()
     {
-        return ArrayHelper::merge(parent::rules(), [
+        return ArrayHelper::merge(parent::rules(), $this->triageRules(), [
             [['source_type'], 'default', 'value' => self::SOURCE_MANUAL],
             [['status'], 'default', 'value' => self::STATUS_NEW],
             [['lock_version'], 'default', 'value' => 0],
@@ -96,7 +115,9 @@ class CmsLead extends Core
             }],
             [['name'], 'filter', 'filter' => 'trim'],
             [['description', 'source_ref', 'source_name', 'source_url'], 'default', 'value' => null],
-            [['name', 'source_type', 'status'], 'required'],
+            [['source_type', 'status'], 'required'],
+            // The deal form may leave the name empty: «Компания — источник» or the number (LeadTriage::suggestName()).
+            [['name'], 'required', 'when' => static fn(self $model) => !$model->autoName],
             [['cms_site_id', 'submitted_by_id', 'partner_id', 'executor_id', 'cms_company_id', 'cms_user_id', 'processed_at', 'lock_version'], 'integer'],
             [['description', 'reject_reason', 'result_comment'], 'string'],
             [['partner_reward_value'], 'number', 'min' => 0.01, 'skipOnEmpty' => true],
@@ -132,7 +153,7 @@ class CmsLead extends Core
             }],
             // With a site reason list the reason is chosen from it and the text is an optional comment.
             [['reject_reason'], 'required', 'message' => 'Укажите причину отклонения', 'when' => static function (self $model) {
-                return $model->status === self::STATUS_REJECTED && !CmsLeadRejectReason::siteHasReasons($model->cms_site_id);
+                return $model->status === self::STATUS_REJECTED && !$model->getTriageResult() && !CmsLeadRejectReason::siteHasReasons($model->cms_site_id);
             }],
             [['cms_lead_reject_reason_id'], 'filter', 'filter' => static function ($value) {
                 return $value === '' ? null : $value;
@@ -143,7 +164,7 @@ class CmsLead extends Core
                 'message' => 'Причина не найдена на этом сайте.'],
             [['cms_lead_reject_reason_id'], 'required', 'message' => 'Выберите причину отказа',
                 'when' => static function (self $model) {
-                    return $model->status === self::STATUS_REJECTED && CmsLeadRejectReason::siteHasReasons($model->cms_site_id);
+                    return $model->status === self::STATUS_REJECTED && !$model->getTriageResult() && CmsLeadRejectReason::siteHasReasons($model->cms_site_id);
                 },
                 'whenClient' => 'function (attribute, value) { return $("[data-sx-lead-status]").val() === "'.self::STATUS_REJECTED.'"; }',
             ],
@@ -164,6 +185,113 @@ class CmsLead extends Core
         ]);
     }
 
+    /**
+     * Sorting columns are written only by crm\LeadTriage, never by a form
+     * ("!" — validated but not safe for load()/setAttributes()), and their
+     * rules exist only once the migration added the columns.
+     */
+    protected function triageRules(): array
+    {
+        $rules = [];
+        if (static::triageReady()) {
+            $rules[] = [['!merged_into_id', '!triaged_by', '!triaged_at'], 'integer'];
+            $rules[] = [['!triage_result'], 'in', 'range' => array_keys(self::triageResults())];
+        }
+        if (static::amountReady()) {
+            // «Сумма» of an open deal (m261028_120000); the success form proposes it as deal_amount.
+            $rules[] = [['amount'], 'filter', 'filter' => static function ($value) {
+                return is_string($value) ? (trim(str_replace([' ', ','], ['', '.'], $value)) ?: null) : $value;
+            }];
+            $rules[] = [['amount'], 'number', 'min' => 0, 'max' => 9999999999999999, 'skipOnEmpty' => true];
+            $rules[] = [['deal_amount'], 'default', 'value' => static fn(self $model) => $model->amount ?: null,
+                'when' => static fn(self $model) => $model->status === self::STATUS_SUCCESS];
+        }
+        if (static::pipelineReady()) {
+            // П2б: the pipeline of the deal; a stage must belong to it.
+            $rules[] = [['cms_lead_pipeline_id'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value];
+            $rules[] = [['cms_lead_pipeline_id'], 'integer'];
+            $rules[] = [['cms_lead_pipeline_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLeadPipeline::class,
+                'targetAttribute' => ['cms_lead_pipeline_id' => 'id', 'cms_site_id' => 'cms_site_id'],
+                'message' => 'Воронка не найдена на этом сайте.'];
+            $rules[] = [['cms_lead_stage_id'], function ($attribute) {
+                $stage = $this->cms_lead_stage_id ? CmsLeadStage::findOne((int)$this->cms_lead_stage_id) : null;
+                if ($stage && !$this->stageBelongsToPipeline($stage)) {
+                    $this->addError($attribute, 'Этап «'.$stage->name.'» из другой воронки.');
+                }
+            }];
+            $rules[] = [['!stage_changed_at'], 'integer'];
+        }
+
+        return $rules;
+    }
+
+    /** The pipeline columns and the history exist (П2б migration may run after the code update). */
+    public static function pipelineReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::getDb()->getTableSchema(static::tableName(), true);
+            $ready = $schema && $schema->getColumn('cms_lead_pipeline_id') !== null && CmsLeadStageHistory::ready();
+        }
+
+        return $ready;
+    }
+
+    /**
+     * The pipeline the deal is in: its own, else the default one of the site
+     * (deals without a pipeline belong to it); null on a site without pipelines.
+     */
+    public function getEffectivePipeline(): ?CmsLeadPipeline
+    {
+        if (!static::pipelineReady()) {
+            return null;
+        }
+        if ($this->cms_lead_pipeline_id) {
+            foreach (CmsLeadPipeline::forSite((int)$this->cms_site_id) as $pipeline) {
+                if ((int)$pipeline->id === (int)$this->cms_lead_pipeline_id) {
+                    return $pipeline;
+                }
+            }
+        }
+
+        return CmsLeadPipeline::defaultFor((int)$this->cms_site_id);
+    }
+
+    /** A stage without a pipeline belongs to the default one. */
+    public function stageBelongsToPipeline(CmsLeadStage $stage): bool
+    {
+        if ((int)$stage->cms_site_id !== (int)$this->cms_site_id) {
+            return false;
+        }
+        $pipeline = $this->getEffectivePipeline();
+        if (!$pipeline) {
+            return true;
+        }
+        if ($stage->cms_lead_pipeline_id) {
+            return (int)$stage->cms_lead_pipeline_id === (int)$pipeline->id;
+        }
+
+        return $pipeline->isMain;
+    }
+
+    /** @return CmsLeadStage[] stages of the deal's pipeline in board order */
+    public function getPipelineStages(): array
+    {
+        return CmsLeadStage::forPipeline($this->getEffectivePipeline(), (int)$this->cms_site_id);
+    }
+
+    /** The column «Сумма» exists (the migration may run after the code update). */
+    public static function amountReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::getDb()->getTableSchema(static::tableName(), true);
+            $ready = $schema && $schema->getColumn('amount') !== null;
+        }
+
+        return $ready;
+    }
+
     public function transactions()
     {
         return [self::SCENARIO_DEFAULT => self::OP_INSERT | self::OP_UPDATE];
@@ -177,6 +305,7 @@ class CmsLead extends Core
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
+        $this->recordStageHistory($insert, $changedAttributes);
 
         if (!$insert && $this->partner_id
             && $this->status === self::STATUS_SUCCESS
@@ -193,7 +322,9 @@ class CmsLead extends Core
                 $this->recordCreationActivity();
             }
 
-            if ($this->executor_id) {
+            if ($this->suppressNotifications) {
+                // One notification for the whole batch is the writer's job.
+            } elseif ($this->executor_id) {
                 $currentUserId = \Yii::$app->has('user') && !\Yii::$app->user->isGuest
                     ? (int)\Yii::$app->user->id
                     : 0;
@@ -234,6 +365,11 @@ class CmsLead extends Core
         if ($this->status !== self::STATUS_REJECTED) {
             $this->reject_reason = null;
             $this->cms_lead_reject_reason_id = null;
+            // A reopened sorted deal is an ordinary deal again; source events come back to it.
+            if ($this->hasAttribute('triage_result')) {
+                $this->triage_result = null;
+                $this->merged_into_id = null;
+            }
         } elseif ($this->cms_lead_reject_reason_id && trim((string)$this->reject_reason) === '') {
             // Partner cabinets, notifications and API read the text: keep it filled.
             $reason = CmsLeadRejectReason::findOne((int)$this->cms_lead_reject_reason_id);
@@ -243,9 +379,110 @@ class CmsLead extends Core
             $this->result_comment = null;
             $this->deal_amount = null;
         }
+        if (static::pipelineReady()) {
+            $this->preparePipeline();
+        }
         $this->assignFirstStageOnStart($insert);
+        if (static::pipelineReady() && ($insert || $this->isAttributeChanged('status', false)
+            || $this->isAttributeChanged('cms_lead_stage_id', false) || $this->isAttributeChanged('cms_lead_pipeline_id', false))) {
+            $this->stage_changed_at = time();
+        }
 
         return true;
+    }
+
+    /**
+     * A new deal goes to the default pipeline (a form, a letter, the API) unless
+     * the caller chose one; a site without pipelines keeps none. A stage of
+     * another pipeline is dropped when the deal moves (assignFirstStageOnStart()
+     * then takes the first stage of the new one). An unsorted deal has no stage.
+     */
+    protected function preparePipeline(): void
+    {
+        if (!$this->cms_lead_pipeline_id && ($default = CmsLeadPipeline::defaultFor((int)$this->cms_site_id))) {
+            $this->cms_lead_pipeline_id = (int)$default->id;
+        }
+        if ($this->status === self::STATUS_NEW) {
+            $this->cms_lead_stage_id = null;
+        } elseif ($this->cms_lead_stage_id && $this->isAttributeChanged('cms_lead_pipeline_id', false)) {
+            $stage = CmsLeadStage::findOne((int)$this->cms_lead_stage_id);
+            if (!$stage || !$this->stageBelongsToPipeline($stage)) {
+                $this->cms_lead_stage_id = null;
+            }
+        }
+    }
+
+    /**
+     * One history row for every change of status, pipeline or stage, in the
+     * transaction of the save. The author is the signed-in employee, else the
+     * creator of a new deal, else the system (console, imports).
+     */
+    protected function recordStageHistory(bool $insert, array $changedAttributes): void
+    {
+        if (!static::pipelineReady()) {
+            return;
+        }
+        $from = [];
+        foreach (['status', 'cms_lead_pipeline_id', 'cms_lead_stage_id'] as $attribute) {
+            $from[$attribute] = $insert ? null
+                : (array_key_exists($attribute, $changedAttributes) ? $changedAttributes[$attribute] : $this->getAttribute($attribute));
+        }
+        if (!$insert && (string)$from['status'] === (string)$this->status
+            && (int)$from['cms_lead_pipeline_id'] === (int)$this->cms_lead_pipeline_id
+            && (int)$from['cms_lead_stage_id'] === (int)$this->cms_lead_stage_id) {
+            return;
+        }
+
+        $kind = CmsLeadStageHistory::KIND_STAGE;
+        if ($insert) {
+            $kind = CmsLeadStageHistory::KIND_CREATE;
+        } elseif ($this->status === self::STATUS_SUCCESS && $from['status'] !== self::STATUS_SUCCESS) {
+            $kind = CmsLeadStageHistory::KIND_SUCCESS;
+        } elseif ($this->status === self::STATUS_REJECTED && $from['status'] !== self::STATUS_REJECTED) {
+            $kind = CmsLeadStageHistory::KIND_REJECT;
+        } elseif (in_array($from['status'], [self::STATUS_SUCCESS, self::STATUS_REJECTED], true)) {
+            $kind = CmsLeadStageHistory::KIND_REOPEN;
+        } elseif ($from['cms_lead_pipeline_id'] && (int)$from['cms_lead_pipeline_id'] !== (int)$this->cms_lead_pipeline_id) {
+            $kind = CmsLeadStageHistory::KIND_PIPELINE;
+        } elseif ($from['status'] === self::STATUS_NEW && $this->status === self::STATUS_IN_WORK) {
+            $kind = CmsLeadStageHistory::KIND_TAKE;
+        }
+
+        $stageName = static function ($stageId): ?string {
+            if (!$stageId) {
+                return null;
+            }
+            $name = CmsLeadStage::find()->select(['name'])->andWhere(['id' => (int)$stageId])->scalar();
+
+            return $name === false || $name === null ? null : (string)$name;
+        };
+        $actorId = \Yii::$app->has('user', true) && !\Yii::$app->user->isGuest ? (int)\Yii::$app->user->id : null;
+        if (!$actorId && $insert && (int)$this->created_by > 0) {
+            $actorId = (int)$this->created_by;
+        }
+
+        static::getDb()->createCommand()->insert(CmsLeadStageHistory::tableName(), [
+            'cms_site_id' => (int)$this->cms_site_id,
+            'cms_lead_id' => (int)$this->id,
+            'created_at' => (int)$this->stage_changed_at ?: time(),
+            'created_by' => $actorId,
+            'kind' => $kind,
+            'from_status' => $from['status'],
+            'to_status' => (string)$this->status,
+            'from_pipeline_id' => $from['cms_lead_pipeline_id'] ? (int)$from['cms_lead_pipeline_id'] : null,
+            'to_pipeline_id' => $this->cms_lead_pipeline_id ? (int)$this->cms_lead_pipeline_id : null,
+            'from_stage_id' => $from['cms_lead_stage_id'] ? (int)$from['cms_lead_stage_id'] : null,
+            'to_stage_id' => $this->cms_lead_stage_id ? (int)$this->cms_lead_stage_id : null,
+            'from_stage_name' => $stageName($from['cms_lead_stage_id']),
+            'to_stage_name' => $stageName($this->cms_lead_stage_id),
+            'is_migrated' => 0,
+        ])->execute();
+    }
+
+    /** @return \yii\db\ActiveQuery transitions of the deal, oldest first */
+    public function getStageHistory()
+    {
+        return $this->hasMany(CmsLeadStageHistory::class, ['cms_lead_id' => 'id'])->orderBy(['id' => SORT_ASC]);
     }
 
     /**
@@ -258,15 +495,21 @@ class CmsLead extends Core
         if ($this->status !== self::STATUS_IN_WORK || $this->cms_lead_stage_id) {
             return;
         }
-        if (!$insert && $this->getOldAttribute('status') === self::STATUS_IN_WORK) {
+        $movedPipeline = static::pipelineReady() && $this->isAttributeChanged('cms_lead_pipeline_id', false);
+        if (!$insert && $this->getOldAttribute('status') === self::STATUS_IN_WORK && !$movedPipeline) {
             return;
         }
         try {
-            $stageId = CmsLeadStage::find()
-                ->cmsSite((int)$this->cms_site_id)
-                ->select(['id'])
-                ->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC])
-                ->scalar();
+            if (static::pipelineReady()) {
+                $stages = $this->getPipelineStages();
+                $stageId = $stages ? (int)$stages[0]->id : null;
+            } else {
+                $stageId = CmsLeadStage::find()
+                    ->cmsSite((int)$this->cms_site_id)
+                    ->select(['id'])
+                    ->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC])
+                    ->scalar();
+            }
         } catch (\yii\db\Exception $e) {
             // The stage table appears with a migration that may run after the code update.
             return;
@@ -437,11 +680,11 @@ class CmsLead extends Core
                 'cms_user_id' => $userId,
                 'model_code' => $this->skeeksModelCode,
                 'model_id' => (int)$this->id,
-                'name' => 'Появилась новая сделка',
+                'name' => 'Новая сделка в Неразобранном',
             ])->exists()) {
                 continue;
             }
-            $this->sendWebNotify($userId, 'Появилась новая сделка', $this->sourceNameAsText);
+            $this->sendWebNotify($userId, 'Новая сделка в Неразобранном', $this->sourceNameAsText);
         }
     }
 
@@ -527,12 +770,94 @@ class CmsLead extends Core
     {
         $oldStatus = (string)$this->getOldAttribute('status');
         return match ($oldStatus) {
-            self::STATUS_NEW => [self::STATUS_NEW, self::STATUS_IN_WORK],
+            // An unsorted deal closes without work only by sorting (spam, added elsewhere, support).
+            self::STATUS_NEW => $this->getTriageResult()
+                ? [self::STATUS_NEW, self::STATUS_IN_WORK, self::STATUS_REJECTED]
+                : [self::STATUS_NEW, self::STATUS_IN_WORK],
             self::STATUS_IN_WORK => [self::STATUS_IN_WORK, self::STATUS_SUCCESS, self::STATUS_REJECTED],
             self::STATUS_SUCCESS => [self::STATUS_SUCCESS, self::STATUS_IN_WORK],
             self::STATUS_REJECTED => [self::STATUS_REJECTED, self::STATUS_IN_WORK],
             default => array_keys(self::statuses()),
         };
+    }
+
+    /**
+     * Status names for employees: a new deal is "Неразобранное" (as in amoCRM),
+     * the outcomes are «Успешно» and «Отказ».
+     * Partners and clients keep statuses().
+     */
+    public static function staffStatuses(): array
+    {
+        // П2б: the outcomes as employees know them from amoCRM and Bitrix24.
+        return array_replace(self::statuses(), [
+            self::STATUS_NEW => 'Неразобранное',
+            self::STATUS_SUCCESS => 'Успешно',
+            self::STATUS_REJECTED => 'Отказ',
+        ]);
+    }
+
+    public static function triageResults(): array
+    {
+        return [
+            self::TRIAGE_MERGED => 'Добавлено в другую сделку',
+            self::TRIAGE_SUPPORT => 'Передано в поддержку',
+            self::TRIAGE_SPAM => 'Спам',
+        ];
+    }
+
+    /** Employee name of the state: the sorting result of a sorted deal, else the status. */
+    public function getStaffStatusName(): string
+    {
+        if ($this->status === self::STATUS_REJECTED && ($result = $this->getTriageResult())) {
+            return self::triageResults()[$result] ?? $result;
+        }
+
+        return self::staffStatuses()[$this->status] ?? $this->status;
+    }
+
+    /** The sorting columns exist (the migration may run after the code update). */
+    public static function triageReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::getDb()->getTableSchema(static::tableName(), true);
+            $ready = $schema && $schema->getColumn('triage_result') !== null;
+        }
+
+        return $ready;
+    }
+
+        /**
+     * Where the work on this request goes on: the deal it was added to (the
+     * chain is followed), else the deal itself. Repeated source events land there.
+     */
+    public function resolveMerged(): self
+    {
+        $lead = $this;
+        $seen = [];
+        while ($lead->hasAttribute('merged_into_id') && $lead->merged_into_id && !isset($seen[(int)$lead->id]) && count($seen) < 10) {
+            $seen[(int)$lead->id] = true;
+            $next = self::findOne((int)$lead->merged_into_id);
+            if (!$next) {
+                break;
+            }
+            $lead = $next;
+        }
+
+        return $lead;
+    }
+
+        /** Sorting result or null; null also before the sorting migration. */
+    public function getTriageResult(): ?string
+    {
+        return $this->hasAttribute('triage_result') && $this->getAttribute('triage_result')
+            ? (string)$this->getAttribute('triage_result')
+            : null;
+    }
+
+        public function getIsUnsorted(): bool
+    {
+        return $this->status === self::STATUS_NEW;
     }
 
     public static function statusDescriptions(): array
@@ -606,10 +931,48 @@ class CmsLead extends Core
     /** Deal amount for employees, e.g. «50 000 ₽»; empty when not set. */
     public function getDealAmountAsText(): string
     {
-        if ($this->deal_amount === null || $this->deal_amount === '') {
+        return self::moneyText($this->deal_amount);
+    }
+
+    /** «Сумма» (expected) of the deal, e.g. «50 000 ₽»; empty when not set or before the migration. */
+    public function getAmountAsText(): string
+    {
+        return $this->hasAttribute('amount') ? self::moneyText($this->getAttribute('amount')) : '';
+    }
+
+    /**
+     * The one amount an employee sees (owner's decision П2а): a successful deal
+     * shows «Сумма сделки» (the result), every other one «Сумма» (expected).
+     *
+     * @return array [label, text]; text '' when there is no amount to show
+     */
+    public function getShownAmount(): array
+    {
+        return $this->status === self::STATUS_SUCCESS
+            ? ['Сумма сделки', $this->dealAmountAsText]
+            : ['Сумма', $this->amountAsText];
+    }
+
+    /** "ожидали …" under the result of a successful deal when «Сумма» was different. */
+    public function getExpectedAmountNote(): string
+    {
+        if ($this->status !== self::STATUS_SUCCESS || !$this->hasAttribute('amount')) {
             return '';
         }
-        $amount = (float)$this->deal_amount;
+        $expected = $this->getAttribute('amount');
+        if ($expected === null || $expected === '' || (float)$expected === (float)$this->deal_amount) {
+            return '';
+        }
+
+        return 'ожидали '.$this->amountAsText;
+    }
+
+    private static function moneyText($value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+        $amount = (float)$value;
 
         return \Yii::$app->formatter->asDecimal($amount, floor($amount) == $amount ? 0 : 2).' ₽';
     }
@@ -677,10 +1040,17 @@ class CmsLead extends Core
             'partner_reward_value' => 'Вознаграждение партнёру, бонусов',
             'result_comment' => 'Результат обработки',
             'deal_amount' => 'Сумма сделки, ₽',
+            'amount' => 'Сумма, ₽',
             'reject_reason' => 'Причина отклонения',
             'no_answer_count' => 'Неудачных попыток дозвониться',
             'cms_lead_stage_id' => 'Этап',
+            'cms_lead_pipeline_id' => 'Воронка',
+            'stage_changed_at' => 'На этапе с',
             'cms_lead_reject_reason_id' => 'Причина отказа',
+            'triage_result' => 'Итог разбора',
+            'merged_into_id' => 'Добавлено в сделку',
+            'triaged_by' => 'Кто разобрал',
+            'triaged_at' => 'Когда разобрана',
         ]);
     }
 
@@ -690,6 +1060,9 @@ class CmsLead extends Core
     public function getCompany() { return $this->hasOne(CmsCompany::class, ['id' => 'cms_company_id']); }
     public function getClient() { return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']); }
     public function getStage() { return $this->hasOne(CmsLeadStage::class, ['id' => 'cms_lead_stage_id']); }
+    public function getPipeline() { return $this->hasOne(CmsLeadPipeline::class, ['id' => 'cms_lead_pipeline_id']); }
+    public function getMergedInto() { return $this->hasOne(self::class, ['id' => 'merged_into_id']); }
+    public function getTriagedBy() { return $this->hasOne(CmsUser::class, ['id' => 'triaged_by']); }
     public function getRejectReasonItem() { return $this->hasOne(CmsLeadRejectReason::class, ['id' => 'cms_lead_reject_reason_id']); }
     public function getPhones() { return $this->hasMany(CmsLeadPhone::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }
     public function getEmails() { return $this->hasMany(CmsLeadEmail::class, ['cms_lead_id' => 'id'])->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC]); }

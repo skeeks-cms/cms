@@ -248,3 +248,104 @@
         flex-basis: 85vw;
     }
 }
+
+/* П2б: pipeline switcher, column totals and quick add (as in amoCRM and Bitrix24). */
+.sx-lead-kanban__pipelines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--sx-color-border);
+}
+
+.sx-lead-kanban__pipeline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: -1px;
+    padding: 8px 14px;
+    border-bottom: 2px solid transparent;
+    color: var(--sx-color-text-muted);
+    font-weight: 600;
+    text-decoration: none !important;
+}
+
+.sx-lead-kanban__pipeline:hover,
+.sx-lead-kanban__pipeline:focus {
+    color: var(--sx-color-text);
+}
+
+.sx-lead-kanban__pipeline.is-active {
+    border-bottom-color: var(--sx-color-accent);
+    color: var(--sx-color-text);
+}
+
+.sx-lead-kanban__pipeline--setup {
+    margin-left: auto;
+    font-weight: 400;
+}
+
+.sx-lead-kanban__summary {
+    color: var(--sx-color-text-muted);
+    white-space: nowrap;
+}
+
+.sx-lead-kanban__head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+}
+
+.sx-lead-kanban__head-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sx-lead-kanban__head-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+.sx-lead-kanban__amount {
+    color: var(--sx-color-text);
+    white-space: nowrap;
+}
+
+.sx-lead-kanban__column--success {
+    --sx-lead-stage-color: var(--sx-color-success);
+}
+
+.sx-lead-kanban__column--danger {
+    --sx-lead-stage-color: var(--sx-color-danger);
+}
+
+.sx-lead-kanban__add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 8px 8px 0;
+    padding: 6px;
+    border: 1px dashed var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    text-decoration: none !important;
+}
+
+.sx-lead-kanban__add:hover,
+.sx-lead-kanban__add:focus {
+    border-color: var(--sx-color-accent);
+    color: var(--sx-color-accent);
+}
+
+.sx-lead-kanban__client {
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+}

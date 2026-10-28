@@ -77,6 +77,67 @@ class CrmContactBlockWidget extends Widget
     public ?string $addSize = null;
     /** Extra BackendSurfaceWidget options (e.g. density classes of the card). */
     public array $surface = [];
+    /** Show only the first N rows and a link «ещё N» to $moreUrl (the card that has them all); 0 — all. */
+    public int $limit = 0;
+    public ?string $moreUrl = null;
+
+    /**
+     * Rows of phones (company, client or deal phone models: `id`, `name`,
+     * `value`) with the same actions everywhere: the "⋮" menu of their
+     * controller, SMS/chat and a call, plus package actions.
+     *
+     * @param array $options editable (bool, the "⋮" menu), actions (bool, SMS and the call; package actions stay),
+     *                       call (array, extra attributes of the call button), note (callable|null, fn($phone): ?string)
+     */
+    public static function phoneItems(iterable $phones, string $controllerId, $owner, array $options = []): array
+    {
+        $items = [];
+        foreach ($phones as $phone) {
+            $value = (string)$phone->value;
+            $items[] = [
+                'label' => $phone->name ?: 'Телефон',
+                'value' => Html::a(Html::encode($value), 'tel:'.preg_replace('/[^\d+]/', '', $value), ['data-pjax' => '0']),
+                'note' => isset($options['note']) ? ($options['note'])($phone) : null,
+                'actions' => (($options['editable'] ?? true) ? self::menu($controllerId, (int)$phone->id, 'Изменить телефон') : '')
+                    .self::contactActions(self::CONTACT_PHONE, $value, $owner, ($options['actions'] ?? true) ? [
+                        'sms' => self::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $value]),
+                        'call' => self::iconButton('phone', 'Позвонить', array_merge(['class' => 'sx-telephony-btn', 'data-value' => $value], $options['call'] ?? [])),
+                    ] : []),
+            ];
+        }
+
+        return $items;
+    }
+
+    /** Rows of emails with the "⋮" menu, «Письмо» (mailto, replaced by the mail package) and package actions; see {@see phoneItems()}. */
+    public static function emailItems(iterable $emails, string $controllerId, $owner, array $options = []): array
+    {
+        $items = [];
+        foreach ($emails as $email) {
+            $value = (string)$email->value;
+            $items[] = [
+                'label' => $email->name ?: 'Email',
+                'value' => Html::a(Html::encode($value), 'mailto:'.$value, ['data-pjax' => '0']),
+                'note' => isset($options['note']) ? ($options['note'])($email) : null,
+                'actions' => (($options['editable'] ?? true) ? self::menu($controllerId, (int)$email->id, 'Изменить email') : '')
+                    .self::contactActions(self::CONTACT_EMAIL, $value, $owner, [
+                        'mailto' => self::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$value]),
+                    ]),
+            ];
+        }
+
+        return $items;
+    }
+
+    /** The link «ещё N» under a shortened list. */
+    public static function moreLink(int $count, ?string $url): string
+    {
+        $label = 'ещё '.$count;
+
+        return $url
+            ? Html::a(Html::encode($label), $url, ['class' => 'sx-contact-more', 'data-pjax' => '0'])
+            : Html::tag('div', Html::encode($label), ['class' => 'sx-contact-more']);
+    }
 
     /** A BackendIcon by name, or its icon-font fallback. */
     public static function icon(string $name, int $size = 16): string
@@ -152,7 +213,8 @@ class CrmContactBlockWidget extends Widget
         CrmContactsAsset::register($this->view);
 
         $rows = '';
-        foreach ($this->items as $item) {
+        $items = $this->limit > 0 ? array_slice($this->items, 0, $this->limit) : $this->items;
+        foreach ($items as $item) {
             $body = Html::tag('span', Html::encode((string)($item['label'] ?? '')), ['class' => 'sx-contact-label'])
                 .Html::tag('span', (string)($item['value'] ?? ''), ['class' => 'sx-contact-value']);
             if (!empty($item['note'])) {
@@ -164,6 +226,9 @@ class CrmContactBlockWidget extends Widget
                 .(!empty($item['actions']) ? Html::tag('div', $item['actions'], ['class' => 'sx-contact-actions']) : ''),
                 ['class' => 'sx-contact-row']
             );
+        }
+        if (count($this->items) > count($items)) {
+            $rows .= self::moreLink(count($this->items) - count($items), $this->moreUrl);
         }
         if (!$this->items && $this->emptyText !== '') {
             $rows .= Html::tag('div', Html::encode($this->emptyText), ['class' => 'sx-contact-empty']);

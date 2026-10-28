@@ -119,6 +119,13 @@ html[data-sx-theme] .sx-surface__actions .sx-hint-icon:focus {
     color: var(--sx-color-text-muted);
 }
 
+.sx-contact-more {
+    display: block;
+    padding: 4px 0 2px;
+    font-size: 13px;
+    color: var(--sx-color-text-muted);
+}
+
 .sx-contact-add {
     display: flex;
     align-items: center;

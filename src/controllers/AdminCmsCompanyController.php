@@ -58,6 +58,9 @@ use yii\web\ForbiddenHttpException;
  */
 class AdminCmsCompanyController extends BackendModelStandartController
 {
+    use \skeeks\cms\controllers\traits\ClientTransferActions;
+    use \skeeks\cms\controllers\traits\CrmDuplicateCheckActions;
+
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Компании");
@@ -151,12 +154,17 @@ HTML
                                     'has_tasks'      => 'Есть дела и задачи',
                                     'has_tasks_for_me'      => 'Есть дела и задачи для меня',
                                     'not_paid_bills' => 'Есть неоплаченные счета',
-                                ] + (class_exists(ShopPayment::class) ? ['no_payments' => 'Нет оплат'] : []),
+                                ] + (class_exists(ShopPayment::class) ? ['no_payments' => 'Нет оплат'] : [])
+                                    + \skeeks\cms\crm\CrmAccess::responsibleFilterItems(),
                                 'on apply' => function (QueryFiltersEvent $e) {
                                     /**
                                      * @var $query ActiveQuery
                                      */
                                     $query = $e->dataProvider->query;
+
+                                    // П2а: «Мои клиенты (основной)», «Без ответственного».
+                                    \skeeks\cms\crm\CrmAccess::instance()->applyResponsibleFilter($query, 'company', (string)$e->field->value,
+                                        CmsCompany::tableName().'.id', (int)\Yii::$app->user->id);
 
                                     if ($e->field->value == 'overdue_deals') {
 
@@ -409,7 +417,11 @@ HTML
 
                                 $data = [];
                                 if ($model->managers) {
-                                    foreach ($model->managers as $manager) {
+                                    // The main responsible first (П2а).
+                                    $mainId = \skeeks\cms\crm\CrmAccess::instance()->mainResponsibleId('company', (int)$model->id);
+                                    $managers = $model->managers;
+                                    usort($managers, static fn($a, $b) => ((int)$b->id === $mainId) <=> ((int)$a->id === $mainId));
+                                    foreach ($managers as $manager) {
                                         $data[] = \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
                                             'user'    => $manager,
                                             'isSmall' => true,
@@ -632,7 +644,35 @@ HTML
 
             "create" => [
                 'fields' => [$this, 'updateFields'],
+                // П2а: phones and emails of a pasted line (CrmDuplicateCheckActions) checked before the save.
+                'on beforeValidate' => function (Event $event) {
+                    $model = $event->sender->model;
+                    $errors = $this->cardContactErrors();
+                    if ($errors) {
+                        $model->getValidators()->append(\yii\validators\Validator::createValidator(function () use ($model, $errors) {
+                            $model->addError('name', implode(' ', $errors));
+                        }, $model, ['name']));
+                    }
+                },
+                'on beforeSave' => function () {
+                    // The company and its phones and emails are saved together or not at all.
+                    $transaction = CmsCompany::getDb()->beginTransaction();
+                    \Yii::$app->on(\yii\base\Application::EVENT_AFTER_REQUEST, static function () use ($transaction) {
+                        if ($transaction->isActive) {
+                            $transaction->rollBack();
+                        }
+                    });
+                    $this->_cardTransaction = $transaction;
+                },
+                'on afterSave' => function (Event $event) {
+                    $this->saveCardContacts($event->sender->model);
+                    if ($this->_cardTransaction && $this->_cardTransaction->isActive) {
+                        $this->_cardTransaction->commit();
+                    }
+                },
             ],
+            'duplicate-check' => $this->duplicateCheckAction(),
+            'duplicate-request' => $this->duplicateRequestAction(),
             "update" => [
                 'fields' => [$this, 'updateFields'],
                 "accessCallback" => function () {
@@ -886,6 +926,9 @@ HTML
                 },
             ],
 
+            // П2а: a leader or an administrator gives the client to another employee.
+            'transfer' => $this->clientTransferAction(),
+            'crm-access' => $this->clientAccessAction(),
         ]);
     }
 
@@ -1110,6 +1153,7 @@ HTML
             $model->managers = [\Yii::$app->user->id];
         }
 
+        // П2а: before a new company is saved, the CRM shows if it already exists.
         $mainFieldSet = [
 
             'name',
@@ -1220,6 +1264,17 @@ HTML
 
         ];
 
+        if ($model->isNewRecord) {
+            // П2а: phone and email right after the name; while they are filled the CRM shows if the company exists.
+            $withCheck = [];
+            foreach ($mainFieldSet as $key => $field) {
+                $withCheck[$key] = $field;
+                if ($field === 'name') {
+                    $withCheck['crm_duplicate_check'] = $this->duplicateCheckField('company');
+                }
+            }
+            $mainFieldSet = $withCheck;
+        }
 
         $result = [
             'main' => [

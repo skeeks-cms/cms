@@ -98,3 +98,18 @@ html[data-sx-theme] .sx-lead-report table.sx-data-table > * > tr > .sx-lead-repo
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* П2б: rules of the history funnel. */
+.sx-lead-report__rules {
+    margin-bottom: 1rem;
+    color: var(--sx-color-text-muted);
+}
+
+.sx-lead-report__rules > summary {
+    cursor: pointer;
+}
+
+.sx-lead-report__rules ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+}

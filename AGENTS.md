@@ -128,6 +128,27 @@ ingestion selects recipients after saving contacts; repeated contact sync
 checks existing new-lead notifications before emitting another one.
 Test: tests/cms-lead-company-access.php with Composer autoload, isolated SQLite.
 
+## Duplicates, «Неразобранное» and assignment (П2а)
+
+Status `new` is «Неразобранное» for employees (`CmsLead::staffStatuses()`,
+`staffStatusName`); partners keep `statuses()`. The one duplicate check is
+`crm\CrmMatcher` (component `crmMatcher`), employee CRM rights are
+`crm\CrmAccess` (component `crmAccess`), sorting and the client of a deal are
+`crm\LeadTriage`, access requests `crm\CrmAccessRequests`
+(`cms_crm_access_request`), "Это другая компания" `cms_crm_duplicate_mark`
+(migration m261028_100000). Actions: `controllers\traits\LeadTriageActions`
+(create window with "Кто это", triage, identity, assign, match, requests).
+Sorted deals: `triage_result` (merged, support, spam), `merged_into_id`; out
+of the report and the kanban "Отказ". Contract and order of the create
+window: skill `references/crm-duplicates-and-triage.md`.
+Links employee ↔ company/client carry `access_level` (full, sales; migration
+m261028_110000); «Передать клиента» is `crm\CrmClientTransfer` behind
+`controllers\traits\ClientTransferActions` in the company and user cards.
+Every CRM change in the core must keep a simple site (no cms-communication, no
+CRM data) working as before — the "base site" rule of the skill reference.
+Test: tests/crm-lead-triage-stand.php (CRM_TRIAGE_STAND_TEST=local, stand DB,
+rolled back).
+
 ## Verification
 
 `WidgetRenderable` logs rendering exceptions and PHP errors server-side and

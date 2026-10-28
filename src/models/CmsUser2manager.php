@@ -38,7 +38,7 @@ class CmsUser2manager extends \skeeks\cms\base\ActiveRecord
             [['client_id', 'worker_id'], 'integer'],
             [['client_id', 'worker_id'], 'required'],
             [['client_id', 'worker_id'], 'unique', 'targetAttribute' => ['client_id', 'worker_id']],
-        ]);
+        ], \skeeks\cms\crm\CrmAccess::levelRules());
     }
 
 
@@ -78,5 +78,18 @@ class CmsUser2manager extends \skeeks\cms\base\ActiveRecord
     {
         $userClass = \Yii::$app->user->identityClass;
         return $this->hasOne($userClass, ['id' => 'client_id']);
+    }
+
+    /** The client keeps exactly one main responsible (crm\CrmAccess::ensureMain()). */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$this->client_id);
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$this->client_id);
     }
 }

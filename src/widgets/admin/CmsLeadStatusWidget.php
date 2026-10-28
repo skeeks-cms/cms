@@ -39,12 +39,14 @@ class CmsLeadStatusWidget extends Widget
         }
 
         BackendAsset::register($this->view);
+        // Employees (showStage) see "Неразобранное" and the sorting result; partners keep the public name.
+        $name = $this->showStage ? $this->lead->staffStatusName : $this->lead->statusName;
 
         $options = ArrayHelper::merge([
             'title' => ArrayHelper::getValue(
                 CmsLead::statusDescriptions(),
                 $this->lead->status,
-                $this->lead->statusName
+                $name
             ),
         ], (array)$this->options);
         Html::addCssClass($options, CmsLead::statusCssClass($this->lead->status));
@@ -54,7 +56,7 @@ class CmsLeadStatusWidget extends Widget
             Html::tag('i', '', [
                 'class' => CmsLead::statusIconClass($this->lead->status),
                 'aria-hidden' => 'true',
-            ]).Html::encode($this->lead->statusName),
+            ]).Html::encode($name),
             $options
         );
 
@@ -82,7 +84,7 @@ class CmsLeadStatusWidget extends Widget
     }
 
     /** Neutral stage chip; the optional stage color marks its dot. */
-    public static function renderStage(CmsLeadStage $stage): string
+    public static function renderStage(CmsLeadStage $stage, bool $withPipeline = true): string
     {
         $dot = Html::tag('i', '', array_filter([
             'class' => 'fas fa-circle',
@@ -90,7 +92,10 @@ class CmsLeadStatusWidget extends Widget
             'style' => $stage->color ? 'color: '.$stage->color : null,
         ]));
 
-        return Html::tag('span', $dot.Html::encode($stage->name), [
+        // «Воронка: этап» on a site with several pipelines (stage names may repeat in them).
+        $name = $withPipeline && CmsLead::pipelineReady() ? $stage->fullName : $stage->name;
+
+        return Html::tag('span', $dot.Html::encode($name), [
             'class' => 'sx-status',
             'title' => 'Этап работы со сделкой',
         ]);

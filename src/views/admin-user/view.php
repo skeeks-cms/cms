@@ -285,21 +285,13 @@ CSS
             <?php BackendSurfaceWidget::end(); ?>
 
             <?php
+            $approvedNote = static fn($contact) => $contact->is_approved ? 'Подтверждён клиентом' : 'Не подтверждён';
             echo CrmContactBlockWidget::widget([
                 'title' => 'Телефоны',
                 'hint' => 'У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию.',
                 'icon' => 'phone',
                 'surface' => $contactSurface,
-                'items' => array_map(static fn($phone) => [
-                    'label' => $phone->name ?: 'Телефон',
-                    'value' => Html::a(Html::encode($phone->value), 'tel:'.preg_replace('/[^\d+]/', '', (string)$phone->value), ['data-pjax' => '0']),
-                    'note' => $phone->is_approved ? 'Подтверждён клиентом' : 'Не подтверждён',
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-user-phone', (int)$phone->id, 'Изменить телефон')
-                        .CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_PHONE, (string)$phone->value, $model, [
-                            'sms' => CrmContactBlockWidget::iconButton('message', 'Написать SMS', ['class' => 'sx-send-sms-trigger', 'data-phone' => $phone->value]),
-                            'call' => CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value]),
-                        ]),
-                ], $model->cmsUserPhones),
+                'items' => CrmContactBlockWidget::phoneItems($model->cmsUserPhones, '/cms/admin-user-phone', $model, ['note' => $approvedNote]),
                 'emptyText' => 'Телефонов пока нет',
                 'addLabel' => 'Добавить телефон',
                 'addRoute' => ['/cms/admin-user-phone/create', 'CmsUserPhone' => ['cms_user_id' => $model->id]],
@@ -311,15 +303,7 @@ CSS
                 'hint' => 'У пользователя может быть задано несколько email адресов. Первый из них является основным и используется по умолчанию.',
                 'icon' => 'mail',
                 'surface' => $contactSurface,
-                'items' => array_map(static fn($email) => [
-                    'label' => $email->name ?: 'Email',
-                    'value' => Html::a(Html::encode($email->value), 'mailto:'.$email->value, ['data-pjax' => '0']),
-                    'note' => $email->is_approved ? 'Подтверждён клиентом' : 'Не подтверждён',
-                    'actions' => CrmContactBlockWidget::menu('/cms/admin-user-email', (int)$email->id, 'Изменить email')
-                        .CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_EMAIL, (string)$email->value, $model, [
-                            'mailto' => CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
-                        ]),
-                ], $model->cmsUserEmails),
+                'items' => CrmContactBlockWidget::emailItems($model->cmsUserEmails, '/cms/admin-user-email', $model, ['note' => $approvedNote]),
                 'emptyText' => 'Email пока нет',
                 'addLabel' => 'Добавить email',
                 'addRoute' => ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => $model->id]],

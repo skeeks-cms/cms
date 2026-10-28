@@ -16,14 +16,15 @@ $companyController = file_get_contents($root.'/controllers/AdminCmsCompanyContro
 $userController = file_get_contents($root.'/controllers/AdminUserController.php');
 
 $requiredModelFragments = [
-    "[['name', 'source_type', 'status'], 'required']",
+    "[['source_type', 'status'], 'required']",
+    "[['name'], 'required', 'when' => static fn(self \$model) => !\$model->autoName]",
     'public function getPhones()',
     'public function getEmails()',
     'public function getMainPhone()',
     'public function getMainEmail()',
     "self::SOURCE_PARTNER => 'Партнёрская программа'",
     'public function allowedNextStatuses(): array',
-    'self::STATUS_NEW => [self::STATUS_NEW, self::STATUS_IN_WORK]',
+    'self::STATUS_NEW => $this->getTriageResult()',
     'self::STATUS_IN_WORK => [self::STATUS_IN_WORK, self::STATUS_SUCCESS, self::STATUS_REJECTED]',
     'self::STATUS_SUCCESS => [self::STATUS_SUCCESS, self::STATUS_IN_WORK]',
     'self::STATUS_REJECTED => [self::STATUS_REJECTED, self::STATUS_IN_WORK]',
@@ -81,7 +82,9 @@ if (strpos($editAction, "'icon' => 'fa fa-edit'") === false) {
     throw new RuntimeException('The dedicated lead edit action must use an available backend icon.');
 }
 if (strpos($controller, "'visibleFilters' => ['q', 'status', 'source_type']") === false) {
-    if (strpos($controller, "array_merge(['q', 'status', 'cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], \$utmAttributes)") === false) {
+    // П2б: «Воронка» joins the filters only on a site with several pipelines.
+    if (strpos($controller, "['cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], \$utmAttributes)") === false
+        || strpos($controller, "count(CmsLeadPipeline::forSite()) > 1 ? ['cms_lead_pipeline_id'] : []") === false) {
         throw new RuntimeException('Lead filters must include source and canonical UTM attribution fields.');
     }
 }
@@ -103,12 +106,14 @@ $processFields = substr($controller, $processFieldsStart, $statusOptionsStart - 
 if (strpos($processFields, 'executor_id') !== false || strpos($processFields, 'managerField') !== false) {
     throw new RuntimeException('Lead processing must not reassign the responsible manager.');
 }
-if (strpos($controller, '$model->executor_id') === false
-    || strpos($controller, '? CmsLead::STATUS_IN_WORK') === false
+// П2а: «Новая сделка» is the standard create window with the client block; the responsible
+// defaults to the current employee (or the client's responsible) and a deal with one is in work.
+$triageActions = file_get_contents(dirname(__DIR__).'/src/controllers/traits/LeadTriageActions.php');
+$triage = file_get_contents(dirname(__DIR__).'/src/crm/LeadTriage.php');
+if (strpos($triageActions, "new LeadIdentityForm(['executor_id' => (int)\\Yii::\$app->user->id])") === false
+    || strpos($triageActions, "'class' => BackendModelCreateAction::class") === false
+    || strpos($triage, '$lead->status = $lead->executor_id ? CmsLead::STATUS_IN_WORK : CmsLead::STATUS_NEW') === false
     || strpos($controller, "\$fields['executor_id'] = \$this->managerField()") === false
-    || strpos($controller, '$model = $action ? $action->model : null') === false
-    || strpos($controller, '$model && $model->isNewRecord') === false
-    || strpos($controller, '$model->executor_id = (int)\\Yii::$app->user->id') === false
     || strpos($controller, "'label' => 'Ответственный сотрудник'") === false
 ) {
     throw new RuntimeException('Manual lead creation must default to the current manager, allow reassignment, and set in-work status.');
@@ -184,7 +189,8 @@ if (strpos($view, "'title' => \$model->name") !== false
 if (strpos($view, 'min-height: 220px') !== false) {
     throw new RuntimeException('Lead card must not retain the old artificial minimum height.');
 }
-foreach (['sx-detail-layout__aside', 'sx-detail-layout__main', 'Добавить комментарий', '$model->getLogs()->activity()'] as $activityFragment) {
+// П2б: the comment form is «Примечание», as in amoCRM.
+foreach (['sx-detail-layout__aside', 'sx-detail-layout__main', "'Примечание'", '$model->getLogs()->activity()'] as $activityFragment) {
     if (strpos($view, $activityFragment) === false) {
         throw new RuntimeException('Lead card must use the company-style split activity layout: '.$activityFragment);
     }
@@ -245,7 +251,7 @@ foreach (['Добавить телефон', 'Добавить email', 'sx-send-
 if (strpos($controller, "@skeeks/cms/views/admin-cms-lead/_model_header") === false) {
     throw new RuntimeException('Lead workflow actions must be available from the shared model header on every lead action.');
 }
-foreach (['Взять в работу', 'Создать компанию', 'Создать клиента', 'BackendModelHeader::widget', 'CmsLeadStatusWidget::widget'] as $headerFragment) {
+foreach (['Разобрать', '/cms/admin-cms-lead/triage', 'Клиент сделки', 'Сменить ответственного', 'BackendModelHeader::widget', 'CmsLeadStatusWidget::widget'] as $headerFragment) {
     if (strpos($header, $headerFragment) === false) {
         throw new RuntimeException('Lead model header is incomplete: '.$headerFragment);
     }
@@ -406,9 +412,9 @@ foreach ($displayNameContracts as $fragment) {
 if (strpos($model, "\$label = 'Форма на сайте «'.\$this->sourceNameAsText.'»'") !== false) {
     throw new RuntimeException('CmsLead must not rebuild a Form2 title around an editable persisted name.');
 }
-if (strpos($header, "'CmsCompany' => ['name' => \$model->name") === false
-    || strpos($header, "'CmsUser' => ['first_name' => \$model->name") === false) {
-    throw new RuntimeException('CRM creation forms must receive the persisted lead name explicitly.');
+// П2а: the client of a deal in work is found or created in «Клиент сделки» (the duplicate check), not in bare create forms.
+if (strpos($header, "'/cms/admin-cms-lead/identity'") === false) {
+    throw new RuntimeException('A deal in work must open «Клиент сделки» to find or create its client.');
 }
 
 echo "CMS lead contract: ok\n";

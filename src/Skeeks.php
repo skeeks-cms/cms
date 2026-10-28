@@ -237,6 +237,11 @@ class Skeeks extends Component implements BootstrapInterface
             'name_one'   => 'Сделка',
             'controller' => 'cms/admin-cms-lead',
         ],
+        \skeeks\cms\models\CmsLeadPipeline::class => [
+            'name'       => 'Воронки сделок',
+            'name_one'   => 'Воронка',
+            'controller' => 'cms/admin-cms-lead-pipeline',
+        ],
         CmsLeadStage::class     => [
             'name'       => 'Этапы сделок',
             'name_one'   => 'Этап сделки',

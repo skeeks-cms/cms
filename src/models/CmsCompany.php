@@ -118,6 +118,13 @@ class CmsCompany extends ActiveRecord
     }
 
 
+    public function init()
+    {
+        parent::init();
+        // The managers field rewrites the links: their levels and the main responsible are kept.
+        \skeeks\cms\crm\CrmAccess::keepLinks($this, CmsCrmAccessRequest::RECORD_COMPANY);
+    }
+
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [

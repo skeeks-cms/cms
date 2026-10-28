@@ -4,6 +4,7 @@ namespace skeeks\cms\services;
 
 use skeeks\cms\events\LeadReportPartnerRewardsEvent;
 use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadPipeline;
 use skeeks\cms\models\CmsLeadRejectReason;
 use skeeks\cms\models\CmsLeadStage;
 use skeeks\cms\models\CmsUser;
@@ -22,13 +23,18 @@ class CmsLeadReportService extends Component
 {
     public const EVENT_PARTNER_REWARDS = 'partnerRewards';
 
+    /** @var CmsLeadPipeline|null the pipeline of the current build */
+    private $pipeline;
+
     /**
      * @param int $from unix time, inclusive
      * @param int $to unix time, inclusive
      * @param string|null $sourceType CmsLead::SOURCE_* or null for all
+     * @param CmsLeadPipeline|null $pipeline only the deals of this pipeline (П2б)
      */
-    public function build(int $from, int $to, ?string $sourceType = null): array
+    public function build(int $from, int $to, ?string $sourceType = null, ?CmsLeadPipeline $pipeline = null): array
     {
+        $this->pipeline = $pipeline;
         $table = CmsLead::tableName();
         $query = CmsLead::find()->forManager()->cmsSite()
             ->select([
@@ -37,8 +43,15 @@ class CmsLeadReportService extends Component
                 $table.'.utm_source', $table.'.utm_campaign',
             ])
             ->andWhere(['between', $table.'.created_at', $from, $to]);
+        if (CmsLead::triageReady()) {
+            // Spam, requests added to another deal and support are not sales.
+            $query->andWhere([$table.'.triage_result' => null]);
+        }
         if ($sourceType) {
             $query->andWhere([$table.'.source_type' => $sourceType]);
+        }
+        if ($pipeline) {
+            $query->andWhere($pipeline->leadCondition($table));
         }
         $leads = $query->asArray()->all();
 
@@ -187,15 +200,15 @@ class CmsLeadReportService extends Component
     /** Current state of the target leads, in board order. */
     private function funnelRows(array $counts): array
     {
-        $rows = [['title' => CmsLead::statuses()[CmsLead::STATUS_NEW], 'count' => $counts[CmsLead::STATUS_NEW] ?? 0, 'color' => null]];
-        $stages = CmsLeadStage::forCurrentSite();
+        $rows = [['title' => CmsLead::staffStatuses()[CmsLead::STATUS_NEW], 'count' => $counts[CmsLead::STATUS_NEW] ?? 0, 'color' => null]];
+        $stages = CmsLeadStage::forPipeline($this->pipeline);
         if (!$stages || !empty($counts['stage-0'])) {
             $rows[] = ['title' => $stages ? 'В работе: без этапа' : 'В работе', 'count' => $counts['stage-0'] ?? 0, 'color' => null];
         }
         foreach ($stages as $stage) {
             $rows[] = ['title' => $stage->name, 'count' => $counts['stage-'.(int)$stage->id] ?? 0, 'color' => $stage->color];
         }
-        $rows[] = ['title' => CmsLead::statuses()[CmsLead::STATUS_SUCCESS], 'count' => $counts[CmsLead::STATUS_SUCCESS] ?? 0, 'color' => null];
+        $rows[] = ['title' => CmsLead::staffStatuses()[CmsLead::STATUS_SUCCESS], 'count' => $counts[CmsLead::STATUS_SUCCESS] ?? 0, 'color' => null];
 
         return $rows;
     }

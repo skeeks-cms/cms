@@ -207,6 +207,61 @@ class CmsDepartment extends ActiveRecord
     }
 
     /**
+     * Руководители сотрудника: обратное правило к subordinateIds() на том же дереве.
+     * L — руководитель X, если X есть в subordinateIds(L): руководители отделов, в которых
+     * X работает, и всех их родительских отделов, а для руководителя отдела — руководители
+     * родительских отделов. Сам сотрудник в список не входит.
+     *
+     * @param int $workerId
+     * @return int[]
+     */
+    public static function leaderIdsOf(int $workerId): array
+    {
+        if ($workerId <= 0) {
+            return [];
+        }
+
+        $rows = (new \yii\db\Query())
+            ->select(['id', 'pid', 'worker_id'])
+            ->from(static::tableName())
+            ->all(static::getDb());
+        $byId = [];
+        foreach ($rows as $row) {
+            $byId[(int)$row['id']] = $row;
+        }
+
+        $start = array_map('intval', (new \yii\db\Query())
+            ->select(['cms_department_id'])
+            ->from(CmsDepartment2worker::tableName())
+            ->andWhere(['worker_id' => $workerId])
+            ->column(static::getDb()));
+        foreach ($rows as $row) {
+            // A head is a subordinate of the heads above his department, not of himself.
+            if ((int)$row['worker_id'] === $workerId && $row['pid']) {
+                $start[] = (int)$row['pid'];
+            }
+        }
+
+        $result = [];
+        $seen = [];
+        foreach ($start as $departmentId) {
+            while ($departmentId && isset($byId[$departmentId]) && !isset($seen[$departmentId])) {
+                $seen[$departmentId] = true;
+                $leaderId = (int)$byId[$departmentId]['worker_id'];
+                if ($leaderId) {
+                    $result[$leaderId] = $leaderId;
+                }
+                $departmentId = (int)$byId[$departmentId]['pid'];
+            }
+        }
+
+        unset($result[$workerId]);
+        sort($result);
+
+        return array_values($result);
+    }
+
+    /**
      * @param string $glue
      *
      * @return string

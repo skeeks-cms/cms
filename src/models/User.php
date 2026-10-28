@@ -171,6 +171,9 @@ class User
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "_cmsAfterSave"]);
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
+
+        // A client: the managers field rewrites the links, their levels and the main responsible are kept.
+        \skeeks\cms\crm\CrmAccess::keepLinks($this, CmsCrmAccessRequest::RECORD_CLIENT);
     }
 
 

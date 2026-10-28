@@ -18,11 +18,13 @@ use yii\helpers\ArrayHelper;
  * @property int|null    $created_at
  * @property int|null    $updated_at
  * @property int         $cms_site_id
+ * @property int|null    $cms_lead_pipeline_id the pipeline; empty — the default (or the only) pipeline
  * @property string      $name
  * @property string|null $color
  * @property int         $sort
  *
  * @property CmsLead[]   $leads
+ * @property CmsLeadPipeline|null $pipeline
  */
 class CmsLeadStage extends ActiveRecord
 {
@@ -47,8 +49,15 @@ class CmsLeadStage extends ActiveRecord
             [['cms_site_id', 'sort'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['color'], 'match', 'pattern' => '/^#[0-9a-f]{6}$/', 'message' => 'Укажите цвет в формате #RRGGBB.'],
-            [['name'], 'unique', 'targetAttribute' => ['cms_site_id', 'name'], 'message' => 'Такой этап уже есть.'],
-        ]);
+            [['name'], 'unique', 'targetAttribute' => static::pipelineReady() ? ['cms_site_id', 'cms_lead_pipeline_id', 'name'] : ['cms_site_id', 'name'],
+                'message' => 'Такой этап уже есть.'],
+        ], static::pipelineReady() ? [
+            [['cms_lead_pipeline_id'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
+            [['cms_lead_pipeline_id'], 'integer'],
+            [['cms_lead_pipeline_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLeadPipeline::class,
+                'targetAttribute' => ['cms_lead_pipeline_id' => 'id', 'cms_site_id' => 'cms_site_id'],
+                'message' => 'Воронка не найдена на этом сайте.'],
+        ] : []);
     }
 
     public function attributeLabels()
@@ -57,6 +66,7 @@ class CmsLeadStage extends ActiveRecord
             'name' => 'Название',
             'color' => 'Цвет',
             'sort' => 'Порядок',
+            'cms_lead_pipeline_id' => 'Воронка',
         ]);
     }
 
@@ -67,6 +77,53 @@ class CmsLeadStage extends ActiveRecord
             'sort' => 'Этапы идут слева направо по возрастанию числа.',
             'color' => 'Необязательно. Цвет метки этапа в карточке и на канбане.',
         ]);
+    }
+
+    /** The stage column exists (П2б migration may run after the code update). */
+    public static function pipelineReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::getDb()->getTableSchema(static::tableName(), true);
+            $ready = $schema && $schema->getColumn('cms_lead_pipeline_id') !== null;
+        }
+
+        return $ready;
+    }
+
+    public function getPipeline()
+    {
+        return $this->hasOne(CmsLeadPipeline::class, ['id' => 'cms_lead_pipeline_id']);
+    }
+
+    /**
+     * Stages of a pipeline in board order. Without a pipeline (a site that has
+     * none) — every stage of the site, as before pipelines.
+     *
+     * @return CmsLeadStage[]
+     */
+    public static function forPipeline(?CmsLeadPipeline $pipeline, ?int $siteId = null): array
+    {
+        if ($pipeline) {
+            return $pipeline->stages;
+        }
+
+        return static::find()
+            ->cmsSite($siteId ?: null)
+            ->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+    }
+
+    /** «Воронка: этап» when the site has several pipelines, else the stage name. */
+    public function getFullName(): string
+    {
+        $pipelines = CmsLeadPipeline::forSite((int)$this->cms_site_id);
+        if (count($pipelines) < 2) {
+            return (string)$this->name;
+        }
+        $pipeline = $this->pipeline ?: CmsLeadPipeline::defaultFor((int)$this->cms_site_id);
+
+        return ($pipeline ? $pipeline->name.': ' : '').$this->name;
     }
 
     public function getLeads()

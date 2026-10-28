@@ -507,8 +507,9 @@ return array_merge(dashboardsMenu(), [
                             /*"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/ru.png'],*/
                         ],
                         [
-                            "label" => \Yii::t('skeeks/cms', "Этапы сделок"),
-                            "url"   => ["cms/admin-cms-lead-stage"],
+                            // П2б: pipelines with their stages (the stage list is the tab «Этапы» of a pipeline).
+                            "label" => "Воронки и этапы сделок",
+                            "url"   => ["cms/admin-cms-lead-pipeline"],
                             'priority' => 900,
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                         ],

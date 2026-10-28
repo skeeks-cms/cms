@@ -233,6 +233,26 @@ $this->registerCss(<<<CSS
     margin-top: 0.25rem;
     overflow-wrap: anywhere;
 }
+.sx-lead-quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+.sx-lead-quick .sx-lead-next-step__menu {
+    left: 0;
+    right: auto;
+}
+.sx-lead-success-hint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    color: var(--sx-color-success-on-soft);
+    border: 1px solid var(--sx-color-success);
+    background: var(--sx-color-success-soft);
+}
 .sx-lead-identity-card__arrow {
     align-self: center;
     flex: 0 0 auto;
@@ -248,9 +268,30 @@ CSS
     <?php BackendSurfaceWidget::begin(['raised' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
         <?= $this->render('_stage-bar', [
             'model' => $model,
-            'steps' => (new \skeeks\cms\services\CmsLeadBoardService())->steps($model, (int)\Yii::$app->user->id),
+            'steps' => \skeeks\cms\services\CmsLeadBoardService::forLead($model)->steps($model, (int)\Yii::$app->user->id),
         ]); ?>
     <?php BackendSurfaceWidget::end(); ?>
+
+    <?php
+    // П2б: the pipeline criterion (order, first payment) only suggests closing; the manager closes.
+    $successSignals = $canWork ? \skeeks\cms\crm\LeadPipelines::instance()->successSignals($model) : [];
+    ?>
+    <?php if ($successSignals) : ?>
+        <?php $successUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+            '/cms/admin-cms-lead/process', 'pk' => $model->id, 'status' => CmsLead::STATUS_SUCCESS,
+        ])->enableEmptyLayout()->enableNoActions()->url; ?>
+        <div class="sx-surface sx-surface--raised sx-surface--padded sx-lead-success-hint" role="status">
+            <div>
+                <strong>Похоже, сделка состоялась.</strong>
+                <?= Html::encode(implode(' ', $successSignals)); ?>
+            </div>
+            <?= Html::a('<i class="fas fa-check" aria-hidden="true"></i> Закрыть успешно', $successUrl, [
+                'class' => 'sx-button sx-button--primary sx-button--sm',
+                'data-pjax' => '0',
+                'onclick' => 'new sx.classes.backend.widgets.Action('.\yii\helpers\Json::encode(['isOpenNewWindow' => true, 'url' => $successUrl]).').go(); return false;',
+            ]); ?>
+        </div>
+    <?php endif; ?>
 
     <?php if (!$model->cms_company_id || !$model->cms_user_id) : ?>
         <div
@@ -265,7 +306,29 @@ CSS
 
     <div class="sx-lead-layout sx-detail-layout">
         <aside class="sx-detail-layout__aside sx-surface-stack">
-            <?php if ($model->company) : ?>
+            <?php
+            // A deal given to an employee without its company: the company only as "название + ответственный".
+            $crmAccess = \skeeks\cms\crm\CrmAccess::instance();
+            $viewerId = (int)\Yii::$app->user->id;
+            $companyVisible = $model->company && $crmAccess->canSeeCompany($viewerId, (int)$model->company->id);
+            $clientVisible = $model->client && $crmAccess->canSeeClient($viewerId, (int)$model->client->id);
+            $briefCard = static function (string $label, string $title, array $responsible, string $icon): string {
+                $names = implode(', ', array_column($responsible, 'name'));
+                return Html::tag('div',
+                    Html::tag('span', Html::tag('i', '', ['class' => $icon, 'aria-hidden' => 'true']), ['class' => 'sx-lead-identity-card__icon'])
+                    .Html::tag('span',
+                        Html::tag('span', Html::encode($label), ['class' => 'sx-lead-identity-card__label'])
+                        .Html::tag('span', Html::encode($title), ['class' => 'sx-lead-identity-card__title'])
+                        .Html::tag('div', $names !== '' ? 'Ответственный: '.Html::encode($names) : 'Ответственного нет', ['class' => 'sx-lead-identity-card__meta']),
+                        ['class' => 'sx-lead-identity-card__body']
+                    ),
+                    ['class' => 'sx-surface sx-surface--raised sx-lead-identity-card']
+                );
+            };
+            ?>
+            <?= $this->render('_about', ['model' => $model, 'canWork' => $canWork]); ?>
+
+            <?php if ($model->company && $companyVisible) : ?>
                 <?= $identityCard(
                     '/cms/admin-cms-company',
                     (int)$model->company->id,
@@ -275,11 +338,23 @@ CSS
                     [
                         ArrayHelper::getValue($model->company->phones, '0.value'),
                         ArrayHelper::getValue($model->company->emails, '0.value'),
+                        // The viewer's level of the company; below "full" it works as "full" until П2а+.
+                        (static function () use ($crmAccess, $viewerId, $model) {
+                            $level = $crmAccess->linkLevel($viewerId, 'company', (int)$model->company->id);
+                            if (!$level) {
+                                return null;
+                            }
+                            $name = mb_strtolower(\skeeks\cms\crm\CrmAccess::levels()[$level] ?? $level, 'UTF-8');
+
+                            return 'Ваш доступ: '.$name.($level !== \skeeks\cms\crm\CrmAccess::LEVEL_FULL && !$crmAccess->enforceLevels ? ' (пока как полный)' : '');
+                        })(),
                     ]
                 ); ?>
+            <?php elseif ($model->company) : ?>
+                <?= $briefCard('Компания', (string)$model->company->name, $crmAccess->names($crmAccess->companyResponsibleIds((int)$model->company->id)), 'fas fa-building'); ?>
             <?php endif; ?>
 
-            <?php if ($model->client) : ?>
+            <?php if ($model->client && $clientVisible) : ?>
                 <?= $identityCard(
                     '/cms/admin-user',
                     (int)$model->client->id,
@@ -288,7 +363,11 @@ CSS
                     'fas fa-user',
                     [$model->client->phone, $model->client->email]
                 ); ?>
+            <?php elseif ($model->client) : ?>
+                <?= $briefCard('Контакт', 'Контакт из базы', $crmAccess->names($crmAccess->clientResponsibleIds((int)$model->client->id)), 'fas fa-user'); ?>
             <?php endif; ?>
+
+            <?= $this->render('_client', ['model' => $model, 'companyVisible' => $companyVisible, 'clientVisible' => $clientVisible]); ?>
 
             <?php if ($model->partner) : ?>
                 <?= $identityCard(
@@ -318,9 +397,13 @@ CSS
                 ? CrmContactBlockWidget::menu($controllerId, $id, $title)
                 : '';
 
+            // П2г: the phones, emails and addresses of the request are read only while the deal has no company and no person;
+            // once a client is linked, the «Клиент» blocks show the client's own contacts.
+            $requestData = !$model->company && !$model->client;
+            if ($requestData) {
             echo CrmContactBlockWidget::widget([
-                'title' => 'Телефоны',
-                'hint' => 'У сделки может быть несколько телефонов. Первый из них основной, по нему звонят и пишут SMS. При создании компании телефоны переносятся в неё.',
+                'title' => 'Телефоны из обращения',
+                'hint' => 'Телефоны, с которыми пришла сделка. Первый из них основной, по нему звонят и пишут SMS. Когда у сделки появится компания или клиент, здесь будут их контакты.',
                 'icon' => 'phone',
                 'items' => array_map(static fn($phone) => [
                     'label' => $phone->name ?: 'Телефон',
@@ -338,8 +421,8 @@ CSS
             ]);
 
             echo CrmContactBlockWidget::widget([
-                'title' => 'Email',
-                'hint' => 'У сделки может быть несколько email адресов. Первый из них основной. При создании компании адреса переносятся в неё.',
+                'title' => 'Email из обращения',
+                'hint' => 'Адреса, с которыми пришла сделка. Первый из них основной. Когда у сделки появится компания или клиент, здесь будут их контакты.',
                 'icon' => 'mail',
                 'items' => array_map(static fn($email) => [
                     'label' => $email->name ?: 'Email',
@@ -356,7 +439,7 @@ CSS
             ]);
 
             echo CrmContactBlockWidget::widget([
-                'title' => 'Адреса',
+                'title' => 'Адреса из обращения',
                 'hint' => 'Адреса офиса, склада или магазина клиента. Первый из них основной. При создании компании адреса переносятся в неё.',
                 'icon' => 'map-pin',
                 'items' => array_map(static fn($address) => [
@@ -374,6 +457,7 @@ CSS
                 'addLabel' => 'Добавить адрес',
                 'addRoute' => $canWork ? ['/cms/admin-cms-lead-address/create', 'CmsLeadAddress' => ['cms_lead_id' => $leadId]] : null,
             ]);
+            }
 
             if ($canWork) {
                 $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => $leadId]));
@@ -494,8 +578,52 @@ JS
                     'onclick' => 'new sx.classes.backend.widgets.Action('.$action.').go(); return false;',
                 ]);
             };
+            // П2б: quick actions in a row on top of the right column, as in amoCRM and Bitrix24:
+            // «Задача», «Примечание», «Позвонить», «Не дозвонились», «Письмо», then the actions of
+            // packages (CrmCardBlocksWidget::EVENT_ACTIONS: «Сделать КП», «Отправить презентацию», …).
+            $quick = [];
+            $icon = static fn(string $name): string => \skeeks\cms\backend\helpers\BackendIcon::renderConfigured($name, ['size' => 16]);
+            $taskUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                '/cms/admin-cms-task/create',
+                'CmsTask' => ['cms_lead_id' => $model->id],
+            ])->enableEmptyLayout()->enableNoActions()->url;
+            $canTask = $canWork && \Yii::$app->user->can('cms/admin-task');
+            if ($canTask) {
+                $quick[] = $openActionLink($icon('plus').' Задача', $taskUrl, $leadTasks ? 'secondary' : 'primary');
+            }
+            if ($canWork) {
+                $quick[] = Html::a($icon('message').' Примечание', '#sx-lead-note', [
+                    'class' => 'sx-button sx-button--secondary sx-button--sm',
+                    'data-pjax' => '0',
+                    'onclick' => 'var f = document.getElementById("sx-lead-note"); if (f) { f.scrollIntoView({behavior: "smooth", block: "center"}); var t = f.querySelector("textarea, [contenteditable=true]"); if (t) { t.focus(); } } return false;',
+                ]);
+            }
+            // The phone and email of the request, else of the contact, else of the company (only a visible card).
+            $contactOf = static function (string $kind) use ($model, $clientVisible, $companyVisible): string {
+                $own = $kind === 'phone' ? $model->mainPhone : $model->mainEmail;
+                if ($own) {
+                    return (string)$own->value;
+                }
+                if ($model->client && $clientVisible && trim((string)$model->client->{$kind}) !== '') {
+                    return (string)$model->client->{$kind};
+                }
+                if ($model->company && $companyVisible) {
+                    return (string)ArrayHelper::getValue($kind === 'phone' ? $model->company->phones : $model->company->emails, '0.value', '');
+                }
+
+                return '';
+            };
+            $callPhone = $contactOf('phone');
+            if ($canWork && $callPhone !== '') {
+                $quick[] = Html::button($icon('phone').' Позвонить', [
+                    'class' => 'sx-button sx-button--secondary sx-button--sm sx-telephony-btn',
+                    'data-value' => $callPhone,
+                    'data-lead-id' => (int)$model->id,
+                    'title' => 'Позвонить на '.$callPhone,
+                ]);
+            }
             if ($canWork && $isInWork) {
-                $nextStepActions[] = $openActionLink(
+                $quick[] = $openActionLink(
                     '<i class="fas fa-phone-slash" aria-hidden="true"></i> Не дозвонились',
                     (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                         '/cms/admin-cms-lead/no-answer',
@@ -505,31 +633,30 @@ JS
                     ['size' => 'small']
                 );
             }
-            // Actions of the next step: "Поставить задачу" and those of packages
-            // (CrmCardBlocksWidget::EVENT_ACTIONS: "Отправить презентацию", "Сделать КП") in one menu.
-            $stepItems = [];
-            if ($canWork && \Yii::$app->user->can('cms/admin-task')) {
-                $stepItems['task'] = [
-                    'label' => 'Поставить задачу',
-                    'icon' => 'plus',
-                    'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                        '/cms/admin-cms-task/create',
-                        'CmsTask' => ['cms_lead_id' => $model->id],
-                    ])->enableEmptyLayout()->enableNoActions()->url,
-                ];
+            $mailTo = $contactOf('email');
+            if ($canWork && $mailTo !== '') {
+                // The letter of the CRM mail (a package adds it to the email row); else the mail program.
+                $mailHtml = \skeeks\cms\widgets\admin\CrmContactBlockWidget::contactActions(
+                    \skeeks\cms\widgets\admin\CrmContactBlockWidget::CONTACT_EMAIL, $mailTo, $model, []);
+                $mailOnClick = preg_match('/onclick="([^"]+)"/', $mailHtml, $match) ? html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5) : null;
+                $quick[] = $mailOnClick
+                    ? Html::button($icon('mail').' Письмо', ['class' => 'sx-button sx-button--secondary sx-button--sm', 'onclick' => $mailOnClick, 'title' => 'Письмо на '.$mailTo])
+                    : Html::a($icon('mail').' Письмо', 'mailto:'.$mailTo, ['class' => 'sx-button sx-button--secondary sx-button--sm', 'data-pjax' => '0']);
             }
-            if ($canWork) {
-                $stepItems += \skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions($model);
-            }
-            $stepVariant = $leadTasks ? 'secondary' : 'primary';
-            if (count($stepItems) === 1) {
-                $item = reset($stepItems);
-                $nextStepActions[] = $openActionLink(
-                    \skeeks\cms\backend\helpers\BackendIcon::renderConfigured((string)($item['icon'] ?? 'plus'), ['size' => 16]).' '.Html::encode($item['label']),
+            $stepItems = $canWork ? \skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions($model) : [];
+            // The first two package actions stay in the row (КП, презентация), the rest go to «Ещё».
+            foreach (array_slice($stepItems, 0, 2, true) as $item) {
+                $quick[] = $openActionLink(
+                    (!empty($item['icon']) ? $icon((string)$item['icon']).' ' : '').Html::encode($item['label']),
                     (string)$item['url'],
-                    $stepVariant
+                    'secondary'
                 );
-            } elseif ($stepItems) {
+            }
+            $stepItems = array_slice($stepItems, 2, null, true);
+            if ($canTask && !$leadTasks) {
+                $nextStepActions[] = $openActionLink($icon('plus').' Поставить задачу', $taskUrl, 'primary');
+            }
+            if ($stepItems) {
                 $menu = '';
                 foreach ($stepItems as $item) {
                     $menu .= Html::a(
@@ -544,9 +671,9 @@ JS
                         ]
                     );
                 }
-                $nextStepActions[] = Html::tag('details',
-                    Html::tag('summary', \skeeks\cms\backend\helpers\BackendIcon::render('plus', ['size' => 16]).' Действие '
-                        .Html::tag('span', '▾', ['aria-hidden' => 'true']), ['class' => 'sx-button sx-button--'.$stepVariant.' sx-button--sm'])
+                $quick[] = Html::tag('details',
+                    Html::tag('summary', 'Ещё '
+                        .Html::tag('span', '▾', ['aria-hidden' => 'true']), ['class' => 'sx-button sx-button--secondary sx-button--sm'])
                     .Html::tag('div', $menu, ['class' => 'sx-lead-next-step__menu', 'role' => 'menu']),
                     ['class' => 'sx-lead-next-step__actions', 'data-sx-lead-step-menu' => true]
                 );
@@ -561,7 +688,11 @@ JS
                 );
             }
             ?>
-            <?php if ($leadTasks || $isInWork) : ?>
+            <?php if ($quick) : ?>
+                <div class="sx-surface sx-surface--raised sx-surface--compact sx-lead-quick" role="toolbar" aria-label="Быстрые действия">
+                    <?= implode('', $quick); ?>
+                </div>
+            <?php endif; ?>
                 <?php
                 $this->registerCss(<<<CSS
 .sx-lead-next-step__task {
@@ -616,6 +747,7 @@ JS
 CSS
                 );
                 ?>
+            <?php if ($leadTasks || $isInWork) : ?>
                 <?php BackendSurfaceWidget::begin([
                     'title' => 'Следующий шаг',
                     'titleTag' => 'h2',
@@ -627,7 +759,7 @@ CSS
                 ]); ?>
                     <?php if (!$leadTasks) : ?>
                         <p>
-                            <span class="sx-status sx-status--warning">Не запланирован</span>
+                            <span class="sx-status sx-status--warning">Нет запланированных задач</span>
                             Поставьте задачу, чтобы не забыть про сделку: когда перезвонить или что сделать дальше.
                         </p>
                     <?php else : ?>
@@ -644,7 +776,8 @@ CSS
             <?php endif; ?>
             <?php $pjax = Pjax::begin(['id' => 'cms-lead-comments', 'options' => ['class' => 'sx-surface-stack sx-activity-thread']]); ?>
                 <?php if ($canWork) : ?>
-                    <?php BackendSurfaceWidget::begin(['title' => $model->partner_id ? 'Написать партнёру' : 'Добавить комментарий', 'titleTag' => 'h2', 'raised' => true, 'responsive' => true]); ?>
+                    <?php // «Примечание» as in amoCRM; the quick action scrolls here. ?>
+                    <?php BackendSurfaceWidget::begin(['title' => $model->partner_id ? 'Написать партнёру' : 'Примечание', 'titleTag' => 'h2', 'raised' => true, 'responsive' => true, 'options' => ['id' => 'sx-lead-note']]); ?>
                         <?= CmsCommentWidget::widget(['model' => $model, 'backend_url' => ['/cms/admin-cms-lead/add-comment', 'pk' => $model->id], 'isShowPin' => false]); ?>
                     <?php BackendSurfaceWidget::end(); ?>
                 <?php endif; ?>

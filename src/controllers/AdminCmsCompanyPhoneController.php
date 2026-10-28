@@ -176,6 +176,12 @@ JS
 
         ];
 
+        // П2а: another company already has this value — saved only with a reason (crm\CrmDuplicateGuard).
+        $result['duplicate_reason'] = [
+            'class' => \skeeks\yii2\form\fields\TextareaField::class,
+            'elementOptions' => ['rows' => 2, 'placeholder' => 'Заполните, только если CRM сообщит, что такое значение уже есть у другой компании'],
+        ];
+
         return $result;
     }
 

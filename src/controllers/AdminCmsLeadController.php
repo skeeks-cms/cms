@@ -10,8 +10,11 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\crm\LeadPipelines;
+use skeeks\cms\models\CmsLeadPipeline;
 use skeeks\cms\models\CmsLeadRejectReason;
 use skeeks\cms\models\CmsLeadStage;
+use yii\helpers\Url;
 use skeeks\cms\services\CmsLeadBoardService;
 use skeeks\cms\forms\CmsLeadNoAnswerForm;
 use skeeks\cms\models\queries\CmsLeadQuery;
@@ -46,6 +49,8 @@ use yii\web\NotFoundHttpException;
 
 class AdminCmsLeadController extends BackendModelStandartController
 {
+    use \skeeks\cms\controllers\traits\LeadTriageActions;
+
     /** The section opens on the kanban; the table stays one tab away. */
     public $defaultAction = 'kanban';
 
@@ -82,7 +87,9 @@ class AdminCmsLeadController extends BackendModelStandartController
                     'action' => ['backendAction' => 'create', 'label' => 'Добавить сделку'],
                 ],
                 'filters' => [
-                    'visibleFilters' => array_merge(['q', 'status', 'cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], $utmAttributes),
+                    // «Воронка» only on a site with several pipelines (a simple site sees no new filter).
+                    'visibleFilters' => array_merge(['q', 'status'], count(CmsLeadPipeline::forSite()) > 1 ? ['cms_lead_pipeline_id'] : [],
+                        ['cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], $utmAttributes),
                     'filtersModel' => [
                         'rules' => [[array_merge(['q', 'next_step'], $utmAttributes), 'safe']],
                         'attributeDefines' => array_merge(['q', 'next_step'], $utmAttributes),
@@ -107,7 +114,8 @@ class AdminCmsLeadController extends BackendModelStandartController
                                     $event->dataProvider->query->search($value);
                                 },
                             ],
-                            'status' => $this->selectFilter(CmsLead::statuses()),
+                            'status' => $this->selectFilter(CmsLead::staffStatuses()),
+                            'cms_lead_pipeline_id' => $this->selectFilter(ArrayHelper::map(CmsLeadPipeline::forSite(), 'id', 'name')),
                             'cms_lead_stage_id' => $this->selectFilter($this->stageItems()),
                             'cms_lead_reject_reason_id' => $this->selectFilter($this->rejectReasonItems()),
                             'source_type' => $this->selectFilter(CmsLead::sources()),
@@ -120,8 +128,23 @@ class AdminCmsLeadController extends BackendModelStandartController
                     },
                     'defaultPageSize' => 50,
                     'defaultOrder' => ['created_at' => SORT_DESC],
-                    'visibleColumns' => ['actions', 'name', 'status', 'next_step', 'source_type', 'contacts', 'executor_id', 'partner_id', 'created_at'],
+                    'visibleColumns' => ['actions', 'name', 'status', 'shown_amount', 'next_step', 'source_type', 'contacts', 'executor_id', 'partner_id', 'created_at'],
                     'columns' => [
+                        // One amount at a time: «Сумма» of an open or rejected deal, «Сумма сделки» of a successful one.
+                        'shown_amount' => [
+                            'label' => 'Сумма',
+                            'format' => 'raw',
+                            'value' => static function (CmsLead $model) {
+                                [$label, $text] = $model->shownAmount;
+                                if ($text === '') {
+                                    return '';
+                                }
+                                $note = $model->expectedAmountNote;
+
+                                return Html::tag('span', Html::encode($text), ['title' => $label.($note !== '' ? ', '.$note : '')])
+                                    .($note !== '' ? Html::tag('div', Html::encode($note), ['class' => 'sx-collection-cell__secondary']) : '');
+                            },
+                        ],
                         'name' => [
                             'class' => BackendEntityLinkColumn::class,
                             'controllerId' => '/cms/admin-cms-lead',
@@ -178,23 +201,22 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'isVisible' => false,
                 'callback' => [$this, 'kanbanMove'],
             ],
-            'create' => [
-                'name' => 'Новая сделка',
-                'priority' => 30,
-                'fields' => [$this, 'editFields'],
-                'on beforeValidate' => static function (Event $event) {
-                    /** @var CmsLead $model */
-                    $model = $event->sender->model;
-                    $model->cms_site_id = (int)\Yii::$app->skeeks->site->id;
-                    foreach (['submitted_by_id', 'cms_company_id', 'cms_user_id', 'source_ref', 'source_url', 'source_data',
-                        'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'processed_at',
-                        'reject_reason', 'result_comment', 'cms_lead_stage_id', 'cms_lead_reject_reason_id'] as $attribute) {
-                        $model->{$attribute} = null;
-                    }
-                    $model->status = $model->executor_id
-                        ? CmsLead::STATUS_IN_WORK
-                        : CmsLead::STATUS_NEW;
-                },
+            'move-pipeline' => [
+                'class' => BackendModelAction::class,
+                'name' => 'Перенести в другую воронку',
+                'isVisible' => false,
+                'callback' => [$this, 'movePipeline'],
+                'accessCallback' => fn() => $this->model && !$this->model->isTerminal && count(CmsLeadPipeline::forSite()) > 1
+                    && ($this->canWorkWithModel() || ($this->model->status === CmsLead::STATUS_NEW
+                        && \skeeks\cms\crm\CrmAccess::instance()->canTriage((int)\Yii::$app->user->id, $this->model))),
+            ],
+            'stage-history' => [
+                'class' => BackendModelAction::class,
+                'name' => 'История этапов',
+                'icon' => 'fas fa-stream',
+                'priority' => 38,
+                'isVisible' => CmsLead::pipelineReady(),
+                'callback' => fn() => $this->render('stage-history', ['model' => $this->model]),
             ],
             'view' => [
                 'class' => BackendModelAction::class,
@@ -365,7 +387,9 @@ class AdminCmsLeadController extends BackendModelStandartController
             ],
             'delete-multi' => new UnsetArrayValue(),
             'update' => new UnsetArrayValue(),
-        ]);
+            // The standard create form is replaced by «найти или создать» (LeadTriageActions::createLead).
+            'create' => new UnsetArrayValue(),
+        ], $this->triageActions());
     }
 
     /** Compact next-step cell: nearest open task, overdue or missing state. */
@@ -477,16 +501,67 @@ JS
         $isAdmin = \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
         $siteId = (int)\Yii::$app->skeeks->site->id;
 
+        // П2б: one pipeline at a time, as in amoCRM and Bitrix24; the default one first.
+        $pipelines = CmsLeadPipeline::forSite($siteId);
+        $pipeline = null;
+        $pipelineId = (int)$request->get('pipeline');
+        foreach ($pipelines as $item) {
+            if ((int)$item->id === $pipelineId) {
+                $pipeline = $item;
+            }
+        }
+        $pipeline = $pipeline ?: CmsLeadPipeline::defaultFor($siteId);
+
+        $filters = [
+            'source_type' => array_key_exists((string)$request->get('source'), CmsLead::sources()) ? (string)$request->get('source') : '',
+            CmsLeadBoardService::FILTER_NO_TASK => (bool)$request->get('no_task'),
+        ];
+
         return $this->render('kanban', [
-            'columns' => (new CmsLeadBoardService())->columns($executorId ?: null, $q),
+            'columns' => (new CmsLeadBoardService($pipeline, $filters))->columns($executorId ?: null, $q),
+            'pipelines' => $pipelines,
+            'pipeline' => $pipeline,
+            'filters' => $filters,
             'executorId' => $executorId,
             'q' => $q,
             'managers' => $managers,
             'isAdmin' => $isAdmin,
             'setup' => $isAdmin ? [
-                'stages' => (bool)$this->stageItems(),
+                'stages' => (bool)CmsLeadStage::forPipeline($pipeline, $siteId),
                 'rejectReasons' => CmsLeadRejectReason::siteHasReasons($siteId),
             ] : null,
+        ]);
+    }
+
+    /**
+     * «Перенести в другую воронку» from the card: the pipeline and its stage.
+     * GET renders the small window, POST moves (LeadPipelines::move()).
+     */
+    public function movePipeline()
+    {
+        $lead = $this->model;
+        $userId = (int)\Yii::$app->user->id;
+        $pipelines = CmsLeadPipeline::forSite((int)$lead->cms_site_id);
+        $error = null;
+        if (\Yii::$app->request->isPost) {
+            try {
+                LeadPipelines::instance()->move($lead,
+                    (int)\Yii::$app->request->post('pipeline_id'),
+                    (int)\Yii::$app->request->post('stage_id') ?: null,
+                    $userId);
+                $pipeline = $lead->getEffectivePipeline();
+                \Yii::$app->session->setFlash('success', 'Сделка перенесена в воронку «'.($pipeline ? $pipeline->name : '').'».');
+
+                return $this->renderContent(Html::script('window.top.location.href = '.\yii\helpers\Json::htmlEncode(Url::to(['view', 'pk' => $lead->id])).';'));
+            } catch (\DomainException $e) {
+                $error = $e->getMessage();
+            }
+        }
+
+        return $this->render('move-pipeline', [
+            'model' => $lead,
+            'pipelines' => $pipelines,
+            'error' => $error,
         ]);
     }
 
@@ -538,11 +613,33 @@ JS
         if (!array_key_exists($source, CmsLead::sources())) {
             $source = '';
         }
+        // П2б: the report of one pipeline, by the history of transitions.
+        $pipelines = CmsLeadPipeline::forSite();
+        $pipeline = null;
+        foreach ($pipelines as $item) {
+            if ((int)$item->id === (int)$request->get('pipeline')) {
+                $pipeline = $item;
+            }
+        }
+        $pipeline = $pipeline ?: CmsLeadPipeline::defaultFor();
+        $managers = $this->kanbanManagers();
+        $executorId = (int)$request->get('executor');
+        if ($executorId && !isset($managers[$executorId])) {
+            $executorId = 0;
+        }
 
         return $this->render('report', [
             'period' => $period,
             'source' => $source,
-            'report' => (new \skeeks\cms\services\CmsLeadReportService())->build($from, $to, $source ?: null),
+            'pipelines' => $pipelines,
+            'pipeline' => $pipeline,
+            'managers' => $managers,
+            'executorId' => $executorId,
+            'funnel' => (new \skeeks\cms\services\CmsLeadFunnelReportService())->build($pipeline, $from, $to, array_filter([
+                'source_type' => $source,
+                'executor_id' => $executorId,
+            ])),
+            'report' => (new \skeeks\cms\services\CmsLeadReportService())->build($from, $to, $source ?: null, $pipeline),
         ]);
     }
 
@@ -578,7 +675,22 @@ JS
             }
 
             $column = (string)\Yii::$app->request->post('column');
-            if ((new CmsLeadBoardService())->move($lead, $column, (int)\Yii::$app->user->id)) {
+            if ($lead->status === CmsLead::STATUS_NEW && strpos($column, CmsLeadBoardService::STAGE_PREFIX) === 0
+                && $this->needsSorting($lead)) {
+                // A deal with a known client or an open deal of it is sorted first: a repeat, support or spam.
+                if (!\skeeks\cms\crm\CrmAccess::instance()->canTriage((int)\Yii::$app->user->id, $lead)) {
+                    throw new \RuntimeException('Сделка уже закреплена за другим менеджером.');
+                }
+                $response->data = ['openUrl' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    '/cms/admin-cms-lead/triage',
+                    'pk' => $lead->id,
+                    'stage_id' => (int)substr($column, strlen(CmsLeadBoardService::STAGE_PREFIX)) ?: null,
+                ])->enableEmptyLayout()->enableNoActions()->url];
+                $response->success = true;
+
+                return $response;
+            }
+            if (CmsLeadBoardService::forLead($lead)->move($lead, $column, (int)\Yii::$app->user->id)) {
                 $lead = CmsLead::find()->with(['activeTasks', 'stage', 'executor', 'rejectReasonItem'])->andWhere(['id' => $lead->id])->one();
                 $response->data = ['card' => $this->renderPartial('_kanban-card', ['model' => $lead])];
             } else {
@@ -598,6 +710,23 @@ JS
         return $response;
     }
 
+    /**
+     * Dropping an unsorted deal on a stage takes it into work as before П2а,
+     * unless the CRM already knows its client (a strong match): then the
+     * sorting window opens. A simple site without CRM data keeps one move.
+     */
+    private function needsSorting(CmsLead $lead): bool
+    {
+        $matcher = \skeeks\cms\crm\CrmMatcher::instance();
+        foreach ($matcher->rawFind($matcher->inputOfLead($lead)) as $candidate) {
+            if ($candidate['strong']) {
+                return true;
+            }
+        }
+
+        return (bool)$lead->cms_company_id || (bool)$lead->cms_user_id;
+    }
+
     /** Reject reason choices of the current site; empty until the table exists. */
     private function rejectReasonItems(): array
     {
@@ -608,11 +737,11 @@ JS
         }
     }
 
-    /** Stage choices of the current site; empty until the stage table exists. */
+    /** Stage choices of the current site (grouped by pipeline when there are several); empty until the stage table exists. */
     private function stageItems(): array
     {
         try {
-            return ArrayHelper::map(CmsLeadStage::forCurrentSite(), 'id', 'name');
+            return LeadPipelines::instance()->stageItems();
         } catch (\yii\db\Exception $e) {
             return [];
         }
@@ -822,11 +951,13 @@ JS
             $model->executor_id = (int)\Yii::$app->user->id;
         }
 
-        $fields = [
-            'name',
-            'source_type' => ['class' => SelectField::class, 'items' => CmsLead::sources(), 'allowNull' => false],
-            'source_name',
-        ];
+        $fields = ['name' => []];
+        if (CmsLead::amountReady() && (!$model || $model->status !== CmsLead::STATUS_SUCCESS)) {
+            // An open deal shows «Сумма» only; «Сумма сделки» belongs to the success form.
+            $fields['amount'] = ['class' => NumberField::class, 'elementOptions' => ['placeholder' => 'Ожидаемая сумма, ₽', 'min' => 0, 'step' => 'any']];
+        }
+        $fields['source_type'] = ['class' => SelectField::class, 'items' => CmsLead::sources(), 'allowNull' => false];
+        $fields['source_name'] = [];
 
         $isNewRecord = $model && $model->isNewRecord;
         if ($isNewRecord || \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
@@ -859,12 +990,13 @@ JS
         $fields = [
             'status' => [
                 'class' => SelectField::class,
-                'items' => $this->model ? array_intersect_key(CmsLead::statuses(), array_flip($this->model->allowedNextStatuses())) : CmsLead::statuses(),
+                'items' => $this->model ? array_intersect_key(CmsLead::staffStatuses(), array_flip($this->model->allowedNextStatuses())) : CmsLead::staffStatuses(),
                 'allowNull' => false,
                 'elementOptions' => $statusOptions,
             ],
         ];
-        $stageItems = $this->stageItems();
+        // Only the stages of the deal's own pipeline.
+        $stageItems = $this->model ? ArrayHelper::map($this->model->pipelineStages, 'id', 'name') : $this->stageItems();
         if ($stageItems) {
             $fields['cms_lead_stage_id'] = [
                 'class' => SelectField::class,
@@ -872,6 +1004,11 @@ JS
                 'nullLabel' => 'Без этапа',
                 'options' => $this->statusFieldOptions([CmsLead::STATUS_IN_WORK]),
             ];
+        }
+        if ($this->model && ($this->model->deal_amount === null || $this->model->deal_amount === '')
+            && $this->model->hasAttribute('amount') && $this->model->getAttribute('amount') !== null && !\Yii::$app->request->isPost) {
+            // «Сумма сделки» starts from «Сумма»; the manager may correct it (not saved unless the deal succeeds).
+            $this->model->deal_amount = $this->model->getAttribute('amount');
         }
         $fields['deal_amount'] = [
             'class' => NumberField::class,

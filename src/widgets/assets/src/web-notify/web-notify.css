@@ -30,6 +30,7 @@
     line-height: 1.4;
 }
 
+.sx-notifies .sx-notifies-list .sx-name .sx-action-trigger,
 .sx-notifies .sx-notifies-list .sx-model .sx-action-trigger,
 .sx-notifies .sx-notifies-list .sx-notify-entry__child-model .sx-action-trigger {
     display: block;
@@ -47,6 +48,8 @@
     text-decoration: none;
 }
 
+.sx-notifies .sx-notifies-list .sx-name .sx-action-trigger:hover,
+.sx-notifies .sx-notifies-list .sx-name .sx-action-trigger:focus-visible,
 .sx-notifies .sx-notifies-list .sx-model .sx-action-trigger:hover,
 .sx-notifies .sx-notifies-list .sx-model .sx-action-trigger:focus-visible {
     color: var(--sx-color-accent);

@@ -10,8 +10,10 @@ namespace skeeks\cms\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadPipeline;
 use skeeks\cms\models\CmsLeadStage;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\yii2\form\fields\SelectField;
 use skeeks\cms\widgets\admin\CmsLeadStatusWidget;
 use skeeks\cms\widgets\ColorInput;
 use skeeks\yii2\form\fields\NumberField;
@@ -61,13 +63,19 @@ class AdminCmsLeadStageController extends BackendModelStandartController
                         ]);
                     },
                     'defaultOrder' => ['sort' => SORT_ASC],
-                    'visibleColumns' => ['checkbox', 'actions', 'name', 'sort', 'countLeads'],
+                    'visibleColumns' => array_merge(['checkbox', 'actions', 'name'], CmsLeadPipeline::forSite() ? ['cms_lead_pipeline_id'] : [], ['sort', 'countLeads']),
                     'columns' => [
+                        'cms_lead_pipeline_id' => [
+                            'value' => static function (CmsLeadStage $model) {
+                                $pipeline = $model->pipeline ?: CmsLeadPipeline::defaultFor((int)$model->cms_site_id);
+                                return $pipeline ? $pipeline->name : '';
+                            },
+                        ],
                         'name' => [
                             'class' => BackendEntityLinkColumn::class,
                             'controllerId' => '/cms/admin-cms-lead-stage',
                             'attribute' => 'name',
-                            'content' => static fn(CmsLeadStage $model) => CmsLeadStatusWidget::renderStage($model),
+                            'content' => static fn(CmsLeadStage $model) => CmsLeadStatusWidget::renderStage($model, false),
                         ],
                         'sort' => [
                             'value' => static fn(CmsLeadStage $model) => \Yii::$app->formatter->asInteger($model->sort),
@@ -90,7 +98,23 @@ class AdminCmsLeadStageController extends BackendModelStandartController
 
     public function updateFields($action)
     {
-        return [
+        $fields = [];
+        $pipelines = CmsLeadPipeline::forSite();
+        if ($pipelines) {
+            // П2б: a stage belongs to a pipeline; from the tab «Этапы» of a pipeline it is preset.
+            $model = $action->model;
+            if ($model && $model->isNewRecord && !$model->cms_lead_pipeline_id) {
+                $model->cms_lead_pipeline_id = (int)(\Yii::$app->request->get('CmsLeadStage')['cms_lead_pipeline_id'] ?? 0)
+                    ?: (int)CmsLeadPipeline::defaultFor()->id;
+            }
+            $fields['cms_lead_pipeline_id'] = [
+                'class' => SelectField::class,
+                'items' => ArrayHelper::map($pipelines, 'id', 'name'),
+                'allowNull' => false,
+            ];
+        }
+
+        return $fields + [
             'name',
             'sort' => ['class' => NumberField::class],
             'color' => [

@@ -197,10 +197,18 @@ crmExtensionExpect(CrmContactBlockWidget::contactActions(CrmContactBlockWidget::
     'An email handler must not change phone rows.');
 Event::off(CrmContactBlockWidget::class, CrmContactBlockWidget::EVENT_CONTACT_ACTIONS, $handler);
 
-// Cards render rows through the event.
+// Cards render rows through the event: directly (the request data of a deal) or through the shared rows
+// phoneItems()/emailItems() of the company and client cards and of «Клиент» in the deal card (П2г).
+$widgetSource = file_get_contents(dirname(__DIR__).'/src/widgets/admin/CrmContactBlockWidget.php');
+crmExtensionExpect(substr_count($widgetSource, 'self::contactActions(self::CONTACT_') === 2,
+    'phoneItems() and emailItems() must render their actions through contactActions().');
+$sharedRows = static fn(string $source): bool => strpos($source, 'CrmContactBlockWidget::phoneItems(') !== false
+    && strpos($source, 'CrmContactBlockWidget::emailItems(') !== false;
+crmExtensionExpect($sharedRows(file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/_client.php')),
+    '«Клиент» of the deal card must use the rows of the company and client cards.');
 foreach (['admin-cms-lead', 'admin-cms-company', 'admin-user'] as $viewDir) {
     $view = file_get_contents(dirname(__DIR__).'/src/views/'.$viewDir.'/view.php');
-    crmExtensionExpect(substr_count($view, 'CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_') === 2,
+    crmExtensionExpect(substr_count($view, 'CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_') === 2 || $sharedRows($view),
         $viewDir.' must render phone and email actions through CrmContactBlockWidget::contactActions().');
     crmExtensionExpect(strpos($view, 'Logs()->activity()') !== false, $viewDir.' activity feed must use CmsLogQuery::activity().');
 }

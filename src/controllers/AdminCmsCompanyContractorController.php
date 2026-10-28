@@ -43,6 +43,16 @@ class AdminCmsCompanyContractorController extends AdminCmsContractorAttachContro
         if ($this->isAttached($owner, $contractor)) {
             return;
         }
+        // П2а: an INN of another company is linked only with a reason and marked as a possible duplicate.
+        $others = array_values(array_diff(array_map('intval', CmsCompany2contractor::find()->select('cms_company_id')
+            ->andWhere(['cms_contractor_id' => (int)$contractor->id])->column()), [(int)$owner->id]));
+        $reason = trim((string)\Yii::$app->request->post('CrmDuplicate', [])['reason'] ?? '');
+        if ($others && \skeeks\cms\crm\CrmDuplicateGuard::ready()) {
+            if (\skeeks\cms\crm\CrmDuplicateGuard::refuses($reason)) {
+                throw new \DomainException(\skeeks\cms\crm\CrmDuplicateGuard::message('ИНН '.$contractor->inn, $others));
+            }
+            \skeeks\cms\crm\CrmDuplicateGuard::mark((int)$owner->id, $others, $reason);
+        }
         $map = new CmsCompany2contractor([
             'cms_company_id' => (int)$owner->id,
             'cms_contractor_id' => (int)$contractor->id,
@@ -50,6 +60,21 @@ class AdminCmsCompanyContractorController extends AdminCmsContractorAttachContro
         if (!$map->save()) {
             throw new \RuntimeException(implode('; ', $map->getFirstErrors()));
         }
+    }
+
+    public function updateFields($action)
+    {
+        $result = parent::updateFields($action);
+        $result['crm_duplicate_reason'] = [
+            'class' => \skeeks\yii2\form\fields\HtmlBlock::class,
+            'content' => '<div class="form-group"><label class="control-label">'.\yii\helpers\Html::encode(\skeeks\cms\crm\CrmDuplicateGuard::reasonLabel()).'</label>'
+                .\yii\helpers\Html::textarea('CrmDuplicate[reason]', (string)(\Yii::$app->request->post('CrmDuplicate', [])['reason'] ?? ''), [
+                    'class' => 'form-control', 'rows' => 2,
+                    'placeholder' => 'Заполните, только если CRM сообщит, что реквизиты с этим ИНН уже есть у другой компании',
+                ]).'</div>',
+        ];
+
+        return $result;
     }
 
     protected function ownerUrl(ActiveRecord $owner): array

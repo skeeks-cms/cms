@@ -113,11 +113,29 @@ abstract class AdminCmsContractorAttachController extends AdminCmsContractorCont
         }
 
         $rr = new RequestResponse();
-        if (!$this->isAttached($this->owner, $existing)) {
-            $this->attach($this->owner, $existing);
-            $rr->message = 'Реквизиты с этим ИНН уже есть в базе — они привязаны без повторного создания.';
-        } else {
-            $rr->message = 'Эти реквизиты уже добавлены.';
+        $rr->success = true;
+        try {
+            if (!$this->isAttached($this->owner, $existing)) {
+                $this->attach($this->owner, $existing);
+                $rr->message = 'Реквизиты с этим ИНН уже есть в базе — они привязаны без повторного создания.';
+            } else {
+                $rr->message = 'Эти реквизиты уже добавлены.';
+            }
+        } catch (\DomainException $e) {
+            // A refusal of the owner (П2а: an INN of another company without a reason) is a message, not an error page.
+            $rr->success = false;
+            $rr->message = $e->getMessage();
+        }
+
+        if ($rr->isRequestAjaxPost() && !$rr->success) {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            \Yii::$app->response->data = $rr;
+            \Yii::$app->end();
+        }
+        if (!$rr->success) {
+            \Yii::$app->session->setFlash('error', $rr->message);
+            \Yii::$app->response->redirect(\yii\helpers\Url::current());
+            \Yii::$app->end();
         }
 
         if ($rr->isRequestAjaxPost()) {

@@ -70,7 +70,45 @@ class CmsCompanyPhone extends ActiveRecord
                 'targetAttribute' => ['cms_company_id', 'value'],
                 'message' => 'Этот номер телефона уже добавлен в компанию.',
             ],
+            // П2а: another company with this phone — only with a reason, marked as a possible duplicate.
+            [['duplicate_reason'], 'string', 'max' => 2000],
+            [['value'], 'validateCrmDuplicate'],
         ]);
+    }
+
+    /** «Почему это другая компания», when another company has this phone (crm\CrmDuplicateGuard). */
+    public $duplicate_reason;
+
+    /** @var int[] companies with the same phone found by the validation */
+    private array $_duplicateOf = [];
+
+    public function validateCrmDuplicate($attribute): void
+    {
+        $this->_duplicateOf = [];
+        // A new row, another value or another company (a contact moved to a third company) is checked anew.
+        if (!\skeeks\cms\crm\CrmDuplicateGuard::ready()
+            || (!$this->isNewRecord && !$this->isAttributeChanged('value', false) && !$this->isAttributeChanged('cms_company_id', false))) {
+            return;
+        }
+        $others = \skeeks\cms\crm\CrmDuplicateGuard::companiesWith('phone', (string)$this->value, $this->cms_company_id ? (int)$this->cms_company_id : null,
+            $this->isNewRecord ? null : (int)$this->id);
+        if (!$others) {
+            return;
+        }
+        if (\skeeks\cms\crm\CrmDuplicateGuard::refuses((string)$this->duplicate_reason)) {
+            $this->addError($attribute, \skeeks\cms\crm\CrmDuplicateGuard::message('Телефон '.$this->value, $others));
+            return;
+        }
+        $this->_duplicateOf = $others;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if ($this->_duplicateOf && $this->cms_company_id) {
+            \skeeks\cms\crm\CrmDuplicateGuard::mark((int)$this->cms_company_id, $this->_duplicateOf, (string)$this->duplicate_reason);
+            $this->_duplicateOf = [];
+        }
     }
 
 
@@ -83,6 +121,7 @@ class CmsCompanyPhone extends ActiveRecord
             'cms_company_id' => "Компания",
             'name'           => "Описание",
             'value'          => "Телефон",
+            'duplicate_reason' => \skeeks\cms\crm\CrmDuplicateGuard::reasonLabel(),
             'sort'           => "Сортировка",
         ]);
     }

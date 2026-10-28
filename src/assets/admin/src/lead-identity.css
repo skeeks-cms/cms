@@ -1,0 +1,455 @@
+/* «Кто это» and sorting of «Неразобранное» (П2а). */
+.sx-lead-identity {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+    /* The popover «Есть совпадения» stands to the right while there is room for it. */
+    container-type: inline-size;
+}
+/* "Компания" above "Контакт", as in Bitrix24. */
+.sx-lead-identity__parts {
+    display: grid;
+    gap: 1rem;
+    max-width: 640px;
+}
+.sx-lead-identity__part,
+.sx-lead-identity__mode,
+.sx-lead-identity__panel,
+.sx-lead-identity__contacts,
+.sx-lead-identity__executor {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    /* Columns of different height must not spread their rows apart. */
+    align-content: start;
+}
+/* The dropdown and the popover go past the card of the backend form section. */
+html[data-sx-theme] .sx-form-fieldset:has(.sx-lead-identity) {
+    overflow: visible;
+}
+html[data-sx-theme] .sx-form-fieldset:has(.sx-lead-identity) > .sx-form-fieldset-content:last-child {
+    border-radius: 0 0 var(--sx-form-section-radius) var(--sx-form-section-radius);
+}
+/* Inside a standard backend form the block gets the same side padding as its fields. */
+.sx-lead-identity-field {
+    padding: 0.75rem 1.25rem 1rem;
+}
+.sx-lead-identity__mode[hidden],
+.sx-lead-identity__panel[hidden] {
+    display: none;
+}
+.sx-lead-identity__fields {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.sx-lead-identity__title {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+.sx-lead-identity__choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+}
+.sx-lead-identity__choices--stack {
+    flex-direction: column;
+}
+.sx-lead-identity__choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0;
+    font-weight: 400;
+    cursor: pointer;
+}
+.sx-lead-identity__panel {
+    padding: 0.75rem;
+    border: 1px solid var(--sx-color-warning, #d9a400);
+    border-radius: var(--sx-radius-control, 6px);
+    background: var(--sx-color-warning-soft, rgba(217, 164, 0, 0.08));
+}
+.sx-lead-identity__panel > .sx-button {
+    justify-self: start;
+}
+.sx-lead-identity__panel-title,
+.sx-lead-identity__fixed,
+.sx-lead-identity__note,
+.sx-lead-identity__hints-empty {
+    margin: 0;
+}
+.sx-lead-identity__note,
+.sx-lead-identity__hints-empty,
+.sx-lead-identity__fixed {
+    color: var(--sx-color-text-muted);
+    font-size: 0.875rem;
+}
+.sx-lead-identity__foreign {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.sx-lead-identity__hints-title {
+    margin-bottom: 0.5rem;
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+}
+.sx-lead-identity__contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-weight: 400;
+}
+.sx-lead-identity__contact > span {
+    overflow-wrap: anywhere;
+}
+.sx-lead-hints {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.sx-lead-hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control, 6px);
+    background: var(--sx-color-surface-raised);
+}
+.sx-lead-hint.is-strong {
+    border-color: var(--sx-color-accent-border);
+}
+.sx-lead-hint.is-hidden {
+    background: var(--sx-color-surface-muted);
+}
+.sx-lead-hint__main {
+    display: grid;
+    gap: 0.125rem;
+    min-width: 0;
+    flex: 1 1 260px;
+}
+.sx-lead-hint__kind,
+.sx-lead-hint__meta {
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+}
+.sx-lead-hint__title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.sx-lead-hint__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+/* Search fields "Компания" and "Контакт" with their results. */
+.sx-lead-identity__results {
+    max-height: 22rem;
+    overflow: auto;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control, 6px);
+    background: var(--sx-color-surface-raised);
+    box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
+}
+.sx-lead-identity__results[hidden],
+.sx-lead-identity__new[hidden],
+.sx-lead-identity__check[hidden],
+.sx-lead-identity__badge[hidden],
+.sx-lead-identity__switch[hidden] {
+    display: none;
+}
+.sx-lead-identity__part {
+    position: relative;
+}
+.sx-lead-identity__label {
+    margin: 0;
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+.sx-lead-identity__box {
+    position: relative;
+    min-width: 0;
+}
+.sx-lead-identity__icon {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    color: var(--sx-color-text-muted);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+/* Above the backend form rules (form.sx-backend-form input[type="text"]). */
+.sx-lead-identity .sx-lead-identity__box .sx-lead-identity__input.form-control {
+    padding-right: 2.5rem;
+    padding-left: 2.25rem;
+}
+.sx-lead-identity .sx-lead-identity__box .sx-lead-identity__input.form-control[readonly] {
+    background: var(--sx-color-surface-raised);
+    font-weight: 600;
+    cursor: default;
+}
+.sx-lead-identity__badge {
+    position: absolute;
+    top: -0.5rem;
+    right: 0.75rem;
+    padding: 0 0.375rem;
+    border-radius: 999px;
+    background: var(--sx-color-accent-soft, rgba(65, 135, 245, 0.14));
+    color: var(--sx-color-accent);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    text-transform: uppercase;
+}
+.sx-lead-identity__switch {
+    position: absolute;
+    top: 50%;
+    right: 0.375rem;
+    padding: 0.25rem 0.375rem;
+    border: 0;
+    border-radius: var(--sx-radius-control, 6px);
+    background: none;
+    color: var(--sx-color-text-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+.sx-lead-identity__switch:hover,
+.sx-lead-identity__switch:focus-visible {
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-accent);
+}
+.sx-lead-identity__box .sx-lead-identity__results {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    left: 0;
+    max-height: none;
+    overflow: visible;
+}
+.sx-lead-drop--found {
+    max-height: 18rem;
+    overflow: auto;
+}
+.sx-lead-drop {
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+}
+.sx-lead-drop__item {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+}
+.sx-lead-drop__item:hover,
+.sx-lead-drop__item:focus {
+    background: var(--sx-color-surface-muted);
+    outline: none;
+}
+.sx-lead-drop__item.is-hidden {
+    cursor: default;
+}
+.sx-lead-drop__item.is-hidden:hover {
+    background: none;
+}
+.sx-lead-drop--found + .sx-lead-drop--create {
+    border-top: 1px solid var(--sx-color-border);
+}
+.sx-lead-drop__item--create {
+    color: var(--sx-color-accent);
+}
+.sx-lead-drop__title {
+    overflow-wrap: anywhere;
+}
+.sx-lead-drop__meta {
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+}
+.sx-lead-drop__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+}
+/* Phone and email of a new record, under its name. */
+.sx-lead-identity__new {
+    display: grid;
+    gap: 0.5rem;
+    padding-left: 1.5rem;
+}
+.sx-lead-identity__new-field {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    font-weight: 400;
+}
+.sx-lead-identity__check {
+    position: absolute;
+    z-index: 25;
+    top: 0;
+    left: calc(100% + 1rem);
+    width: 360px;
+}
+.sx-lead-check {
+    display: grid;
+    gap: 0.75rem;
+    max-height: 32rem;
+    overflow: auto;
+    padding: 0.875rem;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-card, 10px);
+    background: var(--sx-color-surface-raised);
+    box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
+}
+.sx-lead-check__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+.sx-lead-check__close {
+    padding: 0 0.25rem;
+    border: 0;
+    background: none;
+    color: var(--sx-color-text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.sx-lead-check__group {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.625rem;
+    border-radius: var(--sx-radius-control, 6px);
+    background: var(--sx-color-surface-muted);
+}
+.sx-lead-check__group-title {
+    color: var(--sx-color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.sx-lead-check__card {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--sx-radius-control, 6px);
+    background: var(--sx-color-surface-raised);
+}
+.sx-lead-check__kind,
+.sx-lead-check__meta {
+    color: var(--sx-color-text-muted);
+    font-size: 0.75rem;
+}
+.sx-lead-check__title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.sx-lead-check__contacts {
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+}
+.sx-lead-check__contacts b {
+    color: var(--sx-color-text);
+}
+.sx-lead-check__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+}
+/* No room on the right (a narrow window): the popover goes under the fields. */
+@container (max-width: 1040px) {
+    .sx-lead-identity__check {
+        position: static;
+        width: auto;
+    }
+}
+.sx-lead-results {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.sx-lead-results__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid var(--sx-color-border);
+}
+.sx-lead-results__item:last-child {
+    border-bottom: 0;
+}
+.sx-lead-results__head {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--sx-color-border);
+    background: var(--sx-color-warning-soft, rgba(217, 164, 0, 0.08));
+    font-weight: 600;
+}
+[data-sx-dupcheck-reason][hidden] {
+    display: none;
+}
+.sx-crm-dupcheck__results {
+    margin-bottom: 1rem;
+}
+.sx-lead-results__item.is-hidden {
+    background: var(--sx-color-surface-muted);
+}
+.sx-lead-triage__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+.sx-lead-triage__repeats {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.sx-lead-triage__repeat {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+}
+.sx-lead-triage__request {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.sx-lead-triage__request p {
+    margin: 0;
+    white-space: pre-line;
+}
+.sx-lead-requests {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+form.is-busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+@media (max-width: 600px) {
+    .sx-lead-identity__contact {
+        grid-template-columns: 1fr;
+    }
+}
