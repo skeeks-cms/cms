@@ -352,7 +352,7 @@ return array_merge(dashboardsMenu(), [
             [
                 'label'          => 'Запросы доступа',
                 'priority'       => 115,
-                'icon'           => 'fas fa-user-lock',
+                "img"            => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/access-request.svg'],
                 "url"            => ["cms/admin-cms-crm-access-request"],
                 'accessCallback' => static fn() => \skeeks\cms\crm\CrmAccess::instance()->canUseRequests((int)\Yii::$app->user->id),
                 'badge'          => static fn() => \skeeks\cms\crm\CrmAccess::instance()->pendingRequestsCount((int)\Yii::$app->user->id),
