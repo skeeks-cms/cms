@@ -4,7 +4,8 @@
  * CRM employee sees its data and its own feed read only and takes it into work
  * (ClientTransferActions::clientTake()) — then he is the main responsible and
  * the card opens in full. A protected client without employees is assigned by
- * a leader or an administrator.
+ * a leader or an administrator. An administrator sees the card in full anyway
+ * (CrmAccess::isAdmin()), the banner only offers to take it.
  *
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsCompany|skeeks\cms\models\CmsUser $model
@@ -33,7 +34,11 @@ $canTake = $access->canTakeIntoWork($code, (int)$model->id);
     'options' => ['class' => 'sx-crm-pool'],
 ]); ?>
     <?php if ($canTake) : ?>
-        <p class="sx-lead-identity__note">С клиентом пока никто не работает. Возьмите его в работу — вы станете основным ответственным, и карточка откроется полностью: сделки, счета, правка данных.</p>
+        <?php if ($access->isAdmin((int)\Yii::$app->user->id)) : ?>
+            <p class="sx-lead-identity__note">С клиентом пока никто не работает. Администратору карточка открыта полностью; взять клиента в работу можно здесь, назначить другого ответственного — во вкладке «Доступ».</p>
+        <?php else : ?>
+            <p class="sx-lead-identity__note">С клиентом пока никто не работает. Возьмите его в работу — вы станете основным ответственным, и карточка откроется полностью: сделки, счета, правка данных.</p>
+        <?php endif; ?>
         <div class="sx-lead-hint__actions">
             <?= Html::button('Взять в работу', [
                 'class' => 'sx-button sx-button--primary',

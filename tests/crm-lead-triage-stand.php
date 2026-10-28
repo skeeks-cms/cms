@@ -781,6 +781,13 @@ try {
             && !$actionAllowed('cms/admin-cms-company', $pool, 'update') && !$actionAllowed('cms/admin-cms-company', $pool, 'deals')
             && !$actionAllowed('cms/admin-cms-company', $pool, 'bills') && !$actionAllowed('cms/admin-cms-company', $pool, 'payments'),
             'a card of the pool: the profile and «Взять в работу», no edit, no deals, bills or payments');
+        // An administrator sees every client in full, the pool included.
+        $as($admin);
+        $check($actionAllowed('cms/admin-cms-company', $pool, 'view') && $actionAllowed('cms/admin-cms-company', $pool, 'deals')
+            && $actionAllowed('cms/admin-cms-company', $pool, 'bills') && $actionAllowed('cms/admin-cms-company', $pool, 'payments')
+            && $actionAllowed('cms/admin-cms-company', $pool, 'update') && $access2d->feedCondition($admin, $pool) === null,
+            'an administrator: a company of the pool opens in full (deals, bills, payments, edit, the whole feed)');
+        $as($other);
         $poolFeed = $access2d->feedCondition($other, $pool);
         $check($poolFeed !== null && strpos(json_encode($poolFeed), 'CmsLead') === false, 'the feed of the pool: the client\'s own records only');
         $filteredPool = CmsCompany::find()->andWhere(['id' => $pool->id]);
