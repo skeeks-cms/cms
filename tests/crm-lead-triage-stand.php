@@ -447,6 +447,37 @@ try {
     $call->id++;
     (new \skeeks\cms\crm\CrmClientCallNotifier())->notify($call);
     $check(!CmsWebNotify::find()->andWhere(['event_key' => 'crm.client_call:'.(int)$call->id])->exists(), 'no notification when the main responsible took the call');
+    // The client feed for "deal": the client's own records and his deals' records; tasks of other deals are hidden.
+    $feedLog = static function ($model, string $text) {
+        $log = new \skeeks\cms\models\CmsLog(['model_code' => $model->skeeksModelCode, 'model_id' => $model->id, 'log_type' => 'comment', 'comment' => $text]);
+        $log->save(false);
+
+        return $log;
+    };
+    $ownTask = new CmsTask(['name' => 'Своя '.$uniq, 'executor_id' => $other->id, 'cms_lead_id' => $lead->id, 'cms_company_id' => $company->id]);
+    $ownTask->save(false);
+    $otherTask = new CmsTask(['name' => 'Чужая '.$uniq, 'executor_id' => $owner->id, 'cms_lead_id' => $ownersLead->id, 'cms_company_id' => $company->id]);
+    $otherTask->save(false);
+    CmsTask::updateAll(['cms_company_id' => $company->id], ['id' => [$ownTask->id, $otherTask->id]]);
+    $companyNote = $feedLog($company, 'Клиент звонил '.$uniq);
+    $ownTaskNote = $feedLog($ownTask, 'По своей '.$uniq);
+    $otherTaskNote = $feedLog($otherTask, 'По чужой '.$uniq);
+    $as($other);
+    $feedIds = static fn() => array_map('intval', CmsCompany::findOne($company->id)->getLogs()->select(\skeeks\cms\models\CmsLog::tableName().'.id')->column());
+    $seen = $feedIds();
+    $check(in_array((int)$companyNote->id, $seen, true) && in_array((int)$ownTaskNote->id, $seen, true) && !in_array((int)$otherTaskNote->id, $seen, true),
+        '"deal": the feed shows the client records and his deals, not the tasks of another deal');
+    $check(in_array((int)$companyNote->id, array_map('intval', CmsCompany::findOne($company->id)->getCompanyLogs()->select('id')->column()), true),
+        '"deal": the card feed keeps the communication with the client');
+    $as($owner);
+    $check(in_array((int)$otherTaskNote->id, $feedIds(), true), '"full" sees the whole feed');
+    // Pinning: who works on the record of the comment.
+    $check(!$levelAccess->canPinLog($other->id, $companyNote) && $levelAccess->canPinLog($owner->id, $companyNote),
+        'a company comment is pinned from the level "edit", not by "deal"');
+    $leadNote = $feedLog($ownersLead, 'Комментарий сделки '.$uniq);
+    $check(!$levelAccess->canPinLog($other->id, $leadNote) && $levelAccess->canPinLog($owner->id, $leadNote),
+        'a deal comment is pinned by who works on the deal');
+    $as($other);
     // "full" (the main responsible): everything.
     $as($owner);
     $check($levelAccess->canEditClientData($owner->id, 'company', (int)$company->id) && $levelAccess->canManageAccess($owner->id, 'company', (int)$company->id)

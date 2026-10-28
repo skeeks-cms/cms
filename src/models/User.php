@@ -180,6 +180,17 @@ class User
     /**
      * @return queries\CmsLogQuery
      */
+    /** П2а+: the feed of a client person for the current employee by his level (crm\CrmAccess::feedCondition()). */
+    private function limitFeed(\yii\db\ActiveQuery $query): void
+    {
+        if (\Yii::$app->has('user') && \Yii::$app->user->identity) {
+            $condition = \skeeks\cms\crm\CrmAccess::instance()->feedCondition(\Yii::$app->user->identity, $this);
+            if ($condition !== null) {
+                $query->andWhere($condition);
+            }
+        }
+    }
+
     public function getUserLogs() {
         $q = CmsLog::find()
             ->andWhere([
@@ -187,6 +198,7 @@ class User
                 ['model_code' => $this->skeeksModelCode],
                 ['model_id' => $this->id],
             ]);
+        $this->limitFeed($q);
 
         $q->multiple = true;
 
@@ -231,6 +243,7 @@ class User
             ])
 
             ->orderBy(['created_at' => SORT_DESC]);
+        $this->limitFeed($q);
 
         $q->multiple = true;
 

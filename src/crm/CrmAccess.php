@@ -577,13 +577,67 @@ class CrmAccess extends Component
         return $query;
     }
 
+    /**
+     * The feed of a company or a person for the level "Свои сделки" (П2а+,
+     * owner's decision 28.10.2026): the records of the client itself (calls,
+     * letters, chats, comments — the communication his deal needs), the
+     * records of his own deals and of the tasks tied to them (a proposal writes
+     * its events to the feed of its deal or client, it has no feed of its own).
+     * Hidden: other deals, services (CmsDeal), projects, bills, payments, tasks
+     * and proposals not tied to his deals. Null — no limit ("edit", "full", a
+     * leader, an administrator, an employee card, or the client is not seen).
+     *
+     * @param \skeeks\cms\models\CmsCompany|User $record
+     * @return array|null a where condition for CmsLog::find()
+     */
+    public function feedCondition($user, $record): ?array
+    {
+        $code = self::clientRecordOf($record);
+        if ($code === null || ($record instanceof User && $record->is_worker)) {
+            return null;
+        }
+        $level = $this->clientDataLevel($user, $code[0], (int)$code[1]);
+        if ($level === null || self::levelRank($level) >= self::levelRank(self::LEVEL_EDIT)) {
+            return null;
+        }
+        $table = \skeeks\cms\models\CmsLog::tableName();
+        $identity = $this->identity($user);
+        $ownLeads = CmsLead::find()->forManager($identity)->select(CmsLead::tableName().'.id')
+            ->andWhere([CmsLead::tableName().($record instanceof CmsCompany ? '.cms_company_id' : '.cms_user_id') => (int)$record->id]);
+        $condition = ['or',
+            ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]],
+            ['and', [$table.'.model_code' => (new CmsLead())->skeeksModelCode], [$table.'.model_id' => $ownLeads]],
+            ['and', [$table.'.model_code' => (new \skeeks\cms\models\CmsTask())->skeeksModelCode],
+                [$table.'.model_id' => \skeeks\cms\models\CmsTask::find()->select('id')->andWhere(['cms_lead_id' => $ownLeads])]],
+        ];
+        return $condition;
+    }
+
+    /**
+     * Pinning a comment changes what everybody sees first in a card: a deal —
+     * who works on it (CmsLead::canBeWorkedBy()), a company or a person — who
+     * may edit it (canEditClientRecord()). Other records keep their rules.
+     */
+    public function canPinLog($user, \skeeks\cms\models\CmsLog $log): bool
+    {
+        $model = $log->model;
+        if ($model instanceof CmsLead) {
+            return $model->canBeWorkedBy($this->userId($user));
+        }
+        if ($model instanceof CmsCompany || ($model instanceof User && !$model->is_worker)) {
+            return $this->canEditClientRecord($user, $model);
+        }
+
+        return true;
+    }
+
     /** [record code, record id] of a client model or of a row of its data; null — not client data. */
     public static function clientRecordOf($model): ?array
     {
         if ($model instanceof CmsCompany) {
             return [CmsCrmAccessRequest::RECORD_COMPANY, (int)$model->id];
         }
-        if ($model instanceof CmsUser) {
+        if ($model instanceof User) {
             return [CmsCrmAccessRequest::RECORD_CLIENT, (int)$model->id];
         }
         if ($model instanceof \yii\db\ActiveRecord) {

@@ -162,6 +162,10 @@ class AdminCmsLogController extends BackendModelStandartController
                 if (!$log) {
                     throw new Exception("Комментарий не найден");
                 }
+                // П2а+: who works on the record of the comment (a deal, a company, a person).
+                if (!\skeeks\cms\crm\CrmAccess::instance()->canPinLog((int)\Yii::$app->user->id, $log)) {
+                    throw new Exception("Закреплять комментарии здесь может тот, кто работает с этой записью.");
+                }
 
                 $log->is_pinned = $isPinned ? 1 : 0;
                 if (!$log->save(false, ['is_pinned', 'updated_at', 'updated_by'])) {
