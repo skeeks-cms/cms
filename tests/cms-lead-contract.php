@@ -133,12 +133,12 @@ $lead = strpos($menu, "'label'    => \\Yii::t('skeeks/cms', 'Сделки')");
 if ($company === false || $client === false || $lead === false) {
     throw new RuntimeException('CRM menu entries are incomplete.');
 }
-if (!($company < $client && $client < $lead)
-    || !preg_match("/'Компании'\)[\\s\\S]*?'priority'\s*=>\s*100/", $menu)
-    || !preg_match("/'Клиенты'\)[\\s\\S]*?'priority'\s*=>\s*110/", $menu)
-    || !preg_match("/'Сделки'\)[\\s\\S]*?'priority'\s*=>\s*120/", $menu)
+// The menu is sorted by priority, not by the order in the file.
+if (!preg_match("/'Сделки'\)[\\s\\S]*?'priority'\s*=>\s*100/", $menu)
+    || !preg_match("/'Компании'\)[\\s\\S]*?'priority'\s*=>\s*110/", $menu)
+    || !preg_match("/'Клиенты'\)[\\s\\S]*?'priority'\s*=>\s*120/", $menu)
 ) {
-    throw new RuntimeException('CRM menu order must be Companies, Clients, Leads.');
+    throw new RuntimeException('CRM menu order must be Leads, Companies, Clients.');
 }
 if (!preg_match("/'name'\s*=>\s*'cms\/admin-lead'[\s\S]*?'description'\s*=>\s*\['skeeks\/cms',\s*'Сделки'\]/", $permissions)) {
     throw new RuntimeException('Lead section must expose the same explicit RBAC permission contract as companies and clients.');
