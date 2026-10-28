@@ -566,10 +566,16 @@ JS
             "create" => [
                 'fields' => [$this, 'updateFields'],
                 'priority' => 200,
+                'on beforeValidate' => function ($event) {
+                    $this->keepAvailableLead($event->sender->model);
+                },
             ],
 
             "update" => [
                 'fields' => [$this, 'updateFields'],
+                'on beforeValidate' => function ($event) {
+                    $this->keepAvailableLead($event->sender->model);
+                },
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-task/manage", ['model' => $this->model]);
                 },
@@ -2493,21 +2499,39 @@ JS
                 ],
             ],
 
-            // The deal refines the client, so it stands under the company / client, before the service.
+            // The deal refines the client, so it stands under the company / client, before the service:
+            // open deals available to the employee, of the chosen company or client (CmsTask::validateLead()).
             'cms_lead_id' => [
-                'class' => HtmlBlock::class,
-                'content' => $model->cms_lead_id && $model->cmsLead
-                    ? '<div class="col-12 form-group sx-task-lead">'
-                        .Html::activeHiddenInput($model, 'cms_lead_id')
-                        .'<span class="text-muted">Сделка:</span> '
-                        .\skeeks\cms\backend\widgets\BackendEntityLink::widget([
-                            'controllerId' => '/cms/admin-cms-lead',
-                            'action'       => 'view',
-                            'modelId'      => $model->cmsLead->id,
-                            'label'        => $model->cmsLead->displayName,
-                        ])
-                        .'</div>'
-                    : '',
+                'class'        => WidgetField::class,
+                'widgetClass'  => AjaxSelectModel::class,
+                'widgetConfig' => [
+                    'id'          => 'cmstask-lead-relation-select',
+                    'modelClass'  => CmsLead::class,
+                    'searchQuery' => function ($word = '') use ($model) {
+                        $query = CmsLead::find()->forManager();
+                        $companyId = (int)\Yii::$app->request->get('cms_company_id', $model->cms_company_id);
+                        $userId = (int)\Yii::$app->request->get('cms_user_id', $model->cms_user_id);
+                        if ($companyId) {
+                            $query->andWhere([CmsLead::tableName().'.cms_company_id' => $companyId]);
+                        } elseif ($userId) {
+                            $query->andWhere([CmsLead::tableName().'.cms_user_id' => $userId, CmsLead::tableName().'.cms_company_id' => null]);
+                        }
+                        // Open deals; the deal already linked stays choosable even when it is closed.
+                        $query->andWhere(['or',
+                            ['not in', CmsLead::tableName().'.status', [CmsLead::STATUS_SUCCESS, CmsLead::STATUS_REJECTED]],
+                            [CmsLead::tableName().'.id' => (int)$model->cms_lead_id],
+                        ]);
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query->orderBy([CmsLead::tableName().'.id' => SORT_DESC]);
+                    },
+                    'pluginOptions' => [
+                        'ajax' => [
+                            'data' => new JsExpression('function(params) { return {q: params.term, cms_company_id: $(".cms_company_id-btn").hasClass("sx-active") ? $("#cmstask-cms_company_id").val() : "", cms_user_id: $(".cms_user_id-btn").hasClass("sx-active") ? $("#cmstask-cms_user_id").val() : ""}; }'),
+                        ],
+                    ],
+                ],
             ],
 
             //"Сделка как услуга": the service of the task.
@@ -2806,6 +2830,22 @@ JS
      * Новая задача из карточки лида: лид должен быть доступен сотруднику,
      * а компания или клиент лида подставляются, если связь ещё не выбрана.
      */
+    /**
+     * «Сделка» of the task form: a deal chosen anew must be available to the employee
+     * (forManager); otherwise the previous one stays. The link to the client is
+     * checked by CmsTask::validateLead().
+     */
+    protected function keepAvailableLead(CmsTask $model): void
+    {
+        $leadId = (int)$model->cms_lead_id;
+        if (!$leadId || (!$model->isNewRecord && $leadId === (int)$model->getOldAttribute('cms_lead_id'))) {
+            return;
+        }
+        if (!CmsLead::find()->forManager()->andWhere([CmsLead::tableName().'.id' => $leadId])->exists()) {
+            $model->cms_lead_id = $model->isNewRecord ? null : $model->getOldAttribute('cms_lead_id');
+        }
+    }
+
     protected function applyLeadToNewTask(CmsTask $model): void
     {
         $lead = CmsLead::find()->forManager()->andWhere([CmsLead::tableName().'.id' => (int)$model->cms_lead_id])->one();

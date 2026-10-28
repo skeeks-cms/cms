@@ -333,6 +333,7 @@ class CmsTask extends ActiveRecord
             [['cms_lead_id'], 'integer'],
             [['cms_lead_id'], 'default', 'value' => null],
             [['cms_lead_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLead::class, 'targetAttribute' => 'id'],
+            [['cms_lead_id'], 'validateLead'],
 
             //"Сделка как услуга": the deal of the task, a resource of that deal, internal tasks hidden from the client.
             [['cms_deal_id', 'deal_resource_id'], 'integer', 'when' => function () { return $this->hasAttribute('cms_deal_id'); }],
@@ -887,6 +888,30 @@ class CmsTask extends ActiveRecord
      * when the task has neither; a different company is refused. The resource
      * must be a resource of this deal.
      */
+    /**
+     * «Сделка» (CmsLead) chosen in the task form belongs to the task's client: the
+     * company of the deal, or its person when the deal has no company. An empty
+     * client is taken from the deal. Checked when the link is set or the client changes.
+     */
+    public function validateLead($attribute)
+    {
+        $changed = $this->isNewRecord || $this->isAttributeChanged('cms_lead_id', false)
+            || $this->isAttributeChanged('cms_company_id', false) || $this->isAttributeChanged('cms_user_id', false);
+        // A deal without a client yet («Неразобранное») fits any task.
+        if (!$changed || !($lead = CmsLead::findOne((int)$this->cms_lead_id)) || !$lead->cms_company_id && !$lead->cms_user_id) {
+            return;
+        }
+        if (!$this->cms_company_id && !$this->cms_user_id && !$this->cms_project_id) {
+            $this->cms_company_id = $lead->cms_company_id ? (int)$lead->cms_company_id : null;
+            $this->cms_user_id = $lead->cms_company_id ? null : ($lead->cms_user_id ? (int)$lead->cms_user_id : null);
+            return;
+        }
+        if ($this->cms_company_id && (int)$lead->cms_company_id !== (int)$this->cms_company_id
+            || !$this->cms_company_id && $this->cms_user_id && ($lead->cms_company_id || (int)$lead->cms_user_id !== (int)$this->cms_user_id)) {
+            $this->addError($attribute, 'Сделка относится к другому клиенту.');
+        }
+    }
+
     public function validateDeal($attribute)
     {
         if (!$this->cms_deal_id) {
