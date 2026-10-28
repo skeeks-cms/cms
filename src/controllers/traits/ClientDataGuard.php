@@ -12,7 +12,9 @@ use skeeks\cms\models\CmsCrmAccessRequest;
  * an administrator). "Свои сделки" sees the rows and contacts the client;
  * update, delete and delete-multi are refused (403, and their buttons are
  * hidden as for any action without access); create too, except a new phone
- * or email (clientDataAddable()).
+ * or email (clientDataAddable()). An existing row never changes its owner
+ * (the company or the person) through a form, even by a hidden field of a
+ * crafted POST (release audit F03, 29.10.2026): such an update is refused.
  *
  * Usage in actions(): `return $this->guardClientData($actions);`
  * The controller names the owner column of its rows in clientDataColumn().
@@ -49,7 +51,8 @@ trait ClientDataGuard
 
                 return in_array($name, ['create', 'delete-multi'], true)
                     ? $this->canEditRequestedClient()
-                    : ($this->model === null || CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $this->model));
+                    : ($this->model === null || (CrmAccess::instance()->canEditClientRecord((int)\Yii::$app->user->id, $this->model)
+                        && !$this->clientDataOwnerChanged()));
             };
             if ($name === 'delete-multi') {
                 $each = $actions[$name]['eachAccessCallback'] ?? null;
@@ -61,6 +64,26 @@ trait ClientDataGuard
         }
 
         return $actions;
+    }
+
+    /**
+     * The posted form moves the row to another company or person: an owner
+     * column posted with a value other than the stored one.
+     */
+    protected function clientDataOwnerChanged(): bool
+    {
+        $model = $this->model;
+        $posted = $model ? \Yii::$app->request->post($model->formName()) : null;
+        if (!is_array($posted)) {
+            return false;
+        }
+        foreach (['cms_company_id', 'cms_user_id'] as $column) {
+            if ($model->hasAttribute($column) && array_key_exists($column, $posted) && (int)$posted[$column] !== (int)$model->getAttribute($column)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
