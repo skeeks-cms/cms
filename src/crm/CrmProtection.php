@@ -95,16 +95,18 @@ class CrmProtection
             return [self::ALWAYS, null, 'Включено вручную'];
         }
         $column = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id';
+        // A person is protected by his personal services and payments (without a company), never by the company's.
+        $personal = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? [] : ['cms_company_id' => null];
         $now = time();
 
-        $deal = CmsDeal::find()->andWhere([$column => $recordId, 'is_active' => 1])
+        $deal = CmsDeal::find()->andWhere([$column => $recordId, 'is_active' => 1])->andWhere($personal)
             ->andWhere(['or', ['end_at' => null], ['>', 'end_at', $now]])
             ->orderBy(['end_at' => SORT_DESC, 'id' => SORT_DESC])->one();
         if ($deal) {
             return [self::PROTECTED, $deal->end_at ? (int)$deal->end_at : null, 'Действующая услуга №'.(int)$deal->id.' «'.$deal->name.'»'];
         }
 
-        $payment = $this->lastPaymentAt($column, $recordId);
+        $payment = $this->lastPaymentAt($column, $recordId, $personal);
         $until = $payment ? strtotime('+'.self::months().' months', $payment) : null;
         if ($until && $until > $now) {
             return [self::PROTECTED, $until, 'Последний платёж '.date('d.m.Y', $payment)];
@@ -336,13 +338,13 @@ class CrmProtection
     }
 
     /** @return int|null the time of the last incoming payment */
-    private function lastPaymentAt(string $column, int $recordId): ?int
+    private function lastPaymentAt(string $column, int $recordId, array $personal = []): ?int
     {
         $payment = '\skeeks\cms\shop\models\ShopPayment';
         if (!class_exists($payment)) {
             return null;
         }
-        $at = $payment::find()->andWhere([$column => $recordId, 'is_debit' => 1])
+        $at = $payment::find()->andWhere([$column => $recordId, 'is_debit' => 1])->andWhere($personal)
             ->select(new \yii\db\Expression('MAX(COALESCE(operation_at, created_at))'))->scalar();
 
         return $at ? (int)$at : null;

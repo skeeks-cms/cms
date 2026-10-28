@@ -63,11 +63,18 @@ class CmsLeadQuery extends CmsActiveQuery
             $availableCompanyIds->andWhere(['not in', CmsCompany::tableName().'.id', $dealOnly]);
         }
         $table = $this->getPrimaryTableName();
-
-        return $this->andWhere(['or',
+        $condition = ['or',
             [$table.'.executor_id' => $managerIds],
             ['exists', $availableCompanyIds->andWhere($this->companyEvidenceCondition($table, (int)$user->id))],
-        ]);
+        ];
+        // A personal deal of a person (no company, owner's decision 29.10.2026): the access to the person
+        // himself — a "full" link of the employee or a subordinate; his companies do not open it.
+        if (\skeeks\cms\crm\CrmAccess::levelsReady()) {
+            $condition[] = ['and', [$table.'.cms_company_id' => null], [$table.'.cms_user_id' => \skeeks\cms\models\CmsUser2manager::find()->select('client_id')
+                ->andWhere(['worker_id' => $managerIds, 'access_level' => \skeeks\cms\crm\CrmAccess::LEVEL_FULL])]];
+        }
+
+        return $this->andWhere($condition);
     }
 
     /** Read-only evidence; never automatically converts or links a lead. */
@@ -87,9 +94,13 @@ class CmsLeadQuery extends CmsActiveQuery
 
         return ['or',
             $lead.'.cms_company_id = '.$company.'.id',
-            ['exists', $links],
-            ['exists', $this->contactEvidence('{{%cms_lead_phone}}', '{{%cms_company_phone}}', $lead, $company.'.id', 'cms_company_id', true)],
-            ['exists', $this->contactEvidence('{{%cms_lead_email}}', '{{%cms_company_email}}', $lead, $company.'.id', 'cms_company_id', false)],
+            // A person or contacts of the company: the evidence of an incoming deal nobody works on yet
+            // (the sorting). A deal in work of a person is his personal order, not the company's.
+            ['and', [$lead.'.executor_id' => null], ['or',
+                ['exists', $links],
+                ['exists', $this->contactEvidence('{{%cms_lead_phone}}', '{{%cms_company_phone}}', $lead, $company.'.id', 'cms_company_id', true)],
+                ['exists', $this->contactEvidence('{{%cms_lead_email}}', '{{%cms_company_email}}', $lead, $company.'.id', 'cms_company_id', false)],
+            ]],
         ];
     }
 

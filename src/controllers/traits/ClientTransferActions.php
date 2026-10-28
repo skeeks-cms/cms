@@ -309,7 +309,7 @@ trait ClientTransferActions
             'protectionReady' => \skeeks\cms\crm\CrmProtection::ready(),
             'protectionState' => \skeeks\cms\crm\CrmProtection::state($code, $id),
             // The reason names payments and services: only for who sees the whole client ("full"), not a card of the pool.
-            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id, $canManage || CrmAccess::seesWholeClient($myLevel)),
+            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id, $canManage || CrmAccess::seesWholeClient($access->wholeClientLevel($actorId, $code, $id))),
             'canTransfer' => $canTransfer,
             'transferUrl' => Url::current([0 => '/'.$this->uniqueId.'/transfer']),
             'work' => $canTransfer ? (new CrmClientTransfer())->openWork($code, $id) : ['leads' => [], 'tasks' => []],

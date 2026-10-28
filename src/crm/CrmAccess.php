@@ -592,9 +592,10 @@ class CrmAccess extends Component
      * level of his own link and of his subordinates' links, never above it
      * (owner's decision 29.10.2026): a subordinate main or "full" — "full",
      * "edit" — "edit", "deal" — "deal" (his "своё" is then the work of the
-     * department). A person without an own link takes the best level of the
-     * employee's links to the person's companies (people of a company are its
-     * data).
+     * department). The data of a person (the name, phones, emails) take the
+     * best level of the person and of the person's companies (people of a
+     * company are its data, owner's decision 29.10.2026); the personal orders
+     * of a person are personalLevel().
      */
     public function clientDataLevel($user, string $recordCode, int $recordId): ?string
     {
@@ -609,7 +610,7 @@ class CrmAccess extends Component
         }
         $userId = $this->userId($user);
         $records = [[$recordCode, $recordId]];
-        if ($recordCode === CmsCrmAccessRequest::RECORD_CLIENT && $this->linkLevel($userId, $recordCode, $recordId) === null) {
+        if ($recordCode === CmsCrmAccessRequest::RECORD_CLIENT) {
             foreach (CmsCompany2user::find()->select('cms_company_id')->andWhere(['cms_user_id' => $recordId])->column() as $companyId) {
                 $records[] = [CmsCrmAccessRequest::RECORD_COMPANY, (int)$companyId];
             }
@@ -629,6 +630,45 @@ class CrmAccess extends Component
 
         // Visible without an own link or a subordinate's one (the evidence of a deal and the like): as "deal".
         return $best ?? self::LEVEL_DEAL;
+    }
+
+    /**
+     * The level of the personal orders of a person — services, deals, bills,
+     * payments, documents, proposals where the person is the customer without
+     * a company (owner's decision 29.10.2026): only the access to the person
+     * himself — the best link of the employee and his subordinates to the
+     * person, "full" for an administrator. A link to the person's company, even
+     * "full", does not open them. Null — no link (the person may still be seen
+     * through a company: his data, not his orders).
+     */
+    public function personalLevel($user, int $clientId): ?string
+    {
+        if (!$this->canSeeClient($user, $clientId)) {
+            return null;
+        }
+        if (!$this->enforceLevels || $this->isAdmin($user) || !self::levelsReady()) {
+            return self::LEVEL_FULL;
+        }
+        $best = null;
+        foreach ($this->ownerIds($user) as $ownerId) {
+            $level = $this->linkLevel($ownerId, CmsCrmAccessRequest::RECORD_CLIENT, $clientId);
+            if (self::levelRank($level) > self::levelRank($best)) {
+                $best = $level;
+            }
+        }
+
+        return $best;
+    }
+
+    /**
+     * The level that opens the whole client (seesWholeClient()): of a company —
+     * clientDataLevel(); of a person — personalLevel() (his own orders).
+     */
+    public function wholeClientLevel($user, string $recordCode, int $recordId): ?string
+    {
+        return $recordCode === CmsCrmAccessRequest::RECORD_CLIENT
+            ? $this->personalLevel($user, $recordId)
+            : $this->clientDataLevel($user, $recordCode, $recordId);
     }
 
     /**
@@ -753,8 +793,9 @@ class CrmAccess extends Component
      * One visibility of the client records that are not deals — services
      * (CmsDeal), bills, payments, documents, tasks, proposals (owner's decision
      * 28.10.2026): a record of a company or a person is seen when the client is
-     * seen in full (seesWholeClient(): a link "full" of him or a subordinate, a
-     * person of such a company without an own link), or when the record is
+     * seen in full (seesWholeClient(): a link "full" of him or a subordinate;
+     * a personal order of a person — without a company — by the access to the
+     * person only, personalLevel()), or when the record is
      * "своё" — the $own conditions of the
      * caller (created by him or his subordinates, he is the executor or the
      * responsible, it is tied to his deal). With "Свои сделки" and "edit" the
@@ -781,34 +822,20 @@ class CrmAccess extends Component
 
         return array_merge(['or',
             [$table.'.'.$companyColumn => $companies],
-            $this->fullClientCondition($user, $table.'.'.$userColumn, $companies),
+            // A personal order (no company): the access to the person himself, not to his companies.
+            ['and', [$table.'.'.$companyColumn => null], $this->fullClientCondition($user, $table.'.'.$userColumn)],
         ], $own);
     }
 
     /**
-     * People seen in full (seesWholeClient() of clientDataLevel() in SQL): an
-     * own or a subordinate's link "full", or no own link and a company of the
-     * person seen in full.
+     * People whose personal orders are seen in full (seesWholeClient() of
+     * personalLevel() in SQL): a link "full" of the employee or a subordinate
+     * to the person. The person's companies do not count.
      */
-    private function fullClientCondition($user, string $column, \yii\db\ActiveQuery $fullCompanies): array
+    private function fullClientCondition($user, string $column): array
     {
-        $userId = $this->userId($user);
-        $ownerIds = $this->ownerIds($user);
-        $subordinates = array_values(array_diff($ownerIds, [$userId]));
-        $condition = ['or',
-            [$column => CmsUser2manager::find()->select('client_id')
-                ->andWhere(['worker_id' => $userId, 'access_level' => self::LEVEL_FULL])],
-            ['and',
-                ['not in', $column, CmsUser2manager::find()->select('client_id')->andWhere(['worker_id' => $userId])],
-                [$column => CmsCompany2user::find()->select('cms_user_id')->andWhere(['cms_company_id' => $fullCompanies])],
-            ],
-        ];
-        if ($subordinates) {
-            $condition[] = [$column => CmsUser2manager::find()->select('client_id')
-                ->andWhere(['worker_id' => $subordinates, 'access_level' => self::LEVEL_FULL])];
-        }
-
-        return $condition;
+        return [$column => CmsUser2manager::find()->select('client_id')
+            ->andWhere(['worker_id' => $this->ownerIds($user), 'access_level' => self::LEVEL_FULL])];
     }
 
     /**
@@ -838,7 +865,8 @@ class CrmAccess extends Component
 
             return $this->clientOwnFeedCondition($user, $record, $table);
         }
-        if ($level === null || self::seesWholeClient($level)) {
+        // A person: his data by his companies too, his orders by the access to him only (personalLevel()).
+        if ($level === null || self::seesWholeClient($this->wholeClientLevel($user, $code[0], (int)$code[1]))) {
             return null;
         }
         $table = \skeeks\cms\models\CmsLog::tableName();

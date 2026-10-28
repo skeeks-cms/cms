@@ -941,6 +941,69 @@ try {
         }
     }
 
+    // A client person is equal to a company: his data by his companies too, his personal orders by the access to him only.
+    if (CrmAccess::mainReady() && \skeeks\cms\crm\CrmProtection::ready()) {
+        $personCompany = new CmsCompany(['name' => 'Компания человека '.$uniq]);
+        $personCompany->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $personCompany->id]);
+        $person = new CmsUser(['first_name' => 'Человек'.$uniq, 'is_worker' => 0]);
+        $person->save();
+        (new \skeeks\cms\models\CmsCompany2user(['cms_company_id' => $personCompany->id, 'cms_user_id' => $person->id]))->save(false);
+        CrmAccess::instance()->setMain('company', (int)$personCompany->id, (int)$other->id, CrmAccess::LEVEL_EDIT);
+        $serviceType = (int)\skeeks\cms\models\CmsDealType::find()->select('id')->scalar();
+        $personalService = new \skeeks\cms\models\CmsDeal(['name' => 'Личная услуга '.$uniq, 'cms_user_id' => $person->id, 'is_active' => 1, 'start_at' => time() - 86400,
+            'end_at' => time() + 86400 * 30, 'cms_deal_type_id' => $serviceType, 'amount' => 0, 'currency_code' => 'RUB', 'description' => '', 'is_periodic' => 0]);
+        $personalService->save(false);
+        $companyService = new \skeeks\cms\models\CmsDeal(['name' => 'Услуга компании '.$uniq, 'cms_company_id' => $personCompany->id, 'cms_user_id' => $person->id, 'is_active' => 1,
+            'start_at' => time() - 86400, 'end_at' => time() + 86400 * 30, 'cms_deal_type_id' => $serviceType, 'amount' => 0, 'currency_code' => 'RUB', 'description' => '', 'is_periodic' => 0]);
+        $companyService->save(false);
+        $personalLead = new CmsLead(['name' => 'Личная сделка '.$uniq, 'cms_site_id' => $siteId, 'cms_user_id' => $person->id,
+            'executor_id' => $admin->id, 'status' => CmsLead::STATUS_IN_WORK]);
+        $personalLead->save(false);
+        $leadSeen = static fn(CmsUser $user) => CmsLead::find()->forManager($user)->andWhere([CmsLead::tableName().'.id' => $personalLead->id])->exists();
+        $servicesSeen = static fn(CmsUser $user) => array_map('intval', \skeeks\cms\models\CmsDeal::find()->forManager($user)
+            ->andWhere([\skeeks\cms\models\CmsDeal::tableName().'.id' => [$personalService->id, $companyService->id]])->select(\skeeks\cms\models\CmsDeal::tableName().'.id')->column());
+        $as($other);
+        $check(CrmAccess::instance()->clientDataLevel($other, 'client', (int)$person->id) === CrmAccess::LEVEL_FULL
+            && CrmAccess::instance()->canEditClientData($other, 'client', (int)$person->id), 'the data of a person: the level of his company');
+        $check(CrmAccess::instance()->personalLevel($other, (int)$person->id) === null && $servicesSeen($other) === [(int)$companyService->id]
+            && CrmAccess::instance()->feedCondition($other, $person) !== null && !$leadSeen($other),
+            'the personal orders of a person (services, deals) are closed by the access to his company, even "full"');
+        // An own link to the person counts with the company: the best of them.
+        CrmAccess::instance()->grantLink('client', (int)$person->id, (int)$other->id, CrmAccess::LEVEL_DEAL);
+        $check(CrmAccess::instance()->clientDataLevel($other, 'client', (int)$person->id) === CrmAccess::LEVEL_FULL
+            && CrmAccess::instance()->personalLevel($other, (int)$person->id) === CrmAccess::LEVEL_DEAL, 'an own "deal" link to a person does not lower the level of his data');
+        CrmAccess::instance()->setLevel('client', (int)$person->id, (int)$other->id, CrmAccess::LEVEL_FULL);
+        $check(count($servicesSeen($other)) === 2 && CrmAccess::instance()->feedCondition($other, $person) === null && $leadSeen($other),
+            'the access "full" to the person opens his personal orders');
+        $as($admin);
+        // The protection: the personal services and payments protect the person, not the company's.
+        $check(\skeeks\cms\crm\CrmProtection::state('client', (int)$person->id) === 'protected', 'a personal service protects the person');
+        $personalService->is_active = 0;
+        $personalService->save(false);
+        $check(\skeeks\cms\crm\CrmProtection::state('client', (int)$person->id) === 'free', 'a service of his company does not protect the person');
+        $companyPayment = new \skeeks\cms\shop\models\ShopPayment(['cms_site_id' => $siteId, 'cms_company_id' => $personCompany->id, 'cms_user_id' => $person->id,
+            'is_debit' => 1, 'amount' => 1000, 'currency_code' => 'RUB', 'operation_at' => time()]);
+        $companyPayment->save(false);
+        (new \skeeks\cms\crm\CrmProtection())->recalc('client', (int)$person->id);
+        $check(\skeeks\cms\crm\CrmProtection::state('client', (int)$person->id) === 'free', 'a payment of his company does not protect the person');
+        // A person without a company: the pool, «Взять в работу», the protection — as a company.
+        $single = new CmsUser(['first_name' => 'Физлицо'.$uniq, 'is_worker' => 0]);
+        $single->save();
+        $check(CrmAccess::instance()->inPool('client', (int)$single->id) && CrmAccess::instance()->canTakeIntoWork('client', (int)$single->id),
+            'a person without a company and employees is in the general pool');
+        $as($other);
+        $took = (new LeadTriage())->workWithClient(CrmAccess::instance()->candidateRef('client', (int)$single->id), (int)$other->id);
+        $check(CrmAccess::instance()->mainResponsibleId('client', (int)$single->id) === (int)$other->id && empty($took['request'])
+            && \skeeks\cms\crm\CrmProtection::state('client', (int)$single->id) === 'free', '«Взять в работу» of a person: the employee is the main one');
+        $personalPayment = new \skeeks\cms\shop\models\ShopPayment(['cms_site_id' => $siteId, 'cms_user_id' => $single->id,
+            'is_debit' => 1, 'amount' => 1000, 'currency_code' => 'RUB', 'operation_at' => time()]);
+        $personalPayment->save(false);
+        $check(\skeeks\cms\crm\CrmProtection::state('client', (int)$single->id) === 'protected' && CrmAccess::instance()->approvalRequired('client', (int)$single->id),
+            'a personal payment protects the person');
+        $as($admin);
+    }
+
     // A leader takes the best level of his subordinates on a client, never above it.
     $leader = null;
     $subordinate = null;
