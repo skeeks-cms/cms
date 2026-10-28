@@ -236,6 +236,8 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'name' => 'Обработка',
                 'icon' => 'fa fa-edit',
                 'priority' => 20,
+                // Not a tab: the stage bar of the card does it; «Успешно» / «Отказ» and the kanban open this form.
+                'isVisible' => false,
                 'fields' => [$this, 'processFields'],
                 'accessCallback' => fn() => $this->canWorkWithModel(),
                 'on beforeValidate' => function (Event $event) {
