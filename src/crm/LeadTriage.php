@@ -157,7 +157,9 @@ class LeadTriage
         $form = new LeadIdentityForm([$part.'_mode' => LeadIdentityForm::MODE_FOREIGN, $part.'_ref' => $ref, 'foreign_comment' => $comment]);
         $siteId = \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site ? (int)\Yii::$app->skeeks->site->id : null;
         $result = $this->createLead(new CmsLead(['cms_site_id' => $siteId, 'description' => $comment]), $form, $actorId);
-        $result['message'] = 'Сделка №'.(int)$result['lead']->id.' создана на вас, у вас доступ «Свои сделки» к клиенту. Основной ответственный получил уведомление.';
+        $result['message'] = $this->access->mainResponsibleId($parsed[0] === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, (int)$parsed[1]) === $actorId
+            ? 'Клиент взят в работу: вы его основной ответственный, сделка №'.(int)$result['lead']->id.' создана на вас.'
+            : 'Сделка №'.(int)$result['lead']->id.' создана на вас, у вас доступ «Свои сделки» к клиенту. Основной ответственный получил уведомление.';
 
         return $result;
     }
@@ -253,6 +255,12 @@ class LeadTriage
             } elseif ($form->client_mode === LeadIdentityForm::MODE_EXISTING && ($user = CmsUser::findOne((int)$form->client_id))) {
                 $client = (string)$user->shortDisplayName;
             }
+        }
+        // П2д: a deal with «Услуга» is «Услуга — Компания» (outbound sales: the service is what tells deals apart).
+        $service = $lead->cms_deal_type_id && CmsLead::dealTypeReady() && ($type = \skeeks\cms\models\CmsDealType::findOne((int)$lead->cms_deal_type_id))
+            ? trim((string)$type->name) : '';
+        if ($service !== '') {
+            return mb_substr(implode(' — ', array_filter([$service, $client])), 0, 255);
         }
         $source = trim((string)$lead->source_name);
         if ($source === '' && $lead->source_type && $lead->source_type !== CmsLead::SOURCE_MANUAL) {
@@ -626,6 +634,13 @@ class LeadTriage
                     throw new \DomainException('Email компании: '.implode('; ', $row->getFirstErrors()));
                 }
             }
+            // П2д: the site of a company found by a manager goes to its links.
+            if (($site = LeadIdentityForm::siteUrl($form->company_site)) !== '') {
+                $row = new \skeeks\cms\models\CmsCompanyLink(['cms_company_id' => (int)$company->id, 'url' => $site, 'name' => 'Сайт']);
+                if (!$row->save()) {
+                    throw new \DomainException('Сайт компании: '.implode('; ', $row->getFirstErrors()));
+                }
+            }
             $companyId = (int)$company->id;
             $newCompany = $company;
         }
@@ -707,7 +722,11 @@ class LeadTriage
 
         if ($identity['foreign']) {
             [$recordCode, $recordId] = [$identity['foreign'][0], (int)$identity['foreign'][1]];
-            if ((int)$lead->executor_id === $actorId) {
+            if ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null) {
+                // «Взять в работу» (П2д): a free client of the general pool — the actor becomes its main
+                // responsible ("full"), no request and no notification; the next one gets «Работать с этим клиентом».
+                $this->access->setMain($recordCode, $recordId, $actorId);
+            } elseif ((int)$lead->executor_id === $actorId) {
                 // «Работать с этим клиентом»: the deal is the actor's, the level "Свои сделки" at once, no request
                 // (owner's decision 28.10.2026): the main responsible and his leaders are notified; the level is
                 // raised in «Доступ» of the client.

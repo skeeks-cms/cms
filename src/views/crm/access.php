@@ -14,6 +14,9 @@
  * @var array[] $leaders id, name — leaders of the main responsible
  * @var bool $canManage
  * @var bool $approval
+ * @var bool $protectionReady П2д: the protection of the client (crm\CrmProtection)
+ * @var string $protectionState free|protected|always
+ * @var string $protectionText «Под защитой до …: последний платёж …»
  * @var bool $canTransfer
  * @var string $transferUrl
  * @var array $work leads (CmsLead[]), tasks (CmsTask[]) for the transfer
@@ -170,6 +173,37 @@ $workerSearch = static function ($word = '') {
         <?php BackendSurfaceWidget::end(); ?>
     <?php endif; ?>
 
+    <?php if (!empty($protectionReady)) : ?>
+        <?php BackendSurfaceWidget::begin([
+            'title' => 'Защита клиента',
+            'titleTag' => 'h2',
+            'hint' => '«Свободная» — нет платежей за последнее время и действующих услуг: без ответственного клиента берут в работу, с ответственным — работают по своей сделке с уведомлением. «Под защитой» — был платёж или есть действующая услуга: другой менеджер работает только по согласованию, сделка после одобрения. «Всегда по согласованию» — для ключевых клиентов, не истекает. Обращения клиента не ждут одобрения.',
+            'raised' => true,
+            'responsive' => true,
+        ]); ?>
+            <p><strong><?= Html::encode($protectionText); ?></strong></p>
+            <div class="sx-crm-access__actions">
+                <?= Html::dropDownList('protection', $protectionState === 'always' ? 'always' : 'auto', [
+                    'auto' => 'Авто: по платежам и услугам',
+                    'always' => 'Всегда по согласованию',
+                ], [
+                    'class' => 'form-control',
+                    'disabled' => !$canManage,
+                    'aria-label' => 'Защита клиента',
+                    'data-sx-crm-access' => 'protection',
+                    'data-url' => $url,
+                ]); ?>
+                <?php if ($canManage && $main && $protectionState === 'free') : ?>
+                    <?= Html::button('Вернуть в общий пул', [
+                        'class' => 'sx-button sx-button--secondary sx-button--sm',
+                        'data-sx-crm-access' => 'pool',
+                        'data-url' => $url,
+                        'data-sx-confirm' => 'Вернуть клиента в общий пул? У него не останется ответственных сотрудников, его возьмёт в работу первый, кто его найдёт.',
+                    ]); ?>
+                <?php endif; ?>
+            </div>
+        <?php BackendSurfaceWidget::end(); ?>
+    <?php else : ?>
     <?php BackendSurfaceWidget::begin([
         'title' => 'Доступ только по согласованию',
         'titleTag' => 'h2',
@@ -186,4 +220,5 @@ $workerSearch = static function ($word = '') {
             Работать с клиентом только по согласованию с основным ответственным
         </label>
     <?php BackendSurfaceWidget::end(); ?>
+    <?php endif; ?>
 </div>

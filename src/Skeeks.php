@@ -92,6 +92,36 @@ class Skeeks extends Component implements BootstrapInterface
             \skeeks\cms\source\RecordSources::attach();
         }
 
+        // П2д: the protection of a client follows its payments (cms-shop, when installed) and services.
+        $protection = static function (callable $callback) {
+            try {
+                if (\skeeks\cms\crm\CrmProtection::ready()) {
+                    $callback(new \skeeks\cms\crm\CrmProtection());
+                }
+            } catch (\Throwable $e) {
+                \Yii::warning('Защита клиента не пересчитана: '.$e->getMessage(), \skeeks\cms\crm\CrmProtection::class);
+            }
+        };
+        if (class_exists('\skeeks\cms\shop\models\ShopPayment')) {
+            foreach ([BaseActiveRecord::EVENT_AFTER_INSERT, BaseActiveRecord::EVENT_AFTER_UPDATE] as $paymentEvent) {
+                Event::on('\skeeks\cms\shop\models\ShopPayment', $paymentEvent, static function (Event $event) use ($protection) {
+                    $protection(static fn($service) => $service->onPayment($event->sender));
+                });
+            }
+        }
+        foreach ([BaseActiveRecord::EVENT_AFTER_INSERT, BaseActiveRecord::EVENT_AFTER_UPDATE, BaseActiveRecord::EVENT_AFTER_DELETE] as $dealEvent) {
+            Event::on(CmsDeal::class, $dealEvent, static function (Event $event) use ($protection) {
+                $deal = $event->sender;
+                $protection(static function ($service) use ($deal) {
+                    if ($deal->cms_company_id) {
+                        $service->recalc('company', (int)$deal->cms_company_id);
+                    } elseif ($deal->cms_user_id) {
+                        $service->recalc('client', (int)$deal->cms_user_id);
+                    }
+                });
+            });
+        }
+
         Event::on(View::class, View::EVENT_AFTER_RENDER, function (Event $event) {
 
             /*<!--форма обратная связь-->
@@ -153,6 +183,9 @@ class Skeeks extends Component implements BootstrapInterface
 
 
         });
+        // П2д: a presentation or a КП sent from a deal of «Исходящие продажи» and its first view move the deal.
+        \skeeks\cms\crm\OutboundSales::subscribe();
+
         //Уведомления для пользователей
         Event::on(CmsLog::class, BaseActiveRecord::EVENT_AFTER_INSERT, function (Event $event) {
             /**

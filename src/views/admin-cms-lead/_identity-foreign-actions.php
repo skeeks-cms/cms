@@ -23,27 +23,33 @@ $isCompany = $for === 'company';
 $responsible = implode(', ', array_column($candidate['responsible'], 'name'));
 $responsibleName = $candidate['responsible'][0]['name'] ?? '';
 $byApproval = !empty($candidate['byApproval']);
+// П2д: a free client without a main responsible (the general pool).
+$canTake = !empty($candidate['canTake']);
+$workLabel = $canTake ? 'Взять в работу' : 'Работать с этим клиентом';
 $withDuplicate = $withDuplicate ?? true;
 ?>
 <?php if ($allowForeign) : ?>
     <?php if ($byApproval || !empty($sendAtOnce)) : ?>
-        <?= Html::button('Работать с этим клиентом', [
+        <?= Html::button($workLabel, [
             'class' => 'sx-button sx-button--primary sx-button--sm',
             'title' => $byApproval
-                ? 'С клиентом работают по согласованию: запрос уйдёт основному ответственному, сделка будет создана после одобрения.'
-                : 'Сделка будет создана на вас, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.',
+                ? 'Клиент под защитой: запрос уйдёт основному ответственному, сделка будет создана после одобрения.'
+                : ($canTake ? 'У клиента нет ответственного: вы станете основным ответственным, сделка будет создана на вас.'
+                    : 'Сделка будет создана на вас, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.'),
             'data-sx-identity-work' => $for,
             'data-ref' => $candidate['ref'],
             'data-url' => $requestUrl,
             // Not data-confirm: yii.js would submit the form around the button after the confirmation.
             'data-sx-confirm' => $byApproval
-                ? 'С этим клиентом работают только по согласованию'.($responsibleName !== '' ? ' с сотрудником '.$responsibleName : '').'. Отправить запрос? Сделка будет создана после одобрения.'
-                : 'Создать сделку на вас по этому клиенту? У вас будет доступ «Свои сделки», основному ответственному'.($responsibleName !== '' ? ' ('.$responsibleName.')' : '').' уйдёт уведомление.',
+                ? 'Клиент под защитой: работать с ним можно по согласованию'.($responsibleName !== '' ? ' с сотрудником '.$responsibleName : '').'. Отправить запрос? Сделка будет создана после одобрения.'
+                : ($canTake ? 'Взять клиента в работу? Вы станете его основным ответственным, сделка будет создана на вас.'
+                    : 'Создать сделку на вас по этому клиенту? У вас будет доступ «Свои сделки», основному ответственному'.($responsibleName !== '' ? ' ('.$responsibleName.')' : '').' уйдёт уведомление.'),
         ]); ?>
     <?php else : ?>
-        <?= Html::button('Работать с этим клиентом', [
+        <?= Html::button($workLabel, [
             'class' => 'sx-button sx-button--primary sx-button--sm',
-            'title' => 'Сделка будет ваша, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.',
+            'title' => $canTake ? 'У клиента нет ответственного: вы станете основным ответственным.'
+                : 'Сделка будет ваша, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.',
             'data-sx-identity-foreign' => $for,
             'data-action' => LeadIdentityForm::FOREIGN_WORK,
             'data-ref' => $candidate['ref'],
@@ -62,5 +68,7 @@ $withDuplicate = $withDuplicate ?? true;
     ], static fn($value) => $value !== null)); ?>
 <?php endif; ?>
 <?php if ($byApproval) : ?>
-    <span class="sx-lead-hint__meta">Доступ по согласованию с основным ответственным</span>
+    <span class="sx-lead-hint__meta">Клиент под защитой: работа по согласованию с основным ответственным</span>
+<?php elseif ($canTake) : ?>
+    <span class="sx-lead-hint__meta">Свободный клиент без ответственного</span>
 <?php endif; ?>

@@ -192,6 +192,14 @@ return [
                     'interval' => 3600 * 24,
                 ],
 
+                // П2д: the protection of clients whose payment or service expired.
+                'cms/crm/protection' => [
+                    'jobType' => 'cms.crm-protection',
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => 'Защита клиентов: снять истёкшую',
+                    'interval' => 3600 * 24,
+                ],
+
                 'cms/notify/cleanup' => [
                     'jobType' => 'cms.notify-cleanup',
                     'class' => \skeeks\cms\agent\CmsAgent::class,

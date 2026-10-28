@@ -526,10 +526,10 @@
         var control = $(this);
         var op = control.data('sxCrmAccess');
         // Buttons act on click (remove, add), the level select and the flag on change.
-        if ((op === 'remove' || op === 'add') !== (event.type === 'click')) {
+        if ((op === 'remove' || op === 'add' || op === 'pool') !== (event.type === 'click')) {
             return;
         }
-        if (op === 'remove' && !window.confirm(control.data('sxConfirm'))) {
+        if ((op === 'remove' || op === 'pool') && !window.confirm(control.data('sxConfirm'))) {
             return false;
         }
         var data = {op: op, user_id: control.data('userId') || '', level: op === 'level' ? control.val() : '',
@@ -537,6 +537,9 @@
         if (op === 'add') {
             data.user_id = $(control.data('userInput')).val() || '';
             data.level = $(control.data('levelInput')).val() || '';
+        }
+        if (op === 'protection') {
+            data.value = control.val();
         }
         data[yii.getCsrfParam()] = yii.getCsrfToken();
         $.ajax({url: control.data('url'), method: 'POST', data: data, dataType: 'json',
@@ -547,7 +550,7 @@
                 if (op === 'remove') {
                     control.closest('li').remove();
                 }
-                if (op === 'add') {
+                if (op === 'add' || op === 'pool' || op === 'protection') {
                     window.location.reload();
                 }
             } else {

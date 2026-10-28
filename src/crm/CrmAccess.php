@@ -325,7 +325,11 @@ class CrmAccess extends Component
         if (!$record || !$record->hasAttribute('crm_access_by_approval')) {
             throw new \DomainException('Клиент не найден.');
         }
+        // П2д: «Авто / Всегда по согласованию» of the protection; the old flag follows for a rollback.
         $record->updateAttributes(['crm_access_by_approval' => $required ? 1 : 0]);
+        if (CrmProtection::ready()) {
+            (new CrmProtection())->setAlways($recordCode, $recordId, $required);
+        }
     }
 
     /**
@@ -386,7 +390,15 @@ class CrmAccess extends Component
     /** Ready filters of the company and client lists by the main responsible. */
     public static function responsibleFilterItems(): array
     {
-        return self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_responsible' => 'Без ответственного'] : [];
+        $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_responsible' => 'Без ответственного'] : [];
+        if (CrmProtection::ready()) {
+            // П2д: the protection of the client.
+            foreach (CrmProtection::states() as $state => $name) {
+                $items['protection_'.$state] = 'Защита: '.mb_strtolower($name, 'UTF-8');
+            }
+        }
+
+        return $items;
     }
 
     /**
@@ -398,6 +410,11 @@ class CrmAccess extends Component
     public function applyResponsibleFilter(\yii\db\Query $query, string $recordCode, string $value, string $idColumn, int $viewerId): void
     {
         if (!self::mainReady() || !isset(self::responsibleFilterItems()[$value])) {
+            return;
+        }
+        if (strpos($value, 'protection_') === 0) {
+            $query->andWhere([substr($idColumn, 0, (int)strrpos($idColumn, '.')).'.crm_protection' => substr($value, strlen('protection_'))]);
+
             return;
         }
         [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
@@ -428,17 +445,33 @@ class CrmAccess extends Component
     }
 
     /**
-     * «Доступ только по согласованию»: «Работать с этим клиентом» only sends a
-     * request, the deal is created after the approval.
+     * The client is «Под защитой» or «Всегда по согласованию» (П2д,
+     * CrmProtection): «Работать с этим клиентом» only sends a request, the deal
+     * is created after the approval. Before the П2д migration — the old hand
+     * flag «Доступ только по согласованию».
      */
     public function approvalRequired(string $recordCode, int $recordId): bool
     {
         if (!self::mainReady()) {
             return false;
         }
+        if (CrmProtection::ready()) {
+            return CrmProtection::state($recordCode, $recordId) !== CrmProtection::FREE;
+        }
         $record = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne($recordId) : CmsUser::findOne($recordId);
 
         return $record && $record->hasAttribute('crm_access_by_approval') && (bool)$record->crm_access_by_approval;
+    }
+
+    /**
+     * «Взять в работу» (П2д): a free client without a main responsible — the
+     * general pool; the first employee who takes it becomes the main one
+     * (`full`), no request and no notification.
+     */
+    public function canTakeIntoWork(string $recordCode, int $recordId): bool
+    {
+        return self::mainReady() && $recordId > 0 && $this->mainResponsibleId($recordCode, $recordId) === null
+            && !$this->approvalRequired($recordCode, $recordId);
     }
 
     /**
@@ -805,9 +838,12 @@ class CrmAccess extends Component
             'title' => null,
             'responsible' => [],
             'hasOpenLeads' => false,
-            // «Доступ только по согласованию»: «Работать с этим клиентом» sends a request first.
+            // A protected client: «Работать с этим клиентом» sends a request first.
             'byApproval' => !$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
                 && $this->approvalRequired($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id),
+            // A free client without a main responsible (the general pool): «Взять в работу».
+            'canTake' => !$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
+                && $this->canTakeIntoWork($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id),
         ];
 
         if ($type === CrmMatcher::TYPE_COMPANY && ($company = CmsCompany::findOne($id))) {

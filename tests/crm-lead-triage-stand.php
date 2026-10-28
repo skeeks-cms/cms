@@ -718,6 +718,83 @@ try {
         \skeeks\cms\crm\CrmDuplicateGuard::$mode = null;
     }
 
+    // --- П2д: the protection of a client and the general pool ---
+    if (\skeeks\cms\crm\CrmProtection::ready() && class_exists(\skeeks\cms\shop\models\ShopPayment::class)) {
+        $protection = new \skeeks\cms\crm\CrmProtection();
+        $access2d = CrmAccess::instance();
+        $as($owner);
+        $guarded = new CmsCompany(['name' => 'Защита '.$uniq]);
+        $guarded->save(false);
+        $access2d->setMain('company', (int)$guarded->id, (int)$owner->id);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'free' && !$access2d->approvalRequired('company', (int)$guarded->id),
+            'a client without payments and services is free');
+        $pay = static function (CmsCompany $company, int $at) use ($siteId) {
+            $payment = new \skeeks\cms\shop\models\ShopPayment(['cms_site_id' => $siteId, 'cms_company_id' => $company->id, 'is_debit' => 1, 'amount' => 1000, 'currency_code' => 'RUB', 'operation_at' => $at]);
+            $payment->save(false);
+
+            return $payment;
+        };
+        $pay($guarded, time() - 86400 * 400);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'free', 'a payment older than the protection period does not protect');
+        $pay($guarded, time() - 86400);
+        $guarded->refresh();
+        $check($guarded->crm_protection === 'protected' && (int)$guarded->crm_protected_until > strtotime('+11 months')
+            && strpos((string)$guarded->crm_protection_reason, 'Последний платёж') === 0 && $access2d->approvalRequired('company', (int)$guarded->id),
+            'a recent payment protects the client (the event of the payment recalculates it)');
+        $check(strpos(\skeeks\cms\crm\CrmProtection::describe('company', (int)$guarded->id), 'Под защитой до ') === 0, 'the protection in words');
+        \skeeks\cms\shop\models\ShopPayment::updateAll(['operation_at' => time() - 86400 * 800], ['cms_company_id' => $guarded->id]);
+        $protection->recalcMany();
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'free', 'the daily recalculation frees an expired protection');
+        $service = new \skeeks\cms\models\CmsDeal(['name' => 'Услуга '.$uniq, 'cms_company_id' => $guarded->id, 'is_active' => 1, 'start_at' => time() - 86400, 'end_at' => time() + 86400 * 30,
+            'cms_deal_type_id' => (int)\skeeks\cms\models\CmsDealType::find()->select('id')->scalar(), 'amount' => 0, 'currency_code' => 'RUB', 'description' => '', 'is_periodic' => 0]);
+        $service->save(false);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'protected', 'an active service protects (the event of the service)');
+        $service->is_active = 0;
+        $service->save(false);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'free', 'a closed service frees the client');
+        $access2d->setApprovalRequired('company', (int)$guarded->id, true);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'always', '«Всегда по согласованию» by hand');
+        $protection->recalcMany(true);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'always', '«Всегда по согласованию» never expires');
+        $access2d->setApprovalRequired('company', (int)$guarded->id, false);
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$guarded->id) === 'free', '«Авто» recalculates from payments and services');
+        $filtered = CmsCompany::find()->andWhere(['id' => $guarded->id]);
+        $access2d->applyResponsibleFilter($filtered, 'company', 'protection_free', CmsCompany::tableName().'.id', (int)$owner->id);
+        $check($filtered->exists() && isset(CrmAccess::responsibleFilterItems()['protection_protected']), 'the company list filters by the protection');
+
+        // The general pool: a free company without a main responsible — «Взять в работу».
+        $pool = new CmsCompany(['name' => 'Пул '.$uniq]);
+        $pool->save(false);
+        $check($access2d->canTakeIntoWork('company', (int)$pool->id) && !$access2d->canTakeIntoWork('company', (int)$guarded->id),
+            'only a free company without a main responsible is taken into work');
+        $poolRef = $access2d->candidateRef('company', (int)$pool->id);
+        $presentedPool = $access2d->presentCandidate(['type' => 'company', 'id' => (int)$pool->id], false, $other);
+        $check(!empty($presentedPool['canTake']) && empty($presentedPool['byApproval']), 'a match of the pool offers «Взять в работу»');
+        $as($other);
+        $taken = (new LeadTriage())->workWithClient($poolRef, (int)$other->id);
+        $check($access2d->mainResponsibleId('company', (int)$pool->id) === (int)$other->id && empty($taken['request'])
+            && (int)$taken['lead']->executor_id === (int)$other->id && strpos($taken['message'], 'взят в работу') !== false,
+            '«Взять в работу»: the employee becomes the main responsible, the deal is his, no request');
+        $check(!CmsWebNotify::find()->andWhere(['event_key' => 'lead.delegated:'.(int)$taken['lead']->id.':'.(int)$other->id])->exists(),
+            '«Взять в работу» notifies nobody');
+        $check(!$access2d->canTakeIntoWork('company', (int)$pool->id), 'the next employee gets «Работать с этим клиентом»');
+        // Back to the pool by the main responsible; a protected client is not returned.
+        $protection->returnToPool('company', (int)$pool->id, (int)$other->id);
+        $check($access2d->mainResponsibleId('company', (int)$pool->id) === null && !CmsCompany2manager::find()->andWhere(['cms_company_id' => $pool->id])->exists(),
+            '«Вернуть в общий пул»: the client has no employees');
+        // The first payment of a company without a main responsible: who registered it becomes the main one.
+        $as($owner);
+        $pay($pool, time());
+        $check($access2d->mainResponsibleId('company', (int)$pool->id) === (int)$owner->id
+            && \skeeks\cms\crm\CrmProtection::state('company', (int)$pool->id) === 'protected', 'the first payment gives a main responsible and protects');
+        try {
+            $protection->returnToPool('company', (int)$pool->id, (int)$owner->id);
+            $check(false, 'a protected client is not returned to the pool');
+        } catch (DomainException $e) {
+            $check($access2d->mainResponsibleId('company', (int)$pool->id) === (int)$owner->id, 'a protected client is not returned to the pool');
+        }
+    }
+
     // --- leaders ---
     foreach (CmsDepartment::find()->all() as $department) {
         foreach (CmsDepartment::subordinateIds((int)$department->worker_id) as $subordinateId) {

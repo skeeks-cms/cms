@@ -172,8 +172,16 @@ trait ClientTransferActions
                 }
                 switch ((string)$request->post('op')) {
                     case 'approval':
-                        $access->setApprovalRequired($code, $id, (bool)$request->post('value'));
-                        $response->message = $request->post('value') ? 'Теперь с клиентом работают только по согласованию.' : 'Согласование для работы с клиентом выключено.';
+                    case 'protection':
+                        // П2д: «Авто» (by payments and services) or «Всегда по согласованию».
+                        $always = (string)$request->post('value') === 'always' || (string)$request->post('value') === '1';
+                        $access->setApprovalRequired($code, $id, $always);
+                        $response->message = $always ? 'Теперь с клиентом работают только по согласованию.'
+                            : 'Защита клиента считается автоматически: '.\skeeks\cms\crm\CrmProtection::describe($code, $id).'.';
+                        break;
+                    case 'pool':
+                        (new \skeeks\cms\crm\CrmProtection())->returnToPool($code, $id, $actorId);
+                        $response->message = 'Клиент возвращён в общий пул: его возьмёт в работу первый сотрудник, который его найдёт.';
                         break;
                     case 'level':
                         $access->setLevel($code, $id, (int)$request->post('user_id'), (string)$request->post('level'));
@@ -210,6 +218,9 @@ trait ClientTransferActions
             'leaders' => $mainId ? $access->names(CmsDepartment::leaderIdsOf($mainId)) : [],
             'canManage' => $canManage,
             'approval' => $access->approvalRequired($code, $id),
+            'protectionReady' => \skeeks\cms\crm\CrmProtection::ready(),
+            'protectionState' => \skeeks\cms\crm\CrmProtection::state($code, $id),
+            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id),
             'canTransfer' => $canTransfer,
             'transferUrl' => Url::current([0 => '/'.$this->uniqueId.'/transfer']),
             'work' => $canTransfer ? (new CrmClientTransfer())->openWork($code, $id) : ['leads' => [], 'tasks' => []],
