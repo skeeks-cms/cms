@@ -38,6 +38,7 @@ class CrmAccessLog
     public const TRANSFER = 'transfer';
     public const MAIN_AUTO = 'main_auto';
     public const POOL = 'pool';
+    public const PROTECTION = 'protection';
 
     public static function events(): array
     {
@@ -55,6 +56,7 @@ class CrmAccessLog
             self::TRANSFER => 'Клиент передан',
             self::MAIN_AUTO => 'Основной ответственный назначен',
             self::POOL => 'Возвращён в общий пул',
+            self::PROTECTION => 'Защита изменена',
         ];
     }
 
@@ -153,6 +155,9 @@ class CrmAccessLog
                 break;
             case self::POOL:
                 $text = 'клиент возвращён в общий пул';
+                break;
+            case self::PROTECTION:
+                $text = 'защита клиента изменена';
                 break;
             default:
                 $text = self::events()[$log->event] ?? $log->event;

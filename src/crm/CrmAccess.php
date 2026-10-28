@@ -393,7 +393,8 @@ class CrmAccess extends Component
     /** Ready filters of the company and client lists by the main responsible. */
     public static function responsibleFilterItems(): array
     {
-        $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_responsible' => 'Без ответственного', 'pool' => 'Общий пул'] : [];
+        $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_main' => 'Без основного ответственного',
+            'no_responsible' => 'Без сотрудников', 'pool' => 'Общий пул'] : [];
         if (CrmProtection::ready()) {
             // П2д: the protection of the client.
             foreach (CrmProtection::states() as $state => $name) {
@@ -424,6 +425,8 @@ class CrmAccess extends Component
         $links = $class::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($idColumn)]);
         if ($value === 'my_main') {
             $query->andWhere(['exists', $links->andWhere([$userColumn => $viewerId, 'is_main' => 1])]);
+        } elseif ($value === 'no_main') {
+            $query->andWhere(['not exists', $links->andWhere(['is_main' => 1])]);
         } elseif ($value === 'pool') {
             // П2д: no employee and not protected — taken into work by whoever finds it first.
             $query->andWhere(['not exists', $links]);
@@ -433,6 +436,25 @@ class CrmAccess extends Component
         } else {
             $query->andWhere(['not exists', $links]);
         }
+    }
+
+    /**
+     * The filters «Основной ответственный» and «Сотрудник работает» of the
+     * company and client lists: the employee is the main one, or has any link.
+     *
+     * @param string $idColumn the id column of the listed records, e.g. "cms_company.id"
+     */
+    public function applyEmployeeFilter(\yii\db\Query $query, string $recordCode, int $userId, bool $mainOnly, string $idColumn): void
+    {
+        if ($userId <= 0) {
+            return;
+        }
+        [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
+        $links = $class::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($idColumn), $userColumn => $userId]);
+        if ($mainOnly && self::mainReady()) {
+            $links->andWhere(['is_main' => 1]);
+        }
+        $query->andWhere(['exists', $links]);
     }
 
     /** An employee is not a client: his own record has no responsible employees. */

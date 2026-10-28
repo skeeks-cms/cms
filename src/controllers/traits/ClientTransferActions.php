@@ -283,7 +283,13 @@ trait ClientTransferActions
                     case 'protection':
                         // П2д: «Авто» (by payments and services) or «Всегда по согласованию».
                         $always = (string)$request->post('value') === 'always' || (string)$request->post('value') === '1';
+                        $protectionBefore = \skeeks\cms\crm\CrmProtection::state($code, $id);
                         $access->setApprovalRequired($code, $id, $always);
+                        $protectionAfter = \skeeks\cms\crm\CrmProtection::state($code, $id);
+                        if ($protectionBefore !== $protectionAfter) {
+                            CrmAccessLog::write(CrmAccessLog::PROTECTION, $code, $id, ['actor_id' => $actorId,
+                                'comment' => \skeeks\cms\crm\CrmProtection::states()[$protectionBefore].' → '.\skeeks\cms\crm\CrmProtection::states()[$protectionAfter]]);
+                        }
                         $response->message = $always ? 'Теперь с клиентом работают только по согласованию.'
                             : 'Защита клиента считается автоматически: '.\skeeks\cms\crm\CrmProtection::describe($code, $id).'.';
                         break;

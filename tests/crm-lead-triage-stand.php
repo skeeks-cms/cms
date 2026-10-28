@@ -878,6 +878,41 @@ try {
             if ($strangerLog) {
                 $check(!$sees($strangerLog, $took), 'another employee does not see the events of a client not his');
             }
+
+            // The filters and bulk actions of the company list.
+            $as($admin);
+            $listed = static function (string $filter, ?int $userId = null, bool $mainOnly = false) use ($bare) {
+                $query = CmsCompany::find()->andWhere([CmsCompany::tableName().'.id' => $bare->id]);
+                if ($userId === null) {
+                    CrmAccess::instance()->applyResponsibleFilter($query, 'company', $filter, CmsCompany::tableName().'.id', 0);
+                } else {
+                    CrmAccess::instance()->applyEmployeeFilter($query, 'company', $userId, $mainOnly, CmsCompany::tableName().'.id');
+                }
+
+                return $query->exists();
+            };
+            $check($listed('no_main') && $listed('', (int)$other->id) && !$listed('', (int)$other->id, true),
+                'the filters «Без основного ответственного» and «Сотрудник работает»');
+            $bulk = static fn(string $operation, array $values) => (new \skeeks\cms\crm\CrmBulkAccessForm(array_merge(['operation' => $operation], $values)))->apply($bare);
+            $bulk(\skeeks\cms\crm\CrmBulkAccessForm::MAIN, ['user_id' => $owner->id]);
+            $bulkMain = $journal($bare, \skeeks\cms\crm\CrmAccessLog::MAIN_AUTO);
+            $check(CrmAccess::instance()->mainResponsibleId('company', (int)$bare->id) === (int)$owner->id && $bulkMain && (int)$bulkMain->actor_id === (int)$admin->id
+                && !$listed('no_main') && $listed('', (int)$owner->id, true), 'bulk «Назначить основного ответственного»: the main one, the journal, the filters');
+            $bulk(\skeeks\cms\crm\CrmBulkAccessForm::GRANT, ['user_id' => $other->id, 'level' => CrmAccess::LEVEL_EDIT]);
+            $bulkLevel = $journal($bare, \skeeks\cms\crm\CrmAccessLog::LEVEL);
+            $check(CrmAccess::instance()->linkLevel($other->id, 'company', (int)$bare->id) === CrmAccess::LEVEL_EDIT
+                && $bulkLevel && $bulkLevel->level_from === CrmAccess::LEVEL_DEAL && $bulkLevel->level_to === CrmAccess::LEVEL_EDIT,
+                'bulk «Добавить сотрудника с уровнем»: an existing link changes its level, written as «Уровень изменён»');
+            $bulk(\skeeks\cms\crm\CrmBulkAccessForm::PROTECTION, ['protection' => 'always']);
+            $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$bare->id) === 'always' && $journal($bare, \skeeks\cms\crm\CrmAccessLog::PROTECTION),
+                'bulk «Сменить защиту»: always by approval, written to the journal');
+            $bulk(\skeeks\cms\crm\CrmBulkAccessForm::PROTECTION, ['protection' => 'auto']);
+            $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$bare->id) !== 'always', 'bulk «Сменить защиту»: back to «Авто»');
+            if ($strangerLog) {
+                $check(!CrmAccess::instance()->canManageAccess((int)$strangerLog->id, 'company', (int)$bare->id)
+                    && CrmAccess::instance()->canManageAccess((int)$admin->id, 'company', (int)$bare->id),
+                    'a bulk action refuses a company the employee does not manage, an administrator manages all');
+            }
         }
     }
 
