@@ -655,6 +655,18 @@ CSS
                 'actions' => $cardActions,
                 'packageActions' => $canWork,
             ]); ?>
+                <?php // Pinned comments right under the block of actions, as in the company and client cards. ?>
+                <?php $pinnedLeadCommentsQuery = $model->getLogs()->comments()->pinned(); ?>
+                <?php if ($pinnedLeadCommentsQuery->count()) : ?>
+                    <?php BackendSurfaceWidget::begin(['title' => 'Закрепленные комментарии', 'raised' => true, 'responsive' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
+                        <?= CmsLogListWidget::widget([
+                            'query' => $pinnedLeadCommentsQuery,
+                            'is_show_model' => false,
+                            'is_show_pin_controls' => $canWork,
+                            'is_raised' => false,
+                        ]); ?>
+                    <?php BackendSurfaceWidget::end(); ?>
+                <?php endif; ?>
             <?php if ($leadTasks || $isInWork) : ?>
                 <?php BackendSurfaceWidget::begin([
                     'title' => 'Следующий шаг',
@@ -682,18 +694,6 @@ CSS
                     <?php endif; ?>
                 <?php BackendSurfaceWidget::end(); ?>
             <?php endif; ?>
-                <?php // Pinned comments under the form, as in the company and client cards. ?>
-                <?php $pinnedLeadCommentsQuery = $model->getLogs()->comments()->pinned(); ?>
-                <?php if ($pinnedLeadCommentsQuery->count()) : ?>
-                    <?php BackendSurfaceWidget::begin(['title' => 'Закрепленные комментарии', 'raised' => true, 'responsive' => true, 'options' => ['class' => 'sx-surface--compact']]); ?>
-                        <?= CmsLogListWidget::widget([
-                            'query' => $pinnedLeadCommentsQuery,
-                            'is_show_model' => false,
-                            'is_show_pin_controls' => $canWork,
-                            'is_raised' => false,
-                        ]); ?>
-                    <?php BackendSurfaceWidget::end(); ?>
-                <?php endif; ?>
                 <?= CmsLogListWidget::widget([
                     'query' => $model->getLogs()->activity(),
                     'is_show_model' => false,
