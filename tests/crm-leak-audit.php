@@ -210,7 +210,8 @@ try {
     $foreign = $lead($name('чужая сделка'), ['cms_company_id' => $A->id], (int)$admin->id, 913377);
     $ownP = $lead($name('своя сделка клиента Б'), ['cms_user_id' => $person->id], (int)$worker->id);
     $foreignP = $lead($name('чужая сделка клиента Б'), ['cms_user_id' => $person->id], (int)$admin->id);
-    $poolLead = $lead($name('сделка компании из пула'), ['cms_company_id' => $pool->id], (int)$admin->id);
+    // the general pool holds only clients without a history (owner's decision 29.10.2026): an unsorted inquiry only
+    $poolLead = $lead($name('сделка компании из пула'), ['cms_company_id' => $pool->id, 'status' => CmsLead::STATUS_NEW], (int)$admin->id);
     $protectedLead = $lead($name('сделка защищённой'), ['cms_company_id' => $protected->id], (int)$admin->id);
 
     $service = new CmsDeal(['name' => $name('услуга'), 'description' => '', 'cms_company_id' => $A->id, 'cms_deal_type_id' => 13,
@@ -229,7 +230,6 @@ try {
     $billA = $bill(['cms_company_id' => $A->id], 91337.71, 'счёт компании А');
     $db->createCommand()->insert('cms_deal2bill', ['shop_bill_id' => $billA->id, 'cms_deal_id' => $service->id, 'created_at' => time()])->execute();
     $billP = $bill(['cms_user_id' => $person->id], 91338.72, 'счёт клиента Б');
-    $billPool = $bill(['cms_company_id' => $pool->id], 91339.73, 'счёт компании из пула');
     $billProt = $bill(['cms_company_id' => $protected->id], 91340.74, 'счёт защищённой');
 
     $payment = static function (array $client, float $amount, string $what) use ($name, $siteId) {
@@ -357,16 +357,18 @@ try {
     // Г: a person without a company, protected by his personal payment, no link with the employee
     $G = $human('Клиент Г', [], (int)$admin->id, 'always');
     $payG = $payment(['cms_user_id' => $G->id], 82340.74, 'личный платёж Г');
-    // Д: a person without a company of the general pool
+    // Д: a person without a company of the general pool — no history, an unsorted inquiry only
     $D = $human('Клиент Д', [], null);
-    $leadD = $lead($name('сделка клиента Д'), ['cms_user_id' => $D->id], (int)$admin->id);
-    $billD = $bill(['cms_user_id' => $D->id], 92339.73, 'счёт клиента Д');
+    $leadD = $lead($name('сделка клиента Д'), ['cms_user_id' => $D->id, 'status' => CmsLead::STATUS_NEW], (int)$admin->id);
+    // Ж: a person without a company and without a main responsible, with an old payment — a history: not the pool
+    $Zh = $human('Клиент Ж', [], null);
+    $payZh = $payment(['cms_user_id' => $Zh->id, 'operation_at' => time() - 86400 * 1000], 82341.75, 'давний платёж Ж');
     // Е: a person of two companies — "Свои сделки" in one, "edit" in the other
     $E1 = $company('Компания Е1', [[(int)$admin->id, CrmAccess::LEVEL_FULL, 1], [(int)$worker->id, CrmAccess::LEVEL_DEAL, 0]]);
     $E2 = $company('Компания Е2', [[(int)$admin->id, CrmAccess::LEVEL_FULL, 1], [(int)$worker->id, CrmAccess::LEVEL_EDIT, 0]]);
     $E = $human('Клиент Е', [(int)$E1->id, (int)$E2->id], (int)$admin->id);
     echo "people: В {$V->id} (lead {$leadV->id}, service {$serviceV->id}, bill {$billV->id}, payment {$payV->id}, document {$docV->id}, КП $kpV),"
-        ." Г {$G->id} (payment {$payG->id}), Д {$D->id} (lead {$leadD->id}, bill {$billD->id}), Е {$E->id} (companies {$E1->id}/{$E2->id})\n";
+        ." Г {$G->id} (payment {$payG->id}), Д {$D->id} (lead {$leadD->id}), Ж {$Zh->id} (payment {$payZh->id}), Е {$E->id} (companies {$E1->id}/{$E2->id})\n";
 
     echo "fixture: company A {$A->id}, pool {$pool->id}, protected {$protected->id}, person {$person->id}; leads own {$own->id} foreign {$foreign->id};"
         ." service {$service->id}; bill {$billA->id}; payment {$payA->id}; document {$docA->id}; proposals $kpForeign/$kpCompany/$kpService/$kpOwn;"
@@ -579,7 +581,6 @@ try {
             $closed('Компания из пула: вкладка '.$tab, '/~sxx/cms/admin-cms-company/'.$tab.'?pk='.$pool->id, '');
         }
         $closed('Компания из пула: сделка по ссылке', '/~sxx/cms/admin-cms-lead/view?pk='.$poolLead->id, $poolLead->name);
-        $closed('Компания из пула: счёт по ссылке', '/~sxx/cms/admin-cms-bill/view?pk='.$billPool->id, '');
 
         // --- the protected company without a link ---
         foreach (['view', 'leads', 'deals', 'bills', 'documents', 'payments', 'tasks', 'telephony', 'log', 'crm-access'] as $tab) {
@@ -699,14 +700,14 @@ try {
         'личная сделка В' => $leadV->name, 'личная услуга В' => $serviceV->name, 'личный счёт В' => '92 337', 'личный платёж В' => '82 337',
         'личный документ В' => $docV->description, 'личное КП В' => AUDIT_PREFIX.'личное КП В '.$uniq, 'сумма сделки В' => '923 377',
         'коммент. личной сделки В' => AUDIT_PREFIX.'комментарий личной сделки В '.$uniq, 'коммент. личного счёта В' => AUDIT_PREFIX.'комментарий личного счёта В '.$uniq,
-        'клиент Г' => $G->first_name, 'платёж Г' => '82 340', 'сделка Д' => $leadD->name, 'счёт Д' => '92 339',
+        'клиент Г' => $G->first_name, 'платёж Г' => '82 340', 'сделка Д' => $leadD->name, 'клиент Ж' => $Zh->first_name, 'платёж Ж' => '82 341',
     ];
     $routes = [
         'личная сделка В' => ['admin-cms-lead', $leadV->id], 'личная услуга В' => ['admin-cms-deal', $serviceV->id],
         'личный счёт В' => ['admin-cms-bill', $billV->id], 'личный платёж В' => ['admin-payment', $payV->id],
         'личный документ В' => ['admin-cms-document', $docV->id], 'личное КП В' => ['admin-cms-proposal', $kpV],
         'клиент Г' => ['admin-user', $G->id], 'платёж Г' => ['admin-payment', $payG->id],
-        'сделка Д' => ['admin-cms-lead', $leadD->id], 'счёт Д' => ['admin-cms-bill', $billD->id],
+        'сделка Д' => ['admin-cms-lead', $leadD->id], 'клиент Ж' => ['admin-user', $Zh->id], 'платёж Ж' => ['admin-payment', $payZh->id],
     ];
     $personV = ['личная сделка В', 'личная услуга В', 'личный счёт В', 'личный платёж В', 'личный документ В', 'личное КП В', 'сумма сделки В',
         'коммент. личной сделки В', 'коммент. личного счёта В'];
@@ -800,26 +801,36 @@ try {
     // Д: the pool — his data and «Взять в работу», not his deal and bill
     [$code, $card] = $mustSeeClient('Клиент Д (пул): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
     $mustFail('Клиент Д (пул): кнопка «Взять в работу»', 'GET view → '.$code, $code === 200 && mb_strpos($card, 'Взять в работу') !== false, 'кнопки нет');
-    $hits = $code === 200 ? $found($card, ['сделка Д', 'счёт Д']) : [];
+    $hits = $code === 200 ? $found($card, ['сделка Д']) : [];
     $report('Клиент Д (пул): карточка без чужого', 'GET view → '.$code, (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
     foreach (['leads', 'bills', 'payments', 'tasks', 'log'] as $tab) {
         $closed('Клиент Д (пул): вкладка '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$D->id, '');
     }
     $closed('Клиент Д (пул): сделка по ссылке', '/~sxx/cms/admin-cms-lead/view?pk='.$leadD->id, '');
-    $closed('Клиент Д (пул): счёт по ссылке', '/~sxx/cms/admin-cms-bill/view?pk='.$billD->id, '');
+    // Ж: a history without a main responsible — not the pool, no «Взять в работу», closed without a link
+    foreach (['view', 'leads', 'bills', 'payments', 'log', 'crm-access', 'update'] as $tab) {
+        [$code, $card] = $closed('Клиент Ж (давний платёж, без основного): '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$Zh->id, '');
+        if ($tab === 'view') {
+            $takeable = $code === 200 && mb_strpos($card, 'Взять в работу') !== false;
+            $report('Клиент Ж: нет «Взять в работу»', 'GET view → '.$code, $takeable, $takeable ? 'кнопка есть: клиент с историей в пуле' : '');
+        }
+    }
+    $closed('Клиент Ж: платёж по ссылке', '/~sxx/shop/admin-payment/view?pk='.$payZh->id, '');
+    $mustFail('Клиент Ж: не в общем пуле', 'CrmAccess::inPool()', !CrmAccess::instance()->inPool(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT, (int)$Zh->id), 'в пуле');
     // Е: two companies, "deal" and "edit" — the best one, "edit", changes his data
     $mustSeeClient('Клиент Е: карточка', '/~sxx/cms/admin-user/view?pk='.$E->id, $E->first_name);
     [$code] = $http('/~sxx/cms/admin-user/update?pk='.$E->id);
     $mustFail('Клиент Е (deal + edit): правка данных', 'GET admin-user/update → '.$code, $code === 200, 'правка не открывается — лучший уровень не учтён');
     @unlink($jar);
-    foreach (['cms_user_get' => ['id' => $G->id], 'shop_payment_get' => ['id' => $payG->id], 'cms_lead_get' => ['id' => $leadD->id], 'shop_bill_get' => ['id' => $billD->id]] as $name => $args) {
-        [$status] = $tool($name, $args);
-        $report('MCP '.$name.' ('.($name === 'cms_user_get' || $name === 'shop_payment_get' ? 'клиент Г' : 'клиент Д').')', 'executeTool id='.$args['id'], $status === 'ok', $status === 'ok' ? 'вернул запись' : '');
+    foreach ([['cms_user_get', $G->id, 'клиент Г'], ['shop_payment_get', $payG->id, 'клиент Г'], ['cms_lead_get', $leadD->id, 'клиент Д'],
+                 ['cms_user_get', $Zh->id, 'клиент Ж'], ['shop_payment_get', $payZh->id, 'клиент Ж']] as [$name, $id, $whose]) {
+        [$status] = $tool($name, ['id' => $id]);
+        $report('MCP '.$name.' ('.$whose.')', 'executeTool id='.$id, $status === 'ok', $status === 'ok' ? 'вернул запись' : '');
     }
     foreach (['cms_user_list' => ['q' => $uniq], 'cms_crm_client_overview_list' => ['record_type' => 'client', 'q' => $uniq],
                  'cms_crm_history_get' => ['record_type' => 'client', 'record_id' => $G->id, 'limit' => 50]] as $name => $args) {
         [$status, $out] = $tool($name, $args);
-        $hits = $status === 'ok' ? $found($json($out), ['клиент Г', 'платёж Г', 'сделка Д', 'счёт Д']) : [];
+        $hits = $status === 'ok' ? $found($json($out), ['клиент Г', 'платёж Г', 'сделка Д', 'клиент Ж', 'платёж Ж']) : [];
         $report('MCP '.$name.' (Г, Д)', 'executeTool '.http_build_query($args).($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
     }
     [$status, $out] = $tool('cms_user_get', ['id' => $E->id]);
