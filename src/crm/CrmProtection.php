@@ -297,6 +297,49 @@ class CrmProtection
         return $plan;
     }
 
+    public const OLD_BASE_COMMENT = 'Назначен основным: старая база без ответственного';
+
+    /**
+     * Client persons of the old base in the general pool (owner's decision
+     * 29.10.2026): no company, no employee of their own, created before the
+     * given time. The cutoff is explicit, so people who come later from an
+     * import or a bot without a responsible stay in the pool.
+     *
+     * @return CmsUser[]
+     */
+    public function oldBasePeople(int $before, ?int $siteId = null): array
+    {
+        if (!CrmAccess::mainReady() || $before <= 0) {
+            return [];
+        }
+        $table = CmsUser::tableName();
+        $query = CmsUser::find()->andWhere([$table.'.is_worker' => 0])->andWhere(['<', $table.'.created_at', $before])
+            ->andWhere(['not exists', \skeeks\cms\models\CmsUser2manager::find()->select('id')->andWhere(['client_id' => new \yii\db\Expression($table.'.id')])])
+            ->andWhere(['not exists', \skeeks\cms\models\CmsCompany2user::find()->select('id')->andWhere(['cms_user_id' => new \yii\db\Expression($table.'.id')])])
+            ->orderBy([$table.'.id' => SORT_ASC]);
+        if ($siteId) {
+            $query->andWhere([$table.'.cms_site_id' => $siteId]);
+        }
+
+        return $query->all();
+    }
+
+    /** Makes the employee the main responsible of oldBasePeople(), each written to the journal. */
+    public function applyOldBase(array $people, int $userId): int
+    {
+        $count = 0;
+        foreach ($people as $person) {
+            if (CrmAccess::instance()->inPool(CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id)) {
+                CrmAccess::instance()->setMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id, $userId);
+                CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id, ['actor_id' => null, 'user_id' => $userId,
+                    'level_to' => CrmAccess::LEVEL_FULL, 'comment' => self::OLD_BASE_COMMENT]);
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
     /** Applies mainPlan(): the chosen employee becomes the main responsible ("full"). */
     public function applyMainPlan(array $plan): int
     {
