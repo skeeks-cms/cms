@@ -970,6 +970,19 @@ try {
     $check(strpos($card, 'admin-cms-company-phone/create') === false && strpos($card, 'Изменить телефон') === false
         && strpos($card, 'admin-cms-company-address/create') === false && strpos($card, 'crm-access-add') === false,
         'HTTP: the company card of "deal" has no add, edit or access buttons');
+    // «Доступы» — the standard list of the journal; the old addresses lead there.
+    [$code, $journalPage] = $http('/~sxx/cms/admin-cms-crm-access-log');
+    $check($code === 200 && strpos($journalPage, 'Ждут моего решения') !== false && strpos($journalPage, 'sx-grid-multi-btn') === false,
+        'HTTP: «Доступы» opens with the tab «Ждут моего решения», no bulk actions');
+    foreach (['/~sxx/cms/admin-cms-company/crm-access-log', '/~sxx/cms/admin-cms-crm-access-request'] as $oldPath) {
+        $curl = curl_init($base.$oldPath);
+        curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEFILE => $jar, CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTPHEADER => ['Host: '.(getenv('TEST_HTTP_HOST') ?: 'localhost:8080')]]);
+        curl_exec($curl);
+        $check(in_array((int)curl_getinfo($curl, CURLINFO_HTTP_CODE), [301, 302], true)
+            && strpos((string)curl_getinfo($curl, CURLINFO_REDIRECT_URL), 'admin-cms-crm-access-log') !== false, 'HTTP: '.$oldPath.' leads to «Доступы»');
+        curl_close($curl);
+    }
     preg_match('/name="csrf-param" content="([^"]+)"/', $card, $param);
     preg_match('/name="csrf-token" content="([^"]+)"/', $card, $token);
     $csrf = $param && $token ? [$param[1] => html_entity_decode($token[1])] : [];

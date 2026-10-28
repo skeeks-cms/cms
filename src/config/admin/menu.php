@@ -331,8 +331,6 @@ return array_merge(dashboardsMenu(), [
                 'priority' => 110,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/company.svg'],
                 "url"      => ["cms/admin-cms-company"],
-                // Requests waiting for my decision (the tab «Доступы» of the section, the journal of the access).
-                'badge'    => static fn() => \skeeks\cms\crm\CrmAccess::instance()->pendingRequestsCount((int)\Yii::$app->user->id),
             ],
 
             [
@@ -349,6 +347,16 @@ return array_merge(dashboardsMenu(), [
                         'priority' => 0,
                     ],
                 ],*/
+            ],
+            // The journal of the access to clients; the counter — requests waiting for my decision
+            // (the default tab «Ждут моего решения» opens).
+            [
+                'label'          => 'Доступы',
+                'priority'       => 190,
+                "img"            => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/access-request.svg'],
+                "url"            => ["cms/admin-cms-crm-access-log"],
+                'accessCallback' => static fn() => \skeeks\cms\crm\CrmAccessLog::ready() && \skeeks\cms\crm\CrmAccess::mainReady(),
+                'badge'          => static fn() => \skeeks\cms\crm\CrmAccess::instance()->pendingRequestsCount((int)\Yii::$app->user->id),
             ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Сделки'),

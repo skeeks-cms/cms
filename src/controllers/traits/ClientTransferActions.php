@@ -87,62 +87,16 @@ trait ClientTransferActions
     }
 
     /**
-     * «Доступы» — a tab of «Компании» (the journal of the access to clients,
-     * crm\CrmAccessLog): every employee of the CRM sees the events he may see.
+     * The old address of the journal (a tab of «Компании» before 29.10.2026):
+     * the journal is the section «Доступы» (AdminCmsCrmAccessLogController).
      */
     public function clientAccessLogAction(): array
     {
         return [
             'class' => \skeeks\cms\backend\ViewBackendAction::class,
-            'name' => 'Доступы',
-            'icon' => 'fas fa-user-shield',
-            'priority' => 1100,
-            'callback' => [$this, 'clientAccessLog'],
-            'accessCallback' => static fn() => CrmAccessLog::ready() && CrmAccess::mainReady(),
+            'isVisible' => false,
+            'callback' => fn() => $this->redirect(['/cms/admin-cms-crm-access-log/index']),
         ];
-    }
-
-    public function clientAccessLog()
-    {
-        $request = \Yii::$app->request;
-        $userId = (int)\Yii::$app->user->id;
-        $table = \skeeks\cms\models\CmsCrmAccessLog::tableName();
-        $waiting = (int)\skeeks\cms\models\CmsCrmAccessLog::find()->andWhere(CrmAccessLog::waitingCondition($userId))->count();
-        $filters = [
-            'scope' => (string)$request->get('scope', $waiting ? 'waiting' : 'all'),
-            'event' => (string)$request->get('event', ''),
-            'employee' => (int)$request->get('employee', 0),
-            'company' => (int)$request->get('company', 0),
-            'dates' => (string)$request->get('dates', ''),
-        ];
-        $query = \skeeks\cms\models\CmsCrmAccessLog::find()->with(['actor', 'user', 'lead', 'request']);
-        if (($visible = CrmAccessLog::visibleCondition($userId)) !== null) {
-            $query->andWhere($visible);
-        }
-        if ($filters['scope'] === 'waiting') {
-            $query->andWhere(CrmAccessLog::waitingCondition($userId));
-        }
-        if (isset(CrmAccessLog::events()[$filters['event']])) {
-            $query->andWhere([$table.'.event' => $filters['event']]);
-        }
-        if ($filters['employee']) {
-            $query->andWhere(['or', [$table.'.actor_id' => $filters['employee']], [$table.'.user_id' => $filters['employee']]]);
-        }
-        if ($filters['company']) {
-            $query->andWhere([$table.'.record_code' => CmsCrmAccessRequest::RECORD_COMPANY, $table.'.record_id' => $filters['company']]);
-        }
-        if ($filters['dates'] && ($range = \skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget::parseRange($filters['dates']))) {
-            $query->andWhere(['between', $table.'.created_at', (int)$range[0], (int)$range[1]]);
-        }
-
-        return $this->render('@skeeks/cms/views/crm/access-log', [
-            'provider' => new \yii\data\ActiveDataProvider([
-                'query' => $query->orderBy([$table.'.created_at' => SORT_DESC, $table.'.id' => SORT_DESC]),
-                'pagination' => ['pageSize' => 50],
-            ]),
-            'filters' => $filters,
-            'waiting' => $waiting,
-        ]);
     }
 
     /**

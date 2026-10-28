@@ -1,12 +1,13 @@
 <?php
 /**
  * Events of the journal of the access to clients (crm\CrmAccessLog) as a
- * table: the tab «Доступы» of «Компании» and the history at the bottom of
- * «Доступ» of a client. A pending request links its card (the decision).
+ * table: the history at the bottom of
+ * «Доступ» of a client (the full journal is the section «Доступы»). A pending
+ * request links its card (the decision).
  *
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsCrmAccessLog[] $events
- * @var bool $withClient show the client column (the tab «Доступы»)
+ * @var bool $withClient show the client column
  */
 
 use skeeks\cms\backend\widgets\BackendEntityLink;

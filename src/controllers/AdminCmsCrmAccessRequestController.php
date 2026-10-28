@@ -149,11 +149,11 @@ class AdminCmsCrmAccessRequestController extends BackendModelStandartController
         ]);
         // Requests are made by the CRM (crm\CrmAccessRequests), never by a form.
         unset($actions['create'], $actions['delete'], $actions['delete-multi']);
-        // The list is the tab «Доступы» of «Компании» (the journal); the card of a request stays here.
+        // The list is the section «Доступы» (the journal, AdminCmsCrmAccessLogController); the card of a request stays here.
         $actions['index'] = [
             'class' => ViewBackendAction::class,
             'isVisible' => false,
-            'callback' => fn() => $this->redirect(['/cms/admin-cms-company/crm-access-log', 'scope' => 'waiting']),
+            'callback' => fn() => $this->redirect(['/cms/admin-cms-crm-access-log/index']),
         ];
         // A record link opened in a new tab (BackendEntityLink falls back to "update") shows the card.
         $actions['update'] = [
