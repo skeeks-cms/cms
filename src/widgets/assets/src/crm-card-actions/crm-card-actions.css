@@ -1,0 +1,136 @@
+/* The block of actions of a CRM card: action tabs and the note field under them. */
+.sx-crm-actions {
+    padding: 0;
+}
+.sx-crm-actions__tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0 2px;
+    padding: 0 8px;
+    border-bottom: 1px solid var(--sx-color-border);
+}
+.sx-crm-actions__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 -1px;
+    padding: 9px 8px 8px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: none;
+    color: var(--sx-color-text-muted);
+    font: inherit;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+.sx-crm-actions__tab:hover,
+.sx-crm-actions__tab:focus-visible {
+    color: var(--sx-color-text);
+    outline: none;
+}
+.sx-crm-actions__tab:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--sx-color-focus-ring, var(--sx-color-accent-border));
+}
+.sx-crm-actions__tab.is-active {
+    border-bottom-color: var(--sx-color-accent);
+    color: var(--sx-color-text);
+    font-weight: 600;
+}
+.sx-crm-actions__tab svg {
+    flex: 0 0 auto;
+}
+.sx-crm-actions__tab[hidden],
+.sx-crm-actions__menu-item[hidden],
+.sx-crm-actions__more[hidden] {
+    display: none;
+}
+.sx-crm-actions__more {
+    position: relative;
+    display: flex;
+}
+.sx-crm-actions__more > summary {
+    list-style: none;
+}
+.sx-crm-actions__more > summary::-webkit-details-marker {
+    display: none;
+}
+.sx-crm-actions__menu {
+    position: absolute;
+    top: calc(100% + 2px);
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    min-width: 230px;
+    padding: 4px;
+    border: 1px solid var(--sx-menu-border-color, var(--sx-color-border));
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-menu-background, var(--sx-color-surface-raised));
+    box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
+}
+.sx-crm-actions__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: var(--sx-radius-control);
+    background: none;
+    color: var(--sx-menu-color, var(--sx-color-text));
+    font: inherit;
+    text-align: left;
+    white-space: nowrap;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+.sx-crm-actions__menu-item:hover,
+.sx-crm-actions__menu-item:focus {
+    background: var(--sx-menu-hover-background, var(--sx-color-surface-hover));
+    color: var(--sx-menu-active-color, var(--sx-color-accent));
+    outline: none;
+}
+.sx-crm-actions__body {
+    padding: 10px 12px 12px;
+}
+.sx-crm-actions__placeholder {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-color-surface);
+    color: var(--sx-color-text-subtle);
+    font: inherit;
+    text-align: left;
+    cursor: text;
+}
+.sx-crm-actions__placeholder:hover {
+    border-color: var(--sx-color-border-strong, var(--sx-color-border));
+}
+.sx-crm-actions__placeholder:focus-visible {
+    border-color: var(--sx-color-accent-border);
+    outline: none;
+}
+.sx-crm-actions.is-open .sx-crm-actions__placeholder {
+    display: none;
+}
+.sx-crm-actions__form[hidden] {
+    display: none;
+}
+@media (max-width: 575px) {
+    .sx-crm-actions__tabs {
+        padding: 0 4px;
+    }
+    .sx-crm-actions__tab {
+        padding: 8px 6px 7px;
+        font-size: 0.8125rem;
+    }
+    .sx-crm-actions__body {
+        padding: 8px;
+    }
+}

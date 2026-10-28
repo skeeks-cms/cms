@@ -39,6 +39,16 @@ class CmsCommentWidget extends Widget
      * @var bool Показывать управление закреплением комментария.
      */
     public $isShowPin = true;
+
+    /**
+     * @var string Подсказка в пустом поле.
+     */
+    public $placeholder = 'Напишите комментарий…';
+
+    /**
+     * @var bool Кнопка «Отмена» рядом с «Отправить» (data-sx-comment-cancel; её обрабатывает тот, кто свернул форму, например CrmCardActionsWidget).
+     */
+    public $isShowCancel = false;
     
     public $backend_url = ['/cms/admin-cms-log/add-comment'];
 

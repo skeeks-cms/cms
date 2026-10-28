@@ -233,16 +233,6 @@ $this->registerCss(<<<CSS
     margin-top: 0.25rem;
     overflow-wrap: anywhere;
 }
-.sx-lead-quick {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-}
-.sx-lead-quick .sx-lead-next-step__menu {
-    left: 0;
-    right: auto;
-}
 .sx-lead-success-hint {
     display: flex;
     align-items: center;
@@ -578,25 +568,17 @@ JS
                     'onclick' => 'new sx.classes.backend.widgets.Action('.$action.').go(); return false;',
                 ]);
             };
-            // П2б: quick actions in a row on top of the right column, as in amoCRM and Bitrix24:
-            // «Задача», «Примечание», «Позвонить», «Не дозвонились», «Письмо», then the actions of
-            // packages (CrmCardBlocksWidget::EVENT_ACTIONS: «Сделать КП», «Отправить презентацию», …).
-            $quick = [];
-            $icon = static fn(string $name): string => \skeeks\cms\backend\helpers\BackendIcon::renderConfigured($name, ['size' => 16]);
+            // The block of actions over the feed, as in Bitrix24 (CrmCardActionsWidget): «Примечание»,
+            // «Задача», «Позвонить», «Письмо», «Не дозвонились», then the tabs of packages
+            // (CrmCardBlocksWidget::EVENT_ACTIONS: «Отправить презентацию», «Отправить КП», …).
+            $cardActions = [];
             $taskUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                 '/cms/admin-cms-task/create',
                 'CmsTask' => ['cms_lead_id' => $model->id],
             ])->enableEmptyLayout()->enableNoActions()->url;
             $canTask = $canWork && \Yii::$app->user->can('cms/admin-task');
             if ($canTask) {
-                $quick[] = $openActionLink($icon('plus').' Задача', $taskUrl, $leadTasks ? 'secondary' : 'primary');
-            }
-            if ($canWork) {
-                $quick[] = Html::a($icon('message').' Примечание', '#sx-lead-note', [
-                    'class' => 'sx-button sx-button--secondary sx-button--sm',
-                    'data-pjax' => '0',
-                    'onclick' => 'var f = document.getElementById("sx-lead-note"); if (f) { f.scrollIntoView({behavior: "smooth", block: "center"}); var t = f.querySelector("textarea, [contenteditable=true]"); if (t) { t.focus(); } } return false;',
-                ]);
+                $cardActions['task'] = ['label' => 'Задача', 'icon' => 'plus', 'url' => $taskUrl];
             }
             // The phone and email of the request, else of the contact, else of the company (only a visible card).
             $contactOf = static function (string $kind) use ($model, $clientVisible, $companyVisible): string {
@@ -615,23 +597,12 @@ JS
             };
             $callPhone = $contactOf('phone');
             if ($canWork && $callPhone !== '') {
-                $quick[] = Html::button($icon('phone').' Позвонить', [
-                    'class' => 'sx-button sx-button--secondary sx-button--sm sx-telephony-btn',
+                $cardActions['call'] = ['label' => 'Позвонить', 'icon' => 'phone', 'options' => [
+                    'class' => 'sx-telephony-btn',
                     'data-value' => $callPhone,
                     'data-lead-id' => (int)$model->id,
                     'title' => 'Позвонить на '.$callPhone,
-                ]);
-            }
-            if ($canWork && $isInWork) {
-                $quick[] = $openActionLink(
-                    '<i class="fas fa-phone-slash" aria-hidden="true"></i> Не дозвонились',
-                    (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                        '/cms/admin-cms-lead/no-answer',
-                        'pk' => $model->id,
-                    ])->enableEmptyLayout()->enableNoActions()->url,
-                    'secondary',
-                    ['size' => 'small']
-                );
+                ]];
             }
             $mailTo = $contactOf('email');
             if ($canWork && $mailTo !== '') {
@@ -639,60 +610,26 @@ JS
                 $mailHtml = \skeeks\cms\widgets\admin\CrmContactBlockWidget::contactActions(
                     \skeeks\cms\widgets\admin\CrmContactBlockWidget::CONTACT_EMAIL, $mailTo, $model, []);
                 $mailOnClick = preg_match('/onclick="([^"]+)"/', $mailHtml, $match) ? html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5) : null;
-                $quick[] = $mailOnClick
-                    ? Html::button($icon('mail').' Письмо', ['class' => 'sx-button sx-button--secondary sx-button--sm', 'onclick' => $mailOnClick, 'title' => 'Письмо на '.$mailTo])
-                    : Html::a($icon('mail').' Письмо', 'mailto:'.$mailTo, ['class' => 'sx-button sx-button--secondary sx-button--sm', 'data-pjax' => '0']);
+                $cardActions['mail'] = ['label' => 'Письмо', 'icon' => 'mail', 'options' => [
+                    'onclick' => $mailOnClick ?: 'window.location.href = '.\yii\helpers\Json::encode('mailto:'.$mailTo).'; return false;',
+                    'title' => 'Письмо на '.$mailTo,
+                ]];
             }
-            $stepItems = $canWork ? \skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions($model) : [];
-            // The first two package actions stay in the row (КП, презентация), the rest go to «Ещё».
-            foreach (array_slice($stepItems, 0, 2, true) as $item) {
-                $quick[] = $openActionLink(
-                    (!empty($item['icon']) ? $icon((string)$item['icon']).' ' : '').Html::encode($item['label']),
-                    (string)$item['url'],
-                    'secondary'
-                );
+            if ($canWork && $isInWork) {
+                $cardActions['no-answer'] = [
+                    'label' => 'Не дозвонились',
+                    'icon' => 'phone-missed',
+                    'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        '/cms/admin-cms-lead/no-answer',
+                        'pk' => $model->id,
+                    ])->enableEmptyLayout()->enableNoActions()->url,
+                    'window' => ['size' => 'small'],
+                ];
             }
-            $stepItems = array_slice($stepItems, 2, null, true);
             if ($canTask && !$leadTasks) {
-                $nextStepActions[] = $openActionLink($icon('plus').' Поставить задачу', $taskUrl, 'primary');
-            }
-            if ($stepItems) {
-                $menu = '';
-                foreach ($stepItems as $item) {
-                    $menu .= Html::a(
-                        (!empty($item['icon']) ? \skeeks\cms\backend\helpers\BackendIcon::renderConfigured((string)$item['icon'], ['size' => 16]).' ' : '').Html::encode($item['label']),
-                        (string)$item['url'],
-                        [
-                            'class' => 'sx-lead-next-step__menu-item',
-                            'role' => 'menuitem',
-                            'data-pjax' => '0',
-                            'onclick' => 'this.closest("details").removeAttribute("open"); new sx.classes.backend.widgets.Action('
-                                .\yii\helpers\Json::encode(['isOpenNewWindow' => true, 'url' => (string)$item['url']]).').go(); return false;',
-                        ]
-                    );
-                }
-                $quick[] = Html::tag('details',
-                    Html::tag('summary', 'Ещё '
-                        .Html::tag('span', '▾', ['aria-hidden' => 'true']), ['class' => 'sx-button sx-button--secondary sx-button--sm'])
-                    .Html::tag('div', $menu, ['class' => 'sx-lead-next-step__menu', 'role' => 'menu']),
-                    ['class' => 'sx-lead-next-step__actions', 'data-sx-lead-step-menu' => true]
-                );
-                // A native <details>: closed by an outside click or Escape.
-                $this->registerJs(<<<JS
-$(document).on('click', function (e) {
-    $('[data-sx-lead-step-menu][open]').each(function () { if (!this.contains(e.target)) { this.removeAttribute('open'); } });
-}).on('keydown', function (e) {
-    if (e.key === 'Escape') { $('[data-sx-lead-step-menu][open]').removeAttr('open'); }
-});
-JS
-                );
+                $nextStepActions[] = $openActionLink(\skeeks\cms\backend\helpers\BackendIcon::renderConfigured('plus', ['size' => 16]).' Поставить задачу', $taskUrl, 'primary');
             }
             ?>
-            <?php if ($quick) : ?>
-                <div class="sx-surface sx-surface--raised sx-surface--compact sx-lead-quick" role="toolbar" aria-label="Быстрые действия">
-                    <?= implode('', $quick); ?>
-                </div>
-            <?php endif; ?>
                 <?php
                 $this->registerCss(<<<CSS
 .sx-lead-next-step__task {
@@ -705,48 +642,19 @@ JS
     flex-grow: 1;
     min-width: 0;
 }
-.sx-lead-next-step__actions {
-    position: relative;
-}
-.sx-lead-next-step__actions > summary {
-    list-style: none;
-    cursor: pointer;
-}
-.sx-lead-next-step__actions > summary::-webkit-details-marker {
-    display: none;
-}
-.sx-lead-next-step__menu {
-    position: absolute;
-    top: calc(100% + 4px);
-    right: 0;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    min-width: 230px;
-    padding: 4px;
-    border: 1px solid var(--sx-menu-border-color, var(--sx-color-border));
-    border-radius: var(--sx-radius-control);
-    background: var(--sx-menu-background, var(--sx-color-surface-raised));
-    box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
-}
-.sx-lead-next-step__menu-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: var(--sx-radius-control);
-    color: var(--sx-menu-color, var(--sx-color-text));
-    white-space: nowrap;
-    text-decoration: none !important;
-}
-.sx-lead-next-step__menu-item:hover,
-.sx-lead-next-step__menu-item:focus {
-    background: var(--sx-menu-hover-background, var(--sx-color-surface-hover));
-    color: var(--sx-menu-active-color, var(--sx-color-accent));
-}
 CSS
                 );
                 ?>
+            <?php $pjax = Pjax::begin(['id' => 'cms-lead-comments', 'options' => ['class' => 'sx-surface-stack sx-activity-thread']]); ?>
+            <?php // One block of actions with the note field, inside the feed pjax: a sent note reloads the feed. ?>
+            <?= \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget([
+                'model' => $model,
+                'commentUrl' => $canWork ? ['/cms/admin-cms-lead/add-comment', 'pk' => $model->id] : null,
+                'noteLabel' => $model->partner_id ? 'Партнёру' : 'Примечание',
+                'notePlaceholder' => $model->partner_id ? 'Напишите партнёру…' : 'Напишите примечание…',
+                'actions' => $cardActions,
+                'packageActions' => $canWork,
+            ]); ?>
             <?php if ($leadTasks || $isInWork) : ?>
                 <?php BackendSurfaceWidget::begin([
                     'title' => 'Следующий шаг',
@@ -774,13 +682,6 @@ CSS
                     <?php endif; ?>
                 <?php BackendSurfaceWidget::end(); ?>
             <?php endif; ?>
-            <?php $pjax = Pjax::begin(['id' => 'cms-lead-comments', 'options' => ['class' => 'sx-surface-stack sx-activity-thread']]); ?>
-                <?php if ($canWork) : ?>
-                    <?php // «Примечание» as in amoCRM; the quick action scrolls here. ?>
-                    <?php BackendSurfaceWidget::begin(['title' => $model->partner_id ? 'Написать партнёру' : 'Примечание', 'titleTag' => 'h2', 'raised' => true, 'responsive' => true, 'options' => ['id' => 'sx-lead-note']]); ?>
-                        <?= CmsCommentWidget::widget(['model' => $model, 'backend_url' => ['/cms/admin-cms-lead/add-comment', 'pk' => $model->id]]); ?>
-                    <?php BackendSurfaceWidget::end(); ?>
-                <?php endif; ?>
                 <?php // Pinned comments under the form, as in the company and client cards. ?>
                 <?php $pinnedLeadCommentsQuery = $model->getLogs()->comments()->pinned(); ?>
                 <?php if ($pinnedLeadCommentsQuery->count()) : ?>

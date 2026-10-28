@@ -80,7 +80,7 @@ JS
                 'preset'      => 'basic',
                 'paragraph'   => 'div',
                 'minHeight'   => 110,
-                'placeholder' => 'Напишите комментарий…',
+                'placeholder' => $widget->placeholder,
                 // Screenshots and files given to the text go to the attachments below.
                 'attachLabel' => $widget->isShowAttachments ? 'Прикрепить файлом' : false,
             ])->label(false); ?>
@@ -100,6 +100,9 @@ JS
     <?php // One row, as in the letter form: send, attach, pin. ?>
     <div class="sx-comment-actions">
         <button type="submit" class="sx-button sx-button--primary">Отправить</button>
+        <?php if ($widget->isShowCancel) : ?>
+            <button type="button" class="sx-button sx-button--secondary" data-sx-comment-cancel>Отмена</button>
+        <?php endif; ?>
         <?php if ($widget->isShowAttachments) : ?>
             <?php echo \skeeks\cms\widgets\formInputs\attachments\AttachmentsInputWidget::button(); ?>
         <?php endif; ?>
