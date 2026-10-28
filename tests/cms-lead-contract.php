@@ -312,7 +312,6 @@ foreach ([
         "'name'     => 'Сделки'",
         "'controllerRoute' => '/cms/admin-cms-lead'",
         $relation,
-        "'isStandartBeforeRender' => false",
         "can('cms/admin-lead')",
         "relatedIndexAction->grid['emptyState']",
     ] as $fragment) {
@@ -320,6 +319,22 @@ foreach ([
             throw new RuntimeException('The '.$owner.' card lead tab is incomplete: '.$fragment);
         }
     }
+}
+// The client card lists deals only; the company card has «Новая сделка» (the standard create button
+// of the related grid, the company chosen by LeadTriageActions::presetCreateCompany()) and the tab
+// stands second, right after «Профиль»; «Проекты» are not a tab of the company card.
+if (strpos($userController, "'isStandartBeforeRender' => false") === false) {
+    throw new RuntimeException('The client card lead tab must not show the create button.');
+}
+$companyLeadsTab = substr($companyController, (int)strpos($companyController, "'leads' => ["), 1200);
+if (strpos($companyLeadsTab, "'isStandartBeforeRender' => false") !== false || strpos($companyLeadsTab, "'priority' => 5,") === false) {
+    throw new RuntimeException('The company card lead tab must be second and offer «Новая сделка».');
+}
+if (strpos(substr($companyController, (int)strpos($companyController, "'projects' => ["), 400), "'isVisible' => false") === false) {
+    throw new RuntimeException('«Проекты» must not be a tab of the company card.');
+}
+if (strpos(file_get_contents(dirname(__DIR__).'/src/controllers/traits/LeadTriageActions.php'), '$this->presetCreateCompany(new LeadIdentityForm(') === false) {
+    throw new RuntimeException('«Новая сделка» from a company card must choose that company in «Кто это».');
 }
 if (strpos($controller, 'if (\\Yii::$app->controller !== $this)') === false
     || strpos($controller, 'return null;', strpos($controller, 'public function getModel()')) === false
