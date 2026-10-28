@@ -588,10 +588,13 @@ class CrmAccess extends Component
 
     /**
      * The level the employee works with a company or a person on: null when he
-     * does not see it; "full" for an administrator and for a leader who sees it
-     * through a subordinate. A person without an own link takes the best level
-     * of the employee's links to the person's companies (people of a company
-     * are its data).
+     * does not see it; "full" for an administrator. A leader takes the best
+     * level of his own link and of his subordinates' links, never above it
+     * (owner's decision 29.10.2026): a subordinate main or "full" — "full",
+     * "edit" — "edit", "deal" — "deal" (his "своё" is then the work of the
+     * department). A person without an own link takes the best level of the
+     * employee's links to the person's companies (people of a company are its
+     * data).
      */
     public function clientDataLevel($user, string $recordCode, int $recordId): ?string
     {
@@ -611,16 +614,16 @@ class CrmAccess extends Component
                 $records[] = [CmsCrmAccessRequest::RECORD_COMPANY, (int)$companyId];
             }
         }
-        $subordinates = array_map('intval', CmsDepartment::subordinateIds($userId));
+        // He and his subordinates (as ownerIds()).
+        $ownerIds = array_values(array_unique(array_merge([$userId], array_map('intval', CmsDepartment::subordinateIds($userId)))));
         $best = null;
         foreach ($records as [$code, $id]) {
-            // A client of a subordinate: the leader works on it without limits.
-            if ($subordinates && array_intersect($this->linkedIds($code, $id, null), $subordinates)) {
-                return self::LEVEL_FULL;
-            }
-            $level = $this->linkLevel($userId, $code, $id);
-            if (self::levelRank($level) > self::levelRank($best)) {
-                $best = $level;
+            // His own link and his subordinates' ones: the best of them, not above.
+            foreach ($ownerIds as $ownerId) {
+                $level = $this->linkLevel($ownerId, $code, $id);
+                if (self::levelRank($level) > self::levelRank($best)) {
+                    $best = $level;
+                }
             }
         }
 
@@ -695,8 +698,10 @@ class CrmAccess extends Component
     }
 
     /**
-     * Companies whose deals the employee does not see except his own: his link
-     * is "Свои сделки" and no subordinate of his works on the company (П2а+).
+     * Companies whose deals the employee does not see except his own: the best
+     * link of him and his subordinates is "Свои сделки" (П2а+; a leader is
+     * limited as his best subordinate, clientDataLevel()); "своё" are then the
+     * deals of him and his subordinates.
      * Lists of deals and of records tied to deals (proposals) exclude the
      * other deals of these companies; the company itself, its data and its
      * feed stay visible. Null — nothing to exclude (levels off, no migration).
@@ -709,16 +714,13 @@ class CrmAccess extends Component
             return null;
         }
         $userId = $this->userId($user);
-        $query = CmsCompany2manager::find()->alias('dealOnly')->select('dealOnly.cms_company_id')
-            ->andWhere(['dealOnly.cms_user_id' => $userId, 'dealOnly.access_level' => self::LEVEL_DEAL]);
-        $subordinates = array_map('intval', CmsDepartment::subordinateIds($userId));
-        if ($subordinates) {
-            $query->andWhere(['not exists', CmsCompany2manager::find()->alias('bySubordinate')->select('bySubordinate.id')
-                ->andWhere('bySubordinate.cms_company_id = dealOnly.cms_company_id')
-                ->andWhere(['bySubordinate.cms_user_id' => $subordinates])]);
-        }
+        $ownerIds = array_values(array_unique(array_merge([$userId], array_map('intval', CmsDepartment::subordinateIds($userId)))));
 
-        return $query;
+        return CmsCompany2manager::find()->alias('dealOnly')->select('dealOnly.cms_company_id')
+            ->andWhere(['dealOnly.cms_user_id' => $ownerIds, 'dealOnly.access_level' => self::LEVEL_DEAL])
+            ->andWhere(['not exists', CmsCompany2manager::find()->alias('wider')->select('wider.id')
+                ->andWhere('wider.cms_company_id = dealOnly.cms_company_id')
+                ->andWhere(['wider.cms_user_id' => $ownerIds, 'wider.access_level' => [self::LEVEL_EDIT, self::LEVEL_FULL]])]);
     }
 
     /**

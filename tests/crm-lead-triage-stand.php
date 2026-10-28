@@ -928,6 +928,47 @@ try {
         }
     }
 
+    // A leader takes the best level of his subordinates on a client, never above it.
+    $leader = null;
+    $subordinate = null;
+    foreach (CmsDepartment::find()->all() as $department) {
+        $candidate = CmsUser::findOne((int)$department->worker_id);
+        if (!$candidate || CrmAccess::instance()->isAdmin($candidate)) {
+            continue;
+        }
+        foreach (CmsDepartment::subordinateIds((int)$candidate->id) as $subordinateId) {
+            $user = CmsUser::findOne((int)$subordinateId);
+            if ($user && !CrmAccess::instance()->isAdmin($user) && !CmsDepartment::subordinateIds((int)$user->id)) {
+                [$leader, $subordinate] = [$candidate, $user];
+                break 2;
+            }
+        }
+    }
+    if ($leader && CrmAccess::mainReady()) {
+        $foreign = new CmsCompany(['name' => 'Клиент другого отдела '.$uniq]);
+        $foreign->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $foreign->id]);
+        CrmAccess::instance()->setMain('company', (int)$foreign->id, (int)$admin->id, CrmAccess::LEVEL_EDIT);
+        CrmAccess::instance()->grantLink('company', (int)$foreign->id, (int)$subordinate->id, CrmAccess::LEVEL_DEAL);
+        $subLead = new CmsLead(['name' => 'Сделка подчинённого '.$uniq, 'cms_site_id' => $siteId, 'cms_company_id' => $foreign->id,
+            'executor_id' => $subordinate->id, 'status' => CmsLead::STATUS_IN_WORK]);
+        $subLead->save(false);
+        $mainLead = new CmsLead(['name' => 'Сделка основного '.$uniq, 'cms_site_id' => $siteId, 'cms_company_id' => $foreign->id,
+            'executor_id' => $admin->id, 'status' => CmsLead::STATUS_IN_WORK]);
+        $mainLead->save(false);
+        $leadsSeen = static fn() => CmsLead::find()->forManager($leader)->andWhere([CmsLead::tableName().'.id' => [$subLead->id, $mainLead->id]])->select(CmsLead::tableName().'.id')->column();
+        $check(CrmAccess::instance()->clientDataLevel($leader, 'company', (int)$foreign->id) === CrmAccess::LEVEL_DEAL
+            && !CrmAccess::instance()->canManageAccess($leader, 'company', (int)$foreign->id)
+            && CrmAccess::instance()->dealOnlyCompanyIds($leader)->andWhere(['dealOnly.cms_company_id' => $foreign->id])->exists(),
+            'a leader whose subordinate has "deal" on a foreign client gets "deal", no access management');
+        $check(array_map('intval', $leadsSeen()) === [(int)$subLead->id], 'the leader sees the deal of his subordinate, not the other deals of the client');
+        $check(CrmAccess::instance()->feedCondition($leader, $foreign) !== null, 'the feed of the client is limited for the leader');
+        CrmAccess::instance()->setMain('company', (int)$foreign->id, (int)$subordinate->id, CrmAccess::LEVEL_EDIT);
+        $check(CrmAccess::instance()->clientDataLevel($leader, 'company', (int)$foreign->id) === CrmAccess::LEVEL_FULL
+            && CrmAccess::instance()->canManageAccess($leader, 'company', (int)$foreign->id) && count($leadsSeen()) === 2,
+            'the subordinate is the main responsible: the leader gets "full", manages the access, sees every deal');
+    }
+
     // --- leaders ---
     foreach (CmsDepartment::find()->all() as $department) {
         foreach (CmsDepartment::subordinateIds((int)$department->worker_id) as $subordinateId) {
