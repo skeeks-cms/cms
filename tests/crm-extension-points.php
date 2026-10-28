@@ -341,8 +341,13 @@ crmExtensionExpect(array_keys(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::act
     'Actions are ordered by priority; an action without a label or an address is dropped.');
 crmExtensionExpect(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::actions(null) === [], 'No record, no actions.');
 Event::off(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\widgets\admin\CrmCardBlocksWidget::EVENT_ACTIONS, $actionsHandler);
-crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/view.php'), 'CrmCardBlocksWidget::actions(') !== false,
-    'The next step of a lead offers the actions of packages.');
+// The block of actions over the feed takes the tabs of packages; deal, company and client cards connect it.
+crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/widgets/admin/CrmCardActionsWidget.php'), 'CrmCardBlocksWidget::actions(') !== false,
+    'The block of actions of a card offers the actions of packages.');
+foreach (['admin-cms-lead/view.php', 'admin-cms-company/view.php', 'admin-user/view.php'] as $cardView) {
+    crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/views/'.$cardView), 'CrmCardActionsWidget::widget(') !== false,
+        'The card '.$cardView.' shows the block of actions.');
+}
 
 // «Каналы связи» of a client person: core emails and phones, channels and notes of packages, order by priority.
 \Yii::$app->db->createCommand('CREATE TABLE IF NOT EXISTS cms_user (id INTEGER PRIMARY KEY, is_worker INTEGER DEFAULT 0)')->execute();
