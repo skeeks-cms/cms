@@ -324,18 +324,18 @@ return array_merge(dashboardsMenu(), [
         'label'    => \Yii::t('skeeks/cms', 'Клиенты и сделки'),
         'priority' => 190,
         "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
-        "url"      => ["cms/admin-cms-company"],
+        "url"      => ["cms/admin-cms-lead"],
         'items' => [
             [
                 'label'    => \Yii::t('skeeks/cms', 'Компании'),
-                'priority' => 100,
+                'priority' => 110,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/company.svg'],
                 "url"      => ["cms/admin-cms-company"],
             ],
 
             [
                 'label'    => \Yii::t('skeeks/cms', 'Клиенты'),
-                'priority' => 110,
+                'priority' => 120,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                 "url"      => ["cms/admin-user"],
 
@@ -351,7 +351,7 @@ return array_merge(dashboardsMenu(), [
             // П2а: requests about a client of another main responsible; the counter — pending ones I decide.
             [
                 'label'          => 'Запросы доступа',
-                'priority'       => 115,
+                'priority'       => 190,
                 "img"            => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/access-request.svg'],
                 "url"            => ["cms/admin-cms-crm-access-request"],
                 'accessCallback' => static fn() => \skeeks\cms\crm\CrmAccess::instance()->canUseRequests((int)\Yii::$app->user->id),
@@ -359,26 +359,26 @@ return array_merge(dashboardsMenu(), [
             ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Сделки'),
-                'priority' => 120,
+                'priority' => 100,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                 "url"      => ["cms/admin-cms-lead"],
             ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Счета'),
-                'priority' => 215,
+                'priority' => 130,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/bill.svg'],
                 "url"      => ["cms/admin-cms-bill"],
             ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Документы'),
-                'priority' => 216,
+                'priority' => 150,
                 "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/bill.svg'],
                 "url"      => ["cms/admin-cms-document"],
             ],
 
             [
                 "label" => \Yii::t('skeeks/cms', 'Реквизиты'),
-                'priority' => 215,
+                'priority' => 160,
                 "url"   => ["/cms/admin-cms-contractor"],
                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/contractor.svg'],
             ],
