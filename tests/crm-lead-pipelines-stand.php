@@ -306,30 +306,32 @@ try {
     $check($fresh->save(), 'an empty pipeline is created');
     $check(OutboundSales::ensureStages($fresh) === OutboundSales::DEFAULT_STAGES
         && array_map(static fn($s) => $s->name, CmsLeadStage::forPipeline($fresh, $siteId)) === OutboundSales::DEFAULT_STAGES,
-        'an outbound pipeline without stages gets «Первый контакт», «КП отправлено», «Смотрел», «Думает»');
+        'an outbound pipeline without stages gets «Первый контакт», «КП отправлено», «Смотрел», «Ответил», «Думает»');
     $own = new CmsLeadPipeline(['cms_site_id' => $siteId, 'name' => 'Тест П2д: своя', 'sort' => 901, 'is_default' => 0, 'success_rule' => CmsLeadPipeline::SUCCESS_MANUAL]);
     $check($own->save(), 'a pipeline with its own stages is created');
     foreach (['Звонок' => 10, 'Встреча' => 20] as $name => $sort) {
         (new CmsLeadStage(['cms_site_id' => $siteId, 'cms_lead_pipeline_id' => (int)$own->id, 'name' => $name, 'sort' => $sort]))->save();
     }
-    $check(OutboundSales::ensureStages($own) === [OutboundSales::STAGE_SENT, OutboundSales::STAGE_VIEWED]
-        && array_map(static fn($s) => $s->name, CmsLeadStage::forPipeline($own, $siteId)) === ['Звонок', OutboundSales::STAGE_SENT, OutboundSales::STAGE_VIEWED, 'Встреча']
+    $check(OutboundSales::ensureStages($own) === [OutboundSales::STAGE_SENT, OutboundSales::STAGE_VIEWED, OutboundSales::STAGE_REPLIED]
+        && array_map(static fn($s) => $s->name, CmsLeadStage::forPipeline($own, $siteId)) === ['Звонок', OutboundSales::STAGE_SENT, OutboundSales::STAGE_VIEWED, OutboundSales::STAGE_REPLIED, 'Встреча']
         && OutboundSales::ensureStages($own) === [],
-        'a pipeline with stages keeps them and only gets «КП отправлено» and «Смотрел» after the first one, once');
+        'a pipeline with stages keeps them and only gets «КП отправлено», «Смотрел», «Ответил» after the first one, once');
     $outbound->refresh();
     $check(OutboundSales::stage($outbound, OutboundSales::ROLE_SENT) && OutboundSales::stage($outbound, OutboundSales::ROLE_VIEWED)
-        && (int)OutboundSales::pipeline($siteId)->id === (int)$outbound->id, 'the stand «Исходящие продажи» has «КП отправлено» and «Смотрел» (migration m261029_100000)');
+        && OutboundSales::stage($outbound, OutboundSales::ROLE_REPLIED)
+        && (int)OutboundSales::pipeline($siteId)->id === (int)$outbound->id,
+        'the stand «Исходящие продажи» has «КП отправлено», «Смотрел» and «Ответил» for campaigns (migrations m261029_100000, m261029_110000)');
 
     $sentStage = OutboundSales::stage($outbound, OutboundSales::ROLE_SENT);
     $viewedStage = OutboundSales::stage($outbound, OutboundSales::ROLE_VIEWED);
-    $feed = static function (CmsLead $lead, string $event) {
+    $feed = static function (CmsLead $lead, string $event, int $sendId = 0) {
         $log = new skeeks\cms\models\CmsLog();
         $log->model_code = (string)$lead->skeeksModelCode;
         $log->model_id = (int)$lead->id;
         $log->model_as_text = (string)$lead->name;
         $log->log_type = OutboundSales::PROPOSAL_LOG_TYPE;
         $log->comment = 'КП №0';
-        $log->data = ['id' => 0, 'event' => $event];
+        $log->data = array_filter(['id' => 0, 'event' => $event, 'send' => $sendId]);
         $log->save(false);
         $lead->refresh();
     };
@@ -346,6 +348,24 @@ try {
     $check((int)$sale->cms_lead_stage_id === (int)$viewedStage->id, 'a link check does nothing, the first view moves it to «Смотрел»');
     $feed($sale, 'sent');
     $check((int)$sale->cms_lead_stage_id === (int)$viewedStage->id, 'a second sending does not move it back');
+    // The flow: a sending of a campaign (bot, API, mailing) does not move the deal — the campaign decides.
+    $db = Yii::$app->db;
+    $campaignSend = $db->getTableSchema('{{%cms_proposal_send}}') ? (int)(new yii\db\Query())->select('s.id')->from(['s' => '{{%cms_proposal_send}}'])
+        ->innerJoin(['m' => '{{%cms_comm_message}}'], 'm.id = s.cms_comm_message_id')->andWhere(['not', ['m.cms_comm_campaign_id' => null]])->scalar() : 0;
+    $manualSend = $db->getTableSchema('{{%cms_proposal_send}}') ? (int)(new yii\db\Query())->select('s.id')->from(['s' => '{{%cms_proposal_send}}'])
+        ->innerJoin(['m' => '{{%cms_comm_message}}'], 'm.id = s.cms_comm_message_id')->andWhere(['m.cms_comm_campaign_id' => null])->scalar() : 0;
+    if ($campaignSend && $manualSend) {
+        $check(OutboundSales::isCampaignSend($campaignSend) && !OutboundSales::isCampaignSend($manualSend) && !OutboundSales::isCampaignSend(0),
+            'a sending of a campaign is told from a manual one');
+        $flow = new CmsLead(['cms_site_id' => $siteId, 'name' => 'Тест П2д: поток', 'source_type' => CmsLead::SOURCE_MANUAL, 'cms_lead_pipeline_id' => (int)$outbound->id]);
+        $inWork($flow);
+        $start = (int)$flow->cms_lead_stage_id;
+        $feed($flow, 'sent', $campaignSend);
+        $feed($flow, 'opened', $campaignSend);
+        $check((int)$flow->cms_lead_stage_id === $start, 'a sending and a view of a campaign do not move the deal');
+        $feed($flow, 'sent', $manualSend);
+        $check((int)$flow->cms_lead_stage_id === (int)$sentStage->id, 'a manual sending from the deal moves it');
+    }
     $thinking = null;
     foreach (CmsLeadStage::forPipeline($outbound, $siteId) as $stage) {
         if ($stage->name === OutboundSales::STAGE_THINKING) {
@@ -391,6 +411,20 @@ try {
     $applied = (new LeadTriage())->applyIdentity($named, $identity, (int)$admin->id);
     $check(skeeks\cms\models\CmsCompanyLink::find()->andWhere(['cms_company_id' => (int)$applied['companyId'], 'url' => 'https://romashka-p2d-test.ru'])->exists(),
         'the site of a new company goes to its links');
+    // The rollback of «Услуга» refuses before any DDL while deals have it.
+    $sale->cms_deal_type_id = $type ? (int)$type->id : null;
+    if ($type && $sale->save()) {
+        require_once dirname(__DIR__).'/src/migrations/m261029_100000__alter_table__cms_lead_outbound.php';
+        $refused = null;
+        try {
+            (new m261029_100000__alter_table__cms_lead_outbound(['db' => Yii::$app->db, 'compact' => true]))->safeDown();
+        } catch (\yii\base\Exception $e) {
+            $refused = $e->getMessage();
+        }
+        $check($refused !== null && strpos($refused, 'Откат невозможен') !== false
+            && Yii::$app->db->getTableSchema('{{%cms_lead}}', true)->getColumn('cms_deal_type_id') !== null,
+            'the rollback of «Услуга» refuses while deals have it, the schema stays');
+    }
     $viewSource = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/_identity.php');
     $check(strpos($viewSource, "'company_site' => 'site'") !== false, 'the form «Новая сделка» has the field «Сайт» of a new company');
 

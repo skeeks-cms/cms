@@ -29,6 +29,11 @@ class m261029_100000__alter_table__cms_lead_outbound extends Migration
 
     public function safeDown()
     {
+        // MySQL does not roll DDL back: refuse before the first change rather than lose the services of deals.
+        $used = (int)(new \yii\db\Query())->from('{{%cms_lead}}')->andWhere(['not', ['cms_deal_type_id' => null]])->count('*', $this->db);
+        if ($used) {
+            throw new \yii\base\Exception('Откат невозможен: у '.$used.' сделок указана «Услуга», она пропала бы. Очистите поле у этих сделок, если откат действительно нужен. Схема не изменена.');
+        }
         // The stages stay: deals and the history may already stand on them.
         $this->dropForeignKey('cms_lead__cms_deal_type_id', '{{%cms_lead}}');
         $this->dropIndex('cms_lead__cms_deal_type_id', '{{%cms_lead}}');

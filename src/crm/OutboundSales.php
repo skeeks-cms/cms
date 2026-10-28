@@ -13,12 +13,16 @@ use yii\db\BaseActiveRecord;
  * «Исходящие продажи» (П2д, ARCHITECTURE.md п. 13): the default stages of
  * the outbound pipeline and the personal offer moving a deal through them.
  *
- * A presentation or a КП sent from a deal moves it to «КП отправлено», the
- * first view of the client — to «Смотрел». Only a deal in work of the
- * outbound pipeline moves, and only forward: a deal already further (or in
- * «Неразобранное», or closed) stays where it is. The pipeline and the two
- * stages are the settings of the site CRM (CrmSettings, «Исходящие
- * продажи»); empty — the pipeline by its code and the stages by their names.
+ * A presentation or a КП a manager sent from a deal moves it to «КП
+ * отправлено», the first view of the client — to «Смотрел». Only a deal in
+ * work of the outbound pipeline moves, and only forward: a deal already
+ * further (or in «Неразобранное», or closed) stays where it is. A sending of
+ * a campaign (the flow: a bot through MCP/API, a mailing) never moves a deal:
+ * the campaign makes or completes deals itself (cms-communication), and takes
+ * its stages «Смотрел» and «Ответил» here — pipeline() and stage(). The
+ * pipeline and the two stages of manual offers are the settings of the site
+ * CRM (CrmSettings, «Исходящие продажи»); empty — the pipeline by its code
+ * and the stages by their names.
  *
  * The core does not depend on cms-proposal: it listens to the feed entries
  * the proposal package writes into the card of the deal (CmsLog of type
@@ -32,13 +36,19 @@ class OutboundSales
     public const STAGE_FIRST = 'Первый контакт';
     public const STAGE_SENT = 'КП отправлено';
     public const STAGE_VIEWED = 'Смотрел';
+    public const STAGE_REPLIED = 'Ответил';
     public const STAGE_THINKING = 'Думает';
 
     /** The chain of a new outbound pipeline; «Успешно» and «Отказ» are the results of every pipeline. */
-    public const DEFAULT_STAGES = [self::STAGE_FIRST, self::STAGE_SENT, self::STAGE_VIEWED, self::STAGE_THINKING];
+    public const DEFAULT_STAGES = [self::STAGE_FIRST, self::STAGE_SENT, self::STAGE_VIEWED, self::STAGE_REPLIED, self::STAGE_THINKING];
 
     public const ROLE_SENT = 'sent';
     public const ROLE_VIEWED = 'viewed';
+    /** A reply of a campaign recipient (cms-communication); always by the name «Ответил». */
+    public const ROLE_REPLIED = 'replied';
+
+    /** Stage names by role, used when the settings choose none. */
+    public const ROLE_STAGES = [self::ROLE_SENT => self::STAGE_SENT, self::ROLE_VIEWED => self::STAGE_VIEWED, self::ROLE_REPLIED => self::STAGE_REPLIED];
 
     /** CmsLog::$log_type of the proposal feed (cms-proposal CmsProposal::LOG_TYPE). */
     public const PROPOSAL_LOG_TYPE = 'proposal';
@@ -67,7 +77,7 @@ class OutboundSales
         }
         try {
             $lead = CmsLead::findOne((int)$log->model_id);
-            if ($lead) {
+            if ($lead && !static::isCampaignSend((int)($data['send'] ?? 0))) {
                 static::advance($lead, $role);
             }
         } catch (\Throwable $e) {
@@ -108,6 +118,24 @@ class OutboundSales
         return true;
     }
 
+    /**
+     * The sending went out with a letter of a campaign (the flow). Read by
+     * tables, so the core needs neither cms-proposal nor cms-communication.
+     */
+    public static function isCampaignSend(int $sendId): bool
+    {
+        $db = CmsLead::getDb();
+        if (!$sendId || !$db->getTableSchema('{{%cms_proposal_send}}') || !$db->getTableSchema('{{%cms_comm_message}}')
+            || !$db->getTableSchema('{{%cms_comm_message}}')->getColumn('cms_comm_campaign_id')) {
+            return false;
+        }
+
+        return (new \yii\db\Query())->from(['s' => '{{%cms_proposal_send}}'])
+            ->innerJoin(['m' => '{{%cms_comm_message}}'], 'm.id = s.cms_comm_message_id')
+            ->andWhere(['s.id' => $sendId])->andWhere(['not', ['m.cms_comm_campaign_id' => null]])
+            ->exists($db);
+    }
+
     /** The outbound pipeline of a site: the setting, otherwise the one with the code `outbound`. */
     public static function pipeline(int $siteId): ?CmsLeadPipeline
     {
@@ -121,11 +149,15 @@ class OutboundSales
         return null;
     }
 
-    /** The stage of a role in the pipeline: the setting when it belongs there, otherwise by name. */
+    /**
+     * The stage of a role (ROLE_*) in the pipeline: the setting of manual
+     * offers when it belongs there, otherwise by name. A campaign takes
+     * «Смотрел» and «Ответил» of the outbound pipeline this way.
+     */
     public static function stage(CmsLeadPipeline $pipeline, string $role): ?CmsLeadStage
     {
-        $settingId = (int)self::setting($role === self::ROLE_SENT ? 'proposalSentStageId' : 'proposalViewedStageId');
-        $name = $role === self::ROLE_SENT ? self::STAGE_SENT : self::STAGE_VIEWED;
+        $settingId = (int)self::setting(['sent' => 'proposalSentStageId', 'viewed' => 'proposalViewedStageId'][$role] ?? '');
+        $name = self::ROLE_STAGES[$role] ?? '';
         $byName = null;
         foreach (CmsLeadStage::forPipeline($pipeline, (int)$pipeline->cms_site_id) as $stage) {
             if ($settingId && (int)$stage->id === $settingId) {
@@ -141,9 +173,10 @@ class OutboundSales
 
     /**
      * The default stages of an outbound pipeline: all of them for a pipeline
-     * without stages, otherwise only the missing «КП отправлено» and
-     * «Смотрел» the personal offer needs — «КП отправлено» after the first
-     * stage, «Смотрел» right after it. Nothing existing is changed.
+     * without stages, otherwise only the missing «КП отправлено», «Смотрел»
+     * and «Ответил» the offers and campaigns need — «КП отправлено» after the
+     * first stage, «Смотрел» right after it, «Ответил» after «Смотрел».
+     * Nothing existing is changed.
      *
      * @return string[] names of the created stages
      */
@@ -196,8 +229,13 @@ class OutboundSales
             $sent = $add(self::STAGE_SENT, $after($stages[0]));
             $stages[] = $sent;
         }
-        if (!$find(self::STAGE_VIEWED)) {
-            $stages[] = $add(self::STAGE_VIEWED, $after($sent));
+        $viewed = $find(self::STAGE_VIEWED);
+        if (!$viewed) {
+            $viewed = $add(self::STAGE_VIEWED, $after($sent));
+            $stages[] = $viewed;
+        }
+        if (!$find(self::STAGE_REPLIED)) {
+            $stages[] = $add(self::STAGE_REPLIED, $after($viewed));
         }
 
         return $created;
@@ -205,6 +243,6 @@ class OutboundSales
 
     private static function setting(string $name)
     {
-        return \Yii::$app->has('crmSettings') && isset(\Yii::$app->crmSettings->{$name}) ? \Yii::$app->crmSettings->{$name} : null;
+        return $name !== '' && \Yii::$app->has('crmSettings') && isset(\Yii::$app->crmSettings->{$name}) ? \Yii::$app->crmSettings->{$name} : null;
     }
 }
