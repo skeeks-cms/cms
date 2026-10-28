@@ -212,9 +212,12 @@ trait ClientTransferActions
             'callback' => [$this, 'clientAccess'],
             'accessCallback' => function () {
                 [$code, $id] = $this->transferRecord();
+                $access = CrmAccess::instance();
+                $userId = (int)\Yii::$app->user->id;
+                // Only who sees the client: a hidden one shows neither its name nor its employees.
+                $sees = $code === CmsCrmAccessRequest::RECORD_COMPANY ? $access->canSeeCompany($userId, (int)$id) : $access->canSeeClient($userId, (int)$id);
 
-                return $id && CrmAccess::mainReady() && (CrmAccess::instance()->accessList($code, $id)
-                    || CrmAccess::instance()->canTransferClient((int)\Yii::$app->user->id, $code, $id));
+                return $id && CrmAccess::mainReady() && $sees && ($access->accessList($code, $id) || $access->canTransferClient($userId, $code, $id));
             },
         ];
     }
@@ -305,7 +308,8 @@ trait ClientTransferActions
             'approval' => $access->approvalRequired($code, $id),
             'protectionReady' => \skeeks\cms\crm\CrmProtection::ready(),
             'protectionState' => \skeeks\cms\crm\CrmProtection::state($code, $id),
-            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id),
+            // The reason names payments and services: not for "deal" (it sees neither), nor a card of the pool.
+            'protectionText' => \skeeks\cms\crm\CrmProtection::describe($code, $id, $canManage || in_array($myLevel, [CrmAccess::LEVEL_EDIT, CrmAccess::LEVEL_FULL], true)),
             'canTransfer' => $canTransfer,
             'transferUrl' => Url::current([0 => '/'.$this->uniqueId.'/transfer']),
             'work' => $canTransfer ? (new CrmClientTransfer())->openWork($code, $id) : ['leads' => [], 'tasks' => []],

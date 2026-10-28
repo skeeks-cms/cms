@@ -906,6 +906,18 @@ try {
             $bulk(\skeeks\cms\crm\CrmBulkAccessForm::PROTECTION, ['protection' => 'always']);
             $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$bare->id) === 'always' && $journal($bare, \skeeks\cms\crm\CrmAccessLog::PROTECTION),
                 'bulk «Сменить защиту»: always by approval, written to the journal');
+            // «Доступ» of a hidden client does not open (its name, main responsible and protection stay hidden).
+            $hidden = new CmsCompany(['name' => 'Скрытая '.$uniq]);
+            $hidden->save(false);
+            CmsCompany2manager::deleteAll(['cms_company_id' => $hidden->id]);
+            CrmAccess::instance()->setMain('company', (int)$hidden->id, (int)$owner->id, CrmAccess::LEVEL_EDIT);
+            CrmAccess::instance()->setApprovalRequired('company', (int)$hidden->id, true);
+            $check($actionAllowed('cms/admin-cms-company', $hidden, 'crm-access'), 'an administrator opens «Доступ» of any client');
+            $as($other);
+            if (!CrmAccess::instance()->canSeeCompany((int)$other->id, (int)$hidden->id)) {
+                $check(!$actionAllowed('cms/admin-cms-company', $hidden, 'crm-access'), '«Доступ» of a client the employee does not see is closed');
+            }
+            $as($admin);
             $bulk(\skeeks\cms\crm\CrmBulkAccessForm::PROTECTION, ['protection' => 'auto']);
             $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$bare->id) !== 'always', 'bulk «Сменить защиту»: back to «Авто»');
             if ($strangerLog) {

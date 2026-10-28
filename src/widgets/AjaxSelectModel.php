@@ -73,7 +73,12 @@ class AjaxSelectModel extends AjaxSelect
 
         if (!$this->valueCallback) {
             $this->valueCallback = function ($value) use ($modelClass) {
-                return \yii\helpers\ArrayHelper::map($modelClass::find()->where([$this->modelPkAttribute => $value])->all(), $this->modelPkAttribute, $this->modelShowAttribute);
+                // The selected value is named only within what the search offers: a hidden record
+                // (e.g. an id of a foreign company put into the form address) stays unnamed.
+                $query = is_callable($this->searchQuery) ? $this->_createSearchQuery('') : $modelClass::find();
+                $query->limit(null)->offset(null)->andWhere([$modelClass::tableName().'.'.$this->modelPkAttribute => $value]);
+
+                return \yii\helpers\ArrayHelper::map($query->all(), $this->modelPkAttribute, $this->modelShowAttribute);
             };
         }
 

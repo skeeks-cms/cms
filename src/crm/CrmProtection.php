@@ -311,15 +311,19 @@ class CrmProtection
         return $count;
     }
 
-    /** «Под защитой до 15.03.2027: последний платёж 15.03.2026» and the like. */
-    public static function describe(string $recordCode, int $recordId): string
+    /**
+     * «Под защитой до 15.03.2027: последний платёж 15.03.2026» and the like.
+     * $withReason = false — the state only: the reason names payments and
+     * services, hidden from an employee with "deal".
+     */
+    public static function describe(string $recordCode, int $recordId, bool $withReason = true): string
     {
         $record = self::ready() ? self::record($recordCode, $recordId) : null;
         if (!$record) {
             return 'Свободная';
         }
         $state = (string)$record->crm_protection ?: self::FREE;
-        $reason = (string)$record->crm_protection_reason;
+        $reason = $withReason ? (string)$record->crm_protection_reason : '';
         if ($state === self::ALWAYS) {
             return 'Всегда по согласованию: включено вручную';
         }
