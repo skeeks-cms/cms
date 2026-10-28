@@ -536,6 +536,18 @@ CSS
                 'options' => ['class' => 'sx-surface-stack sx-activity-thread'],
             ]); ?>
 
+                <?php BackendSurfaceWidget::begin([
+                    'title'      => 'Добавить комментарий',
+                    'titleTag'   => 'h3',
+                    'raised'     => true,
+                    'responsive' => true,
+                ]); ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
+                        'model' => $model,
+                    ]); ?>
+                <?php BackendSurfaceWidget::end(); ?>
+
+                <?php // Pinned comments under the form, as in the deal and client cards. ?>
                 <?php $pinnedCompanyCommentsQuery = $model->getCompanyLogs()->comments()->pinned(); ?>
                 <?php if ($pinnedCompanyCommentsQuery->count()) : ?>
                     <?php BackendSurfaceWidget::begin($surfaceConfig('Закрепленные комментарии')); ?>
@@ -547,17 +559,6 @@ CSS
                         ]); ?>
                     <?php BackendSurfaceWidget::end(); ?>
                 <?php endif; ?>
-
-                <?php BackendSurfaceWidget::begin([
-                    'title'      => 'Добавить комментарий',
-                    'titleTag'   => 'h3',
-                    'raised'     => true,
-                    'responsive' => true,
-                ]); ?>
-                    <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                        'model' => $model,
-                    ]); ?>
-                <?php BackendSurfaceWidget::end(); ?>
 
                 <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
                     'query'                => $model->getCompanyLogs()->activity(),

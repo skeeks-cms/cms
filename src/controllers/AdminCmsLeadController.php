@@ -866,7 +866,8 @@ JS
             if (trim(html_entity_decode(strip_tags($log->comment), ENT_QUOTES | ENT_HTML5, 'UTF-8')) === '') {
                 throw new \RuntimeException('Напишите текст комментария.');
             }
-            $log->is_pinned = 0;
+            // «Закрепить комментарий» of the form, as in the company and client cards.
+            $log->is_pinned = $log->is_pinned ? 1 : 0;
             if (!$log->save()) { throw new \RuntimeException(implode('; ', $log->getFirstErrors())); }
             $this->model->notifyPartnerAboutComment((int)$log->id);
             $response->success = true;

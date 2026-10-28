@@ -448,6 +448,19 @@ JS
                             ]); ?>
                 <?php BackendSurfaceWidget::end(); ?>
 
+                <?php // Pinned comments under the form, as in the company and deal cards. ?>
+                <?php $pinnedUserCommentsQuery = $model->getUserLogs()->comments()->pinned(); ?>
+                <?php if ($pinnedUserCommentsQuery->count()) : ?>
+                    <?php BackendSurfaceWidget::begin($surfaceConfig('Закрепленные комментарии')); ?>
+                        <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+                            'query'                => $pinnedUserCommentsQuery,
+                            'is_show_model'        => false,
+                            'is_show_pin_controls' => true,
+                            'is_raised'             => false,
+                        ]); ?>
+                    <?php BackendSurfaceWidget::end(); ?>
+                <?php endif; ?>
+
                         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
                             'query'         => $model->getUserLogs()->activity(),
                             'is_show_model' => false,
