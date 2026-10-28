@@ -2422,22 +2422,6 @@ JS
                 'content' => '<div class="col-12 sx-task-auto-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-auto-start-btn"><i class="fas fa-magic"></i> Рассчитать время выполнения автоматически</button></div>',
             ],
 
-            'cms_lead_id' => [
-                'class' => HtmlBlock::class,
-                'content' => $model->cms_lead_id && $model->cmsLead
-                    ? '<div class="col-12 form-group sx-task-lead">'
-                        .Html::activeHiddenInput($model, 'cms_lead_id')
-                        .'<span class="text-muted">Сделка:</span> '
-                        .\skeeks\cms\backend\widgets\BackendEntityLink::widget([
-                            'controllerId' => '/cms/admin-cms-lead',
-                            'action'       => 'view',
-                            'modelId'      => $model->cmsLead->id,
-                            'label'        => $model->cmsLead->displayName,
-                        ])
-                        .'</div>'
-                    : '',
-            ],
-
             'task_relation' => [
                 'class' => HtmlBlock::class,
                 'content' => '<div class="col-12 sx-choose-task-relation form-group"><div class="btn-group btn-block" role="group" aria-label="Task relation">
@@ -2507,6 +2491,23 @@ JS
                         return $query;
                     },
                 ],
+            ],
+
+            // The deal refines the client, so it stands under the company / client, before the service.
+            'cms_lead_id' => [
+                'class' => HtmlBlock::class,
+                'content' => $model->cms_lead_id && $model->cmsLead
+                    ? '<div class="col-12 form-group sx-task-lead">'
+                        .Html::activeHiddenInput($model, 'cms_lead_id')
+                        .'<span class="text-muted">Сделка:</span> '
+                        .\skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-lead',
+                            'action'       => 'view',
+                            'modelId'      => $model->cmsLead->id,
+                            'label'        => $model->cmsLead->displayName,
+                        ])
+                        .'</div>'
+                    : '',
             ],
 
             //"Сделка как услуга": the service of the task.
