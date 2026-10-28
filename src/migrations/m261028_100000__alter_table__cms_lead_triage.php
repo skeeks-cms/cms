@@ -74,6 +74,11 @@ class m261028_100000__alter_table__cms_lead_triage extends Migration
 
     public function safeDown()
     {
+        $this->refuseRollbackWithData([
+            'отметки «Это другая компания»' => (new \yii\db\Query())->from('{{%cms_crm_duplicate_mark}}'),
+            'запросы доступа' => (new \yii\db\Query())->from('{{%cms_crm_access_request}}'),
+            'разобранные сделки' => (new \yii\db\Query())->from('{{%cms_lead}}')->andWhere(['or', ['not', ['triage_result' => null]], ['not', ['merged_into_id' => null]], ['not', ['triaged_at' => null]]]),
+        ]);
         $this->dropTable('{{%cms_crm_duplicate_mark}}');
         $this->dropTable('{{%cms_crm_access_request}}');
         $this->dropIndex('cms_lead__triage_queue', '{{%cms_lead}}');
@@ -83,5 +88,28 @@ class m261028_100000__alter_table__cms_lead_triage extends Migration
         $this->dropColumn('{{%cms_lead}}', 'triaged_by');
         $this->dropColumn('{{%cms_lead}}', 'merged_into_id');
         $this->dropColumn('{{%cms_lead}}', 'triage_result');
+    }
+
+    /**
+     * MySQL does not roll DDL back, so the data this rollback would destroy is
+     * checked before the first DDL (release audit F06, 29.10.2026): with any of
+     * it the rollback is refused and the schema stays as it is.
+     *
+     * @param array $checks label => a query counting the rows that would be lost
+     */
+    private function refuseRollbackWithData(array $checks): void
+    {
+        $found = [];
+        foreach ($checks as $label => $query) {
+            $count = (int)$query->count('*', $this->db);
+            if ($count > 0) {
+                $found[] = $label.': '.$count;
+            }
+        }
+        if ($found) {
+            throw new \yii\base\Exception('Откат невозможен: он безвозвратно удалит данные CRM ('.implode('; ', $found).'). Схема не изменена. '
+                .'Чтобы откатить: снимите дамп базы (mysqldump) и сохраните эти данные; если они действительно не нужны, удалите их вручную '
+                .'и повторите откат. Вернуть их можно только из резервной копии базы.');
+        }
     }
 }

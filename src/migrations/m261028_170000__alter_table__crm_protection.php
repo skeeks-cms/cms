@@ -30,6 +30,8 @@ class m261028_170000__alter_table__crm_protection extends Migration
 
     public function safeDown()
     {
+        // No data is lost: the computed protection comes back from payments and services
+        // (php yii cms/crm/protection --all), the manual "always" is kept in crm_access_by_approval below.
         foreach (['{{%cms_company}}', '{{%cms_user}}'] as $table) {
             $this->update($table, ['crm_access_by_approval' => 1], ['crm_protection' => 'always']);
             $this->dropIndex(str_replace(['{{%', '}}'], '', $table).'__crm_protection', $table);

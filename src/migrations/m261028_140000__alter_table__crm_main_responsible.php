@@ -55,6 +55,12 @@ class m261028_140000__alter_table__crm_main_responsible extends Migration
 
     public function safeDown()
     {
+        $this->refuseRollbackWithData([
+            'основные ответственные компаний' => (new \yii\db\Query())->from('{{%cms_company2manager}}')->andWhere(['is_main' => 1]),
+            'основные ответственные клиентов' => (new \yii\db\Query())->from('{{%cms_user2manager}}')->andWhere(['is_main' => 1]),
+            'компании «по согласованию»' => (new \yii\db\Query())->from('{{%cms_company}}')->andWhere(['crm_access_by_approval' => 1]),
+            'клиенты «по согласованию»' => (new \yii\db\Query())->from('{{%cms_user}}')->andWhere(['crm_access_by_approval' => 1]),
+        ]);
         $this->update('{{%cms_crm_access_request}}', ['level' => 'sales'], ['level' => 'edit']);
         foreach (['{{%cms_company2manager}}', '{{%cms_user2manager}}'] as $table) {
             $this->update($table, ['access_level' => 'sales'], ['access_level' => ['edit', 'deal']]);
@@ -63,5 +69,28 @@ class m261028_140000__alter_table__crm_main_responsible extends Migration
         $this->dropColumn('{{%cms_company}}', 'crm_access_by_approval');
         $this->dropColumn('{{%cms_user2manager}}', 'is_main');
         $this->dropColumn('{{%cms_company2manager}}', 'is_main');
+    }
+
+    /**
+     * MySQL does not roll DDL back, so the data this rollback would destroy is
+     * checked before the first DDL (release audit F06, 29.10.2026): with any of
+     * it the rollback is refused and the schema stays as it is.
+     *
+     * @param array $checks label => a query counting the rows that would be lost
+     */
+    private function refuseRollbackWithData(array $checks): void
+    {
+        $found = [];
+        foreach ($checks as $label => $query) {
+            $count = (int)$query->count('*', $this->db);
+            if ($count > 0) {
+                $found[] = $label.': '.$count;
+            }
+        }
+        if ($found) {
+            throw new \yii\base\Exception('Откат невозможен: он безвозвратно удалит данные CRM ('.implode('; ', $found).'). Схема не изменена. '
+                .'Чтобы откатить: снимите дамп базы (mysqldump) и сохраните эти данные; если они действительно не нужны, удалите их вручную '
+                .'и повторите откат. Вернуть их можно только из резервной копии базы.');
+        }
     }
 }

@@ -53,6 +53,33 @@ class m261029_130000__create_table__cms_crm_access_log extends Migration
 
     public function safeDown()
     {
+        // The journal of the access is kept for good (ARCHITECTURE.md п. 13).
+        $this->refuseRollbackWithData([
+            'события журнала доступа' => (new \yii\db\Query())->from('{{%cms_crm_access_log}}'),
+        ]);
         $this->dropTable('{{%cms_crm_access_log}}');
+    }
+
+    /**
+     * MySQL does not roll DDL back, so the data this rollback would destroy is
+     * checked before the first DDL (release audit F06, 29.10.2026): with any of
+     * it the rollback is refused and the schema stays as it is.
+     *
+     * @param array $checks label => a query counting the rows that would be lost
+     */
+    private function refuseRollbackWithData(array $checks): void
+    {
+        $found = [];
+        foreach ($checks as $label => $query) {
+            $count = (int)$query->count('*', $this->db);
+            if ($count > 0) {
+                $found[] = $label.': '.$count;
+            }
+        }
+        if ($found) {
+            throw new \yii\base\Exception('Откат невозможен: он безвозвратно удалит данные CRM ('.implode('; ', $found).'). Схема не изменена. '
+                .'Чтобы откатить: снимите дамп базы (mysqldump) и сохраните эти данные; если они действительно не нужны, удалите их вручную '
+                .'и повторите откат. Вернуть их можно только из резервной копии базы.');
+        }
     }
 }
