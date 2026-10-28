@@ -46,6 +46,16 @@ class CmsLogQuery extends CmsActiveQuery
     }
 
     /**
+     * Entries that are not pinned: a feed shows pinned entries once, on top.
+     *
+     * @return $this
+     */
+    public function notPinned()
+    {
+        return $this->andWhere(['or', ['is_pinned' => 0], ['is_pinned' => null]]);
+    }
+
+    /**
      * @return $this
      */
     public function results()
