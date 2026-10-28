@@ -28,6 +28,14 @@ class CrmSettings extends Component
     /** П2д: a payment protects the client this many months (crm\CrmProtection). */
     public $protectionMonths = 12;
 
+    /**
+     * «Исходящие продажи» (П2д): defaults of a new mailing campaign — a call
+     * task when a recipient views the presentation or offer, a deal on that
+     * view. A campaign copies them when created and may change them.
+     */
+    public $outgoingTaskOnView = 1;
+    public $outgoingLeadOnView = 0;
+
     /** The site decides, not a user. */
     protected $_overridePath = [self::OVERRIDE_DEFAULT, self::OVERRIDE_SITE];
 
@@ -52,6 +60,7 @@ class CrmSettings extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['duplicateMode'], 'required'],
             [['duplicateMode'], 'in', 'range' => array_keys(self::duplicateModes())],
+            [['outgoingTaskOnView', 'outgoingLeadOnView'], 'boolean'],
             [['protectionMonths'], 'integer', 'min' => 1, 'max' => 120],
         ]);
     }
@@ -60,6 +69,8 @@ class CrmSettings extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'duplicateMode' => 'Повторы клиентов',
+            'outgoingTaskOnView' => 'Задача при просмотре',
+            'outgoingLeadOnView' => 'Сделка при просмотре в рассылках',
             'protectionMonths' => 'Защита после платежа, месяцев',
         ]);
     }
@@ -67,6 +78,8 @@ class CrmSettings extends Component
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'outgoingTaskOnView' => 'Когда получатель рассылки открыл Презентацию или КП, ответственному ставится задача «Позвонить». Умолчание новой рассылки — в рассылке его можно изменить.',
+            'outgoingLeadOnView' => 'Просмотр Презентации или КП из рассылки сразу создаёт сделку (или дополняет открытую). Обычно сделку создаёт ответ или заявка клиента, а просмотр только делает его «тёплым».',
             'duplicateMode' => 'В обоих режимах при вводе показываются совпадения в базе, а новая запись отмечается как возможный повтор, чтобы её потом можно было объединить. Чужой клиент остаётся скрытым по уровню доступа.',
             'protectionMonths' => 'Клиент, который платил за это время или у которого есть действующая услуга, — «Под защитой»: другой менеджер работает с ним только по согласованию с основным ответственным. Остальные — «Свободные».',
         ]);
@@ -84,6 +97,15 @@ class CrmSettings extends Component
                         'items' => self::duplicateModes(),
                         'allowNull' => false,
                     ],
+                ],
+            ],
+            // «Исходящие продажи» (П2д): the mailing defaults here; the pipeline and the stage of personal offers join this set.
+            'outgoing' => [
+                'class' => FieldSet::class,
+                'name' => 'Исходящие продажи',
+                'fields' => [
+                    'outgoingTaskOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
+                    'outgoingLeadOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
                 ],
             ],
             'protection' => [
