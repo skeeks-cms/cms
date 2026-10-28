@@ -559,7 +559,7 @@
             if (comment === null) {
                 return false;
             }
-        } else if (!window.confirm(button.data('confirm') || 'Подтвердить?')) {
+        } else if (!window.confirm(button.data('sxConfirm') || button.data('confirm') || 'Подтвердить?')) {
             return false;
         }
         var level = button.closest('.sx-lead-hint__actions').find('[data-sx-crm-request-level]').val() || '';

@@ -242,6 +242,12 @@ class Skeeks extends Component implements BootstrapInterface
             'name_one'   => 'Воронка',
             'controller' => 'cms/admin-cms-lead-pipeline',
         ],
+        // A notification about a request opens its card in the backend window.
+        \skeeks\cms\models\CmsCrmAccessRequest::class => [
+            'name'       => 'Запросы доступа',
+            'name_one'   => 'Запрос доступа',
+            'controller' => 'cms/admin-cms-crm-access-request',
+        ],
         CmsLeadStage::class     => [
             'name'       => 'Этапы сделок',
             'name_one'   => 'Этап сделки',

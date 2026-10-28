@@ -673,6 +673,87 @@ class CrmAccess extends Component
         return in_array($this->userId($user), $this->deciderIds($request), true);
     }
 
+    /** A request is seen by those who decide it and by the one who sent it. */
+    public function canSeeRequest($user, CmsCrmAccessRequest $request): bool
+    {
+        return (int)$request->requester_id === $this->userId($user) || $this->isRequestDecider($user, $request);
+    }
+
+    /**
+     * The section «Запросы доступа» (its menu item): administrators, main
+     * responsible employees and leaders — those who may decide requests.
+     */
+    public function canUseRequests($user): bool
+    {
+        if (!self::mainReady()) {
+            return false;
+        }
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+        $userId = $this->userId($user);
+        if ($userId <= 0) {
+            return false;
+        }
+
+        return CmsCompany2manager::find()->andWhere(['cms_user_id' => $userId, 'is_main' => 1])->exists()
+            || CmsUser2manager::find()->andWhere(['worker_id' => $userId, 'is_main' => 1])->exists()
+            || CmsDepartment::subordinateIds($userId)
+            || CmsCrmAccessRequest::find()->andWhere(['requester_id' => $userId])->exists();
+    }
+
+    public const REQUESTS_TO_ME = 'to_me';
+    public const REQUESTS_MINE = 'mine';
+    public const REQUESTS_ALL = 'all';
+
+    /**
+     * The condition of the requests list (the same rule as isRequestDecider()):
+     * "to_me" — pending requests the user decides (the main responsible of the
+     * client is he or his subordinate; an administrator — all), "mine" — sent by
+     * him, "all" — both.
+     *
+     * @return array a where condition for CmsCrmAccessRequest::find()
+     */
+    public function requestsCondition($user, string $scope): array
+    {
+        $userId = $this->userId($user);
+        $table = CmsCrmAccessRequest::tableName();
+        $mine = [$table.'.requester_id' => $userId];
+        if ($scope === self::REQUESTS_MINE) {
+            return $mine;
+        }
+        if ($this->isAdmin($user)) {
+            $decides = ['not', [$table.'.id' => null]];
+        } else {
+            $ids = array_values(array_unique(array_merge([$userId], array_map('intval', CmsDepartment::subordinateIds($userId)))));
+            $main = static function (string $class, string $recordColumn, string $userColumn, string $code) use ($table, $ids) {
+                return ['and', [$table.'.record_code' => $code], ['exists', $class::find()->select('id')->andWhere([
+                    $recordColumn => new \yii\db\Expression($table.'.record_id'), 'is_main' => 1, $userColumn => $ids,
+                ])]];
+            };
+            $decides = ['or',
+                $main(CmsCompany2manager::class, 'cms_company_id', 'cms_user_id', CmsCrmAccessRequest::RECORD_COMPANY),
+                $main(CmsUser2manager::class, 'client_id', 'worker_id', CmsCrmAccessRequest::RECORD_CLIENT),
+                [$table.'.owner_id' => $ids],
+            ];
+        }
+        if ($scope === self::REQUESTS_TO_ME) {
+            return ['and', [$table.'.status' => CmsCrmAccessRequest::STATUS_PENDING], ['<>', $table.'.requester_id', $userId], $decides];
+        }
+
+        return ['or', $mine, $decides];
+    }
+
+    /** The counter of the menu item: pending requests the user decides. */
+    public function pendingRequestsCount($user): int
+    {
+        if (!self::mainReady()) {
+            return 0;
+        }
+
+        return (int)CmsCrmAccessRequest::find()->andWhere($this->requestsCondition($user, self::REQUESTS_TO_ME))->count();
+    }
+
     /** Recipients of a new request: the main responsible of the client and his leaders. */
     public function requestDeciderIds(CmsCrmAccessRequest $request): array
     {

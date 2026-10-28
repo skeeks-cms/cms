@@ -6,14 +6,12 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelCreateAction;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\crm\CrmAccess;
-use skeeks\cms\crm\CrmAccessRequests;
 use skeeks\cms\crm\CrmContactParser;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\crm\CrmMatcher;
 use skeeks\cms\crm\LeadIdentityForm;
 use skeeks\cms\crm\LeadTriage;
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\models\CmsCrmAccessRequest;
 use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsUser;
@@ -28,12 +26,12 @@ use yii\helpers\Url;
 use yii\web\JsExpression;
 use yii\validators\Validator;
 use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 
 /**
  * Sorting «Неразобранное», the client of a deal and assignment (П2а) in the
  * deals section. Decisions live in skeeks\cms\crm (CrmAccess, LeadTriage,
- * CrmMatcher, CrmAccessRequests); these actions parse requests and render.
+ * CrmMatcher; access requests — AdminCmsCrmAccessRequestController); these
+ * actions parse requests and render.
  *
  * Forms post by AJAX and get a RequestResponse; inside a backend window the
  * page then closes it (model-update), otherwise it follows data.redirect.
@@ -102,25 +100,11 @@ trait LeadTriageActions
                 'isVisible' => false,
                 'callback' => [$this, 'workRequest'],
             ],
+            // «Запросы доступа» is its own section (AdminCmsCrmAccessRequestController); old links lead there.
             'requests' => [
                 'class' => ViewBackendAction::class,
-                'name' => 'Запросы доступа',
-                'icon' => 'fas fa-user-lock',
-                'priority' => 60,
-                'callback' => [$this, 'requests'],
-                // A site that never had a request (a simple site without CRM work) gets no tab.
-                'accessCallback' => static function () {
-                    try {
-                        return CmsCrmAccessRequest::find()->exists();
-                    } catch (\yii\db\Exception $e) {
-                        return false;
-                    }
-                },
-            ],
-            'request-decide' => [
-                'class' => ViewBackendAction::class,
                 'isVisible' => false,
-                'callback' => [$this, 'requestDecide'],
+                'callback' => fn() => $this->redirect(['/cms/admin-cms-crm-access-request/index']),
             ],
         ];
     }
@@ -559,60 +543,6 @@ JS
                 trim((string)\Yii::$app->request->post('comment', '')) ?: null);
             $response->success = true;
             $response->message = $result['message'];
-        } catch (\DomainException $e) {
-            $response->success = false;
-            $response->message = $e->getMessage();
-        }
-
-        return $response;
-    }
-
-    /** Requests to me (to decide) and my own requests. */
-    public function requests()
-    {
-        $access = CrmAccess::instance();
-        $userId = (int)\Yii::$app->user->id;
-        $pending = CmsCrmAccessRequest::find()->andWhere(['status' => CmsCrmAccessRequest::STATUS_PENDING])
-            ->orderBy(['id' => SORT_DESC])->limit(200)->all();
-        $toDecide = array_values(array_filter($pending, static fn($request) => $access->canDecideRequest($userId, $request)));
-        $mine = CmsCrmAccessRequest::find()->andWhere(['requester_id' => $userId])->orderBy(['id' => SORT_DESC])->limit(50)->all();
-        // Any responsible or leader decides; the others see the decision.
-        $decided = array_values(array_filter(
-            CmsCrmAccessRequest::find()->andWhere(['status' => [CmsCrmAccessRequest::STATUS_APPROVED, CmsCrmAccessRequest::STATUS_DECLINED]])
-                ->andWhere(['>=', 'decided_at', time() - 30 * 86400])->orderBy(['decided_at' => SORT_DESC])->limit(200)->all(),
-            static fn($request) => (int)$request->requester_id !== $userId && $access->isRequestDecider($userId, $request)
-        ));
-
-        return $this->render('@skeeks/cms/views/admin-cms-lead/requests', [
-            'toDecide' => $toDecide,
-            'mine' => $mine,
-            'decided' => $decided,
-            'service' => new CrmAccessRequests($access),
-        ]);
-    }
-
-    public function requestDecide()
-    {
-        $response = new RequestResponse();
-        if (!$response->isRequestAjaxPost()) {
-            throw new BadRequestHttpException('Запрос решается кнопкой в списке запросов.');
-        }
-        try {
-            $request = CmsCrmAccessRequest::findOne((int)\Yii::$app->request->post('id'));
-            if (!$request) {
-                throw new NotFoundHttpException('Запрос не найден.');
-            }
-            $service = new CrmAccessRequests();
-            $decision = (string)\Yii::$app->request->post('decision');
-            if ($decision === 'cancel') {
-                $service->cancel($request, (int)\Yii::$app->user->id);
-                $response->message = 'Запрос отменён.';
-            } else {
-                $response->message = $service->decide($request, $decision === 'approve', (int)\Yii::$app->user->id,
-                    trim((string)\Yii::$app->request->post('comment')) ?: null,
-                    trim((string)\Yii::$app->request->post('level')) ?: null);
-            }
-            $response->success = true;
         } catch (\DomainException $e) {
             $response->success = false;
             $response->message = $e->getMessage();

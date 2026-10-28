@@ -214,8 +214,31 @@ try {
         && (int)$request->owner_id === (int)$owner->id && (int)$request->cms_lead_id === (int)$lead->id, 'a request to the main responsible with the deal');
     // The common format of CRM notifications: the event as text, the client as the record link.
     $asked = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'kind' => 'crm.access_request', 'event_key' => 'crm.access_request:'.(int)$request->id])->one();
-    $check($asked && $asked->name === $other->shortDisplayName.' работает с клиентом по своей сделке'
-        && $asked->model instanceof CmsCompany && (int)$asked->model_id === (int)$company->id, 'request notification: text and the client as the link line');
+    $check($asked && $asked->name === $other->shortDisplayName.' работает с клиентом «'.$company->name.'» по своей сделке'
+        && $asked->model instanceof CmsCrmAccessRequest && (int)$asked->model_id === (int)$request->id, 'request notification: the client in the text, the request as the link line');
+    $check(strpos($asked->getOpenUrl(), '/admin-cms-crm-access-request/view') !== false && strpos($asked->getOpenUrl(), 'pk='.(int)$request->id) !== false,
+        'the short link of the notification (mail, MAX) opens the request card');
+    // «Запросы доступа»: a section of its own; seen by the deciders and the sender only.
+    $access0 = CrmAccess::instance();
+    $check($access0->canSeeRequest($owner->id, $request) && $access0->canSeeRequest($other->id, $request), 'the main responsible and the sender see the request');
+    $stranger = null;
+    foreach ($plain as $candidate) {
+        if (!in_array((int)$candidate->id, [(int)$owner->id, (int)$other->id], true) && !$access0->isRequestDecider($candidate, $request)) {
+            $stranger = $candidate;
+            break;
+        }
+    }
+    if ($stranger) {
+        $check(!$access0->canSeeRequest($stranger->id, $request), 'another employee does not see the request (403)');
+    }
+    $listed = static fn($user, string $scope) => CmsCrmAccessRequest::find()->andWhere($access0->requestsCondition($user, $scope))->andWhere([CmsCrmAccessRequest::tableName().'.id' => $request->id])->exists();
+    $check($listed($owner, CrmAccess::REQUESTS_TO_ME) && !$listed($other, CrmAccess::REQUESTS_TO_ME), '«Ждут моего решения»: the main responsible, not the sender');
+    $check($listed($other, CrmAccess::REQUESTS_MINE) && !$listed($owner, CrmAccess::REQUESTS_MINE), '«Мои запросы»: the sender');
+    $check($access0->pendingRequestsCount($owner) >= 1 && $access0->canUseRequests($owner), 'the menu item and its counter for the main responsible');
+    [$requestsController] = Yii::$app->createController('cms/admin-cms-crm-access-request');
+    $requestActions = $requestsController->actions();
+    $check(isset($requestActions['view'], $requestActions['decide']) && !isset($requestActions['create']) && !isset($requestActions['delete']),
+        'the section has the card and the decision, requests are not created by a form');
     $same = (new CrmAccessRequests())->request((int)$other->id, 'company', (int)$company->id, CmsCrmAccessRequest::KIND_WORK, (int)$lead->id);
     $check((int)$same->id === (int)$request->id, 'a repeated request joins the pending one');
     $check(!CrmAccess::instance()->canDecideRequest($other->id, $request), 'the requester does not decide');
@@ -315,7 +338,7 @@ try {
     $check($work['lead'] === null && $access->isPending && $access->kind === CmsCrmAccessRequest::KIND_WORK && !$access->cms_lead_id,
         '«Работать с этим клиентом» «по согласованию»: only the request, no deal yet');
     $accessAsked = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'event_key' => 'crm.access_request:'.(int)$access->id])->one();
-    $check($accessAsked && $accessAsked->name === $other->shortDisplayName.' просит разрешения работать с клиентом', 'the request notification text');
+    $check($accessAsked && $accessAsked->name === $other->shortDisplayName.' просит разрешения работать с клиентом «'.$company->name.'»', 'the request notification text');
     if (!in_array((int)$third->id, CmsDepartment::leaderIdsOf((int)$owner->id), true) && !CrmAccess::instance()->isAdmin($third)) {
         $check(!CrmAccess::instance()->canDecideRequest($third->id, $access), 'another employee of the client does not decide');
     }

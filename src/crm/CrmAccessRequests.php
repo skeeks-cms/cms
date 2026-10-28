@@ -81,11 +81,12 @@ class CrmAccessRequests
         if ($recipients) {
             // As every CRM notification: the event in the text, the client as the bold link line
             // (deciders see the client); the link leads to the list of requests.
+            // The text names the client (deciders see it); the request is the bold link line: a click opens
+            // its card in the backend window, with the client, the employee and the deal as links there.
             \Yii::$app->notifications->notify($recipients, 'crm.access_request', [
                 'name' => $this->userName($requesterId).$this->requestText($request),
                 'comment' => $comment,
-                'model' => $request->record,
-                'url' => $this->listUrl(),
+                'model' => $request,
                 'eventKey' => 'crm.access_request:'.(int)$request->id,
             ]);
         }
@@ -95,13 +96,14 @@ class CrmAccessRequests
 
     private function requestText(CmsCrmAccessRequest $request): string
     {
+        $client = '«'.$this->recordName($request).'»';
         switch ($request->kind) {
             case CmsCrmAccessRequest::KIND_WORK:
-                return $request->cms_lead_id ? ' работает с клиентом по своей сделке' : ' просит разрешения работать с клиентом';
+                return $request->cms_lead_id ? ' работает с клиентом '.$client.' по своей сделке' : ' просит разрешения работать с клиентом '.$client;
             case CmsCrmAccessRequest::KIND_DELEGATE:
-                return ' просит сделку по клиенту';
+                return ' просит сделку по клиенту '.$client;
             default:
-                return ' просит доступ к клиенту';
+                return ' просит доступ к клиенту '.$client;
         }
     }
 
@@ -279,7 +281,7 @@ class CrmAccessRequests
 
     private function listUrl(): ?string
     {
-        return \Yii::$app instanceof \yii\web\Application ? \yii\helpers\Url::to(['/cms/admin-cms-lead/requests']) : null;
+        return \Yii::$app instanceof \yii\web\Application ? \yii\helpers\Url::to(['/cms/admin-cms-crm-access-request/index']) : null;
     }
 
     /**

@@ -348,6 +348,15 @@ return array_merge(dashboardsMenu(), [
                     ],
                 ],*/
             ],
+            // П2а: requests about a client of another main responsible; the counter — pending ones I decide.
+            [
+                'label'          => 'Запросы доступа',
+                'priority'       => 115,
+                'icon'           => 'fas fa-user-lock',
+                "url"            => ["cms/admin-cms-crm-access-request"],
+                'accessCallback' => static fn() => \skeeks\cms\crm\CrmAccess::instance()->canUseRequests((int)\Yii::$app->user->id),
+                'badge'          => static fn() => \skeeks\cms\crm\CrmAccess::instance()->pendingRequestsCount((int)\Yii::$app->user->id),
+            ],
             [
                 'label'    => \Yii::t('skeeks/cms', 'Сделки'),
                 'priority' => 120,
