@@ -950,6 +950,13 @@ try {
         $person->save();
         (new \skeeks\cms\models\CmsCompany2user(['cms_company_id' => $personCompany->id, 'cms_user_id' => $person->id]))->save(false);
         CrmAccess::instance()->setMain('company', (int)$personCompany->id, (int)$other->id, CrmAccess::LEVEL_EDIT);
+        // A person of a company with employees is its data, not the general pool.
+        $check(!CrmAccess::instance()->inPool('client', (int)$person->id) && !CrmAccess::instance()->canTakeIntoWork('client', (int)$person->id),
+            'a person of a company with employees is not in the general pool');
+        if (!CrmAccess::instance()->canSeeCompany($owner, (int)$personCompany->id)) {
+            $check(!CmsUser::find()->forManagerOrPool($owner)->andWhere([CmsUser::tableName().'.id' => $person->id])->exists(),
+                'a person of a foreign company is not in the client list of another employee');
+        }
         $serviceType = (int)\skeeks\cms\models\CmsDealType::find()->select('id')->scalar();
         $personalService = new \skeeks\cms\models\CmsDeal(['name' => 'Личная услуга '.$uniq, 'cms_user_id' => $person->id, 'is_active' => 1, 'start_at' => time() - 86400,
             'end_at' => time() + 86400 * 30, 'cms_deal_type_id' => $serviceType, 'amount' => 0, 'currency_code' => 'RUB', 'description' => '', 'is_periodic' => 0]);

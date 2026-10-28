@@ -161,8 +161,9 @@ class CmsUserQuery extends CmsActiveQuery
      */
     /**
      * П2д: the clients the employee sees plus client persons of the general pool
-     * (no employee of their own), read only until one takes it into work. For
-     * the client list, its card and the API only.
+     * (no employee of their own and no company that has employees: a person of
+     * a company is its data, CrmAccess::inPool()), read only until one takes it
+     * into work. For the client list, its card and the API only.
      */
     public function forManagerOrPool(User $user = null)
     {
@@ -186,7 +187,8 @@ class CmsUserQuery extends CmsActiveQuery
             'or',
             ["managers.id" => $managers],
             ["companies.id" => $cmsCompanyQuery],
-            ['and', ['managers.id' => null], [$this->getPrimaryTableName().'.is_worker' => 0]],
+            ['and', ['managers.id' => null], [$this->getPrimaryTableName().'.is_worker' => 0],
+                ['not exists', \skeeks\cms\crm\CrmAccess::personCompanyLinks($this->getPrimaryTableName().'.id')]],
         ]);
 
         return $this;

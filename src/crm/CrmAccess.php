@@ -510,7 +510,27 @@ class CrmAccess extends Component
             return false;
         }
 
-        return !$class::find()->andWhere([$recordColumn => $recordId])->exists();
+        if ($class::find()->andWhere([$recordColumn => $recordId])->exists()) {
+            return false;
+        }
+
+        // A person of a company that has employees is its data, not a free client.
+        return $recordCode !== CmsCrmAccessRequest::RECORD_CLIENT
+            || !self::personCompanyLinks((string)(int)$recordId)->exists();
+    }
+
+    /**
+     * The links of the companies of a person (SQL for EXISTS): a person whose
+     * company has employees is not in the general pool, even without his own
+     * employee.
+     *
+     * @param string $personColumn the column with the person id
+     */
+    public static function personCompanyLinks(string $personColumn): \yii\db\Query
+    {
+        return (new \yii\db\Query())->select(new \yii\db\Expression('1'))->from(['poolPersonCompany' => '{{%cms_company2user}}'])
+            ->innerJoin(['poolCompanyLink' => '{{%cms_company2manager}}'], 'poolCompanyLink.cms_company_id = poolPersonCompany.cms_company_id')
+            ->andWhere('poolPersonCompany.cms_user_id = '.$personColumn);
     }
 
     /** A CRM employee (the right to the companies or clients section) sees a record of the pool. */
@@ -543,7 +563,9 @@ class CrmAccess extends Component
     public function canTakeIntoWork(string $recordCode, int $recordId): bool
     {
         return self::mainReady() && $recordId > 0 && $this->mainResponsibleId($recordCode, $recordId) === null
-            && !$this->approvalRequired($recordCode, $recordId);
+            && !$this->approvalRequired($recordCode, $recordId)
+            // A person of a company with employees is taken through the company.
+            && ($recordCode !== CmsCrmAccessRequest::RECORD_CLIENT || !self::personCompanyLinks((string)(int)$recordId)->exists());
     }
 
     /**
