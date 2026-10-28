@@ -36,13 +36,32 @@ class CrmSettings extends Component
     /** П2д: a payment protects the client this many months (crm\CrmProtection). */
     public $protectionMonths = 12;
 
+    /** Who gets new companies of the flow, who gets its deals (П2д, «Исходящие продажи»). */
+    public const OWNER_NONE = 'none';
+    public const OWNER_SENDER = 'sender';
+    public const OWNER_WORKER = 'worker';
+    public const LEAD_TO_UNSORTED = 'unsorted';
+
     /**
-     * «Исходящие продажи» (П2д): defaults of a new mailing campaign — a call
-     * task when a recipient views the presentation or offer, a deal on that
-     * view. A campaign copies them when created and may change them.
+     * «Исходящие продажи» (П2д): «my defaults» of the flow — a bot through
+     * MCP/API or a mailing campaign. A campaign copies them when created and
+     * may change them; a bot without a campaign works by them. The flow:
+     * the responsible of NEW companies (none — the common pool, the sender,
+     * an employee); what makes a deal besides a reply (a view of the
+     * presentation or offer, a visit by a link); who gets the deal
+     * («Неразобранное», the sender, an employee); the call task on a view
+     * when a view makes no deal. The pipeline is $outboundPipelineId, its
+     * stages «Смотрел» and «Ответил» take the events (OutboundSales).
      */
+    public $outgoingNewCardOwner = self::OWNER_NONE;
+    /** @var int|null the employee of OWNER_WORKER */
+    public $outgoingNewCardWorkerId;
+    public $outgoingLeadOnView = 1;
+    public $outgoingLeadOnVisit = 0;
+    public $outgoingLeadTo = self::OWNER_SENDER;
+    /** @var int|null the employee of OWNER_WORKER */
+    public $outgoingLeadWorkerId;
     public $outgoingTaskOnView = 1;
-    public $outgoingLeadOnView = 0;
 
     /** @var int|null personal offers: the pipeline; null — the one with the code `outbound` */
     public $outboundPipelineId;
@@ -75,7 +94,15 @@ class CrmSettings extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['duplicateMode'], 'required'],
             [['duplicateMode'], 'in', 'range' => array_keys(self::duplicateModes())],
-            [['outgoingTaskOnView', 'outgoingLeadOnView'], 'boolean'],
+            [['outgoingTaskOnView', 'outgoingLeadOnView', 'outgoingLeadOnVisit'], 'boolean'],
+            [['outgoingNewCardOwner'], 'in', 'range' => array_keys(self::newCardOwners())],
+            [['outgoingLeadTo'], 'in', 'range' => array_keys(self::leadReceivers())],
+            [['outgoingNewCardWorkerId', 'outgoingLeadWorkerId'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
+            [['outgoingNewCardWorkerId', 'outgoingLeadWorkerId'], 'integer'],
+            [['outgoingNewCardWorkerId'], 'required', 'when' => static fn(self $m) => $m->outgoingNewCardOwner === self::OWNER_WORKER,
+                'whenClient' => "function () { return $('#crmsettings-outgoingnewcardowner').val() === '".self::OWNER_WORKER."'; }"],
+            [['outgoingLeadWorkerId'], 'required', 'when' => static fn(self $m) => $m->outgoingLeadTo === self::OWNER_WORKER,
+                'whenClient' => "function () { return $('#crmsettings-outgoingleadto').val() === '".self::OWNER_WORKER."'; }"],
             [['protectionMonths'], 'integer', 'min' => 1, 'max' => 120],
             [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
             [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'integer'],
@@ -86,8 +113,13 @@ class CrmSettings extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'duplicateMode' => 'Повторы клиентов',
-            'outgoingTaskOnView' => 'Задача при просмотре',
-            'outgoingLeadOnView' => 'Сделка при просмотре в рассылках',
+            'outgoingNewCardOwner' => 'Ответственный за новые компании',
+            'outgoingNewCardWorkerId' => 'Сотрудник для новых компаний',
+            'outgoingLeadOnView' => 'Сделка при просмотре Презентации или КП',
+            'outgoingLeadOnVisit' => 'Сделка при переходе по ссылке из письма',
+            'outgoingLeadTo' => 'Куда сделка',
+            'outgoingLeadWorkerId' => 'Сотрудник для сделок',
+            'outgoingTaskOnView' => 'Задача «Позвонить» при просмотре',
             'protectionMonths' => 'Защита после платежа, месяцев',
             'outboundPipelineId' => 'Воронка личных предложений',
             'proposalSentStageId' => 'Этап при отправке',
@@ -98,11 +130,13 @@ class CrmSettings extends Component
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'outgoingTaskOnView' => 'Когда получатель рассылки открыл Презентацию или КП, ответственному ставится задача «Позвонить». Умолчание новой рассылки — в рассылке его можно изменить.',
+            'outgoingNewCardOwner' => 'Для компаний, которых ещё нет в CRM: бот или рассылка создаёт их с этим ответственным. Без ответственного — общий пул: компанию берёт в работу первый менеджер. Существующие компании не меняются.',
+            'outgoingLeadOnView' => 'Ответ клиента создаёт сделку всегда. Отметьте, если и просмотр Презентации или КП — повод вести сделку. Открытие письма сделку не создаёт.',
+            'outgoingTaskOnView' => 'Когда просмотр сделку не создаёт, ответственному ставится задача «Позвонить: смотрел Презентацию».',
+            'outgoingLeadTo' => 'Отправитель — тот, от чьего имени ушло письмо. Если у компании нет основного ответственного, он им становится (как «Взять в работу»). Открытая сделка клиента дополняется, новая не создаётся.',
             'outboundPipelineId' => 'Воронка, в которой ведутся продажи по найденным компаниям. Отправка и просмотр Презентации или КП двигают этапы только у сделок этой воронки.',
             'proposalSentStageId' => 'Куда переходит сделка, когда из неё отправили Презентацию или КП. Сделка, которая уже дальше, остаётся на месте.',
             'proposalViewedStageId' => 'Куда переходит сделка, когда клиент впервые открыл Презентацию или КП.',
-            'outgoingLeadOnView' => 'Просмотр Презентации или КП из рассылки сразу создаёт сделку (или дополняет открытую). Обычно сделку создаёт ответ или заявка клиента, а просмотр только делает его «тёплым».',
             'duplicateMode' => 'В обоих режимах при вводе показываются совпадения в базе, а новая запись отмечается как возможный повтор, чтобы её потом можно было объединить. Чужой клиент остаётся скрытым по уровню доступа.',
             'protectionMonths' => 'Клиент, который платил за это время или у которого есть действующая услуга, — «Под защитой»: другой менеджер работает с ним только по согласованию с основным ответственным. Остальные — «Свободные».',
         ]);
@@ -127,8 +161,13 @@ class CrmSettings extends Component
                 'class' => FieldSet::class,
                 'name' => 'Исходящие продажи',
                 'fields' => [
-                    'outgoingTaskOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
+                    'outgoingNewCardOwner' => ['class' => SelectField::class, 'items' => self::newCardOwners(), 'allowNull' => false],
+                    'outgoingNewCardWorkerId' => ['class' => SelectField::class, 'items' => self::workerItems(), 'allowNull' => true],
                     'outgoingLeadOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
+                    'outgoingLeadOnVisit' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
+                    'outgoingTaskOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
+                    'outgoingLeadTo' => ['class' => SelectField::class, 'items' => self::leadReceivers(), 'allowNull' => false],
+                    'outgoingLeadWorkerId' => ['class' => SelectField::class, 'items' => self::workerItems(), 'allowNull' => true],
                     'outboundPipelineId' => [
                         'class' => SelectField::class,
                         'items' => self::pipelineItems(),
@@ -156,6 +195,28 @@ class CrmSettings extends Component
                 ],
             ],
         ];
+    }
+
+    public static function newCardOwners(): array
+    {
+        return [self::OWNER_NONE => 'Без ответственного — общий пул', self::OWNER_SENDER => 'Отправитель', self::OWNER_WORKER => 'Сотрудник'];
+    }
+
+    public static function leadReceivers(): array
+    {
+        return [self::LEAD_TO_UNSORTED => '«Неразобранное»', self::OWNER_SENDER => 'Отправитель', self::OWNER_WORKER => 'Сотрудник'];
+    }
+
+    /** Active employees, id => name. */
+    public static function workerItems(): array
+    {
+        $result = [];
+        foreach (\skeeks\cms\models\CmsUser::find()->isWorker()->andWhere([\skeeks\cms\models\CmsUser::tableName().'.is_active' => 1])->all() as $worker) {
+            $result[(int)$worker->id] = (string)$worker->shortDisplayName;
+        }
+        asort($result);
+
+        return $result;
     }
 
     /** Pipelines of the site, id => name. */
