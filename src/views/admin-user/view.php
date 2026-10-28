@@ -407,27 +407,12 @@ JS
             <?php // Blocks of other packages (КП and others), CrmCardBlocksWidget::EVENT_BLOCKS. ?>
             <?= \skeeks\cms\widgets\admin\CrmCardBlocksWidget::widget(['model' => $model]); ?>
 
-            <? if ($model->managers) : ?>
-                <?php BackendSurfaceWidget::begin($surfaceConfig(
-                    'Работают с клиентом',
-                    'Сотрудники нашей компании, которые работают с этим клиентом.'
-                )); ?>
-                        <div class="sx-users-block">
-                            <? foreach ($model->managers as $manager) : ?>
-                                <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
-                                    'user' => $manager,
-                                ]); ?>
-                                <?php /*echo \yii\helpers\Html::tag("div", "Добавить", [
-                                    'class' => 'btn btn-sm btn-primary sx-btn-select',
-                                    'style' => '    position: absolute;
-                    right: 20px;
-                    top: calc(50% - 15px);',
-                                    'data'  => $model->toArray(),
-                                ]); */ ?>
-                            <? endforeach; ?>
-                        </div>
-                <?php BackendSurfaceWidget::end(); ?>
-            <? endif; ?>
+            <?php // П2а+: who works with the client — the main responsible first, levels, add and remove (views/crm/_access-block.php). ?>
+            <?= $this->render('@skeeks/cms/views/crm/_access-block', [
+                'model' => $model,
+                'controllerRoute' => '/'.$this->context->uniqueId,
+                'surface' => $surfaceConfig('Работают с клиентом', 'Сотрудники нашей компании, которые работают с этим клиентом. Уровень доступа и основной ответственный — во вкладке «Доступ».'),
+            ]); ?>
 
         </div>
 

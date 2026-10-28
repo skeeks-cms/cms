@@ -352,6 +352,37 @@ class CrmAccess extends Component
         return $result;
     }
 
+    /**
+     * The rows of «Доступ» and of the card block «Работают с …»: accessList()
+     * (the main responsible first) plus where an access comes from —
+     * «основной ответственный», «по своей сделке» ("deal" of an executor of a
+     * deal of the client, left by «Работать с этим клиентом»), «выдан вручную».
+     */
+    public function accessRows(string $recordCode, int $recordId): array
+    {
+        $dealOwners = array_map('intval', CmsLead::find()->select('executor_id')->distinct()
+            ->andWhere([$recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id' => $recordId])
+            ->andWhere(['not', ['executor_id' => null]])->column());
+        $rows = $this->accessList($recordCode, $recordId);
+        foreach ($rows as &$row) {
+            $row['origin'] = $row['main'] ? 'основной ответственный'
+                : ($row['level'] === self::LEVEL_DEAL && in_array($row['id'], $dealOwners, true) ? 'по своей сделке' : 'выдан вручную');
+        }
+        unset($row);
+
+        return $rows;
+    }
+
+    /** One line of explanation of each level (the add window, the hints). */
+    public static function levelHints(): array
+    {
+        return [
+            self::LEVEL_DEAL => 'Карточка клиента, звонки и письма, всё по своим сделкам',
+            self::LEVEL_EDIT => 'Плюс правка данных: телефоны, e-mail, люди, адреса, реквизиты',
+            self::LEVEL_FULL => 'Всё, включая удаление клиента',
+        ];
+    }
+
     /** Ready filters of the company and client lists by the main responsible. */
     public static function responsibleFilterItems(): array
     {

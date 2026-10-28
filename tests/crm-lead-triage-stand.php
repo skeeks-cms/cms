@@ -511,6 +511,14 @@ try {
     $companyController->setModel($company);
     $check($companyActions && ($companyController->actions()['transfer']['isVisible'] ?? true) === false,
         '«Передать клиента» is a block of «Доступ», not a tab of its own');
+    // «+ Добавить сотрудника» (the same window in «Доступ» and in the card block): who manages the access only.
+    $check($actionAllowed('cms/admin-cms-company', $company, 'crm-access-add'), 'the main responsible opens «Добавить сотрудника»');
+    $as($other);
+    $check(!$actionAllowed('cms/admin-cms-company', $company, 'crm-access-add'), 'an employee without the access management does not');
+    $as($owner);
+    $rowsOfAccess = array_column($levelAccess->accessRows('company', (int)$company->id), null, 'id');
+    $check($rowsOfAccess[(int)$owner->id]['origin'] === 'основной ответственный' && $rowsOfAccess[(int)$owner->id]['main'],
+        'the rows of the access: the main responsible first, with its origin');
     $linksBefore = CmsCompany2manager::find()->select(['cms_user_id', 'access_level', 'is_main'])->andWhere(['cms_company_id' => $company->id])->orderBy(['cms_user_id' => SORT_ASC])->asArray()->all();
     $peopleBefore = \skeeks\cms\models\CmsCompany2user::find()->select('cms_user_id')->andWhere(['cms_company_id' => $company->id])->column();
     $formCompany = CmsCompany::findOne($company->id);

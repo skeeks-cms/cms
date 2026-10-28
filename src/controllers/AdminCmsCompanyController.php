@@ -962,6 +962,7 @@ HTML
             // П2а: a leader or an administrator gives the client to another employee.
             'transfer' => $this->clientTransferAction(),
             'crm-access' => $this->clientAccessAction(),
+            'crm-access-add' => $this->clientAccessAddAction(),
         ]);
     }
 

@@ -85,6 +85,61 @@ trait ClientTransferActions
 
     }
 
+    /** «+ Добавить сотрудника»: a small form in the standard backend window (the tab and the card block). */
+    public function clientAccessAddAction(): array
+    {
+        return [
+            'class' => BackendModelAction::class,
+            'name' => 'Добавить сотрудника',
+            'isVisible' => false,
+            'callback' => [$this, 'clientAccessAdd'],
+            'accessCallback' => function () {
+                [$code, $id] = $this->transferRecord();
+
+                return $id && CrmAccess::mainReady() && CrmAccess::instance()->canManageAccess((int)\Yii::$app->user->id, $code, $id);
+            },
+        ];
+    }
+
+    public function clientAccessAdd()
+    {
+        [$code, $id] = $this->transferRecord();
+        if (\Yii::$app->request->isPost) {
+            $response = new RequestResponse();
+            try {
+                $this->addAccess($code, $id, (int)\Yii::$app->request->post('user_id'), (string)\Yii::$app->request->post('level'));
+                $response->message = 'Сотрудник добавлен.';
+                $response->success = true;
+            } catch (\DomainException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+            }
+
+            return $response;
+        }
+
+        return $this->render('@skeeks/cms/views/crm/access-add', ['model' => $this->model]);
+    }
+
+    /** Gives an employee a link with a level; an employee already linked is changed in the list. */
+    protected function addAccess(string $code, int $id, int $userId, string $level): void
+    {
+        $access = CrmAccess::instance();
+        if (!$access->canManageAccess((int)\Yii::$app->user->id, $code, $id)) {
+            throw new \DomainException('Доступ к клиенту меняют основной ответственный, его руководитель или администратор.');
+        }
+        if (!isset(CrmAccess::levels()[$level])) {
+            throw new \DomainException('Выберите уровень доступа.');
+        }
+        if (!CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $userId, CmsUser::tableName().'.is_active' => 1])->exists()) {
+            throw new \DomainException('Выберите сотрудника.');
+        }
+        if ($access->linkLevel($userId, $code, $id) !== null) {
+            throw new \DomainException('Этот сотрудник уже работает с клиентом: измените его уровень в списке.');
+        }
+        $access->grantLink($code, $id, $userId, $level);
+    }
+
     public function clientAccessAction(): array
     {
         return [
@@ -129,18 +184,7 @@ trait ClientTransferActions
                         $response->message = 'Сотрудник больше не работает с клиентом.';
                         break;
                     case 'add':
-                        $userId = (int)$request->post('user_id');
-                        $level = (string)$request->post('level');
-                        if (!isset(CrmAccess::levels()[$level])) {
-                            throw new \DomainException('Выберите уровень доступа.');
-                        }
-                        if (!CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $userId, CmsUser::tableName().'.is_active' => 1])->exists()) {
-                            throw new \DomainException('Выберите сотрудника.');
-                        }
-                        if ($access->linkLevel($userId, $code, $id) !== null) {
-                            throw new \DomainException('Этот сотрудник уже работает с клиентом: измените его уровень в списке.');
-                        }
-                        $access->grantLink($code, $id, $userId, $level);
+                        $this->addAccess($code, $id, (int)$request->post('user_id'), (string)$request->post('level'));
                         $response->message = 'Сотрудник добавлен.';
                         break;
                     default:
@@ -155,16 +199,7 @@ trait ClientTransferActions
             return $response;
         }
 
-        $employees = $access->accessList($code, $id);
-        // Where an access comes from: «Работать с этим клиентом» leaves "deal" to who has a deal of the client.
-        $dealOwners = array_map('intval', CmsLead::find()->select('executor_id')->distinct()
-            ->andWhere([$code === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms_company_id' : 'cms_user_id' => $id])
-            ->andWhere(['not', ['executor_id' => null]])->column());
-        foreach ($employees as &$employee) {
-            $employee['origin'] = $employee['main'] ? 'основной ответственный'
-                : ($employee['level'] === CrmAccess::LEVEL_DEAL && in_array($employee['id'], $dealOwners, true) ? 'по своей сделке' : 'выдан вручную');
-        }
-        unset($employee);
+        $employees = $access->accessRows($code, $id);
         $mainId = $access->mainResponsibleId($code, $id);
         $canTransfer = $access->canTransferClient($actorId, $code, $id);
         $myLevel = $access->clientDataLevel($actorId, $code, $id);

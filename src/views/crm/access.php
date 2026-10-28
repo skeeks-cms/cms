@@ -28,7 +28,6 @@ use skeeks\cms\controllers\AdminCmsCrmAccessRequestController as Requests;
 use skeeks\cms\crm\CrmAccess;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\widgets\AjaxSelectModel;
-use skeeks\cms\widgets\admin\CmsWorkerViewWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -44,7 +43,6 @@ foreach ($employees as $employee) {
         $others[] = $employee;
     }
 }
-$worker = static fn(int $id) => ($user = CmsUser::findOne($id)) ? CmsWorkerViewWidget::widget(['user' => $user]) : '';
 $workerSearch = static function ($word = '') {
     $query = CmsUser::find()->isWorker()->cmsSite()->andWhere([CmsUser::tableName().'.is_active' => 1]);
 
@@ -64,7 +62,11 @@ $workerSearch = static function ($word = '') {
         'responsive' => true,
     ]); ?>
         <?php if ($main) : ?>
-            <?= $worker($main['id']); ?>
+            <ul class="sx-crm-access__list">
+                <?= $this->render('@skeeks/cms/views/crm/_access-row', [
+                    'employee' => $main, 'mode' => 'tab', 'canManage' => false, 'accessUrl' => $url,
+                ]); ?>
+            </ul>
         <?php else : ?>
             <p class="sx-lead-identity__note">Основного ответственного нет.</p>
         <?php endif; ?>
@@ -119,67 +121,24 @@ $workerSearch = static function ($word = '') {
     <?php BackendSurfaceWidget::begin([
         'title' => 'Работают с клиентом',
         'titleTag' => 'h2',
-        'hint' => '«Свои сделки» — карточка клиента, звонки и письма, всё по своим сделкам, новый телефон или e-mail. «Свои сделки и данные компании» — плюс правка данных: телефоны, e-mail, люди, адреса, реквизиты. «Полный» — всё, включая удаление.',
+        'hint' => '«Свои сделки» — карточка клиента, звонки и письма, всё по своим сделкам, новый телефон или e-mail. «Свои сделки и данные компании» — плюс правка данных: телефоны, e-mail, люди, адреса, реквизиты. «Полный» — всё, включая удаление. Добавить сотрудника — кнопкой под списком.',
         'raised' => true,
         'responsive' => true,
     ]); ?>
         <?php if (!$others) : ?>
             <p class="sx-lead-identity__note">Кроме основного ответственного, с клиентом никто не работает.</p>
         <?php endif; ?>
-        <ul class="sx-lead-requests">
+        <ul class="sx-crm-access__list">
             <?php foreach ($others as $employee) : ?>
-                <li class="sx-lead-hint">
-                    <div class="sx-lead-triage__request">
-                        <?= $worker($employee['id']); ?>
-                        <span class="sx-lead-hint__meta">
-                            <?= Html::encode(($levels[$employee['level']] ?? $employee['level']).' · '.$employee['origin']); ?>
-                        </span>
-                    </div>
-                    <?php if ($canManage) : ?>
-                        <div class="sx-lead-hint__actions">
-                            <?= Html::dropDownList('level', $employee['level'], $levels, [
-                                'class' => 'form-control',
-                                'aria-label' => 'Уровень доступа '.$employee['name'],
-                                'data-sx-crm-access' => 'level',
-                                'data-user-id' => $employee['id'],
-                                'data-url' => $url,
-                            ]); ?>
-                            <?= Html::button('Убрать', [
-                                'class' => 'sx-button sx-button--secondary sx-button--sm',
-                                'data-sx-crm-access' => 'remove',
-                                'data-user-id' => $employee['id'],
-                                'data-url' => $url,
-                                'data-sx-confirm' => 'Сотрудник '.$employee['name'].' больше не будет работать с клиентом. Его сделки останутся у него.',
-                            ]); ?>
-                        </div>
-                    <?php endif; ?>
-                </li>
+                <?= $this->render('@skeeks/cms/views/crm/_access-row', [
+                    'employee' => $employee, 'mode' => 'tab', 'canManage' => $canManage, 'accessUrl' => $url,
+                ]); ?>
             <?php endforeach; ?>
         </ul>
-
         <?php if ($canManage) : ?>
-            <div class="sx-lead-hint__actions sx-crm-access__add">
-                <?= AjaxSelectModel::widget([
-                    'id' => 'sx-crm-access-add-user',
-                    'name' => 'add_user_id',
-                    'modelClass' => CmsUser::class,
-                    'modelShowAttribute' => 'shortDisplayName',
-                    'searchQuery' => $workerSearch,
-                    'options' => ['placeholder' => 'Сотрудник'],
-                ]); ?>
-                <?= Html::dropDownList('add_level', CrmAccess::LEVEL_DEAL, $levels, [
-                    'id' => 'sx-crm-access-add-level',
-                    'class' => 'form-control',
-                    'aria-label' => 'Уровень доступа нового сотрудника',
-                ]); ?>
-                <?= Html::button('Добавить сотрудника', [
-                    'class' => 'sx-button sx-button--primary sx-button--sm',
-                    'data-sx-crm-access' => 'add',
-                    'data-user-input' => '#sx-crm-access-add-user',
-                    'data-level-input' => '#sx-crm-access-add-level',
-                    'data-url' => $url,
-                ]); ?>
-            </div>
+            <?= $this->render('@skeeks/cms/views/crm/_access-add-button', [
+                'controllerRoute' => '/'.Yii::$app->controller->uniqueId, 'recordId' => (int)$model->id,
+            ]); ?>
         <?php endif; ?>
     <?php BackendSurfaceWidget::end(); ?>
 
