@@ -1,0 +1,210 @@
+<?php
+
+namespace skeeks\cms\crm;
+
+use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadPipeline;
+use skeeks\cms\models\CmsLeadStage;
+use skeeks\cms\models\CmsLog;
+use yii\base\Event;
+use yii\db\BaseActiveRecord;
+
+/**
+ * «Исходящие продажи» (П2д, ARCHITECTURE.md п. 13): the default stages of
+ * the outbound pipeline and the personal offer moving a deal through them.
+ *
+ * A presentation or a КП sent from a deal moves it to «КП отправлено», the
+ * first view of the client — to «Смотрел». Only a deal in work of the
+ * outbound pipeline moves, and only forward: a deal already further (or in
+ * «Неразобранное», or closed) stays where it is. The pipeline and the two
+ * stages are the settings of the site CRM (CrmSettings, «Исходящие
+ * продажи»); empty — the pipeline by its code and the stages by their names.
+ *
+ * The core does not depend on cms-proposal: it listens to the feed entries
+ * the proposal package writes into the card of the deal (CmsLog of type
+ * `proposal`, `data.event` sent/opened, ProposalFeed). The call task on the
+ * first view and the reply in the same deal belong to cms-proposal
+ * (ProposalTasks) and cms-communication (the letters of a conversation pass
+ * their links on).
+ */
+class OutboundSales
+{
+    public const STAGE_FIRST = 'Первый контакт';
+    public const STAGE_SENT = 'КП отправлено';
+    public const STAGE_VIEWED = 'Смотрел';
+    public const STAGE_THINKING = 'Думает';
+
+    /** The chain of a new outbound pipeline; «Успешно» and «Отказ» are the results of every pipeline. */
+    public const DEFAULT_STAGES = [self::STAGE_FIRST, self::STAGE_SENT, self::STAGE_VIEWED, self::STAGE_THINKING];
+
+    public const ROLE_SENT = 'sent';
+    public const ROLE_VIEWED = 'viewed';
+
+    /** CmsLog::$log_type of the proposal feed (cms-proposal CmsProposal::LOG_TYPE). */
+    public const PROPOSAL_LOG_TYPE = 'proposal';
+
+    /** Events of the proposal feed that move a deal, event => role. */
+    public const PROPOSAL_EVENTS = ['sent' => self::ROLE_SENT, 'opened' => self::ROLE_VIEWED];
+
+    /** Attached once at bootstrap (Skeeks::bootstrap()). */
+    public static function subscribe(): void
+    {
+        Event::on(CmsLog::class, BaseActiveRecord::EVENT_AFTER_INSERT, [static::class, 'onFeed']);
+    }
+
+    /** A proposal entry in the feed of a deal; never breaks the sending or the client page. */
+    public static function onFeed(Event $event): void
+    {
+        /** @var CmsLog $log */
+        $log = $event->sender;
+        if ($log->log_type !== self::PROPOSAL_LOG_TYPE) {
+            return;
+        }
+        $data = is_string($log->data) ? (array)json_decode($log->data, true) : (array)$log->data;
+        $role = self::PROPOSAL_EVENTS[$data['event'] ?? ''] ?? null;
+        if ($role === null || (string)$log->model_code !== (string)(new CmsLead())->skeeksModelCode) {
+            return;
+        }
+        try {
+            $lead = CmsLead::findOne((int)$log->model_id);
+            if ($lead) {
+                static::advance($lead, $role);
+            }
+        } catch (\Throwable $e) {
+            \Yii::error('Этап сделки #'.(int)$log->model_id.' по предложению не изменён: '.$e->getMessage(), self::class);
+        }
+    }
+
+    /**
+     * Moves the deal forward to the stage of the role; returns whether it moved.
+     * The history entry gets the signed-in user, on the client page — nobody.
+     */
+    public static function advance(CmsLead $lead, string $role): bool
+    {
+        if ($lead->status !== CmsLead::STATUS_IN_WORK || !CmsLead::pipelineReady()) {
+            return false;
+        }
+        $pipeline = static::pipeline((int)$lead->cms_site_id);
+        $current = $lead->getEffectivePipeline();
+        if (!$pipeline || !$current || (int)$current->id !== (int)$pipeline->id) {
+            return false;
+        }
+        $target = static::stage($pipeline, $role);
+        if (!$target || (int)$lead->cms_lead_stage_id === (int)$target->id) {
+            return false;
+        }
+        $order = array_map(static fn(CmsLeadStage $stage) => (int)$stage->id, CmsLeadStage::forPipeline($pipeline, (int)$lead->cms_site_id));
+        $from = $lead->cms_lead_stage_id ? array_search((int)$lead->cms_lead_stage_id, $order, true) : -1;
+        $to = array_search((int)$target->id, $order, true);
+        if ($to === false || ($from !== false && $from >= $to)) {
+            return false;
+        }
+
+        $lead->cms_lead_stage_id = (int)$target->id;
+        if (!$lead->save(false)) {
+            throw new \RuntimeException('Не удалось сохранить сделку.');
+        }
+
+        return true;
+    }
+
+    /** The outbound pipeline of a site: the setting, otherwise the one with the code `outbound`. */
+    public static function pipeline(int $siteId): ?CmsLeadPipeline
+    {
+        $settingId = (int)self::setting('outboundPipelineId');
+        foreach (CmsLeadPipeline::forSite($siteId) as $pipeline) {
+            if ($settingId ? (int)$pipeline->id === $settingId : $pipeline->code === CmsLeadPipeline::CODE_OUTBOUND) {
+                return $pipeline;
+            }
+        }
+
+        return null;
+    }
+
+    /** The stage of a role in the pipeline: the setting when it belongs there, otherwise by name. */
+    public static function stage(CmsLeadPipeline $pipeline, string $role): ?CmsLeadStage
+    {
+        $settingId = (int)self::setting($role === self::ROLE_SENT ? 'proposalSentStageId' : 'proposalViewedStageId');
+        $name = $role === self::ROLE_SENT ? self::STAGE_SENT : self::STAGE_VIEWED;
+        $byName = null;
+        foreach (CmsLeadStage::forPipeline($pipeline, (int)$pipeline->cms_site_id) as $stage) {
+            if ($settingId && (int)$stage->id === $settingId) {
+                return $stage;
+            }
+            if (!$byName && mb_strtolower(trim((string)$stage->name)) === mb_strtolower($name)) {
+                $byName = $stage;
+            }
+        }
+
+        return $byName;
+    }
+
+    /**
+     * The default stages of an outbound pipeline: all of them for a pipeline
+     * without stages, otherwise only the missing «КП отправлено» and
+     * «Смотрел» the personal offer needs — «КП отправлено» after the first
+     * stage, «Смотрел» right after it. Nothing existing is changed.
+     *
+     * @return string[] names of the created stages
+     */
+    public static function ensureStages(CmsLeadPipeline $pipeline): array
+    {
+        $siteId = (int)$pipeline->cms_site_id;
+        $stages = CmsLeadStage::find()->andWhere(['cms_lead_pipeline_id' => (int)$pipeline->id])
+            ->orderBy(['sort' => SORT_ASC, 'id' => SORT_ASC])->all();
+        $created = [];
+        $add = static function (string $name, int $sort) use ($pipeline, $siteId, &$created): CmsLeadStage {
+            $stage = new CmsLeadStage(['cms_site_id' => $siteId, 'cms_lead_pipeline_id' => (int)$pipeline->id, 'name' => $name, 'sort' => $sort]);
+            if (!$stage->save()) {
+                throw new \RuntimeException('Этап «'.$name.'»: '.implode(' ', $stage->getFirstErrors()));
+            }
+            $created[] = $name;
+
+            return $stage;
+        };
+        if (!$stages) {
+            foreach (self::DEFAULT_STAGES as $index => $name) {
+                $add($name, ($index + 1) * 10);
+            }
+
+            return $created;
+        }
+
+        $find = static function (string $name) use (&$stages): ?CmsLeadStage {
+            foreach ($stages as $stage) {
+                if (mb_strtolower(trim((string)$stage->name)) === mb_strtolower($name)) {
+                    return $stage;
+                }
+            }
+
+            return null;
+        };
+        // A sort between the stage and the next one (equal sorts keep the order of creation).
+        $after = static function (CmsLeadStage $stage) use (&$stages): int {
+            $sorts = array_map(static fn(CmsLeadStage $s) => (int)$s->sort, $stages);
+            $next = null;
+            foreach ($sorts as $sort) {
+                if ($sort > (int)$stage->sort && ($next === null || $sort < $next)) {
+                    $next = $sort;
+                }
+            }
+
+            return $next === null ? (int)$stage->sort + 10 : intdiv((int)$stage->sort + $next, 2);
+        };
+        $sent = $find(self::STAGE_SENT);
+        if (!$sent) {
+            $sent = $add(self::STAGE_SENT, $after($stages[0]));
+            $stages[] = $sent;
+        }
+        if (!$find(self::STAGE_VIEWED)) {
+            $stages[] = $add(self::STAGE_VIEWED, $after($sent));
+        }
+
+        return $created;
+    }
+
+    private static function setting(string $name)
+    {
+        return \Yii::$app->has('crmSettings') && isset(\Yii::$app->crmSettings->{$name}) ? \Yii::$app->crmSettings->{$name} : null;
+    }
+}

@@ -33,6 +33,8 @@ class LeadIdentityForm extends Model
     /** Phones and emails of a new company, comma separated (a parsed line, CrmContactParser). */
     public $company_phones;
     public $company_emails;
+    /** П2д: the site of a new company («Исходящие продажи»), saved as its link. */
+    public $company_site;
 
     public $client_mode = self::MODE_NONE;
     public $client_id;
@@ -69,6 +71,13 @@ class LeadIdentityForm extends Model
             [['company_name', 'client_first_name', 'client_last_name'], 'string', 'max' => 255],
             [['client_phone', 'client_email', 'company_phones', 'company_emails'], 'trim'],
             [['company_phones', 'company_emails'], 'string', 'max' => 2000],
+            [['company_site'], 'trim'],
+            [['company_site'], 'string', 'max' => 255],
+            [['company_site'], function ($attribute) {
+                if (self::siteUrl($this->{$attribute}) === '' && trim((string)$this->{$attribute}) !== '') {
+                    $this->addError($attribute, 'Сайт указан неверно: например, example.ru или https://example.ru.');
+                }
+            }],
             [['client_phone'], 'string', 'max' => 64],
             [['client_email'], 'email'],
             [['foreign_comment', 'duplicate_reason'], 'string', 'max' => 2000],
@@ -93,6 +102,7 @@ class LeadIdentityForm extends Model
             'company_name' => 'Название компании',
             'company_phones' => 'Телефоны компании',
             'company_emails' => 'Email компании',
+            'company_site' => 'Сайт компании',
             'client_mode' => 'Контакт',
             'client_id' => 'Контакт',
             'client_first_name' => 'Имя',
@@ -104,6 +114,21 @@ class LeadIdentityForm extends Model
             'duplicate_reason' => CrmDuplicateGuard::reasonLabel(),
             'executor_id' => 'Ответственный',
         ];
+    }
+
+    /** A typed site as a full address («example.ru» → «https://example.ru»); '' when it is not a site. */
+    public static function siteUrl($value): string
+    {
+        $value = trim((string)$value);
+        if ($value === '') {
+            return '';
+        }
+        if (!preg_match('~^https?://~i', $value)) {
+            $value = 'https://'.$value;
+        }
+        $host = (string)parse_url($value, PHP_URL_HOST);
+        // The same check as the company link (CmsCompanyLink::$url) the site is saved to.
+        return strpos($host, '.') !== false && (new \yii\validators\UrlValidator())->validate($value) ? $value : '';
     }
 
     /** @return string[] phones or emails of a new company from their comma separated field */

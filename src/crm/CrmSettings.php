@@ -3,6 +3,9 @@
 namespace skeeks\cms\crm;
 
 use skeeks\cms\base\Component;
+use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadPipeline;
+use skeeks\cms\models\CmsLeadStage;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
@@ -17,6 +20,11 @@ use yii\helpers\ArrayHelper;
  * amoCRM and Bitrix24): saved without a reason, the employee is only warned.
  * In both modes the pair is marked as a possible duplicate, the hints and the
  * requests stay, a hidden client stays hidden. Read by CrmDuplicateGuard only.
+ *
+ * «Исходящие продажи» (П2д): also the pipeline of outbound sales and the
+ * stages a personal offer sent from its deal moves the deal to
+ * (OutboundSales). Empty — the pipeline with the code `outbound` and the
+ * stages «КП отправлено» and «Смотрел» by name.
  */
 class CrmSettings extends Component
 {
@@ -35,6 +43,13 @@ class CrmSettings extends Component
      */
     public $outgoingTaskOnView = 1;
     public $outgoingLeadOnView = 0;
+
+    /** @var int|null personal offers: the pipeline; null — the one with the code `outbound` */
+    public $outboundPipelineId;
+    /** @var int|null the stage after a presentation or a КП is sent from the deal; null — «КП отправлено» */
+    public $proposalSentStageId;
+    /** @var int|null the stage after the client opened it; null — «Смотрел» */
+    public $proposalViewedStageId;
 
     /** The site decides, not a user. */
     protected $_overridePath = [self::OVERRIDE_DEFAULT, self::OVERRIDE_SITE];
@@ -62,6 +77,8 @@ class CrmSettings extends Component
             [['duplicateMode'], 'in', 'range' => array_keys(self::duplicateModes())],
             [['outgoingTaskOnView', 'outgoingLeadOnView'], 'boolean'],
             [['protectionMonths'], 'integer', 'min' => 1, 'max' => 120],
+            [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
+            [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'integer'],
         ]);
     }
 
@@ -72,6 +89,9 @@ class CrmSettings extends Component
             'outgoingTaskOnView' => 'Задача при просмотре',
             'outgoingLeadOnView' => 'Сделка при просмотре в рассылках',
             'protectionMonths' => 'Защита после платежа, месяцев',
+            'outboundPipelineId' => 'Воронка личных предложений',
+            'proposalSentStageId' => 'Этап при отправке',
+            'proposalViewedStageId' => 'Этап при просмотре',
         ]);
     }
 
@@ -79,6 +99,9 @@ class CrmSettings extends Component
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             'outgoingTaskOnView' => 'Когда получатель рассылки открыл Презентацию или КП, ответственному ставится задача «Позвонить». Умолчание новой рассылки — в рассылке его можно изменить.',
+            'outboundPipelineId' => 'Воронка, в которой ведутся продажи по найденным компаниям. Отправка и просмотр Презентации или КП двигают этапы только у сделок этой воронки.',
+            'proposalSentStageId' => 'Куда переходит сделка, когда из неё отправили Презентацию или КП. Сделка, которая уже дальше, остаётся на месте.',
+            'proposalViewedStageId' => 'Куда переходит сделка, когда клиент впервые открыл Презентацию или КП.',
             'outgoingLeadOnView' => 'Просмотр Презентации или КП из рассылки сразу создаёт сделку (или дополняет открытую). Обычно сделку создаёт ответ или заявка клиента, а просмотр только делает его «тёплым».',
             'duplicateMode' => 'В обоих режимах при вводе показываются совпадения в базе, а новая запись отмечается как возможный повтор, чтобы её потом можно было объединить. Чужой клиент остаётся скрытым по уровню доступа.',
             'protectionMonths' => 'Клиент, который платил за это время или у которого есть действующая услуга, — «Под защитой»: другой менеджер работает с ним только по согласованию с основным ответственным. Остальные — «Свободные».',
@@ -106,6 +129,21 @@ class CrmSettings extends Component
                 'fields' => [
                     'outgoingTaskOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
                     'outgoingLeadOnView' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
+                    'outboundPipelineId' => [
+                        'class' => SelectField::class,
+                        'items' => self::pipelineItems(),
+                        'nullLabel' => 'Воронка «Исходящие продажи»',
+                    ],
+                    'proposalSentStageId' => [
+                        'class' => SelectField::class,
+                        'items' => self::stageItems(),
+                        'nullLabel' => 'Этап «'.OutboundSales::STAGE_SENT.'»',
+                    ],
+                    'proposalViewedStageId' => [
+                        'class' => SelectField::class,
+                        'items' => self::stageItems(),
+                        'nullLabel' => 'Этап «'.OutboundSales::STAGE_VIEWED.'»',
+                    ],
                 ],
             ],
             'protection' => [
@@ -118,5 +156,24 @@ class CrmSettings extends Component
                 ],
             ],
         ];
+    }
+
+    /** Pipelines of the site, id => name. */
+    private static function pipelineItems(): array
+    {
+        return CmsLead::pipelineReady() ? ArrayHelper::map(CmsLeadPipeline::forSite(), 'id', 'name') : [];
+    }
+
+    /** Stages of every pipeline of the site, «Воронка: этап». */
+    private static function stageItems(): array
+    {
+        $items = [];
+        foreach (CmsLead::pipelineReady() ? CmsLeadPipeline::forSite() : [] as $pipeline) {
+            foreach (CmsLeadStage::forPipeline($pipeline) as $stage) {
+                $items[(int)$stage->id] = $pipeline->name.': '.$stage->name;
+            }
+        }
+
+        return $items;
     }
 }

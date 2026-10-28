@@ -29,6 +29,8 @@ Yii::$app->errorHandler->unregister();
 
 use skeeks\cms\crm\LeadPipelineMigration;
 use skeeks\cms\crm\LeadPipelines;
+use skeeks\cms\crm\LeadTriage;
+use skeeks\cms\crm\OutboundSales;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsLeadPipeline;
 use skeeks\cms\models\CmsLeadStage;
@@ -298,6 +300,99 @@ try {
     $kanbanSource = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/kanban.php');
     $check(strpos($kanbanSource, "\$link(['executor' => 'all'])") !== false && strpos($kanbanSource, "\$executorId === \$userId ? null : (\$executorId ?: 'all')") !== false,
         'the kanban links keep «Все сделки» while switching the pipeline or the filters');
+
+    // --- П2д: «Исходящие продажи» — default stages, the personal offer moves the deal forward ---
+    $fresh = new CmsLeadPipeline(['cms_site_id' => $siteId, 'name' => 'Тест П2д: пустая', 'sort' => 900, 'is_default' => 0, 'success_rule' => CmsLeadPipeline::SUCCESS_MANUAL]);
+    $check($fresh->save(), 'an empty pipeline is created');
+    $check(OutboundSales::ensureStages($fresh) === OutboundSales::DEFAULT_STAGES
+        && array_map(static fn($s) => $s->name, CmsLeadStage::forPipeline($fresh, $siteId)) === OutboundSales::DEFAULT_STAGES,
+        'an outbound pipeline without stages gets «Первый контакт», «КП отправлено», «Смотрел», «Думает»');
+    $own = new CmsLeadPipeline(['cms_site_id' => $siteId, 'name' => 'Тест П2д: своя', 'sort' => 901, 'is_default' => 0, 'success_rule' => CmsLeadPipeline::SUCCESS_MANUAL]);
+    $check($own->save(), 'a pipeline with its own stages is created');
+    foreach (['Звонок' => 10, 'Встреча' => 20] as $name => $sort) {
+        (new CmsLeadStage(['cms_site_id' => $siteId, 'cms_lead_pipeline_id' => (int)$own->id, 'name' => $name, 'sort' => $sort]))->save();
+    }
+    $check(OutboundSales::ensureStages($own) === [OutboundSales::STAGE_SENT, OutboundSales::STAGE_VIEWED]
+        && array_map(static fn($s) => $s->name, CmsLeadStage::forPipeline($own, $siteId)) === ['Звонок', OutboundSales::STAGE_SENT, OutboundSales::STAGE_VIEWED, 'Встреча']
+        && OutboundSales::ensureStages($own) === [],
+        'a pipeline with stages keeps them and only gets «КП отправлено» and «Смотрел» after the first one, once');
+    $outbound->refresh();
+    $check(OutboundSales::stage($outbound, OutboundSales::ROLE_SENT) && OutboundSales::stage($outbound, OutboundSales::ROLE_VIEWED)
+        && (int)OutboundSales::pipeline($siteId)->id === (int)$outbound->id, 'the stand «Исходящие продажи» has «КП отправлено» and «Смотрел» (migration m261029_100000)');
+
+    $sentStage = OutboundSales::stage($outbound, OutboundSales::ROLE_SENT);
+    $viewedStage = OutboundSales::stage($outbound, OutboundSales::ROLE_VIEWED);
+    $feed = static function (CmsLead $lead, string $event) {
+        $log = new skeeks\cms\models\CmsLog();
+        $log->model_code = (string)$lead->skeeksModelCode;
+        $log->model_id = (int)$lead->id;
+        $log->model_as_text = (string)$lead->name;
+        $log->log_type = OutboundSales::PROPOSAL_LOG_TYPE;
+        $log->comment = 'КП №0';
+        $log->data = ['id' => 0, 'event' => $event];
+        $log->save(false);
+        $lead->refresh();
+    };
+    $sale = new CmsLead(['cms_site_id' => $siteId, 'name' => 'Тест П2д: продажа', 'source_type' => CmsLead::SOURCE_MANUAL, 'cms_lead_pipeline_id' => (int)$outbound->id,
+        'executor_id' => (int)$admin->id, 'status' => CmsLead::STATUS_IN_WORK]);
+    $inWork = static fn(CmsLead $lead) => $lead->save() && ($lead->executor_id = (int)$admin->id) && ($lead->status = CmsLead::STATUS_IN_WORK) && $lead->save();
+    $check($inWork($sale), 'an outbound deal in work is created: '.implode(' ', $sale->getFirstErrors()));
+    $check((int)$sale->cms_lead_stage_id !== (int)$sentStage->id, 'it starts before «КП отправлено»');
+    $feed($sale, 'sent');
+    $check((int)$sale->cms_lead_stage_id === (int)$sentStage->id && $last($sale)->kind === CmsLeadStageHistory::KIND_STAGE,
+        'a КП sent from the deal moves it to «КП отправлено», with a history row');
+    $feed($sale, 'checked');
+    $feed($sale, 'opened');
+    $check((int)$sale->cms_lead_stage_id === (int)$viewedStage->id, 'a link check does nothing, the first view moves it to «Смотрел»');
+    $feed($sale, 'sent');
+    $check((int)$sale->cms_lead_stage_id === (int)$viewedStage->id, 'a second sending does not move it back');
+    $thinking = null;
+    foreach (CmsLeadStage::forPipeline($outbound, $siteId) as $stage) {
+        if ($stage->name === OutboundSales::STAGE_THINKING) {
+            $thinking = $stage;
+        }
+    }
+    if ($thinking) {
+        $sale->cms_lead_stage_id = (int)$thinking->id;
+        $sale->save();
+        $feed($sale, 'opened');
+        $check((int)$sale->cms_lead_stage_id === (int)$thinking->id, 'a deal already at «Думает» stays there');
+    }
+    $unsorted = new CmsLead(['cms_site_id' => $siteId, 'name' => 'Тест П2д: неразобранная', 'source_type' => CmsLead::SOURCE_MANUAL, 'cms_lead_pipeline_id' => (int)$outbound->id]);
+    $unsorted->save();
+    $feed($unsorted, 'sent');
+    $check($unsorted->status === CmsLead::STATUS_NEW && !$unsorted->cms_lead_stage_id, 'a deal in «Неразобранное» is not moved');
+    $inboundSale = new CmsLead(['cms_site_id' => $siteId, 'name' => 'Тест П2д: входящая', 'source_type' => CmsLead::SOURCE_MANUAL, 'executor_id' => (int)$admin->id, 'status' => CmsLead::STATUS_IN_WORK]);
+    $inWork($inboundSale);
+    $before = (int)$inboundSale->cms_lead_stage_id;
+    $feed($inboundSale, 'sent');
+    $check((int)$inboundSale->cms_lead_stage_id === $before, 'a deal of «Входящие» is not moved');
+    // The settings of the site CRM choose another stage.
+    if ($thinking) {
+        Yii::$app->crmSettings->proposalViewedStageId = (int)$thinking->id;
+        $other = new CmsLead(['cms_site_id' => $siteId, 'name' => 'Тест П2д: настройка', 'source_type' => CmsLead::SOURCE_MANUAL, 'cms_lead_pipeline_id' => (int)$outbound->id,
+            'executor_id' => (int)$admin->id, 'status' => CmsLead::STATUS_IN_WORK]);
+        $inWork($other);
+        $feed($other, 'opened');
+        Yii::$app->crmSettings->proposalViewedStageId = null;
+        $check((int)$other->cms_lead_stage_id === (int)$thinking->id, '«Этап при просмотре» of the CRM settings is used');
+    }
+    $fields = Yii::$app->crmSettings->getConfigFormFields()['outgoing']['fields'] ?? [];
+    $check(isset($fields['outboundPipelineId'], $fields['proposalSentStageId'], $fields['proposalViewedStageId']),
+        'the settings «Исходящие продажи» have the pipeline and the two stages');
+
+    // The form: «Услуга — Компания», the site of a new company.
+    $type = skeeks\cms\models\CmsDealType::find()->orderBy(['id' => SORT_ASC])->one();
+    $identity = new skeeks\cms\crm\LeadIdentityForm(['company_mode' => skeeks\cms\crm\LeadIdentityForm::MODE_NEW, 'company_name' => 'Тест П2д: Ромашка', 'company_site' => 'romashka-p2d-test.ru']);
+    $named = new CmsLead(['cms_site_id' => $siteId, 'cms_deal_type_id' => $type ? (int)$type->id : null]);
+    $check(!$type || (new LeadTriage())->suggestName($named, $identity) === $type->name.' — Тест П2д: Ромашка', 'a deal with «Услуга» is named «Услуга — Компания»');
+    $check(skeeks\cms\crm\LeadIdentityForm::siteUrl('romashka.ru') === 'https://romashka.ru' && skeeks\cms\crm\LeadIdentityForm::siteUrl('не сайт') === ''
+        && $identity->validate(['company_site']), 'a typed site becomes an address, a wrong one is refused');
+    $applied = (new LeadTriage())->applyIdentity($named, $identity, (int)$admin->id);
+    $check(skeeks\cms\models\CmsCompanyLink::find()->andWhere(['cms_company_id' => (int)$applied['companyId'], 'url' => 'https://romashka-p2d-test.ru'])->exists(),
+        'the site of a new company goes to its links');
+    $viewSource = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-lead/_identity.php');
+    $check(strpos($viewSource, "'company_site' => 'site'") !== false, 'the form «Новая сделка» has the field «Сайт» of a new company');
 
     echo 'OK crm-lead-pipelines-stand: '.$checks." checks\n";
 } finally {

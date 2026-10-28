@@ -221,8 +221,26 @@ class CmsLead extends Core
             }];
             $rules[] = [['!stage_changed_at'], 'integer'];
         }
+        if (static::dealTypeReady()) {
+            // П2д: «Услуга» — the kind of service being sold (m261029_100000).
+            $rules[] = [['cms_deal_type_id'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value];
+            $rules[] = [['cms_deal_type_id'], 'integer'];
+            $rules[] = [['cms_deal_type_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsDealType::class, 'targetAttribute' => ['cms_deal_type_id' => 'id']];
+        }
 
         return $rules;
+    }
+
+    /** The column «Услуга» exists (П2д migration may run after the code update). */
+    public static function dealTypeReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::getDb()->getTableSchema(static::tableName(), true);
+            $ready = $schema && $schema->getColumn('cms_deal_type_id') !== null;
+        }
+
+        return $ready;
     }
 
     /** The pipeline columns and the history exist (П2б migration may run after the code update). */
@@ -1045,6 +1063,7 @@ class CmsLead extends Core
             'no_answer_count' => 'Неудачных попыток дозвониться',
             'cms_lead_stage_id' => 'Этап',
             'cms_lead_pipeline_id' => 'Воронка',
+            'cms_deal_type_id' => 'Услуга',
             'stage_changed_at' => 'На этапе с',
             'cms_lead_reject_reason_id' => 'Причина отказа',
             'triage_result' => 'Итог разбора',
@@ -1061,6 +1080,7 @@ class CmsLead extends Core
     public function getClient() { return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']); }
     public function getStage() { return $this->hasOne(CmsLeadStage::class, ['id' => 'cms_lead_stage_id']); }
     public function getPipeline() { return $this->hasOne(CmsLeadPipeline::class, ['id' => 'cms_lead_pipeline_id']); }
+    public function getDealType() { return $this->hasOne(CmsDealType::class, ['id' => 'cms_deal_type_id']); }
     public function getMergedInto() { return $this->hasOne(self::class, ['id' => 'merged_into_id']); }
     public function getTriagedBy() { return $this->hasOne(CmsUser::class, ['id' => 'triaged_by']); }
     public function getRejectReasonItem() { return $this->hasOne(CmsLeadRejectReason::class, ['id' => 'cms_lead_reject_reason_id']); }

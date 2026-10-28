@@ -68,7 +68,7 @@ $pickedTitle = static function (string $part) use ($form): string {
 $searchPart = static function (string $part, string $title, string $placeholder) use ($hidden, $form, $formName, $pickedTitle): string {
     $isCompany = $part === 'company';
     $fields = $isCompany
-        ? ['company_mode' => 'mode', 'company_id' => 'id', 'company_ref' => 'ref', 'company_name' => 'name', 'company_phones' => 'phones', 'company_emails' => 'emails']
+        ? ['company_mode' => 'mode', 'company_id' => 'id', 'company_ref' => 'ref', 'company_name' => 'name', 'company_phones' => 'phones', 'company_emails' => 'emails', 'company_site' => 'site']
         : ['client_mode' => 'mode', 'client_id' => 'id', 'client_ref' => 'ref', 'client_first_name' => 'first_name', 'client_last_name' => 'last_name', 'client_phone' => 'phone', 'client_email' => 'email'];
     $html = Html::tag('label', Html::encode($title), ['class' => 'sx-lead-identity__label', 'for' => 'sx-lead-identity-'.$part]);
     foreach ($fields as $attribute => $role) {
@@ -98,7 +98,9 @@ $searchPart = static function (string $part, string $title, string $placeholder)
         ['class' => 'sx-lead-identity__box', 'data-sx-identity-box' => true]
     );
     // Phone and email of a new record: the hidden fields are filled from them.
-    $newFields = $isCompany ? ['phones' => 'Телефон', 'emails' => 'E-mail'] : ['phone' => 'Телефон', 'email' => 'E-mail'];
+    // П2д: a company found by a manager often starts from its site.
+    $newFields = $isCompany ? ['phones' => 'Телефон', 'emails' => 'E-mail', 'site' => 'Сайт'] : ['phone' => 'Телефон', 'email' => 'E-mail'];
+    $placeholders = ['phones' => '+7', 'phone' => '+7', 'site' => 'example.ru'];
     $inner = '';
     foreach ($newFields as $role => $label) {
         $value = (string)$form->{($isCompany ? 'company_' : 'client_').$role};
@@ -107,7 +109,7 @@ $searchPart = static function (string $part, string $title, string $placeholder)
             .Html::input($role === 'phones' || $role === 'phone' ? 'tel' : 'text', '', $value, [
                 'class' => 'form-control',
                 'autocomplete' => 'off',
-                'placeholder' => $role === 'phones' || $role === 'phone' ? '+7' : 'E-mail',
+                'placeholder' => $placeholders[$role] ?? 'E-mail',
                 'data-sx-identity-new-field' => $role,
             ]),
             ['class' => 'sx-lead-identity__new-field']

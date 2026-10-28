@@ -39,6 +39,9 @@ if ($model->status === CmsLead::STATUS_IN_WORK && $model->stage) {
 }
 $onStage = LeadPipelines::instance()->timeOnStageText($model);
 $rows['Этап'] = Html::encode($place).($onStage !== '' ? Html::tag('span', ' · на этапе '.$onStage, ['class' => 'sx-lead-about__muted']) : '');
+if (CmsLead::dealTypeReady() && $model->dealType) {
+    $rows['Услуга'] = Html::encode($model->dealType->name);
+}
 [$amountLabel, $amountText] = $model->shownAmount;
 $rows[$amountLabel] = $amountText !== '' ? Html::encode($amountText) : Html::tag('span', 'не указана', ['class' => 'sx-lead-about__muted']);
 if ($model->expectedAmountNote !== '') {

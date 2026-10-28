@@ -84,6 +84,8 @@ class LeadPipelineMigration extends BaseObject
             if (!$outbound) {
                 $outbound = $this->create(CmsLeadPipeline::CODE_OUTBOUND, $this->outboundName, 20, false);
                 $done['created'][] = $outbound->name;
+                // П2д: «Первый контакт», «КП отправлено», «Смотрел», «Думает».
+                OutboundSales::ensureStages($outbound);
             }
 
             $done['stagesToInbound'] = CmsLeadStage::updateAll(['cms_lead_pipeline_id' => (int)$inbound->id],

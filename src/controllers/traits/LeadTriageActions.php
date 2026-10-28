@@ -170,9 +170,17 @@ JS
         // As in amoCRM and Bitrix24 the name may stay empty: «Компания — источник» or the number.
         $action->model->autoName = true;
         $dealFields = [
-            'name' => ['elementOptions' => ['placeholder' => 'Можно не заполнять — подставим «Компания — источник»']],
+            'name' => ['elementOptions' => ['placeholder' => 'Можно не заполнять — подставим «Услуга — Компания» или «Компания — источник»']],
         ];
         $dealFields += $this->createPipelineFields($action->model);
+        if (CmsLead::dealTypeReady()) {
+            // П2д: what is being sold («Исходящие продажи»: the deal is named «Услуга — Компания»).
+            $dealFields['cms_deal_type_id'] = [
+                'class' => SelectField::class,
+                'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsDealType::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name'),
+                'nullLabel' => 'Не выбрана',
+            ];
+        }
         if (CmsLead::amountReady()) {
             $dealFields['amount'] = ['class' => NumberField::class, 'elementOptions' => ['placeholder' => 'Ожидаемая сумма, ₽', 'min' => 0, 'step' => 'any']];
         }
