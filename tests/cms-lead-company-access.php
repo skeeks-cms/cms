@@ -50,11 +50,11 @@ namespace {
     $db->createCommand()->batchInsert('cms_company',['id'],[[10],[20]])->execute();
     $db->createCommand()->batchInsert('cms_company2manager',['cms_company_id','cms_user_id'],[[10,110],[10,112],[10,113],[20,111]])->execute();
     $db->createCommand()->insert('cms_company2user',['cms_company_id'=>10,'cms_user_id'=>500])->execute();
-    foreach ([1=>[],2=>['cms_company_id'=>10],3=>['cms_company_id'=>20],4=>['cms_user_id'=>500],5=>[],6=>[],7=>[],8=>['executor_id'=>110],9=>[],10=>[],11=>[]] as $id=>$attrs) {
+    foreach ([1=>[],2=>['cms_company_id'=>10],3=>['cms_company_id'=>20],4=>['cms_user_id'=>500],5=>[],6=>[],7=>[],8=>['executor_id'=>110],9=>[],10=>[],11=>[],12=>['executor_id'=>111]] as $id=>$attrs) {
         $db->createCommand()->insert('cms_lead',array_merge(['id'=>$id,'status'=>'new','source_type'=>'form','cms_site_id'=>6],$attrs))->execute();
     }
     $db->createCommand()->batchInsert('cms_company_phone',['cms_company_id','value'],[[10,'+7 (900) 123-45-67'],[20,'+7 901 123-45-67']])->execute();
-    $db->createCommand()->batchInsert('cms_lead_phone',['cms_lead_id','value'],[[5,'89001234567'],[9,'1234567'],[11,'79011234567']])->execute();
+    $db->createCommand()->batchInsert('cms_lead_phone',['cms_lead_id','value'],[[5,'89001234567'],[9,'1234567'],[11,'79011234567'],[12,'89001234567']])->execute();
     $db->createCommand()->insert('cms_company_email',['cms_company_id'=>10,'value'=>'Hello@Example.test'])->execute();
     $db->createCommand()->insert('cms_lead_email',['cms_lead_id'=>6,'value'=>' hello@example.test '])->execute();
     $db->createCommand()->insert('cms_user_email',['cms_user_id'=>500,'value'=>'client@example.test'])->execute();
@@ -69,6 +69,8 @@ namespace {
     $boss=\skeeks\cms\models\CmsUser::findOne(111); $boss->subordinates=[$worker];
     if (!\skeeks\cms\models\CmsLead::find()->forManager($boss)->andWhere(['cms_lead.id'=>2])->exists()) { throw new \RuntimeException('Company hierarchy'); }
     if (\skeeks\cms\models\CmsLead::find()->forManager($worker)->andWhere(['cms_lead.id'=>1])->exists()) { throw new \RuntimeException('Anonymous direct ID'); }
-    if (\skeeks\cms\models\CmsLead::find()->forManager(\skeeks\cms\models\CmsUser::findOne(1))->count()!=11) { throw new \RuntimeException('Admin triage'); }
-    echo "OK: anonymous/private leads, explicit company/client links, normalized contacts, short-phone rejection, executor/hierarchy, active permitted recipients and admin triage\n";
+    // Contacts of a company prove only an unsorted deal (no executor): a deal in work of another employee is his, not the company's.
+    if (\skeeks\cms\models\CmsLead::find()->forManager($worker)->andWhere(['cms_lead.id'=>12])->exists()) { throw new \RuntimeException('Contact evidence of a deal in work'); }
+    if (\skeeks\cms\models\CmsLead::find()->forManager(\skeeks\cms\models\CmsUser::findOne(1))->count()!=12) { throw new \RuntimeException('Admin triage'); }
+    echo "OK: anonymous/private leads, explicit company/client links, normalized contacts, short-phone rejection, contact evidence only without an executor, executor/hierarchy, active permitted recipients and admin triage\n";
 }

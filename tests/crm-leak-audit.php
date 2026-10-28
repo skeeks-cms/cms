@@ -477,15 +477,17 @@ try {
             $report($place, 'GET '.$path.' → '.$code, $open, $open ? 'открывается' : '');
             return [$code, $body];
         };
-        $mustSee = static function (string $place, string $path, string $marker) use ($http, $report) {
+        // the own must stay visible: otherwise a hidden page or an empty search would pass the audit for nothing
+        $mustSee = static function (string $place, string $path, string $marker) use ($http, &$results, &$levelTag) {
             [$code, $body] = $http($path);
-            $report($place.' (должно быть видно)', 'GET '.$path.' → '.$code, false, $code === 200 && mb_strpos($body, $marker) !== false ? '' : 'НЕ ВИДНО своего — проверить');
+            $seen = $code === 200 && mb_strpos($body, $marker) !== false;
+            $results[] = [$levelTag.$place.' (должно быть видно)', 'GET '.$path.' → '.$code, $seen ? 'ok' : 'FAIL', $seen ? '' : 'НЕ ВИДНО своего'];
         };
 
         // --- sections of the menu ---
         $sections = [
             'Сделки: канбан' => '/~sxx/cms/admin-cms-lead/kanban',
-            'Сделки: канбан, поиск' => '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode('Аудит'),
+            'Сделки: канбан, поиск' => '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode($uniq),
             'Сделки: таблица' => '/~sxx/cms/admin-cms-lead/index',
             'Сделки: отчёт' => '/~sxx/cms/admin-cms-lead/report',
             'Компании' => '/~sxx/cms/admin-cms-company/index',
@@ -503,13 +505,16 @@ try {
             'Звонки' => '/~sxx/cms/admin-cms-telephony-call/index',
             'Проекты' => '/~sxx/cms/admin-cms-project/index',
             'Почта' => '/~sxx/cmsCommunication/admin-cms-comm-message/mail',
-            'Почта: поиск' => '/~sxx/cmsCommunication/admin-cms-comm-message/mail?q='.urlencode(AUDIT_PREFIX.'письмо'),
+            'Почта: поиск' => '/~sxx/cmsCommunication/admin-cms-comm-message/mail?q='.urlencode($uniq),
             'Чаты' => '/~sxx/cmsCommunication/admin-cms-comm-chat',
             'Рабочий стол' => '/~sxx/admin/admin-index/dashboard?pk=1',
         ];
         foreach ($sections as $place => $path) {
             $page('Раздел «'.$place.'»', $path);
         }
+        // the searches above look for the marks of this run ($uniq): they must find the own records (the mail search
+        // has no own control: the letters of the fixture belong to no mailbox, the section lists mailbox letters)
+        $mustSee('Сделки: канбан, поиск своей', '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode($uniq), $own->name);
 
         // --- cards of the foreign records by a direct address ---
         $cards = [
@@ -619,13 +624,13 @@ try {
             $ids = array_unique($m[1]);
             $hits = [];
             foreach ($ids as $ajaxId) {
-                foreach ([$uniq, 'Аудит', '91337', '81337'] as $q) {
+                foreach ([$uniq, $service->name, $foreign->name, '91337', '81337'] as $q) {
                     $sep = strpos($path, '?') === false ? '?' : '&';
                     [$c2, $json] = $http($path.$sep.'ajaxid='.$ajaxId.'&q='.urlencode($q), null, true);
                     $hits = array_merge($hits, array_map(static fn($h) => $h.' ('.$ajaxId.')', $found($json)));
                 }
             }
-            $report('Автодополнение: '.$place, count($ids).' полей выбора, q='.$uniq.'/Аудит', (bool)$hits, implode(', ', array_unique($hits)));
+            $report('Автодополнение: '.$place, count($ids).' полей выбора, q='.$uniq.' и имена услуги и чужой сделки', (bool)$hits, implode(', ', array_unique($hits)));
         }
         // a value of a hidden record put into a form shows its name (AjaxSelectModel::valueCallback)
         [$code, $form] = $http('/~sxx/cms/admin-cms-bill/create?ShopBill%5Bcms_company_id%5D='.$protected->id);
@@ -742,7 +747,7 @@ try {
                      'payments' => 'Платежи', 'tasks' => 'Задачи', 'log' => 'Журнал'] as $tab => $label) {
             $page('Компания А: вкладка «'.$label.'», личное В', '/~sxx/cms/admin-cms-company/'.$tab.'?pk='.$A->id, $personV);
         }
-        foreach (['Сделки: канбан' => '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode('Аудит'), 'Сделки: таблица' => '/~sxx/cms/admin-cms-lead/index',
+        foreach (['Сделки: канбан' => '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode($uniq), 'Сделки: таблица' => '/~sxx/cms/admin-cms-lead/index',
                      'Услуги' => '/~sxx/cms/admin-cms-deal/index', 'Счета' => '/~sxx/cms/admin-cms-bill/index', 'Платежи' => '/~sxx/shop/admin-payment/index',
                      'Документы' => '/~sxx/cms/admin-cms-document/index', 'Предложения' => '/~sxx/cmsProposal/admin-cms-proposal/index',
                      'Клиенты' => '/~sxx/cms/admin-user/index'] as $place => $path) {
