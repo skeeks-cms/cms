@@ -727,8 +727,9 @@ class LeadTriage
     /**
      * One rule for every way a contact of the request goes to a client card:
      * the card must be the deal's company or person, created by the actor in
-     * this very operation or one he may edit (П2а+: "Свои сделки" sees the
-     * card but does not add to it — CrmAccess::canEditClientData()).
+     * this very operation or one he sees: a new phone or email is added on
+     * every level (П2а+, CrmAccess::canAddClientContact()); existing ones are
+     * never changed here.
      */
     private function mayCopyTo(CmsLead $lead, string $target, ?array $identity, int $actorId): bool
     {
@@ -738,7 +739,7 @@ class LeadTriage
             }
             $created = $identity && $identity['newCompany'] && (int)$identity['newCompany']->id === (int)$lead->cms_company_id;
 
-            return $created || $this->access->canEditClientData($actorId, CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id);
+            return $created || $this->access->canAddClientContact($actorId, [CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id]);
         }
         if ($target === 'client') {
             if (!$lead->cms_user_id) {
@@ -746,7 +747,7 @@ class LeadTriage
             }
             $created = $identity && $identity['newClient'] && (int)$identity['newClient']->id === (int)$lead->cms_user_id;
 
-            return $created || $this->access->canEditClientRecord($actorId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id]);
+            return $created || $this->access->canAddClientContact($actorId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id]);
         }
 
         return false;

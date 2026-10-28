@@ -354,6 +354,20 @@ class CmsTelephonyCall extends \skeeks\cms\models\Core
         return implode(" ", $data);
     }
 
+    /** П2а+: a finished incoming call notifies the main responsible of the client (crm\CrmClientCallNotifier). */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if ($insert || array_key_exists('status', $changedAttributes)) {
+            try {
+                (new \skeeks\cms\crm\CrmClientCallNotifier())->notify($this);
+            } catch (\Throwable $e) {
+                // A notification never breaks the call record of a provider webhook.
+                \Yii::warning('Уведомление о звонке #'.(int)$this->id.' не отправлено: '.$e->getMessage(), self::class);
+            }
+        }
+    }
+
     /**
      * @return CmsTaskQuery
      */

@@ -532,6 +532,51 @@ class CrmAccess extends Component
         return $this->canEditClientData($user, $code, $id);
     }
 
+    /**
+     * May the employee add a new phone or email to a company or a person: every
+     * level, "Свои сделки" included (the contact block of his deal, contacts of
+     * the deal copied to the card); changing and removing existing ones is
+     * canEditClientRecord(). The duplicate check works as for everyone.
+     *
+     * @param \yii\base\Model|array $model a model or [record code, record id]
+     */
+    public function canAddClientContact($user, $model): bool
+    {
+        $record = is_array($model) ? $model : self::clientRecordOf($model);
+        if ($record === null || $this->canEditClientRecord($user, $record)) {
+            return true;
+        }
+
+        return $this->clientDataLevel($user, $record[0], (int)$record[1]) !== null;
+    }
+
+    /**
+     * Companies whose deals the employee does not see except his own: his link
+     * is "Свои сделки" and no subordinate of his works on the company (П2а+).
+     * Lists of deals and of records tied to deals (proposals) exclude the
+     * other deals of these companies; the company itself, its data and its
+     * feed stay visible. Null — nothing to exclude (levels off, no migration).
+     *
+     * @param \skeeks\cms\models\User|int $user
+     */
+    public function dealOnlyCompanyIds($user): ?\yii\db\ActiveQuery
+    {
+        if (!$this->enforceLevels || !self::levelsReady()) {
+            return null;
+        }
+        $userId = $this->userId($user);
+        $query = CmsCompany2manager::find()->alias('dealOnly')->select('dealOnly.cms_company_id')
+            ->andWhere(['dealOnly.cms_user_id' => $userId, 'dealOnly.access_level' => self::LEVEL_DEAL]);
+        $subordinates = array_map('intval', CmsDepartment::subordinateIds($userId));
+        if ($subordinates) {
+            $query->andWhere(['not exists', CmsCompany2manager::find()->alias('bySubordinate')->select('bySubordinate.id')
+                ->andWhere('bySubordinate.cms_company_id = dealOnly.cms_company_id')
+                ->andWhere(['bySubordinate.cms_user_id' => $subordinates])]);
+        }
+
+        return $query;
+    }
+
     /** [record code, record id] of a client model or of a row of its data; null — not client data. */
     public static function clientRecordOf($model): ?array
     {

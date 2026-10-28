@@ -421,11 +421,38 @@ try {
         && !$actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'delete') && !$actionAllowed('cms/admin-cms-company', $company, 'add-user'),
         '"deal": the company form, a phone edit and delete, adding a person are refused (403)');
     $check($actionAllowed('cms/admin-cms-company', $company, 'view'), '"deal" opens the company card');
+    // "deal" adds a new phone or email (the contact block of his deal), changes no existing one.
+    $check($levelAccess->canAddClientContact($other->id, ['company', (int)$company->id]), '"deal" adds a new phone or email to the company');
+    $check(!$levelAccess->canEditClientRecord($other->id, $companyPhone), '"deal" does not change an existing phone');
+    // Other deals of the company and the proposals of them are hidden; the company and its feed are not.
+    $ownersLead = new CmsLead(['name' => 'Чужая '.$uniq, 'cms_site_id' => $siteId, 'cms_company_id' => $company->id, 'executor_id' => $owner->id, 'status' => CmsLead::STATUS_IN_WORK]);
+    $check($ownersLead->save(), 'a deal of the main responsible');
+    $sees = static fn(CmsUser $user, CmsLead $deal) => CmsLead::find()->forManager($user)->andWhere([CmsLead::tableName().'.id' => $deal->id])->exists();
+    $check(!$sees($other, $ownersLead) && $sees($other, $lead), '"deal" sees his own deal of the company, not the deal of another employee');
+    $check(!$levelAccess->canSeeLead($other->id, $ownersLead), '"deal": the card of another deal is closed');
+    // Requisites of the company: from "edit".
+    $requisites = new \skeeks\cms\models\CmsContractor(['cms_site_id' => $siteId, 'contractor_type' => 'legal', 'name' => 'ООО «Реквизиты '.$uniq.'»', 'inn' => '77'.$uniq.'01']);
+    $check($requisites->save(false), 'requisites of the company');
+    (new \skeeks\cms\models\CmsCompany2contractor(['cms_company_id' => $company->id, 'cms_contractor_id' => $requisites->id]))->save(false);
+    $check(!$actionAllowed('cms/admin-cms-contractor', $requisites, 'update') && !$actionAllowed('cms/admin-cms-contractor', $requisites, 'delete'),
+        '"deal": the requisites of the company are not changed (403)');
+    // A call of the client: the main responsible is notified when another employee took it.
+    $call = new \skeeks\cms\models\CmsTelephonyCall(['direction' => 'in', 'status' => 'answered', 'cms_company_id' => $company->id, 'cms_worker_user_id' => $other->id]);
+    $call->id = 900000000 + (int)$uniq;
+    (new \skeeks\cms\crm\CrmClientCallNotifier())->notify($call);
+    $callNote = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'event_key' => 'crm.client_call:'.(int)$call->id])->one();
+    $check($callNote && strpos($callNote->name, 'Звонок клиента «'.$company->name.'»') === 0 && (int)$callNote->model_id === (int)$company->id,
+        'a call of the client notifies the main responsible, the company is the link');
+    $call->cms_worker_user_id = $owner->id;
+    $call->id++;
+    (new \skeeks\cms\crm\CrmClientCallNotifier())->notify($call);
+    $check(!CmsWebNotify::find()->andWhere(['event_key' => 'crm.client_call:'.(int)$call->id])->exists(), 'no notification when the main responsible took the call');
     // "full" (the main responsible): everything.
     $as($owner);
     $check($levelAccess->canEditClientData($owner->id, 'company', (int)$company->id) && $levelAccess->canManageAccess($owner->id, 'company', (int)$company->id)
         && $actionAllowed('cms/admin-cms-company', $company, 'update') && $actionAllowed('cms/admin-cms-company', $company, 'delete')
         && $actionAllowed('cms/admin-cms-company-phone', $companyPhone, 'delete'), '"full": the data, the accesses and deleting are allowed');
+    $check($actionAllowed('cms/admin-cms-contractor', $requisites, 'update'), '"full": the requisites are changed');
     $setLevel($other, CrmAccess::LEVEL_EDIT);
     // An incoming request of a client «по согласованию» does not wait: it goes to the main responsible.
     if ($third2 = $plain[3] ?? null) {

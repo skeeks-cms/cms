@@ -57,6 +57,11 @@ class CmsLeadQuery extends CmsActiveQuery
         $availableCompanyIds = CmsCompany::find()
             ->forManager($user)
             ->select(CmsCompany::tableName().'.id');
+        // П2а+: with the level "Свои сделки" only his own deals of the company (the executor branch).
+        $dealOnly = \skeeks\cms\crm\CrmAccess::instance()->dealOnlyCompanyIds($user);
+        if ($dealOnly !== null) {
+            $availableCompanyIds->andWhere(['not in', CmsCompany::tableName().'.id', $dealOnly]);
+        }
         $table = $this->getPrimaryTableName();
 
         return $this->andWhere(['or',

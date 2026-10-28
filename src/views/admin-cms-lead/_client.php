@@ -29,6 +29,8 @@ $contactLimit = 5;
 
 if ($company) {
     $canEdit = $crmAccess->canEditClientData($viewerId, CmsCrmAccessRequest::RECORD_COMPANY, (int)$company->id);
+    // П2а+: "Свои сделки" adds a new phone or email, changes nothing else.
+    $canAdd = $crmAccess->canAddClientContact($viewerId, [CmsCrmAccessRequest::RECORD_COMPANY, (int)$company->id]);
     $companyUrl = Url::to(['/cms/admin-cms-company/view', 'pk' => (int)$company->id]);
 
     // People of the company; the person of the deal first when the company does not have them.
@@ -92,7 +94,7 @@ if ($company) {
         'moreUrl' => $companyUrl,
         'emptyText' => 'Телефонов пока нет',
         'addLabel' => 'Добавить телефон',
-        'addRoute' => $canEdit ? ['/cms/admin-cms-company-phone/create', 'CmsCompanyPhone' => ['cms_company_id' => (int)$company->id]] : null,
+        'addRoute' => $canAdd ? ['/cms/admin-cms-company-phone/create', 'CmsCompanyPhone' => ['cms_company_id' => (int)$company->id]] : null,
         'addSize' => 'small',
     ]);
 
@@ -105,11 +107,12 @@ if ($company) {
         'moreUrl' => $companyUrl,
         'emptyText' => 'Email пока нет',
         'addLabel' => 'Добавить email',
-        'addRoute' => $canEdit ? ['/cms/admin-cms-company-email/create', 'CmsCompanyEmail' => ['cms_company_id' => (int)$company->id]] : null,
+        'addRoute' => $canAdd ? ['/cms/admin-cms-company-email/create', 'CmsCompanyEmail' => ['cms_company_id' => (int)$company->id]] : null,
         'addSize' => 'small',
     ]);
 } elseif ($client) {
     $canEdit = $crmAccess->canEditClientData($viewerId, CmsCrmAccessRequest::RECORD_CLIENT, (int)$client->id);
+    $canAdd = $crmAccess->canAddClientContact($viewerId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$client->id]);
     $clientUrl = Url::to(['/cms/admin-user/view', 'pk' => (int)$client->id]);
 
     echo CrmContactBlockWidget::widget([
@@ -121,7 +124,7 @@ if ($company) {
         'moreUrl' => $clientUrl,
         'emptyText' => 'Телефонов пока нет',
         'addLabel' => 'Добавить телефон',
-        'addRoute' => $canEdit ? ['/cms/admin-user-phone/create', 'CmsUserPhone' => ['cms_user_id' => (int)$client->id]] : null,
+        'addRoute' => $canAdd ? ['/cms/admin-user-phone/create', 'CmsUserPhone' => ['cms_user_id' => (int)$client->id]] : null,
         'addSize' => 'small',
     ]);
 
@@ -134,7 +137,7 @@ if ($company) {
         'moreUrl' => $clientUrl,
         'emptyText' => 'Email пока нет',
         'addLabel' => 'Добавить email',
-        'addRoute' => $canEdit ? ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => (int)$client->id]] : null,
+        'addRoute' => $canAdd ? ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => (int)$client->id]] : null,
         'addSize' => 'small',
     ]);
 }

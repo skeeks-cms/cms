@@ -34,6 +34,12 @@ class AdminCmsCompanyPhoneController extends BackendModelStandartController
         return 'cms_company_id';
     }
 
+    /** "Свои сделки" adds a new one (the contact block of his deal), changes nothing. */
+    protected function clientDataAddable(): bool
+    {
+        return true;
+    }
+
     public function init()
     {
         $this->name = "Управление телефонам";

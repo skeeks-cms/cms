@@ -10,8 +10,9 @@ use skeeks\cms\models\CmsCrmAccessRequest;
  * links, people of a company) let change them only to an employee who may
  * edit the client (CrmAccess::canEditClientRecord(): "edit", "full", a leader,
  * an administrator). "Свои сделки" sees the rows and contacts the client;
- * create, update, delete and delete-multi are refused (403, and their
- * buttons are hidden as for any action without access).
+ * update, delete and delete-multi are refused (403, and their buttons are
+ * hidden as for any action without access); create too, except a new phone
+ * or email (clientDataAddable()).
  *
  * Usage in actions(): `return $this->guardClientData($actions);`
  * The controller names the owner column of its rows in clientDataColumn().
@@ -20,6 +21,15 @@ trait ClientDataGuard
 {
     /** The owner column of the rows: "cms_company_id" (a company) or "cms_user_id" (a person). */
     abstract protected function clientDataColumn(): string;
+
+    /**
+     * Phones and emails: a new row may be added on every level
+     * (CrmAccess::canAddClientContact()), existing ones are changed from "edit".
+     */
+    protected function clientDataAddable(): bool
+    {
+        return false;
+    }
 
     protected function guardClientData(array $actions, array $names = ['create', 'update', 'delete', 'delete-multi']): array
     {
@@ -65,7 +75,7 @@ trait ClientDataGuard
         $userId = (int)\Yii::$app->user->id;
         foreach ([\Yii::$app->request->get($formName), \Yii::$app->request->post($formName)] as $data) {
             $id = (int)($data[$column] ?? 0);
-            if ($id > 0 && !$access->canEditClientRecord($userId, [$code, $id])) {
+            if ($id > 0 && !($this->clientDataAddable() ? $access->canAddClientContact($userId, [$code, $id]) : $access->canEditClientRecord($userId, [$code, $id]))) {
                 return false;
             }
         }
