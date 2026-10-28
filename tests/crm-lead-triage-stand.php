@@ -214,7 +214,7 @@ try {
         && (int)$request->owner_id === (int)$owner->id && (int)$request->cms_lead_id === (int)$lead->id, 'a request to the main responsible with the deal');
     // The common format of CRM notifications: the event as text, the client as the record link.
     $asked = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'kind' => 'crm.access_request', 'event_key' => 'crm.access_request:'.(int)$request->id])->one();
-    $check($asked && $asked->name === $other->shortDisplayName.' работает с клиентом «'.$company->name.'» по своей сделке'
+    $check($asked && $asked->name === $other->shortDisplayName.': работа с клиентом «'.$company->name.'» по своей сделке, запрос уровня доступа'
         && $asked->model instanceof CmsCrmAccessRequest && (int)$asked->model_id === (int)$request->id, 'request notification: the client in the text, the request as the link line');
     $check(strpos($asked->getOpenUrl(), '/admin-cms-crm-access-request/view') !== false && strpos($asked->getOpenUrl(), 'pk='.(int)$request->id) !== false,
         'the short link of the notification (mail, MAX) opens the request card');
@@ -278,7 +278,7 @@ try {
     $hiddenPerson = new CmsUser(['first_name' => 'Скрытый'.$uniq, 'is_worker' => 0]);
     $hiddenPerson->save();
     (new \skeeks\cms\models\CmsUser2manager(['client_id' => $hiddenPerson->id, 'worker_id' => $owner->id]))->save();
-    $personRequest = (new CrmAccessRequests())->request((int)$other->id, 'client', (int)$hiddenPerson->id, CmsCrmAccessRequest::KIND_ACCESS);
+    $personRequest = (new CrmAccessRequests())->request((int)$other->id, 'client', (int)$hiddenPerson->id, CmsCrmAccessRequest::KIND_WORK);
     $check((new CrmAccessRequests())->recordName($personRequest, (int)$other->id) === 'контакт из базы', 'the requester does not learn the name');
     $check((new CrmAccessRequests())->recordName($personRequest, (int)$owner->id) === $hiddenPerson->shortDisplayName, 'the responsible sees the name');
     // 4. A bad phone of a new person is refused before anything is saved.
@@ -292,7 +292,7 @@ try {
     $copy = CmsCrmAccessRequest::findOne($personRequest->id);
     (new CrmAccessRequests())->decide($personRequest, false, (int)$owner->id, 'нет');
     $refused = CmsWebNotify::find()->andWhere(['cms_user_id' => $other->id, 'event_key' => 'crm.access_decided:'.(int)$personRequest->id])->one();
-    $check($refused && $refused->model_id === null && $refused->name === 'Отклонён запрос: доступ к клиенту, клиент «контакт из базы»',
+    $check($refused && $refused->model_id === null && $refused->name === 'Отклонён запрос: работа с клиентом, клиент «контакт из базы»',
         'a refusal does not name or link a hidden person');
     try {
         (new CrmAccessRequests())->decide($copy, true, (int)$admin->id);
@@ -301,7 +301,7 @@ try {
         $check(CmsCrmAccessRequest::findOne($personRequest->id)->status === CmsCrmAccessRequest::STATUS_DECLINED, 'the first decision stays');
     }
     // A cancel by a stale copy does not overwrite a decision.
-    $cancelLater = (new CrmAccessRequests())->request((int)$other->id, 'client', (int)$hiddenPerson->id, CmsCrmAccessRequest::KIND_ACCESS);
+    $cancelLater = (new CrmAccessRequests())->request((int)$other->id, 'client', (int)$hiddenPerson->id, CmsCrmAccessRequest::KIND_WORK);
     $staleCopy = CmsCrmAccessRequest::findOne($cancelLater->id);
     (new CrmAccessRequests())->decide($cancelLater, true, (int)$owner->id);
     try {
@@ -309,6 +309,42 @@ try {
         $check(false, 'a decided request cannot be cancelled');
     } catch (DomainException $e) {
         $check(CmsCrmAccessRequest::findOne($cancelLater->id)->status === CmsCrmAccessRequest::STATUS_APPROVED, 'the decision stays after a late cancel');
+    }
+    // Old kinds («Сделка себе», «Доступ к клиенту»): not sent any more; a pending one is closed as «Устарел».
+    try {
+        (new CrmAccessRequests())->request((int)$other->id, 'company', (int)$company->id, CmsCrmAccessRequest::KIND_DELEGATE, (int)$lead->id);
+        $check(false, 'a request of an old kind is not sent');
+    } catch (DomainException $e) {
+        $check(strpos($e->getMessage(), 'Работать с этим клиентом') !== false, 'a request of an old kind is refused with the new way');
+    }
+    $countBefore = CrmAccess::instance()->pendingRequestsCount($owner);
+    $legacy = new CmsCrmAccessRequest([
+        'requester_id' => $other->id, 'owner_id' => $owner->id, 'record_code' => 'company', 'record_id' => $company->id,
+        'kind' => CmsCrmAccessRequest::KIND_DELEGATE, 'cms_lead_id' => $lead->id, 'level' => CrmAccess::LEVEL_DEAL,
+    ]);
+    $legacy->save(false);
+    Yii::$app->notifications->notify((int)$owner->id, 'crm.access_request', [
+        'name' => 'старый запрос', 'model' => $legacy, 'eventKey' => 'crm.access_request:'.(int)$legacy->id,
+    ]);
+    $check(CrmAccess::instance()->pendingRequestsCount($owner) === $countBefore
+        && !CmsCrmAccessRequest::find()->andWhere(CrmAccess::instance()->requestsCondition($owner, CrmAccess::REQUESTS_TO_ME))->andWhere(['id' => $legacy->id])->exists(),
+        'the menu counter and «Ждут моего решения» skip a request of an old kind');
+    $check(!CrmAccess::instance()->canDecideRequest($owner, $legacy), 'a request of an old kind cannot be decided');
+    $check((new CrmAccessRequests())->closeLegacy() >= 1, 'closeLegacy() closes pending requests of old kinds');
+    $legacy->refresh();
+    $check($legacy->status === CmsCrmAccessRequest::STATUS_OBSOLETE && $legacy->statusName === 'Устарел', 'a pending request of an old kind became «Устарел»');
+    $closedNote = CmsWebNotify::find()->andWhere(['cms_user_id' => $other->id, 'event_key' => 'crm.access_obsolete:'.(int)$legacy->id])->one();
+    $check($closedNote && strpos($closedNote->name, 'Запрос №'.(int)$legacy->id.' закрыт') === 0 && strpos($closedNote->name, 'Работать с этим клиентом') !== false,
+        'the sender is told the request is closed and how access is given now');
+    $check($closedNote && ($closedNote->model instanceof CmsCompany ? (int)$closedNote->model_id === (int)$company->id : strpos($closedNote->name, '«'.$company->name.'»') !== false),
+        'the notification leads to the client (or names it when the sender does not see it)');
+    $ownerNote = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'event_key' => 'crm.access_request:'.(int)$legacy->id])->one();
+    $check($ownerNote && (int)$ownerNote->is_read === 1, 'the notification of the main responsible about it is read');
+    try {
+        (new CrmAccessRequests())->decide($legacy, true, (int)$admin->id);
+        $check(false, 'an obsolete request cannot be decided');
+    } catch (DomainException $e) {
+        $check(CmsCrmAccessRequest::findOne($legacy->id)->status === CmsCrmAccessRequest::STATUS_OBSOLETE, 'an obsolete request stays «Устарел» after a decision try');
     }
     // 7. The reference does not show the id.
     $check(strpos($presented['ref'], 'company:') === false && strpos($presented['ref'], ':'.$company->id) === false, 'the reference is opaque');
@@ -338,7 +374,7 @@ try {
     $check($work['lead'] === null && $access->isPending && $access->kind === CmsCrmAccessRequest::KIND_WORK && !$access->cms_lead_id,
         '«Работать с этим клиентом» «по согласованию»: only the request, no deal yet');
     $accessAsked = CmsWebNotify::find()->andWhere(['cms_user_id' => $owner->id, 'event_key' => 'crm.access_request:'.(int)$access->id])->one();
-    $check($accessAsked && $accessAsked->name === $other->shortDisplayName.' просит разрешения работать с клиентом «'.$company->name.'»', 'the request notification text');
+    $check($accessAsked && $accessAsked->name === $other->shortDisplayName.': запрос на работу с клиентом «'.$company->name.'»', 'the request notification text');
     if (!in_array((int)$third->id, CmsDepartment::leaderIdsOf((int)$owner->id), true) && !CrmAccess::instance()->isAdmin($third)) {
         $check(!CrmAccess::instance()->canDecideRequest($third->id, $access), 'another employee of the client does not decide');
     }

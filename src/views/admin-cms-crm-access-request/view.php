@@ -4,7 +4,9 @@
  * who asks and the level, the comment, «Одобрить» with a level or «Отказать»
  * with a reason, the client with its employees and open deals, the deal.
  * Companies, contacts, employees and deals open their cards in the backend
- * window (BackendEntityLink).
+ * window (BackendEntityLink). A request of an old kind ("delegate", "access")
+ * is read only: what was asked and its status. Texts carry no grammatical
+ * gender: «Имя: запрос …».
  *
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsCrmAccessRequest $model
@@ -30,9 +32,9 @@ $decideUrl = Url::to(['/cms/admin-cms-crm-access-request/decide']);
 $levels = CrmAccess::levels();
 $lead = $model->cms_lead_id ? $model->lead : null;
 $what = [
-    CmsCrmAccessRequest::KIND_WORK => $model->cms_lead_id ? 'работает с клиентом по своей сделке и просит уровень доступа' : 'просит разрешения работать с клиентом (доступ по согласованию)',
-    CmsCrmAccessRequest::KIND_DELEGATE => 'просит передать ему сделку',
-    CmsCrmAccessRequest::KIND_ACCESS => 'просит доступ к клиенту',
+    CmsCrmAccessRequest::KIND_WORK => $model->cms_lead_id ? 'работа с клиентом по своей сделке, запрос уровня доступа' : 'запрос на работу с клиентом (доступ по согласованию)',
+    CmsCrmAccessRequest::KIND_DELEGATE => 'запрос сделки по клиенту (старый вид запроса)',
+    CmsCrmAccessRequest::KIND_ACCESS => 'запрос доступа к клиенту (старый вид запроса)',
 ][$model->kind] ?? '';
 ?>
 <div class="sx-surface-stack">
@@ -43,7 +45,7 @@ $what = [
         'responsive' => true,
     ]); ?>
         <div class="sx-lead-triage__request">
-            <p><?= Requests::employeeLink($model->requester); ?> <?= Html::encode($what); ?></p>
+            <p><?= Requests::employeeLink($model->requester); ?>: <?= Html::encode($what); ?></p>
             <span class="sx-lead-hint__meta">
                 Клиент: <?= Requests::recordLink($model); ?>
                 <?php if ($model->levelName !== '') : ?> · уровень «<?= Html::encode($model->levelName); ?>»<?php endif; ?>
@@ -55,33 +57,33 @@ $what = [
             <?php endif; ?>
         </div>
 
-        <?php if ($canDecide) : ?>
+        <?php if ($model->status === CmsCrmAccessRequest::STATUS_OBSOLETE) : ?>
+            <p class="sx-lead-identity__note">Запрос закрыт: доступ к клиентам теперь выдаётся по-новому — откройте клиента и нажмите «Работать с этим клиентом».</p>
+        <?php elseif ($canDecide) : ?>
             <div class="sx-lead-hint__actions">
-                <?php if ($model->kind !== CmsCrmAccessRequest::KIND_DELEGATE) : ?>
-                    <?= Html::dropDownList('level', $model->level ?: CrmAccess::LEVEL_DEAL,
-                        array_map(static fn($name) => 'Доступ: '.mb_strtolower($name, 'UTF-8'), $levels),
-                        ['class' => 'form-control', 'data-sx-crm-request-level' => true, 'aria-label' => 'Уровень доступа']); ?>
-                <?php endif; ?>
+                <?= Html::dropDownList('level', $model->level ?: CrmAccess::LEVEL_DEAL,
+                    array_map(static fn($name) => 'Доступ: '.mb_strtolower($name, 'UTF-8'), $levels),
+                    ['class' => 'form-control', 'data-sx-crm-request-level' => true, 'aria-label' => 'Уровень доступа']); ?>
                 <?= Html::button('Одобрить', [
                     'class' => 'sx-button sx-button--primary sx-button--sm',
                     'data-sx-crm-request-decide' => 'approve',
                     'data-id' => (int)$model->id,
                     'data-url' => $decideUrl,
-                    'data-sx-confirm' => $model->kind === CmsCrmAccessRequest::KIND_WORK && !$model->cms_lead_id
-                        ? 'Разрешить сотруднику работать с клиентом? Ему будет создана сделка.'
+                    'data-sx-confirm' => !$model->cms_lead_id
+                        ? 'Разрешить сотруднику работать с клиентом? На сотрудника будет создана сделка.'
                         : 'Выдать сотруднику выбранный доступ к клиенту?',
                 ]); ?>
-                <?= Html::button($model->kind === CmsCrmAccessRequest::KIND_WORK && $model->cms_lead_id ? 'Не расширять' : 'Отказать', [
+                <?= Html::button($model->cms_lead_id ? 'Не расширять' : 'Отказать', [
                     'class' => 'sx-button sx-button--secondary sx-button--sm',
                     'data-sx-crm-request-decide' => 'decline',
                     'data-id' => (int)$model->id,
                     'data-url' => $decideUrl,
                 ]); ?>
             </div>
-            <?php if ($model->kind === CmsCrmAccessRequest::KIND_WORK && $model->cms_lead_id) : ?>
+            <?php if ($model->cms_lead_id) : ?>
                 <p class="sx-lead-identity__note">При отказе сделка остаётся у сотрудника с уровнем «Свои сделки».</p>
             <?php endif; ?>
-        <?php elseif ($canCancel) : ?>
+        <?php elseif ($canCancel && !$model->isLegacy) : ?>
             <div class="sx-lead-hint__actions">
                 <?= Html::button('Отменить запрос', [
                     'class' => 'sx-button sx-button--secondary sx-button--sm',
@@ -134,7 +136,7 @@ $what = [
                 </ul>
             <?php endif; ?>
         <?php else : ?>
-            <p class="sx-lead-identity__note">Основной ответственный: <?= Html::encode(implode(', ', array_column(array_filter($employees, static fn($e) => $e['main']), 'name')) ?: '—'); ?>. Остальное откроется, когда запрос одобрят.</p>
+            <p class="sx-lead-identity__note">Основной ответственный: <?= Html::encode(implode(', ', array_column(array_filter($employees, static fn($e) => $e['main']), 'name')) ?: '—'); ?>.<?= $model->isPending ? ' Остальное откроется, когда запрос одобрят.' : ''; ?></p>
         <?php endif; ?>
     <?php BackendSurfaceWidget::end(); ?>
 

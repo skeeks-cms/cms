@@ -190,7 +190,7 @@ class AdminCmsCrmAccessRequestController extends BackendModelStandartController
         return $this->render('@skeeks/cms/views/admin-cms-crm-access-request/view', [
             'model' => $request,
             'canDecide' => $access->canDecideRequest($userId, $request),
-            'canCancel' => $request->isPending && (int)$request->requester_id === $userId,
+            'canCancel' => $request->isPending && !$request->isLegacy && (int)$request->requester_id === $userId,
             // The requester sees the client as in a match (its employees and deals only when he sees the client).
             'clientOpen' => $isDecider || ($recordCode === CmsCrmAccessRequest::RECORD_COMPANY
                     ? $access->canSeeCompany($userId, $recordId) : $access->canSeeClient($userId, $recordId)),

@@ -83,7 +83,7 @@ $live = $live ?? false;
                         <?php elseif ($candidate['strong']) : ?>
                             <?= Html::button('Это он', [
                                 'class' => 'sx-button sx-button--secondary sx-button--sm',
-                                'title' => 'Сделка уйдёт ответственному клиента, можно запросить её себе',
+                                'title' => 'Работать с этим клиентом: основному ответственному клиента уйдёт запрос',
                                 'data-sx-identity-foreign' => $type,
                                 'data-ref' => $candidate['ref'],
                                 'data-title' => $type === CrmMatcher::TYPE_COMPANY ? (string)$candidate['title'] : 'Контакт из базы',

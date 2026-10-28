@@ -12,7 +12,9 @@ use yii\helpers\ArrayHelper;
  * responsible may raise the level or decline (the deal stays with the
  * employee); for a client with «Доступ только по согласованию» the deal is
  * created only after the approval. "delegate" and "access" are requests made
- * before that decision, kept for history. A repeated request of the same
+ * before that decision: read only, the pending ones were closed as
+ * "obsolete" (m261028_150000, CrmAccessRequests::closeLegacy()) and can be
+ * neither created nor decided any more. A repeated request of the same
  * employee joins the pending one. «Передать клиента» is not a request:
  * CrmClientTransfer, by a leader or an administrator.
  *
@@ -31,7 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property string      $kind work (delegate|access — before 28.10.2026)
  * @property string|null $level the level of the link: deal, edit, full (crm\CrmAccess::levels())
  * @property string|null $comment
- * @property string      $status pending|approved|declined|cancelled
+ * @property string      $status pending|approved|declined|cancelled|obsolete
  * @property int|null    $decided_by
  * @property int|null    $decided_at
  * @property string|null $decision_comment
@@ -48,7 +50,7 @@ class CmsCrmAccessRequest extends ActiveRecord
 
     /** «Работать с этим клиентом». */
     public const KIND_WORK = 'work';
-    /** Before 28.10.2026: «Запросить сделку себе» and «Запросить доступ». */
+    /** Before 28.10.2026: «Запросить сделку себе» and «Запросить доступ» — history only (isLegacy()). */
     public const KIND_DELEGATE = 'delegate';
     public const KIND_ACCESS = 'access';
 
@@ -56,6 +58,8 @@ class CmsCrmAccessRequest extends ActiveRecord
     public const STATUS_APPROVED = 'approved';
     public const STATUS_DECLINED = 'declined';
     public const STATUS_CANCELLED = 'cancelled';
+    /** A pending request of an old kind closed when the kinds were reduced to one. */
+    public const STATUS_OBSOLETE = 'obsolete';
 
     public static function tableName()
     {
@@ -94,6 +98,7 @@ class CmsCrmAccessRequest extends ActiveRecord
             self::STATUS_APPROVED => 'Одобрен',
             self::STATUS_DECLINED => 'Отклонён',
             self::STATUS_CANCELLED => 'Отменён',
+            self::STATUS_OBSOLETE => 'Устарел',
         ];
     }
 
@@ -117,6 +122,12 @@ class CmsCrmAccessRequest extends ActiveRecord
     public function getIsPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    /** A request of an old kind ("delegate", "access"): shown, never decided. */
+    public function getIsLegacy(): bool
+    {
+        return $this->kind !== self::KIND_WORK;
     }
 
     public function getKindName(): string

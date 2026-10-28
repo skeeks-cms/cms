@@ -653,11 +653,12 @@ class CrmAccess extends Component
 
     /**
      * Who decides a request: an administrator, the main responsible of the
-     * client and his leaders (isRequestDecider()).
+     * client and his leaders (isRequestDecider()). Requests of the old kinds
+     * are never decided (CmsCrmAccessRequest::getIsLegacy()).
      */
     public function canDecideRequest($user, CmsCrmAccessRequest $request): bool
     {
-        return $request->isPending && $this->isRequestDecider($user, $request);
+        return $request->isPending && !$request->isLegacy && $this->isRequestDecider($user, $request);
     }
 
     /**
@@ -738,7 +739,8 @@ class CrmAccess extends Component
             ];
         }
         if ($scope === self::REQUESTS_TO_ME) {
-            return ['and', [$table.'.status' => CmsCrmAccessRequest::STATUS_PENDING], ['<>', $table.'.requester_id', $userId], $decides];
+            return ['and', [$table.'.status' => CmsCrmAccessRequest::STATUS_PENDING, $table.'.kind' => CmsCrmAccessRequest::KIND_WORK],
+                ['<>', $table.'.requester_id', $userId], $decides];
         }
 
         return ['or', $mine, $decides];
