@@ -437,16 +437,14 @@ JS
                 'options' => ['class' => 'sx-surface-stack sx-activity-thread'],
             ]); ?>
 
-                <?php BackendSurfaceWidget::begin([
-                    'title'      => 'Добавить комментарий',
-                    'titleTag'   => 'h3',
-                    'raised'     => true,
-                    'responsive' => true,
+                <?php // One block of actions over the feed, as in the deal card (CrmCardActionsWidget); a task — for a client, not an employee. ?>
+                <?php echo \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget([
+                    'model'      => $model,
+                    'commentUrl' => ['/cms/admin-cms-log/add-comment'],
+                    'actions'    => !$model->is_worker && \Yii::$app->user->can('cms/admin-task') ? ['task' => ['label' => 'Задача', 'icon' => 'plus', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                        '/cms/admin-cms-task/create', 'CmsTask' => ['cms_user_id' => $model->id],
+                    ])->enableEmptyLayout()->enableNoActions()->url]] : [],
                 ]); ?>
-                            <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                                'model' => $model,
-                            ]); ?>
-                <?php BackendSurfaceWidget::end(); ?>
 
                 <?php // Pinned comments under the form, as in the company and deal cards. ?>
                 <?php $pinnedUserCommentsQuery = $model->getUserLogs()->comments()->pinned(); ?>
