@@ -31,12 +31,14 @@ class CrmAccessLog
     public const REQUEST_CANCELLED = 'request_cancelled';
     public const REQUEST_OBSOLETE = 'request_obsolete';
     public const WORK = 'work';
+    /** Historical: «Взять в работу» of the general pool, removed (п. 13а); kept to show the old journal rows. */
     public const TAKE = 'take';
     public const GRANT = 'grant';
     public const LEVEL = 'level';
     public const REMOVE = 'remove';
     public const TRANSFER = 'transfer';
     public const MAIN_AUTO = 'main_auto';
+    /** Historical: «Вернуть в общий пул», removed (п. 13а); kept to show the old journal rows. */
     public const POOL = 'pool';
     public const PROTECTION = 'protection';
 

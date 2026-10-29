@@ -240,7 +240,7 @@ class AdminCmsCrmAccessLogController extends BackendModelStandartController
 
         return $waiting
             ? 'Ждут вашего решения: '.$waiting.'. Нажмите «Одобрить» или «Отказать» в строке запроса; подробности — по ссылке на запрос.'
-            : 'Кто, кому и когда открыл доступ к клиенту: запросы и решения, выдача и смена уровня, передача, взятие из общего пула.';
+            : 'Кто, кому и когда открыл доступ к клиенту: запросы и решения, выдача и смена уровня, передача и защита.';
     }
 
     public static function canSee(int $userId, CmsCrmAccessLog $log): bool
