@@ -214,7 +214,7 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendModelAction::class,
                 'name' => 'История этапов',
                 'icon' => 'fas fa-stream',
-                'priority' => 38,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_STAGE_HISTORY,
                 'isVisible' => CmsLead::pipelineReady(),
                 'callback' => fn() => $this->render('stage-history', ['model' => $this->model]),
             ],
@@ -256,7 +256,8 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendModelUpdateAction::class,
                 'name' => 'Редактирование',
                 'icon' => 'fa fa-edit',
-                'priority' => 30,
+                // One order of the CRM card tabs: before «Вся активность».
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_EDIT,
                 'fields' => [$this, 'editFields'],
                 'accessCallback' => fn() => $this->canWorkWithModel(),
                 'on beforeValidate' => function (Event $event) {
@@ -345,11 +346,12 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Задачи',
                 'icon' => 'fas fa-list',
-                'priority' => 35,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_TASKS,
                 'controllerRoute' => '/cms/admin-cms-task',
                 'relation' => ['cms_lead_id' => 'id'],
                 'on gridInit' => function ($e) {
                     $e->sender->relatedIndexAction->backendShowings = false;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($e->sender, $this->model, 'task', 'Новая задача');
                 },
             ],
             // What is tied to the deal (owner's decision 29.10.2026): the sections of services, bills and
@@ -358,37 +360,39 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Услуги',
                 'icon' => 'far fa-file',
-                'priority' => 36,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_SERVICES,
                 'controllerRoute' => '/cms/admin-cms-deal',
                 'relation' => ['cms_lead_id' => 'id'],
                 'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('cms_deal'),
                 'on gridInit' => function ($e) {
                     $e->sender->relatedIndexAction->backendShowings = false;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($e->sender, $this->model, 'service', 'Новая услуга');
                 },
             ],
             'bills' => [
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Счета',
                 'icon' => 'fas fa-credit-card',
-                'priority' => 37,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_BILLS,
                 'controllerRoute' => '/cms/admin-cms-bill',
                 'relation' => ['cms_lead_id' => 'id'],
                 'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('shop_bill'),
                 'on gridInit' => function ($e) {
                     $e->sender->relatedIndexAction->backendShowings = false;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($e->sender, $this->model, 'bill', 'Новый счёт');
                 },
             ],
             'payments' => [
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Платежи',
                 'icon' => 'fas fa-credit-card',
-                'priority' => 38,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_PAYMENTS,
                 'controllerRoute' => '/shop/admin-payment',
-                // A payment is tied to the deal through its bill: no own column, no «Добавить» here.
-                'isStandartBeforeRender' => false,
+                // A payment is tied to the deal through its bill: no own column; «Новый платёж» — of the client of the deal.
                 'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('shop_bill')
                     && class_exists(\skeeks\cms\shop\models\ShopBill2payment::class),
                 'on gridInit' => function ($e) {
+                    \skeeks\cms\crm\CrmCardTabs::createOver($e->sender, $this->model, 'payment', 'Новый платёж');
                     $index = $e->sender->relatedIndexAction;
                     $index->backendShowings = false;
                     $baseOnInit = $index->grid['on init'] ?? null;
@@ -409,18 +413,19 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendGridModelRelatedAction::class,
                 'name' => 'Документы',
                 'icon' => 'fas fa-file-signature',
-                'priority' => 39,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_DOCUMENTS,
                 'controllerRoute' => '/cms/admin-cms-document',
                 'relation' => ['cms_lead_id' => 'id'],
                 'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('shop_document'),
                 'on gridInit' => function ($e) {
                     $e->sender->relatedIndexAction->backendShowings = false;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($e->sender, $this->model, 'document', 'Новый документ');
                 },
             ],
             'log' => [
                 'class' => BackendModelLogAction::class,
                 'name' => 'Вся активность',
-                'priority' => 40,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_ACTIVITY,
             ],
             'claim' => [
                 'class' => BackendModelAction::class,

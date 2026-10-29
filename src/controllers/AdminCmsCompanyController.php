@@ -16,7 +16,6 @@ use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
-use skeeks\cms\backend\widgets\ContextMenuControllerActionsWidget;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\helpers\RequestResponse;
@@ -703,6 +702,8 @@ HTML
             'duplicate-check' => $this->duplicateCheckAction(),
             'duplicate-request' => $this->duplicateRequestAction(),
             "update" => [
+                // One order of the CRM card tabs: «Редактировать» before «Активность».
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_EDIT,
                 'fields' => [$this, 'updateFields'],
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]) && $this->canEditCompany($this->model);
@@ -737,7 +738,7 @@ HTML
 
             'deals' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 300,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_SERVICES,
                 'name'     => 'Услуги',
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
@@ -753,6 +754,7 @@ HTML
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'service', 'Новая услуга');
                     $action->relatedIndexAction->backendShowings = false;
                     $action->relatedIndexAction->filters = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -778,7 +780,7 @@ HTML
 
             'bills' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 350,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_BILLS,
                 'name'     => 'Счета',
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
@@ -794,6 +796,7 @@ HTML
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'bill', 'Новый счёт');
                     $action->relatedIndexAction->backendShowings = false;
                     $action->relatedIndexAction->filters = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -819,7 +822,7 @@ HTML
 
             'documents' => [
                 'class'    => BackendModelAction::class,
-                'priority' => 360,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_DOCUMENTS,
                 'name'     => 'Документы',
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
@@ -832,7 +835,7 @@ HTML
             'payments' => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Платежи',
-                'priority' => 400,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_PAYMENTS,
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
                 },
@@ -842,7 +845,7 @@ HTML
 
             'tasks' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 500,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_TASKS,
                 'name'     => 'Задачи',
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
@@ -858,6 +861,7 @@ HTML
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'task', 'Новая задача');
                     $action->relatedIndexAction->backendShowings = false;
                     /*$action->relatedIndexAction->filters = false;*/
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -874,7 +878,7 @@ HTML
 
             'projects' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 550,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_PROJECTS,
                 'name'     => 'Проекты',
                 // Not a tab of the card any more (tasks by company projects are phased out); the section stays.
                 'isVisible' => false,
@@ -906,7 +910,7 @@ HTML
                 'class'    => BackendGridModelRelatedAction::class,
                 // The second tab, right after «Профиль»; «Новая сделка» opens the deal form
                 // with this company chosen (LeadTriageActions::presetCreateCompany()).
-                'priority' => 5,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_LEADS,
                 'name'     => 'Сделки',
                 'icon'     => 'fas fa-user-plus',
                 'controllerRoute' => '/cms/admin-cms-lead',
@@ -924,13 +928,14 @@ HTML
                         'description' => 'Связанные с компанией сделки появятся здесь.',
                         'icon' => 'fas fa-user-plus',
                     ];
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'lead', 'Новая сделка');
                 },
             ],
 
 
             'telephony' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 600,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_CALLS,
                 'name'     => 'Звонки',
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
@@ -963,6 +968,7 @@ HTML
 
             "log" => [
                 'class' => BackendModelLogAction::class,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_ACTIVITY,
                 "accessCallback" => function () {
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model]);
                 },
@@ -1012,73 +1018,8 @@ HTML
                     ]);
                 };
 
-                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
-                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
-                        /** @var CmsCompany $model */
-                        $model = $this->model;
-                        $documentTypes = [
-                            ShopDocument::TYPE_ACT => [
-                                'name' => 'Акт',
-                                'icon' => 'fa fa-file-signature',
-                            ],
-                            ShopDocument::TYPE_UPD => [
-                                'name' => 'УПД',
-                                'icon' => 'fa fa-file-invoice',
-                            ],
-                            ShopDocument::TYPE_WAYBILL => [
-                                'name' => 'Накладная',
-                                'icon' => 'fa fa-truck',
-                            ],
-                            ShopDocument::TYPE_INVOICE_FACTURE => [
-                                'name' => 'Счет-фактура',
-                                'icon' => 'fa fa-file-text-o',
-                            ],
-                            ShopDocument::TYPE_RECONCILIATION_ACT => [
-                                'name' => 'Акт сверки',
-                                'icon' => 'fa fa-balance-scale',
-                                'is_reconciliation' => true,
-                            ],
-                        ];
-
-                        $actions = [];
-                        foreach ($documentTypes as $type => $data) {
-                            $action = clone $createAction;
-                            $action->isVisible = true;
-                            $action->name = $data['name'];
-                            $action->icon = $data['icon'];
-                            if (!empty($data['is_reconciliation'])) {
-                                $action->url = [
-                                    '/cms/admin-cms-document/create-reconciliation',
-                                    'company_id' => $model->id,
-                                    '_sxb' => [
-                                        'el'  => 1,
-                                        'noa' => 1,
-                                    ],
-                                ];
-                            } else {
-                                $action->url = ArrayHelper::merge($action->urlData, [
-                                    'type'           => $type,
-                                    'cms_company_id' => $model->id,
-                                    '_sxb' => [
-                                        'el'  => 1,
-                                        'noa' => 1,
-                                    ],
-                                ]);
-                            }
-                            $actions[] = $action;
-                        }
-
-                        $event->content = ContextMenuControllerActionsWidget::widget([
-                            'actions'         => $actions,
-                            'isOpenNewWindow' => true,
-                            'button'          => [
-                                'class' => 'btn btn-primary',
-                                'tag'   => 'button',
-                                'label' => 'Добавить документ',
-                            ],
-                        ])."<br><br>";
-                    }
-                });
+                // «Новый документ»: the action of the card block, a menu of the document types.
+                \skeeks\cms\crm\CrmCardTabs::attach($indexAction, $this->model, 'document', 'Новый документ');
 
                 return $indexAction->run();
             }
@@ -1127,54 +1068,8 @@ HTML
                 };
 
 
-                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
-                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
-
-
-                        $actions = [];
-                        $createAction->isVisible = true;
-                        $createAction2 = clone $createAction;
-
-                        /**
-                         * @var $createAction BackendModelCreateAction
-                         */
-                        $createAction->url = ArrayHelper::merge($createAction->urlData, [
-                            "ShopPayment" => [
-                                'cms_company_id' => $this->model->id,
-                                'is_debit'       => 1,
-                            ],
-                        ]);
-
-
-                        $createAction->name = "Заплатили нам";
-
-
-                        $createAction2->url = ArrayHelper::merge($createAction2->urlData, [
-                            "ShopPayment" => [
-                                'cms_company_id' => $this->model->id,
-                                'is_debit'       => 0,
-                            ],
-                        ]);
-                        $createAction2->name = "Мы заплатили";
-
-
-                        $actions[] = $createAction;
-                        $actions[] = $createAction2;
-
-                        $event->content = ContextMenuControllerActionsWidget::widget([
-                                'actions'         => $actions,
-                                'isOpenNewWindow' => true,
-                                'button'          => [
-                                    'class' => 'btn btn-primary',
-                                    //'style' => 'font-size: 11px; cursor: pointer;',
-                                    'tag'   => 'button',
-                                    'label' => 'Добавить платеж',
-                                ],
-                            ])."<br><br>";
-                    }
-
-                });
-
+                // «Новый платёж»: the action of the card block, «Заплатили нам / Мы заплатили».
+                \skeeks\cms\crm\CrmCardTabs::attach($indexAction, $this->model, 'payment', 'Новый платёж');
 
                 return $indexAction->run();
             }

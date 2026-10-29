@@ -524,7 +524,7 @@ class AdminUserController extends BackendModelStandartController
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-order",
                 'relation'        => ['cms_user_id' => 'id'],
-                'priority'        => 600,
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_ORDERS,
                 'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
@@ -555,7 +555,6 @@ class AdminUserController extends BackendModelStandartController
             'payments' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Платежи',
-                'priority' => 600,
                 //'callback' => [$this, 'payments'],
                 'icon'     => 'fas fa-credit-card',
 
@@ -569,12 +568,13 @@ class AdminUserController extends BackendModelStandartController
                 },
                 'controllerRoute' => "/shop/admin-payment",
                 'relation'        => ['cms_user_id' => 'id'],
-                'priority'        => 400,
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_PAYMENTS,
                 'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'payment', 'Новый платёж');
                     $action->relatedIndexAction->backendShowings = false;
                     $action->relatedIndexAction->filters = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -595,7 +595,8 @@ class AdminUserController extends BackendModelStandartController
 
                 'controllerRoute' => "/shop/admin-shop-check",
                 'relation'        => ['cms_user_id' => 'id'],
-                'priority'        => 600,
+                // Fiscal checks come from the cash register: no «Добавить».
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_CHECKS,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
@@ -618,16 +619,15 @@ class AdminUserController extends BackendModelStandartController
                 },
             ],
 
+            // The CRM bills, as in the company card: /shop/admin-bill is the read-only list of the order bills.
             'bills' => [
                 'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Счета',
-                'priority' => 600,
-                //'callback' => [$this, 'bills'],
                 'icon'     => 'fas fa-credit-card',
 
-                'controllerRoute' => "/shop/admin-bill",
+                'controllerRoute' => "/cms/admin-cms-bill",
                 'relation'        => ['cms_user_id' => 'id'],
-                'priority'        => 600,
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_BILLS,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
@@ -640,21 +640,13 @@ class AdminUserController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'bill', 'Новый счёт');
                     $action->relatedIndexAction->backendShowings = false;
                     $action->relatedIndexAction->filters = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
-                    ArrayHelper::removeValue($visibleColumns, 'cms_user_id');
+                    ArrayHelper::removeValue($visibleColumns, 'client');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
-                    // The bills the employee sees (ShopBillQuery::forManager(): "своё" for "Свои сделки").
-                    $relationInit = $action->relatedIndexAction->grid['on init'] ?? null;
-                    $action->relatedIndexAction->grid['on init'] = function (Event $e) use ($relationInit) {
-                        if ($relationInit) {
-                            $relationInit($e);
-                        }
-                        $e->sender->dataProvider->query->forManager();
-                    };
-
                 },
 
             ],
@@ -667,7 +659,7 @@ class AdminUserController extends BackendModelStandartController
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-bonus-transaction",
                 'relation'        => ['cms_user_id' => 'id'],
-                'priority'        => 700,
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_BONUS,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
@@ -680,6 +672,7 @@ class AdminUserController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'bonus', 'Новая операция');
                     $action->relatedIndexAction->filters = false;
                     $action->relatedIndexAction->backendShowings = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -700,7 +693,7 @@ class AdminUserController extends BackendModelStandartController
 
             'tasks' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 900,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_TASKS,
                 'name'     => 'Задачи',
                 //'priority' => 90,
                 /*'callback' => [$this, 'shift'],*/
@@ -721,6 +714,7 @@ class AdminUserController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'task', 'Новая задача');
                     $action->relatedIndexAction->backendShowings = false;
                     /*$action->relatedIndexAction->filters = false;*/
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -734,12 +728,11 @@ class AdminUserController extends BackendModelStandartController
 
             'leads' => [
                 'class'    => BackendGridModelRelatedAction::class,
-                'priority' => 950,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_LEADS,
                 'name'     => 'Сделки',
                 'icon'     => 'fas fa-user-plus',
                 'controllerRoute' => '/cms/admin-cms-lead',
                 'relation'        => ['cms_user_id' => 'id'],
-                'isStandartBeforeRender' => false,
                 'accessCallback' => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
@@ -757,11 +750,13 @@ class AdminUserController extends BackendModelStandartController
                         'description' => 'Связанные с клиентом сделки появятся здесь.',
                         'icon' => 'fas fa-user-plus',
                     ];
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'lead', 'Новая сделка');
                 },
             ],
 
             "log" => [
                 'class' => BackendModelLogAction::class,
+                'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_ACTIVITY,
                 "accessCallback" => function () {
                     if (!$this->_checkIsRoot($this->model)) {
                         return false;
@@ -805,6 +800,8 @@ class AdminUserController extends BackendModelStandartController
             ],
 
             'update' => [
+                // One order of the CRM card tabs: «Редактировать» before «Активность».
+                'priority'       => \skeeks\cms\crm\CrmCardTabs::PRIORITY_EDIT,
                 'fields'         => [$this, 'updateFields'],
                 'buttons'        => ["save"],
                 'isVisible'      => true,

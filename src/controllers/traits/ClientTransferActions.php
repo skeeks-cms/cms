@@ -172,7 +172,7 @@ trait ClientTransferActions
             'class' => BackendModelAction::class,
             'name' => 'Доступ',
             'icon' => 'svg:lock',
-            'priority' => 890,
+            'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_ACCESS,
             'callback' => [$this, 'clientAccess'],
             'accessCallback' => function () {
                 [$code, $id] = $this->transferRecord();

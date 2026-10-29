@@ -94,10 +94,7 @@ class CrmCardActionsWidget extends Widget
         $isCompany = $record instanceof \skeeks\cms\models\CmsCompany;
         $deals = self::ownDeals($record);
         if ($deals !== null) {
-            $createUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                '/cms/admin-cms-lead/create',
-                'CmsLead' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id],
-            ])->enableEmptyLayout()->url;
+            $createUrl = self::createDealUrl($record);
             $hint = !$deals ? 'Открытых сделок с клиентом у вас нет: действие начнётся с новой сделки'
                 : (count($deals) === 1 ? 'Действия — по сделке '.self::dealLabel(reset($deals)) : 'Действия — по вашим сделкам: сделку выберете при действии');
 
@@ -123,6 +120,59 @@ class CrmCardActionsWidget extends Widget
         }
 
         return self::widget(['model' => $record, 'commentUrl' => ['/cms/admin-cms-log/add-comment'], 'actions' => $actions]);
+    }
+
+    /** The create window of a deal with the client chosen; after the save the deal card opens (no `noa`). */
+    protected static function createDealUrl($record): string
+    {
+        return (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+            '/cms/admin-cms-lead/create',
+            'CmsLead' => [$record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id],
+        ])->enableEmptyLayout()->url;
+    }
+
+    /** @var array[] "class:id" => the actions of recordActions() in this request */
+    private static array $_recordActions = [];
+
+    /**
+     * The create actions of a card for the button «Новая …» over its list
+     * tabs (\skeeks\cms\crm\CrmCardTabs) — the same as the block, so a tab and
+     * the block never differ: a company or a person client — "lead", "task",
+     * "service", "bill", "payment", "document" ({@see recordTabs()}; on
+     * «Свои сделки» and "edit" through his open deals, {@see dealTabs()}), a
+     * person also "bonus"; a deal — "task" and {@see leadRecordTabs()} for who
+     * works with it (CrmAccess::isLeadWorker()).
+     *
+     * @param \skeeks\cms\models\CmsCompany|\skeeks\cms\models\User|\skeeks\cms\models\CmsLead $record
+     */
+    public static function recordActions($record): array
+    {
+        $key = (int)\Yii::$app->user->id.':'.get_class($record).':'.(int)$record->id;
+        if (array_key_exists($key, self::$_recordActions)) {
+            return self::$_recordActions[$key];
+        }
+        $actions = [];
+        $canTask = \Yii::$app->user->can('cms/admin-task');
+        if ($record instanceof \skeeks\cms\models\CmsLead) {
+            if (!\Yii::$app->user->isGuest && \skeeks\cms\crm\CrmAccess::instance()->isLeadWorker(\Yii::$app->user->identity, $record)) {
+                $actions = ($canTask ? ['task' => self::taskTab(['CmsTask' => ['cms_lead_id' => (int)$record->id]])] : [])
+                    + self::leadRecordTabs($record);
+            }
+        } elseif ($record instanceof \skeeks\cms\models\CmsCompany || !$record->is_worker) {
+            $deals = self::ownDeals($record);
+            if ($deals !== null) {
+                $actions = self::withLeadTab($record, self::dealTabs($record, $deals, [], [], self::createDealUrl($record)));
+            } else {
+                $actions = self::withLeadTab($record, $canTask
+                    ? ['task' => self::taskTab(['CmsTask' => [$record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id]])]
+                    : []) + self::recordTabs($record);
+                if (!$record instanceof \skeeks\cms\models\CmsCompany) {
+                    $actions['bonus'] = self::createTab('Бонусы', '', '/shop/admin-bonus-transaction', ['ShopBonusTransaction' => ['cms_user_id' => (int)$record->id]]);
+                }
+            }
+        }
+
+        return self::$_recordActions[$key] = array_filter($actions);
     }
 
     /**
@@ -256,7 +306,8 @@ class CrmCardActionsWidget extends Widget
             $tabs['service'] = self::createTab('Услуга', 'tools', '/cms/admin-cms-deal', ['CmsDeal' => ['cms_company_id' => $id]], $more);
             $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => ['cms_company_id' => $id]], $more);
         } else {
-            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/shop/admin-bill', ['ShopBill' => ['cms_user_id' => $id]], $more);
+            // The CRM bills: /shop/admin-bill is the read-only list of the order bills.
+            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => ['cms_user_id' => $id]], $more);
         }
         $in = self::createTab('Заплатили нам', '', '/shop/admin-payment', $payment(1));
         $out = self::createTab('Мы заплатили', '', '/shop/admin-payment', $payment(0));
@@ -390,7 +441,7 @@ class CrmCardActionsWidget extends Widget
     }
 
     /** A backend window over the card. */
-    protected static function windowOnClick(string $url): string
+    public static function windowOnClick(string $url): string
     {
         return 'new sx.classes.backend.widgets.Action('.Json::encode(['isOpenNewWindow' => true, 'url' => $url]).').go(); return false;';
     }
