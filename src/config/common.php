@@ -61,6 +61,21 @@ return [
                     'resourceKey' => static function () { return 'cms:notify-cleanup'; },
                     'dedupKey' => static function () { return 'cms:notify-cleanup'; },
                 ],
+                // П2д: the daily recalculation of the client protection (the agent cms/crm/protection).
+                'cms.crm-protection' => [
+                    'type' => 'cms.crm-protection',
+                    'title' => 'Защита клиентов: снять истёкшую',
+                    'handler' => \skeeks\cms\jobs\CrmProtectionJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 1800,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 3,
+                    'idempotent' => true,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'cms:crm-protection'; },
+                    'dedupKey' => static function () { return 'cms:crm-protection'; },
+                ],
             ],
         ],
 
