@@ -129,7 +129,7 @@ class CmsTaskBulkEditForm extends Model
             return;
         }
 
-        if (!CmsCompany::find()->forManager()->andWhere(['id' => (int)$this->{$attribute}])->exists()) {
+        if (!CmsCompany::find()->forManager()->andWhere([CmsCompany::tableName().'.id' => (int)$this->{$attribute}])->exists()) {
             $this->addError($attribute, 'Компания недоступна.');
         }
     }
@@ -140,7 +140,7 @@ class CmsTaskBulkEditForm extends Model
             return;
         }
 
-        if (!CmsUser::find()->forManager()->andWhere(['id' => (int)$this->{$attribute}])->exists()) {
+        if (!CmsUser::find()->forManager()->andWhere([CmsUser::tableName().'.id' => (int)$this->{$attribute}])->exists()) {
             $this->addError($attribute, 'Клиент недоступен.');
         }
     }

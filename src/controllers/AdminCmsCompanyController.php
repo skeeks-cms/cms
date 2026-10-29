@@ -73,6 +73,8 @@ class AdminCmsCompanyController extends BackendModelStandartController
         // The standard header with the shield of a protected client (CrmProtection::shieldFor()).
         $this->modelHeader = function () {
             return \skeeks\cms\backend\widgets\BackendModelHeader::widget([
+                // Explicit: a tab with an embedded controller (payments) leaves the view context on that one.
+                'controller'  => $this,
                 'model'       => $this->model,
                 'titleSuffix' => \skeeks\cms\crm\CrmProtection::shieldFor($this->model),
             ]);

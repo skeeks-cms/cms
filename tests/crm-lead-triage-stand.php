@@ -1160,6 +1160,33 @@ try {
             && CrmAccess::instance()->canManageAccess($leader, 'company', (int)$foreign->id) && count($leadsSeen()) === 2,
             'the subordinate is the main responsible: the leader gets "full", manages the access, sees every deal');
 
+        // The bulk actions of the company list under a leader: the selection of the marked rows goes over
+        // forManagerOrPool() with the join of the managers (an administrator has no join and never met it).
+        $bulkSecond = new CmsCompany(['name' => 'Массово '.$uniq]);
+        $bulkSecond->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $bulkSecond->id]);
+        CrmAccess::instance()->setMain('company', (int)$bulkSecond->id, (int)$subordinate->id);
+        $as($leader);
+        $bulkController = Yii::$app->createController('/cms/admin-cms-company')[0];
+        $applySelection = new \ReflectionMethod(\skeeks\cms\crm\CrmBulkAccessAction::class, 'applySelection');
+        $applySelection->setAccessible(true);
+        foreach ([
+            \skeeks\cms\crm\CrmBulkAccessForm::MAIN => ['user_id' => (int)$subordinate->id],
+            \skeeks\cms\crm\CrmBulkAccessForm::GRANT => ['user_id' => (int)$leader->id, 'level' => CrmAccess::LEVEL_EDIT],
+            \skeeks\cms\crm\CrmBulkAccessForm::PROTECTION => ['protection' => 'always'],
+        ] as $operation => $values) {
+            try {
+                $updated = $applySelection->invoke($bulkController->createAction('crm-bulk-'.$operation),
+                    [(int)$foreign->id, (int)$bulkSecond->id], new \skeeks\cms\crm\CrmBulkAccessForm(['operation' => $operation] + $values));
+                $bulkError = $updated === 2 ? null : 'updated '.var_export($updated, true);
+            } catch (\Throwable $e) {
+                $bulkError = $e->getMessage();
+            }
+            $check($bulkError === null, 'a bulk action «'.$operation.'» under a leader (the join of the managers): '.($bulkError ?? 'ok'));
+        }
+        $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$bulkSecond->id) === 'always', 'the bulk protection is applied');
+        $as($admin);
+
         // A request: decided by the main responsible and his leaders, never by the requester's leader.
         $toMe = static fn(CmsUser $user, CmsCrmAccessRequest $request) => CmsCrmAccessRequest::find()
             ->andWhere(CrmAccess::instance()->requestsCondition($user, CrmAccess::REQUESTS_TO_ME))->andWhere([CmsCrmAccessRequest::tableName().'.id' => $request->id])->exists();

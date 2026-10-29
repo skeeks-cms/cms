@@ -595,16 +595,16 @@ JS
                     $clientId = (int)\Yii::$app->request->get('cms_user_id');
 
                     if ($projectId) {
-                        $project = CmsProject::find()->forManager()->andWhere(['id' => $projectId])->one();
+                        $project = CmsProject::find()->forManager()->andWhere([CmsProject::tableName().'.id' => $projectId])->one();
                         if ($project) {
                             $form->cms_project_id = (int)$project->id;
                             if ($project->cms_company_id) {
                                 $form->cms_company_id = (int)$project->cms_company_id;
                             }
                         }
-                    } elseif ($companyId && CmsCompany::find()->forManager()->andWhere(['id' => $companyId])->exists()) {
+                    } elseif ($companyId && CmsCompany::find()->forManager()->andWhere([CmsCompany::tableName().'.id' => $companyId])->exists()) {
                         $form->cms_company_id = $companyId;
-                    } elseif ($clientId && CmsUser::find()->forManager()->andWhere(['id' => $clientId])->exists()) {
+                    } elseif ($clientId && CmsUser::find()->forManager()->andWhere([CmsUser::tableName().'.id' => $clientId])->exists()) {
                         $form->cms_user_id = $clientId;
                     }
                     return $form;
