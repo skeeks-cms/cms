@@ -103,18 +103,42 @@ try {
     $check($twin->save(), 'the same stage name in another pipeline of the site is allowed');
     $check((int)CmsLeadStage::find()->andWhere(['cms_site_id' => $siteId, 'name' => $same->name])->count() === 2, 'the site has two same-named stages');
     require_once dirname(__DIR__).'/src/migrations/m261028_130000__create_table__cms_lead_pipeline.php';
-    $migration = new m261028_130000__create_table__cms_lead_pipeline(['db' => Yii::$app->db, 'compact' => true]);
-    $refused = null;
-    try {
-        $migration->safeDown();
-    } catch (\yii\base\Exception $e) {
-        $refused = $e->getMessage();
-    }
-    $check($refused !== null && strpos($refused, 'Откат невозможен') !== false && strpos($refused, $same->name) !== false,
-        'the rollback names the same-named stages and refuses');
-    $check(Yii::$app->db->getTableSchema('{{%cms_lead_stage_history}}', true) !== null
-        && Yii::$app->db->getTableSchema('{{%cms_lead}}', true)->getColumn('cms_lead_pipeline_id') !== null,
-        'the refused rollback has not touched the schema');
+    $schemaIntact = static fn(): bool => Yii::$app->db->getTableSchema('{{%cms_lead_stage_history}}', true) !== null
+        && Yii::$app->db->getTableSchema('{{%cms_lead}}', true)->getColumn('cms_lead_pipeline_id') !== null
+        && Yii::$app->db->getTableSchema('{{%cms_lead_stage}}', true)->getColumn('cms_lead_pipeline_id') !== null;
+    $rollback = static function (m261028_130000__create_table__cms_lead_pipeline $migration): ?string {
+        try {
+            $migration->safeDown();
+        } catch (\yii\base\Exception $e) {
+            return $e->getMessage();
+        }
+        return null;
+    };
+
+    // The real migration: pipelines, stages and history hold data, so it refuses first, naming what would be lost.
+    $refused = $rollback(new m261028_130000__create_table__cms_lead_pipeline(['db' => Yii::$app->db, 'compact' => true]));
+    $check($refused !== null && strpos($refused, 'Откат невозможен') !== false
+        && preg_match('/воронки: \d+/u', $refused) && preg_match('/этапы в воронках: \d+/u', $refused) && strpos($refused, 'Схема не изменена') !== false,
+        'the rollback with pipeline data refuses and names what would be lost: '.$refused);
+    $check($schemaIntact(), 'the rollback refused for data has not touched the schema');
+
+    // Without that data the second guard must still refuse same-named stages before any DDL: the data
+    // guard is switched off and every DDL method throws, so reaching DDL fails the test, not the stand.
+    $noDdl = new class(['db' => Yii::$app->db, 'compact' => true]) extends m261028_130000__create_table__cms_lead_pipeline {
+        public $ddl = [];
+        protected function refuseRollbackWithData(array $checks): void {}
+        private function stop(string $what) { $this->ddl[] = $what; throw new RuntimeException('FAIL: the rollback reached DDL: '.$what); }
+        public function execute($sql, $params = []) { $this->stop('execute'); }
+        public function dropTable($table) { $this->stop('dropTable '.$table); }
+        public function dropColumn($table, $column) { $this->stop('dropColumn '.$table.'.'.$column); }
+        public function dropIndex($name, $table) { $this->stop('dropIndex '.$name); }
+        public function dropForeignKey($name, $table) { $this->stop('dropForeignKey '.$name); }
+        public function createIndex($name, $table, $columns, $unique = false) { $this->stop('createIndex '.$name); }
+    };
+    $refused = $rollback($noDdl);
+    $check($refused !== null && strpos($refused, 'Откат невозможен') !== false && strpos($refused, $same->name) !== false && $noDdl->ddl === [],
+        'the rollback names the same-named stages and refuses before any DDL: '.$refused);
+    $check($schemaIntact(), 'the rollback refused for same-named stages has not touched the schema');
 
     // --- a new request goes to the default pipeline, unsorted, without a stage ---
     $lead = new CmsLead(['name' => 'Тест П2б: заявка', 'source_type' => CmsLead::SOURCE_MANUAL, 'amount' => '120 000']);

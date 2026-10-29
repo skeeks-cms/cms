@@ -19,8 +19,13 @@ $checks = [
         && strpos($service, 'CmsLead::STATUS_IN_WORK') !== false,
     'link controls use the same in-work rule as the service' => strpos($controller, "'canLink' => \$this->canLinkIdentity()") !== false
         && strpos($controller, '$this->model->status === CmsLead::STATUS_IN_WORK') !== false
-        && strpos($partial, 'if ($canLink && !$model->cms_company_id)') !== false
-        && strpos($partial, 'if (!$canLink)') !== false,
+        // «Привязать» only with the in-work rule and only into an empty slot; otherwise no button at all,
+        // except «Это он» of an unsorted deal, which the triage right (canTriage) governs.
+        && strpos($partial, "'button' => (\$canTake || (\$canLink && !\$model->cms_company_id)) ? \$button(") !== false
+        && strpos($partial, "'button' => (\$canTake || (\$canLink && !\$model->cms_user_id)) ? \$button(") !== false
+        && preg_match_all("/'button' => \(\\\$canTake \|\| \(\\\$canLink && [^)]+\)\) \? \\\$button\([^;]*\) : '',/", $partial) === 2
+        && strpos($partial, "\$row['button'] !== '' && !\$row['linked']") !== false
+        && strpos($controller, "'canTake' => \\skeeks\\cms\\crm\\CrmAccess::instance()->canTriage((int)\\Yii::\$app->user->id, \$this->model)") !== false,
     'expected link failures return to the card' => substr_count($controller, "session->setFlash('error'") >= 2
         && strpos($controller, "return \$this->redirect(['view', 'pk' => \$this->model->id]);") !== false,
     'phone matching uses every lead phone' => strpos($service, 'foreach ($lead->phones as $phone)') !== false
@@ -40,8 +45,15 @@ $checks = [
     'existing links cannot be overwritten' => strpos($service, 'К сделке уже привязана другая компания.') !== false
         && strpos($service, 'К сделке уже привязан другой клиент.') !== false,
     'linking produces an auditable lead activity' => strpos($service, "'action' => 'lead_identity_link'") !== false,
-    'candidate evidence is visible before linking' => strpos($partial, "implode(' · ', \$match['reasons'])") !== false,
-    'client and related company can be linked together' => strpos($partial, "'Привязать оба'") !== false,
+    // The compact block: one line per match, its reasons in the line next to its button.
+    'candidate evidence is visible before linking' => substr_count($partial, "'reasons' => \$match['reasons']") === 2
+        && strpos($partial, "implode(', ', \$row['reasons'])") !== false
+        && strpos($partial, "Html::tag('span', \$row['button'], ['class' => 'sx-lead-hint__actions'])") !== false,
+    // A person of exactly one company is linked together with it, when the deal has no company yet.
+    'client and related company can be linked together' => strpos($partial, "\$companyId = count(\$companies) === 1 && !\$model->cms_company_id ? (int)\$companies[0]->id : null;") !== false
+        && strpos($partial, "\$button(\$companyId, (int)\$client->id,") !== false
+        && strpos($partial, "Html::hiddenInput('company_id', \$companyId)") !== false
+        && strpos($partial, "Html::hiddenInput('client_id', \$clientId)") !== false,
     'ajax surface has a stable accessible heading id' => strpos($partial, "'id' => 'cms-lead-matches-surface'") !== false,
     'empty results remove the optional surface' => strpos($script, 'element.remove()') !== false,
     'ajax failure offers recovery' => strpos($script, 'data-sx-lead-matches-retry') !== false,

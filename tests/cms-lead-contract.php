@@ -68,10 +68,41 @@ foreach (['CmsLead::statusCssClass', 'CmsLead::statusIconClass', 'BackendAsset::
     }
 }
 
-foreach (["'priority' => 10", "'priority' => 20", "'priority' => 30", "'priority' => 40"] as $priority) {
-    if (strpos($controller, $priority) === false) {
-        throw new RuntimeException('Missing lead-card action priority: '.$priority);
+// Action priorities, as declared in actions(): list actions and the card head keep their own
+// numbers; the card tabs take theirs from crm\CrmCardTabs, one order for every CRM card.
+preg_match_all('/^ {4}const (PRIORITY_[A-Z_]+) = (\d+);/m', file_get_contents($root.'/crm/CrmCardTabs.php'), $tabConstants);
+$tabPriorities = array_combine($tabConstants[1], array_map('intval', $tabConstants[2]));
+preg_match_all("/^ {12}'([a-z-]+)' => \[(.*?)^ {12}\],/ms", $controller, $actionBlocks, PREG_SET_ORDER);
+$actionPriorities = [];
+foreach ($actionBlocks as [, $actionId, $actionBody]) {
+    if (!preg_match("/^ {16}'priority' => ([^,]+),/m", $actionBody, $p)) {
+        continue;
     }
+    $expression = trim($p[1]);
+    if (preg_match('/^\d+$/', $expression)) {
+        $actionPriorities[$actionId] = ['literal', (int)$expression];
+    } elseif (preg_match('/^\\\\skeeks\\\\cms\\\\crm\\\\CrmCardTabs::(PRIORITY_[A-Z_]+)$/', $expression, $c) && isset($tabPriorities[$c[1]])) {
+        $actionPriorities[$actionId] = ['tab', $tabPriorities[$c[1]]];
+    } else {
+        throw new RuntimeException('Unknown lead action priority of '.$actionId.': '.$expression);
+    }
+}
+foreach (['kanban' => 10, 'index' => 20, 'view' => 10, 'process' => 20] as $actionId => $priority) {
+    if (($actionPriorities[$actionId] ?? null) !== ['literal', $priority]) {
+        throw new RuntimeException('Missing lead action priority: '.$actionId.' => '.$priority);
+    }
+}
+$cardTabsInOrder = ['deals', 'bills', 'payments', 'documents', 'tasks', 'stage-history', 'edit', 'log'];
+$previousTab = null;
+foreach ($cardTabsInOrder as $actionId) {
+    if (($actionPriorities[$actionId][0] ?? null) !== 'tab') {
+        throw new RuntimeException('Lead-card tab must take its priority from CrmCardTabs: '.$actionId);
+    }
+    if ($actionPriorities[$actionId][1] <= $actionPriorities['process'][1]
+        || ($previousTab !== null && $actionPriorities[$actionId][1] <= $actionPriorities[$previousTab][1])) {
+        throw new RuntimeException('Lead-card tabs are out of the shared CrmCardTabs order at '.$actionId);
+    }
+    $previousTab = $actionId;
 }
 $editActionStart = strpos($controller, "'edit' => [");
 $editActionEnd = strpos($controller, "'log' => [", $editActionStart);
@@ -190,10 +221,16 @@ if (strpos($view, 'min-height: 220px') !== false) {
     throw new RuntimeException('Lead card must not retain the old artificial minimum height.');
 }
 // П2б: the comment form is «Примечание», as in amoCRM.
-foreach (['sx-detail-layout__aside', 'sx-detail-layout__main', "'Примечание'", '$model->getLogs()->activity()'] as $activityFragment) {
+// The note form is the block of card actions (CrmCardActionsWidget::leadConfig()), shared with the company card.
+foreach (['sx-detail-layout__aside', 'sx-detail-layout__main', 'CrmCardActionsWidget::widget(\skeeks\cms\widgets\admin\CrmCardActionsWidget::leadConfig($model))', '$model->getLogs()->activity()'] as $activityFragment) {
     if (strpos($view, $activityFragment) === false) {
         throw new RuntimeException('Lead card must use the company-style split activity layout: '.$activityFragment);
     }
+}
+$cardActions = file_get_contents($root.'/widgets/admin/CrmCardActionsWidget.php');
+if (strpos($cardActions, "'commentUrl' => \$canWork ? ['/cms/admin-cms-lead/add-comment', 'pk' => \$lead->id] : null") === false
+    || strpos($cardActions, "'noteLabel' => \$lead->partner_id ? 'Партнёру' : 'Примечание'") === false) {
+    throw new RuntimeException('The lead card note must be «Примечание», posted to add-comment only by who works with the deal.');
 }
 $matchesPosition = strpos($view, 'class="sx-lead-matches-slot"');
 $detailLayoutPosition = strpos($view, 'class="sx-lead-layout sx-detail-layout"');
@@ -251,7 +288,8 @@ foreach (['Добавить телефон', 'Добавить email', 'sx-send-
 if (strpos($controller, "@skeeks/cms/views/admin-cms-lead/_model_header") === false) {
     throw new RuntimeException('Lead workflow actions must be available from the shared model header on every lead action.');
 }
-foreach (['Разобрать', '/cms/admin-cms-lead/triage', 'Клиент сделки', 'Сменить ответственного', 'BackendModelHeader::widget', 'CmsLeadStatusWidget::widget'] as $headerFragment) {
+// п. 13б: an unsorted deal is sorted by «Взять в работу» and «Не продажа» (was «Разобрать»).
+foreach (['Взять в работу', 'Не продажа', '/cms/admin-cms-lead/triage', 'Клиент сделки', 'Сменить ответственного', 'BackendModelHeader::widget', 'CmsLeadStatusWidget::widget'] as $headerFragment) {
     if (strpos($header, $headerFragment) === false) {
         throw new RuntimeException('Lead model header is incomplete: '.$headerFragment);
     }
@@ -323,15 +361,20 @@ foreach ([
         }
     }
 }
-// The client card lists deals only; the company card has «Новая сделка» (the standard create button
-// of the related grid, the company chosen by LeadTriageActions::presetCreateCompany()) and the tab
-// stands second, right after «Профиль»; «Проекты» are not a tab of the company card.
-if (strpos($userController, "'isStandartBeforeRender' => false") === false) {
-    throw new RuntimeException('The client card lead tab must not show the create button.');
+// Both client cards offer «Новая сделка» over their deals tab: the same card action as the block of
+// actions (CrmCardTabs::createOver(), the client chosen, by the create right of deals), not the standard
+// create button; the tab stands first after «Профиль» — the lowest of the shared CrmCardTabs priorities.
+$leadsPriority = $tabPriorities['PRIORITY_LEADS'] ?? null;
+if ($leadsPriority === null || $leadsPriority !== min($tabPriorities)) {
+    throw new RuntimeException('CrmCardTabs::PRIORITY_LEADS must be the first of the card tabs.');
 }
-$companyLeadsTab = substr($companyController, (int)strpos($companyController, "'leads' => ["), 1200);
-if (strpos($companyLeadsTab, "'isStandartBeforeRender' => false") !== false || strpos($companyLeadsTab, "'priority' => 5,") === false) {
-    throw new RuntimeException('The company card lead tab must be second and offer «Новая сделка».');
+foreach (['client' => $userController, 'company' => $companyController] as $owner => $relatedController) {
+    $leadsTab = preg_match("/^ {12}'leads' => \[(.*?)^ {12}\],/ms", $relatedController, $m) ? $m[1] : '';
+    if (strpos($leadsTab, "'priority' => \\skeeks\\cms\\crm\\CrmCardTabs::PRIORITY_LEADS,") === false
+        || strpos($leadsTab, '\skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, \'lead\', \'Новая сделка\');') === false
+        || strpos($leadsTab, "'isStandartBeforeRender' => false") !== false) {
+        throw new RuntimeException('The '.$owner.' card lead tab must be first after «Профиль» and offer «Новая сделка» through CrmCardTabs::createOver().');
+    }
 }
 if (strpos(substr($companyController, (int)strpos($companyController, "'projects' => ["), 400), "'isVisible' => false") === false) {
     throw new RuntimeException('«Проекты» must not be a tab of the company card.');
@@ -431,7 +474,9 @@ if (strpos($model, "\$label = 'Форма на сайте «'.\$this->sourceName
     throw new RuntimeException('CmsLead must not rebuild a Form2 title around an editable persisted name.');
 }
 // П2а: the client of a deal in work is found or created in «Клиент сделки» (the duplicate check), not in bare create forms.
-if (strpos($header, "'/cms/admin-cms-lead/identity'") === false) {
+// The header and the block of actions take it from CrmCardActionsWidget::leadConfig(): for who works with a deal in work without a client.
+if (strpos(str_replace("\r\n", "\n", $cardActions), "if (\$canWork && \$lead->status === \\skeeks\\cms\\models\\CmsLead::STATUS_IN_WORK && (!\$lead->cms_company_id || !\$lead->cms_user_id)) {\n            \$actions['identity'] = ['label' => 'Клиент сделки'") === false
+    || strpos($cardActions, "'url' => \$window(['/cms/admin-cms-lead/identity', 'pk' => \$lead->id])") === false) {
     throw new RuntimeException('A deal in work must open «Клиент сделки» to find or create its client.');
 }
 
