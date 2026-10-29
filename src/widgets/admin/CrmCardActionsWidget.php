@@ -575,25 +575,26 @@ class CrmCardActionsWidget extends Widget
         $id = (int)$record->id;
         $more = ['more' => true];
         $payment = static fn(int $debit) => ['ShopPayment' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => $id, 'is_debit' => $debit]];
+        $client = $isCompany ? 'cms_company_id' : 'cms_user_id';
         $tabs = [];
-        if ($isCompany) {
-            $tabs['service'] = self::createTab('Услуга', 'tools', '/cms/admin-cms-deal', ['CmsDeal' => ['cms_company_id' => $id]], $more);
-            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => ['cms_company_id' => $id]], $more);
-        } else {
-            // The CRM bills: /shop/admin-bill is the read-only list of the order bills.
-            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => ['cms_user_id' => $id]], $more);
-        }
+        $tabs['service'] = self::createTab('Услуга', 'tools', '/cms/admin-cms-deal', ['CmsDeal' => [$client => $id]], $more);
+        // The CRM bills (a person too): /shop/admin-bill is the read-only list of the order bills.
+        $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => [$client => $id]], $more);
         $in = self::createTab('Заплатили нам', '', '/shop/admin-payment', $payment(1));
         $out = self::createTab('Мы заплатили', '', '/shop/admin-payment', $payment(0));
         if ($in && $out) {
             $tabs['payment'] = ['label' => 'Платёж', 'icon' => 'credit-card', 'items' => [$in, $out]] + $more;
         }
-        if ($isCompany && self::canCreate('/cms/admin-cms-document')) {
+        if (self::canCreate('/cms/admin-cms-document')) {
             $items = [];
             foreach (\skeeks\cms\shop\models\ShopDocument::optionsForType() as $type => $label) {
+                // The reconciliation act is between contractors of a company.
+                if ($type === \skeeks\cms\shop\models\ShopDocument::TYPE_RECONCILIATION_ACT && !$isCompany) {
+                    continue;
+                }
                 $route = $type === \skeeks\cms\shop\models\ShopDocument::TYPE_RECONCILIATION_ACT
                     ? ['/cms/admin-cms-document/create-reconciliation', 'company_id' => $id]
-                    : ['/cms/admin-cms-document/create', 'type' => $type, 'cms_company_id' => $id];
+                    : ['/cms/admin-cms-document/create', 'type' => $type, $client => $id];
                 $items[] = ['label' => $label, 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($route)
                     ->enableEmptyLayout()->enableNoActions()->url];
             }

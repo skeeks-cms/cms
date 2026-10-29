@@ -651,6 +651,58 @@ class AdminUserController extends BackendModelStandartController
 
             ],
 
+            // Services, documents and calls of a person, as in the company card: the sections with their own
+            // scopes (forManager()) and «Новая …» of the card block (CrmCardTabs); calls have no «Добавить».
+            'deals' => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'name'            => 'Услуги',
+                'icon'            => 'far fa-file',
+                'controllerRoute' => "/cms/admin-cms-deal",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_SERVICES,
+                "accessCallback"  => function () {
+                    return $this->_checkIsRoot($this->model) && \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
+                'on gridInit'     => function ($e) {
+                    $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'service', 'Новая услуга');
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                },
+            ],
+
+            'documents' => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'name'            => 'Документы',
+                'icon'            => 'fas fa-file-signature',
+                'controllerRoute' => "/cms/admin-cms-document",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_DOCUMENTS,
+                "accessCallback"  => function () {
+                    return $this->_checkIsRoot($this->model) && \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
+                'on gridInit'     => function ($e) {
+                    $action = $e->sender;
+                    \skeeks\cms\crm\CrmCardTabs::createOver($action, $this->model, 'document', 'Новый документ');
+                    $action->relatedIndexAction->backendShowings = false;
+                },
+            ],
+
+            'telephony' => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'name'            => 'Звонки',
+                'icon'            => 'fas fa-list',
+                'controllerRoute' => "/cms/admin-cms-telephony-call",
+                'relation'        => ['cms_user_id' => 'id'],
+                'priority'        => \skeeks\cms\crm\CrmCardTabs::PRIORITY_CALLS,
+                "accessCallback"  => function () {
+                    return $this->_checkIsRoot($this->model) && \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model]);
+                },
+                'on gridInit'     => function ($e) {
+                    $e->sender->relatedIndexAction->backendShowings = false;
+                },
+            ],
+
 
             "bonus" => [
                 'class'           => BackendGridModelRelatedAction::class,

@@ -89,6 +89,8 @@
         }
         menu.style.left = "";
         menu.style.right = "";
+        menu.style.maxHeight = "";
+        menu.style.overflowY = "";
         var gap = 8, box = details.getBoundingClientRect(), rect = menu.getBoundingClientRect();
         if (rect.left < gap) {
             menu.style.right = "auto";
@@ -96,6 +98,12 @@
         } else if (rect.right > window.innerWidth - gap) {
             menu.style.left = "auto";
             menu.style.right = (box.right - window.innerWidth + gap) + "px";
+        }
+        // A long menu (16 items of «⋯» on a phone) scrolls inside the screen; Tab scrolls to the focused item.
+        var room = window.innerHeight - rect.top - gap;
+        if (rect.height > room && room >= 160) {
+            menu.style.maxHeight = room + "px";
+            menu.style.overflowY = "auto";
         }
     }, true);
     var timer = null;
