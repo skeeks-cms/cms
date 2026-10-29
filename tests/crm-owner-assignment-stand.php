@@ -173,6 +173,26 @@ try {
     $check($service->apply($again) === [0, 0], 'a repeated apply changes nothing');
     $check((int)(new yii\db\Query())->from('cms_crm_access_log')->count() === $before + 14, 'a repeated apply writes nothing');
 
+    // protect-owners: every client whose main is an owner — also one given from the former pool — becomes «always»;
+    // a client of a keep employee does not; a repeated run changes nothing; the protection agent keeps «always».
+    $c['pool'] = $company('из пула', null, [$w2]);
+    $c['poolKeep'] = $company('из пула сотруднику', null, [$k]);
+    $db->createCommand()->update('cms_company2manager', ['is_main' => 1], ['cms_company_id' => [$c['pool'], $c['poolKeep']]])->execute();
+    $access->resetMemo();
+    $protectionRows = static function () use ($service, $c): array {
+        return array_values(array_filter($service->protectionPlan(), static fn($row) => $row['code'] === 'company' && in_array($row['id'], $c, true)));
+    };
+    $rows = $protectionRows();
+    $check(count($rows) === 1 && $rows[0]['id'] === $c['pool'] && $rows[0]['user_id'] === $w2, 'protect plan: only the owner client not yet «always» '.json_encode($rows));
+    $logBeforeProtect = (int)(new yii\db\Query())->select('MAX(id)')->from('cms_crm_access_log')->scalar();
+    $check($service->applyProtection($rows) === 1 && $protection('cms_company', $c['pool']) === CrmProtection::ALWAYS
+        && $protection('cms_company', $c['poolKeep']) === CrmProtection::FREE, 'protect apply: the owner client «always», the keep client unchanged');
+    $check((new yii\db\Query())->from('cms_crm_access_log')->where(['>', 'id', $logBeforeProtect])
+        ->andWhere(['event' => 'protection', 'record_code' => 'company', 'record_id' => $c['pool'], 'user_id' => $w2])->exists(), 'protect: the journal has the event');
+    $check($protectionRows() === [] && $service->applyProtection($protectionRows()) === 0, 'protect: a repeated run changes nothing');
+    (new CrmProtection())->recalc('company', $c['pool']);
+    $check($protection('cms_company', $c['pool']) === CrmProtection::ALWAYS, 'the protection agent (recalc) keeps «always»');
+
     // The console command: the plan writes nothing.
     $command = static fn() => new class('crm', Yii::$app->getModule('cms')) extends skeeks\cms\console\controllers\CrmController {
         public string $out = '';
@@ -196,7 +216,7 @@ try {
     $out = $controller->out;
     $check($code === 0 && strpos($out, 'Ничего не записано') !== false && strpos($out, 'СПОРНО: у владельца и у сотрудника одновременно') !== false
         && strpos($out, 'Проверка: владельцы — общая') !== false, 'the command prints the plan and the contested records');
-    $check((int)(new yii\db\Query())->from('cms_crm_access_log')->count() === $before + 14, 'the plan of the command writes nothing');
+    $check((int)(new yii\db\Query())->from('cms_crm_access_log')->count() === $before + 15, 'the plan of the command writes nothing');
     $usage = $command()->runAction('assign-owners', []);
     $check($usage !== 0, 'the command without owners refuses');
 } finally {

@@ -218,6 +218,66 @@ class OwnerAssignment
         return [$mains, $always];
     }
 
+    /**
+     * Every client (company or person) whose main responsible is an owner and that is not
+     * «Всегда по согласованию» yet (owner's decision 30.10.2026: all clients of the owners are
+     * protected, including those given to them from the former pool).
+     *
+     * @return array[] code, id, name, user_id (the owner), protection (current)
+     */
+    public function protectionPlan(): array
+    {
+        $plan = [];
+        foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
+            [$linkClass, $recordColumn, $userColumn] = CrmAccess::linkTable($code);
+            $mains = $linkClass::find()->select([$userColumn, $recordColumn])->andWhere(['is_main' => 1, $userColumn => $this->owners ?: [0]])
+                ->asArray()->all();
+            $owner = [];
+            foreach ($mains as $row) {
+                $owner[(int)$row[$recordColumn]] = (int)$row[$userColumn];
+            }
+            if (!$owner) {
+                continue;
+            }
+            $table = $class::tableName();
+            $query = $class::find()->andWhere([$table.'.id' => array_keys($owner)])
+                ->andWhere(['or', [$table.'.crm_protection' => null], ['<>', $table.'.crm_protection', CrmProtection::ALWAYS]])
+                ->orderBy([$table.'.id' => SORT_ASC]);
+            foreach ($query->each(500) as $record) {
+                $plan[] = [
+                    'code' => $code,
+                    'id' => (int)$record->id,
+                    'name' => $record instanceof CmsCompany ? (string)$record->name : (string)$record->shortDisplayName,
+                    'user_id' => $owner[(int)$record->id],
+                    'protection' => (string)$record->crm_protection,
+                ];
+            }
+        }
+
+        return $plan;
+    }
+
+    /** Applies protectionPlan(): «Всегда по согласованию», each change in the journal; returns the count. */
+    public function applyProtection(array $plan): int
+    {
+        $protection = new CrmProtection();
+        $count = 0;
+        foreach ($plan as $row) {
+            $class = $row['code'] === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::class : CmsUser::class;
+            $before = (string)$class::find()->select('crm_protection')->andWhere(['id' => (int)$row['id']])->scalar();
+            if ($before === CrmProtection::ALWAYS) {
+                continue;
+            }
+            $protection->setAlways($row['code'], (int)$row['id'], true);
+            CrmAccessLog::write(CrmAccessLog::PROTECTION, $row['code'], (int)$row['id'], ['actor_id' => null, 'user_id' => (int)$row['user_id'],
+                'comment' => (CrmProtection::states()[$before] ?? $before).' → '.CrmProtection::states()[CrmProtection::ALWAYS]
+                    .', клиент владельца при переходе на новую модель доступа']);
+            $count++;
+        }
+
+        return $count;
+    }
+
     /** @param CmsCompany|CmsUser $record */
     private function row(string $code, $record, array $users, ?int $main): array
     {

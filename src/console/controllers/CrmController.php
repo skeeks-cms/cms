@@ -18,6 +18,8 @@ use yii\console\ExitCode;
  *   php yii cms/crm/assign-history-main [--user=1] --apply  # assign: by the last payment or service, else --user
  *   php yii cms/crm/assign-owners --owners=1,23 --keep=110 --review=1663          # main by the old responsibles: the plan only
  *   php yii cms/crm/assign-owners --owners=1,23 --keep=110 --review=1663 --apply  # assign (owners: also «Всегда по согласованию»)
+ *   php yii cms/crm/protect-owners --owners=1,23          # every client whose main is an owner: the plan only
+ *   php yii cms/crm/protect-owners --owners=1,23 --apply  # make them «Всегда по согласованию»
  */
 class CrmController extends Controller
 {
@@ -47,7 +49,7 @@ class CrmController extends Controller
         return array_merge(parent::options($actionID), $actionID === 'protection' ? ['all'] : [], $actionID === 'assign-main' ? ['apply'] : [],
             $actionID === 'assign-old-clients' ? ['apply', 'user', 'before'] : [], $actionID === 'assign-history-main' ? ['apply', 'user'] : [],
             $actionID === 'assign-orphan-main' ? ['apply', 'user'] : [], $actionID === 'assign-pool-main' ? ['apply', 'user'] : [],
-            $actionID === 'assign-owners' ? ['apply', 'owners', 'keep', 'review'] : []);
+            $actionID === 'assign-owners' ? ['apply', 'owners', 'keep', 'review'] : [], $actionID === 'protect-owners' ? ['apply', 'owners'] : []);
     }
 
     /**
@@ -292,6 +294,48 @@ class CrmController extends Controller
             $this->stdout("\nНазначено основных: {$mains}; «Всегда по согласованию»: {$always}\n");
         } else {
             $this->stdout("\nНичего не записано. Записать: --apply\n");
+        }
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Every client (company or person) whose main responsible is one of --owners becomes «Всегда по
+     * согласованию» (owner's decision 30.10.2026), after assign-owners and assign-pool-main. The plan
+     * by default; --apply writes, each change to the journal of the access; a repeated run changes
+     * nothing. The daily protection agent keeps «always» (CrmProtection::compute()).
+     */
+    public function actionProtectOwners()
+    {
+        $owners = array_values(array_filter(array_map('intval', preg_split('/[\s,]+/', (string)$this->owners))));
+        if (!$owners) {
+            $this->stderr("Укажите --owners=<id через запятую>.\n");
+
+            return ExitCode::USAGE;
+        }
+        if (!\skeeks\cms\crm\OwnerAssignment::ready()) {
+            $this->stderr("Миграции основного ответственного, защиты и журнала доступа ещё не применены.\n");
+
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $service = new \skeeks\cms\crm\OwnerAssignment($owners);
+        $plan = $service->protectionPlan();
+        $groups = [];
+        foreach ($plan as $row) {
+            $user = \skeeks\cms\models\CmsUser::findOne((int)$row['user_id']);
+            $key = ($user ? $user->shortDisplayName : '?').' ('.(int)$row['user_id'].'), '.($row['code'] === 'company' ? 'компании' : 'люди')
+                .', сейчас «'.(\skeeks\cms\crm\CrmProtection::states()[$row['protection']] ?? $row['protection']).'»';
+            $groups[$key] = ($groups[$key] ?? 0) + 1;
+        }
+        ksort($groups);
+        $this->stdout('Клиенты владельцев не «Всегда по согласованию»: '.count($plan)."\n");
+        foreach ($groups as $key => $count) {
+            $this->stdout("  {$key}: {$count}\n");
+        }
+        if ($this->apply) {
+            $this->stdout('Включено «Всегда по согласованию»: '.$service->applyProtection($plan)."\n");
+        } else {
+            $this->stdout("Ничего не записано. Записать: --apply\n");
         }
 
         return ExitCode::OK;
