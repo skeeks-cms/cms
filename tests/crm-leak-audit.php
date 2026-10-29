@@ -430,6 +430,8 @@ try {
             'коммент. сделки пула' => AUDIT_PREFIX.'комментарий сделки пула '.$uniq,
             'письмо по чужой сделке' => AUDIT_PREFIX.'письмо по чужой сделке '.$uniq, 'письмо по услуге' => AUDIT_PREFIX.'письмо по услуге '.$uniq,
             'письмо защищённой' => AUDIT_PREFIX.'письмо защищённой '.$uniq,
+            // A letter linked only to the company: the old correspondence of the client is "full" only (п. 11, 29.10.2026).
+            'письмо компании' => AUDIT_PREFIX.'письмо компании '.$uniq,
             'защищённая компания' => $protected->name, 'сумма чужой сделки' => '913 377',
         ];
         $routes = [
@@ -439,6 +441,7 @@ try {
             'КП чужой сделки' => ['admin-cms-proposal', $kpForeign], 'КП без сделки' => ['admin-cms-proposal', $kpCompany], 'КП услуги' => ['admin-cms-proposal', $kpService],
             'задача чужой сделки' => ['admin-cms-task', $taskForeign->id], 'задача без сделки' => ['admin-cms-task', $taskCompany->id],
             'защищённая компания' => ['admin-cms-company', $protected->id],
+            'письмо компании' => ['admin-cms-comm-message', $letterCompany],
         ];
         $found = static function (string $body, array $keys = null) use (&$foreignMarkers, &$routes): array {
             $hits = [];
@@ -551,6 +554,7 @@ try {
             'Звонок по чужой сделке' => ['/~sxx/cms/admin-cms-telephony-call/view?pk='.$callId, ''],
             'Письмо по чужой сделке' => ['/~sxx/cmsCommunication/admin-cms-comm-message/view?pk='.$letterForeign, ''],
             'Письмо по услуге' => ['/~sxx/cmsCommunication/admin-cms-comm-message/view?pk='.$letterService, ''],
+            'Письмо компании без сделки' => ['/~sxx/cmsCommunication/admin-cms-comm-message/view?pk='.$letterCompany, ''],
             'Чужая сделка клиента Б' => ['/~sxx/cms/admin-cms-lead/view?pk='.$foreignP->id, $foreignP->name],
             'Счёт клиента Б' => ['/~sxx/cms/admin-cms-bill/view?pk='.$billP->id, ''],
             'Платёж клиента Б' => ['/~sxx/shop/admin-payment/view?pk='.$payP->id, ''],
