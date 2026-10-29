@@ -39,7 +39,7 @@
         "skeeks/yii2-config": "^1.0 || dev-master@dev",
         "skeeks/yii2-form": "^1.0 || dev-master@dev",
 
-        "skeeks/cms-backend": "^2.0 || dev-master@dev",
+        "skeeks/cms-backend": "^2.1.1.25 || dev-master@dev",
         "skeeks/cms-backend-admin": "^2.1.1.11 || dev-master@dev",
         "skeeks/cms-admin": "^3.0 || dev-master@dev",
 
@@ -82,7 +82,10 @@
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
     },
     "conflict": {
-        "skeeks/cms-job": "<1.0.6"
+        "skeeks/cms-job": "<1.0.6",
+        "skeeks/cms-mcp": "<1.0.20",
+        "skeeks/cms-proposal": "<1.4.2",
+        "skeeks/cms-shop": "<3.2.7.41"
     },
     "repositories": [
         {
