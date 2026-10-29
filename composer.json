@@ -82,6 +82,7 @@
         "bower-asset/jquery": "2.2.*@stable | 2.1.*@stable | 1.11.*@stable | 1.12.*@stable"
     },
     "conflict": {
+        "skeeks/cms-communication": "<1.19.3",
         "skeeks/cms-job": "<1.0.6",
         "skeeks/cms-mcp": "<1.0.20",
         "skeeks/cms-proposal": "<1.4.2",
