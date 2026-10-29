@@ -189,6 +189,23 @@ class CrmCardActionsWidget extends Widget
                 'window' => ['size' => 'small'],
             ];
         }
+        // The actions of the deal itself (`record`: first in the header «⋯», over a line; in «Ещё» of the block):
+        // «Редактировать» (the edit action, not a tab), «Клиент сделки», «Сменить ответственного» — their windows and rights.
+        $window = static fn(array $route): string => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($route)
+            ->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
+        if ($access->canWorkLead($userId, $lead)) {
+            $actions['edit'] = ['label' => 'Редактировать', 'icon' => 'edit', 'more' => true, 'record' => true, 'options' => [
+                'onclick' => 'window.location.href = '.Json::encode(\yii\helpers\Url::to(['/cms/admin-cms-lead/edit', 'pk' => $lead->id])).'; return false;',
+            ]];
+        }
+        if ($canWork && $lead->status === \skeeks\cms\models\CmsLead::STATUS_IN_WORK && (!$lead->cms_company_id || !$lead->cms_user_id)) {
+            $actions['identity'] = ['label' => 'Клиент сделки', 'icon' => 'user', 'more' => true, 'record' => true,
+                'url' => $window(['/cms/admin-cms-lead/identity', 'pk' => $lead->id])];
+        }
+        if (!$lead->isTerminal && $lead->status !== \skeeks\cms\models\CmsLead::STATUS_NEW && $access->canAssignLead($userId, $lead)) {
+            $actions['assign'] = ['label' => 'Сменить ответственного', 'icon' => 'users', 'more' => true, 'record' => true,
+                'url' => $window(['/cms/admin-cms-lead/assign', 'pk' => $lead->id]), 'window' => ['size' => 'small']];
+        }
         if ($canWork) {
             // In "Ещё": the service, the bill, the payment and the document of the deal.
             $actions += self::leadRecordTabs($lead);
@@ -234,11 +251,13 @@ class CrmCardActionsWidget extends Widget
      * the icons hide: they are in «⋯» too. The header itself renders no delete
      * button then (`actions => false`).
      *
+     * The actions of the record itself (`record`: «Редактировать», «Клиент
+     * сделки», «Сменить ответственного» of {@see leadConfig()}) go first, over
+     * a line; in the block they are in «Ещё» — one list for both menus.
+     *
      * @param \yii\base\Controller|null $controller the card controller (its delete action)
-     * @param array[] $recordItems the actions of the record itself first in «⋯», over a line
-     *   («Редактировать», «Сменить ответственного»…): items as {@see $actions} (`url` opens a window)
      */
-    public static function headerTools($record, bool $icons = true, $controller = null, array $recordItems = []): string
+    public static function headerTools($record, bool $icons = true, $controller = null): string
     {
         $config = self::cardConfig($record);
         if ($config === null) {
@@ -254,8 +273,11 @@ class CrmCardActionsWidget extends Widget
         }
 
         $menu = '';
-        foreach (array_filter($recordItems) as $id => $item) {
-            $menu .= $widget->renderMenuItems('header-record-'.$id, $item);
+        foreach ($items as $id => $item) {
+            if (!empty($item['record'])) {
+                $menu .= $widget->renderMenuItems('header-'.$id, $item);
+                unset($items[$id]);
+            }
         }
         if ($menu !== '') {
             $menu .= Html::tag('div', '', ['class' => 'sx-crm-actions__menu-separator', 'role' => 'separator']);
