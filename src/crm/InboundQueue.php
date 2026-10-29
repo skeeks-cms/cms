@@ -246,10 +246,14 @@ class InboundQueue
         $own = $db->getTransaction() === null ? $db->beginTransaction() : null;
         try {
             $table = '{{%cms_crm_inbound_rotation}}';
-            $db->createCommand('INSERT IGNORE INTO '.$db->quoteTableName($table).' (cms_site_id, queue, updated_at) VALUES (:site, :queue, :time)',
-                [':site' => $siteId, ':queue' => $queue, ':time' => time()])->execute();
+            self::ensureRow($siteId, $queue);
+            // Only the exclusive lock of the existing row here: a shared lock of an insert upgraded to it
+            // made two requests wait for each other (deadlock, release audit F3).
             $row = $db->createCommand('SELECT id, last_user_id FROM '.$db->quoteTableName($table).' WHERE cms_site_id = :site AND queue = :queue FOR UPDATE',
                 [':site' => $siteId, ':queue' => $queue])->queryOne();
+            if (!$row) {
+                throw new \RuntimeException('Очередь «Входящие заявки» не найдена.');
+            }
             $last = $row && $row['last_user_id'] !== null ? (int)$row['last_user_id'] : null;
             $next = $members[0];
             foreach ($members as $id) {
@@ -269,6 +273,40 @@ class InboundQueue
                 $own->rollBack();
             }
             throw $e;
+        }
+    }
+
+    /**
+     * The row of a queue exists before the transaction locks it: created by its own short connection
+     * (autocommit), so the transaction of the deal never holds an insert or a gap lock of it. A queue is
+     * created once; requests that meet there wait for each other on one statement, a rare deadlock of
+     * that statement is repeated.
+     */
+    private static function ensureRow(int $siteId, string $queue): void
+    {
+        $db = \Yii::$app->db;
+        $table = '{{%cms_crm_inbound_rotation}}';
+        $where = ['cms_site_id' => $siteId, 'queue' => $queue];
+        if ((new Query())->from($table)->andWhere($where)->exists($db)) {
+            return;
+        }
+        $own = clone $db;
+        try {
+            for ($attempt = 1; ; $attempt++) {
+                try {
+                    $own->createCommand('INSERT IGNORE INTO '.$own->quoteTableName($table).' (cms_site_id, queue, updated_at) VALUES (:site, :queue, :time)',
+                        [':site' => $siteId, ':queue' => $queue, ':time' => time()])->execute();
+
+                    return;
+                } catch (\yii\db\Exception $e) {
+                    if ($attempt >= 5 || !\skeeks\cms\services\CmsLeadService::isLockConflict($e)) {
+                        throw $e;
+                    }
+                    usleep(random_int(5000, 30000) * $attempt);
+                }
+            }
+        } finally {
+            $own->close();
         }
     }
 

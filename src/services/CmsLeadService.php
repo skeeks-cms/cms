@@ -11,6 +11,17 @@ use yii\db\IntegrityException;
 
 class CmsLeadService
 {
+    /** Attempts of the whole creation when MySQL rolls it back for a deadlock (1213) or a lock wait (1205). */
+    public const LOCK_ATTEMPTS = 4;
+
+    /**
+     * A request of a source: a repeated event (source_type + source_ref) goes on in its deal, a new one is
+     * created in one transaction with its contacts, the route of «Входящие заявки» and the notifications.
+     * Requests at the same moment (the turn of a queue «по кругу») may meet in a deadlock: MySQL rolls the
+     * whole transaction back, and the whole creation runs again from the start (the repeat check included),
+     * a few times with a short random pause. Inside a transaction of the caller nothing is repeated: that
+     * transaction is gone, its owner decides.
+     */
     public function createFromSource(array $attributes): CmsLead
     {
         $phones = $this->normalizeContacts($attributes['phones'] ?? []);
@@ -18,6 +29,31 @@ class CmsLeadService
         unset($attributes['phones'], $attributes['emails']);
         $attributes = $this->normalizeUtmAttributes($attributes);
 
+        $outer = CmsLead::getDb()->getTransaction();
+        $retry = !($outer && $outer->isActive);
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                return $this->createOnce($attributes, $phones, $emails);
+            } catch (\yii\db\Exception $e) {
+                if (!$retry || $attempt >= self::LOCK_ATTEMPTS || !self::isLockConflict($e)) {
+                    throw $e;
+                }
+                \Yii::warning('Сделка из источника: конфликт блокировок, попытка '.($attempt + 1).': '.$e->getMessage(), self::class);
+                usleep(random_int(20000, 80000) * $attempt);
+            }
+        }
+    }
+
+    /** MySQL rolled the statement or the transaction back for a deadlock or a lock wait timeout. */
+    public static function isLockConflict(\yii\db\Exception $e): bool
+    {
+        $info = (array)$e->errorInfo;
+
+        return in_array((int)($info[1] ?? 0), [1213, 1205], true) || ($info[0] ?? null) === '40001';
+    }
+
+    private function createOnce(array $attributes, array $phones, array $emails): CmsLead
+    {
         $lead = new CmsLead();
         $lead->setAttributes($attributes);
         $lead->deferManagerNotifications = true;
