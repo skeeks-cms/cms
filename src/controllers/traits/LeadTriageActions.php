@@ -100,6 +100,13 @@ trait LeadTriageActions
                 'isVisible' => false,
                 'callback' => [$this, 'workRequest'],
             ],
+            // An incoming record of a client with several open deals (crm\CrmInbound): «Привязать к сделке №…».
+            'attach-inbound' => [
+                'class' => ViewBackendAction::class,
+                'isVisible' => false,
+                'name' => 'Привязать к сделке',
+                'callback' => [$this, 'attachInbound'],
+            ],
             // «Запросы доступа» is its own section (AdminCmsCrmAccessRequestController); old links lead there.
             'requests' => [
                 'class' => ViewBackendAction::class,
@@ -591,6 +598,39 @@ JS
         }
 
         return $response;
+    }
+
+    /**
+     * The page of the notification «Клиент … написал — привяжите к своей сделке» (crm\CrmInbound): the record
+     * and the open deals of its client the employee works on; a POST links it to the chosen one.
+     */
+    public function attachInbound()
+    {
+        $inbound = \skeeks\cms\crm\CrmInbound::instance();
+        $type = (string)\Yii::$app->request->get('type', '');
+        $attacher = $inbound->attacher($type);
+        $record = $attacher ? $attacher->find((int)\Yii::$app->request->get('id')) : null;
+        if (!$record) {
+            throw new \yii\web\NotFoundHttpException('Запись не найдена.');
+        }
+        $userId = (int)\Yii::$app->user->id;
+        $leads = $inbound->leadsFor($userId, $type, $record);
+        if (\Yii::$app->request->isPost) {
+            try {
+                $lead = $inbound->attach($userId, $type, $record, (int)\Yii::$app->request->post('lead_id'));
+                \Yii::$app->session->setFlash('success', 'Привязано к сделке №'.(int)$lead->id.'.');
+
+                return $this->redirect(['/cms/admin-cms-lead/view', 'pk' => (int)$lead->id]);
+            } catch (\DomainException $e) {
+                \Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
+
+        return $this->render('@skeeks/cms/views/admin-cms-lead/attach-inbound', [
+            'description' => $attacher->describe($record),
+            'leads' => $leads,
+            'linked' => array_filter($leads, static fn(CmsLead $lead) => $attacher->isLinked($record, $lead)),
+        ]);
     }
 
     /** Services of the deal's client the employee sees: targets of «Это поддержка». */

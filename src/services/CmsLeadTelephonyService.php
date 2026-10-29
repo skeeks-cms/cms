@@ -87,6 +87,13 @@ class CmsLeadTelephonyService
         if (!$lead) {
             $lead = $this->findUnambiguousActiveLead($call->client_phone);
         }
+        if (!$lead && $call->direction === CmsTelephonyCall::DIRECTION_IN) {
+            // The phone of the client card (owner's decision 29.10.2026): its one open deal gets the call, several —
+            // their executors are asked to link it (CrmInbound), one notification per call.
+            $inbound = \skeeks\cms\crm\CrmInbound::instance();
+            $attacher = $inbound->attacher('call');
+            $lead = $attacher ? $inbound->route('call', $call, $attacher->clients($call), 'позвонил', 'call:'.(int)$call->id) : null;
+        }
         if (!$lead) {
             return null;
         }

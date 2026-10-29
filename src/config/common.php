@@ -111,6 +111,14 @@ return [
             'class' => \skeeks\cms\crm\CrmAccess::class,
         ],
 
+        //An incoming letter, call or chat message and the deal of the client (packages add their kinds to `attachers`).
+        'crmInbound' => [
+            'class' => \skeeks\cms\crm\CrmInbound::class,
+            'attachers' => [
+                'call' => \skeeks\cms\crm\CrmInboundCallAttacher::class,
+            ],
+        ],
+
         //The one duplicate check of companies, people and deals (publicMailDomains, legalForms).
         'crmMatcher' => [
             'class' => \skeeks\cms\crm\CrmMatcher::class,

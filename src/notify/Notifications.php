@@ -154,6 +154,9 @@ class Notifications extends Component
             'crm.access_decided' => ['name' => 'Решение по вашему запросу доступа', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
             'crm.duplicate_mark' => ['name' => 'Возможный дубль клиента', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
             'crm.client_call' => ['name' => 'Звонок вашего клиента', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
+            // crm\CrmInbound: the client wrote or called and has several open deals.
+            'crm.inbound_unlinked' => ['name' => 'Клиент написал или позвонил — привяжите к своей сделке', 'category' => self::CATEGORY_CLIENTS,
+                'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
             'lead.assigned' => ['name' => 'Вам назначена сделка', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
             'lead.partner_comment' => ['name' => 'Комментарий партнёра по сделке', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
             'lead.partner_update' => ['name' => 'Партнёрская заявка: статус и комментарии', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_CLIENT],
