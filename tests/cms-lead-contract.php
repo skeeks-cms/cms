@@ -266,10 +266,13 @@ foreach (['$this->model->status = CmsLead::STATUS_IN_WORK', '$this->model->proce
         throw new RuntimeException('Returning a lead to work must restore its active lifecycle state: '.$reopenContract);
     }
 }
-foreach (['if (!$this->model || $this->model->isTerminal)', 'return false;'] as $terminalAccessContract) {
-    if (strpos($controller, $terminalAccessContract) === false) {
-        throw new RuntimeException('Completed leads must remain read-only in controller actions: '.$terminalAccessContract);
-    }
+// Working actions go through the single rule CrmAccess::canWorkLead(), which keeps completed leads read-only.
+$crmAccess = file_get_contents($root.'/crm/CrmAccess.php');
+if (strpos($controller, 'CrmAccess::instance()->canWorkLead((int)\Yii::$app->user->id, $this->model)') === false
+    || strpos($crmAccess, 'return !$lead->isTerminal && $this->isLeadWorker($user, $lead);') === false
+    || strpos(file_get_contents($root.'/models/CmsLead.php'), 'CrmAccess::instance()->canWorkLead($userId, $this)') === false
+) {
+    throw new RuntimeException('Completed leads must remain read-only in controller actions through CrmAccess::canWorkLead().');
 }
 // Contact blocks pass add routes, row menus and call/SMS actions only when $canWork.
 if (substr_count($view, "'addRoute' => \$canWork ?") < 5

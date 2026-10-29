@@ -1005,31 +1005,22 @@ class CmsLead extends Core
         return $this->status === self::STATUS_NEW && !$this->executor_id;
     }
 
+    /** The employee is the responsible (executor) of the deal; who may work on it is canBeWorkedBy(). */
     public function isManagedBy(int $userId): bool
     {
         return (int)$this->executor_id === $userId;
     }
 
+    /** Working actions on an open deal: the single rule CrmAccess::isLeadWorker(). */
     public function canBeWorkedBy(int $userId): bool
     {
-        if ($this->isTerminal) {
-            return false;
-        }
-        if (\Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
-            return true;
-        }
-        return $this->isManagedBy($userId);
+        return \skeeks\cms\crm\CrmAccess::instance()->canWorkLead($userId, $this);
     }
 
+    /** Returning a closed deal to work: the single rule CrmAccess::isLeadWorker(). */
     public function canBeReopenedBy(int $userId): bool
     {
-        if (!$this->isTerminal) {
-            return false;
-        }
-        if (\Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
-            return true;
-        }
-        return $this->isManagedBy($userId);
+        return \skeeks\cms\crm\CrmAccess::instance()->canReopenLead($userId, $this);
     }
 
     public function getIsTerminal(): bool

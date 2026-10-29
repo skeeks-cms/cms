@@ -128,7 +128,7 @@ class CmsLeadNoAnswerForm extends Model
             return;
         }
         if (!$this->lead->canBeWorkedBy((int)\Yii::$app->user->id)) {
-            $this->addError($attribute, 'Сделка закреплена за другим менеджером.');
+            $this->addError($attribute, \skeeks\cms\crm\CrmAccess::LEAD_WORK_DENIED);
         }
     }
 

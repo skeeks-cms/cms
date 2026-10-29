@@ -175,7 +175,7 @@ class CmsLeadBoardService
         if ($column === self::COLUMN_SUCCESS || $column === self::COLUMN_REJECTED) {
             return $lead->status === CmsLead::STATUS_IN_WORK && $lead->canBeWorkedBy($actorId)
                 ? null
-                : 'Завершить можно только сделку в работе, закреплённую за вами.';
+                : 'Завершить можно только сделку в работе. '.\skeeks\cms\crm\CrmAccess::LEAD_WORK_DENIED;
         }
         if (strpos($column, self::STAGE_PREFIX) !== 0) {
             return 'Неизвестная колонка.';
@@ -184,10 +184,10 @@ class CmsLeadBoardService
             return $lead->canBeClaimed || $lead->canBeWorkedBy($actorId) ? null : 'Сделка уже закреплена за другим менеджером.';
         }
         if ($lead->isTerminal) {
-            return $lead->canBeReopenedBy($actorId) ? null : 'Вернуть эту сделку в работу может только ответственный или администратор.';
+            return $lead->canBeReopenedBy($actorId) ? null : \skeeks\cms\crm\CrmAccess::LEAD_WORK_DENIED;
         }
 
-        return $lead->canBeWorkedBy($actorId) ? null : 'Сделка закреплена за другим менеджером.';
+        return $lead->canBeWorkedBy($actorId) ? null : \skeeks\cms\crm\CrmAccess::LEAD_WORK_DENIED;
     }
 
     /**

@@ -44,7 +44,7 @@ class LeadPipelines extends Component
             throw new \DomainException('Воронки ещё не включены на сайте.');
         }
         if ($lead->isTerminal || !CrmAccess::instance()->canWorkLead($actorId, $lead) && !($lead->status === CmsLead::STATUS_NEW && CrmAccess::instance()->canTriage($actorId, $lead))) {
-            throw new \DomainException('Перенести можно только открытую сделку, закреплённую за вами.');
+            throw new \DomainException('Перенести можно только открытую сделку. '.CrmAccess::LEAD_WORK_DENIED);
         }
         $pipeline = null;
         foreach (CmsLeadPipeline::forSite((int)$lead->cms_site_id) as $item) {

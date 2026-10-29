@@ -101,35 +101,70 @@ class CrmAccess extends Component
             ->andWhere([CmsLead::tableName().'.id' => (int)$lead->id])->exists();
     }
 
-    /** Working actions: the responsible of an open deal or an administrator. */
+    /**
+     * Who works on a deal — the single rule of every working action (owner's
+     * decision 29.10.2026): the stage, comments, editing, "Не дозвонились", the
+     * client of the deal, its contacts and requisites, letters and SMS from it,
+     * the responsible, reopening. An administrator; the responsible (executor);
+     * his leaders (CmsDepartment::leaderIdsOf()); an employee who sees the client
+     * of the deal in full (seesWholeClient(): his or a subordinate's link "full",
+     * the main responsible). "Свои сделки" and "edit" work only on their own deals.
+     * The open/closed state is checked by canWorkLead() and canReopenLead().
+     */
+    public function isLeadWorker($user, CmsLead $lead): bool
+    {
+        $userId = $this->userId($user);
+        if ($userId <= 0) {
+            return false;
+        }
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+        if ($lead->executor_id && ((int)$lead->executor_id === $userId
+                || in_array($userId, CmsDepartment::leaderIdsOf((int)$lead->executor_id), true))) {
+            return true;
+        }
+        if ($lead->cms_company_id
+            && self::seesWholeClient($this->wholeClientLevel($user, CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id))) {
+            return true;
+        }
+
+        return $lead->cms_user_id
+            && self::seesWholeClient($this->wholeClientLevel($user, CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id));
+    }
+
+    /** The refusal of a working action on a deal (isLeadWorker()). */
+    public const LEAD_WORK_DENIED = 'С этой сделкой работают её ответственный, его руководитель и сотрудники с полным доступом к клиенту.';
+
+    /** Working actions on an open deal (isLeadWorker()); CmsLead::canBeWorkedBy() is this. */
     public function canWorkLead($user, CmsLead $lead): bool
     {
-        return $lead->canBeWorkedBy($this->userId($user));
+        return !$lead->isTerminal && $this->isLeadWorker($user, $lead);
+    }
+
+    /** Returning a closed deal to work (isLeadWorker()); CmsLead::canBeReopenedBy() is this. */
+    public function canReopenLead($user, CmsLead $lead): bool
+    {
+        return $lead->isTerminal && $this->isLeadWorker($user, $lead);
     }
 
     /**
-     * Who may give a deal to another employee: an administrator, the
-     * responsible, his leaders, a responsible of the deal's company; for an
-     * unsorted deal — whoever may sort it.
+     * Who may give a deal to another employee: who works on it (isLeadWorker());
+     * for an unsorted deal — whoever may sort it.
      */
     public function canAssignLead($user, CmsLead $lead): bool
     {
         if ($lead->isTerminal) {
             return false;
         }
-        $userId = $this->userId($user);
         if ($this->isAdmin($user)) {
             return true;
         }
         if ($lead->status === CmsLead::STATUS_NEW && !$lead->executor_id) {
             return $this->canTriage($user, $lead);
         }
-        if ($lead->executor_id && ((int)$lead->executor_id === $userId
-                || in_array($userId, CmsDepartment::leaderIdsOf((int)$lead->executor_id), true))) {
-            return true;
-        }
 
-        return $lead->cms_company_id && in_array($userId, $this->companyResponsibleIds((int)$lead->cms_company_id), true);
+        return $this->isLeadWorker($user, $lead);
     }
 
     public function canSeeCompany($user, int $companyId): bool

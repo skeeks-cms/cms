@@ -265,7 +265,8 @@ class AdminCmsLeadController extends BackendModelStandartController
                         'source_data', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
                         'status', 'reject_reason', 'result_comment', 'processed_at', 'cms_lead_stage_id', 'cms_lead_reject_reason_id',
                     ];
-                    if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                    // The responsible: whoever may give the deal to another employee (CrmAccess::canAssignLead()).
+                    if (!\skeeks\cms\crm\CrmAccess::instance()->canAssignLead((int)\Yii::$app->user->id, $event->sender->model)) {
                         $protected[] = 'executor_id';
                     }
                     $this->restoreAttributes($event->sender->model, $protected);
@@ -972,7 +973,7 @@ JS
         $fields['source_name'] = [];
 
         $isNewRecord = $model && $model->isNewRecord;
-        if ($isNewRecord || \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+        if ($isNewRecord || ($model && \skeeks\cms\crm\CrmAccess::instance()->canAssignLead((int)\Yii::$app->user->id, $model))) {
             $fields['executor_id'] = $this->managerField();
         }
         $fields['partner_id'] = $this->partnerField();
@@ -1121,9 +1122,7 @@ JS
 
     private function canWorkWithModel(): bool
     {
-        if (!$this->model || $this->model->isTerminal) { return false; }
-        if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) { return true; }
-        return $this->model->isManagedBy((int)\Yii::$app->user->id);
+        return $this->model && \skeeks\cms\crm\CrmAccess::instance()->canWorkLead((int)\Yii::$app->user->id, $this->model);
     }
 
     private function canLinkIdentity(): bool
