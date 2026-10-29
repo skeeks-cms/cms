@@ -157,18 +157,33 @@ if ($model->status === CmsLead::STATUS_NEW && $access->canTriage($userId, $model
             'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode(['isOpenNewWindow' => true, 'url' => $amountUrl, 'size' => 'small']).').go(); return false;',
         ]);
     }
-} elseif ($canWork && $model->status === CmsLead::STATUS_IN_WORK) {
-    if (!$model->cms_company_id || !$model->cms_user_id) {
-        $toolbar[] = $windowLink('<i class="fas fa-user-plus" aria-hidden="true"></i> Клиент сделки', ['/cms/admin-cms-lead/identity', 'pk' => $model->id]);
-    }
+}
+
+// The actions of the deal itself — first in «⋯», over a line (owner's decision 30.10.2026): «Редактировать»
+// (the edit action, not a tab), «Клиент сделки», «Сменить ответственного»; the same windows and rights.
+$windowItem = static fn(string $label, string $icon, array $route, array $window = []): array => [
+    'label' => $label,
+    'icon' => $icon,
+    'url' => (string)BackendUrlHelper::createByParams($route)->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+    'window' => $window,
+];
+$recordItems = [];
+// The hidden tab is not among modelActions: its own action decides (accessCallback canWorkWithModel()).
+$editAction = $this->context instanceof \skeeks\cms\backend\BackendController ? $this->context->createAction('edit') : null;
+if ($editAction && (!$editAction instanceof \skeeks\cms\IHasPermissions || $editAction->isAllow)) {
+    $editUrl = Json::encode(\yii\helpers\Url::to(['/cms/admin-cms-lead/edit', 'pk' => $model->id]));
+    $recordItems['edit'] = ['label' => 'Редактировать', 'icon' => 'edit', 'options' => ['onclick' => 'window.location.href = '.$editUrl.'; return false;']];
+}
+if ($canWork && $model->status === CmsLead::STATUS_IN_WORK && (!$model->cms_company_id || !$model->cms_user_id)) {
+    $recordItems['identity'] = $windowItem('Клиент сделки', 'user', ['/cms/admin-cms-lead/identity', 'pk' => $model->id]);
 }
 if (!$model->isTerminal && $model->status !== CmsLead::STATUS_NEW && $access->canAssignLead($userId, $model)) {
-    $toolbar[] = $windowLink('<i class="fas fa-share" aria-hidden="true"></i> Сменить ответственного', ['/cms/admin-cms-lead/assign', 'pk' => $model->id], 'secondary', 'small');
+    $recordItems['assign'] = $windowItem('Сменить ответственного', 'users', ['/cms/admin-cms-lead/assign', 'pk' => $model->id], ['size' => 'small']);
 }
 
 // «Позвонить», «Письмо» and «⋯» of the card block («Удалить» last in «⋯»). An unsorted request keeps the right
 // side for «Взять в работу» and «Не продажа»: only «⋯», the call and the letter are inside it.
-$toolbar[] = \skeeks\cms\widgets\admin\CrmCardActionsWidget::headerTools($model, $model->status !== CmsLead::STATUS_NEW, $this->context);
+$toolbar[] = \skeeks\cms\widgets\admin\CrmCardActionsWidget::headerTools($model, $model->status !== CmsLead::STATUS_NEW, $this->context, $recordItems);
 
 echo BackendModelHeader::widget([
     'model' => $model,

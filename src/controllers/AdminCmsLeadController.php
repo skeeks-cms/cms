@@ -256,7 +256,8 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'class' => BackendModelUpdateAction::class,
                 'name' => 'Редактирование',
                 'icon' => 'fa fa-edit',
-                // One order of the CRM card tabs: before «Вся активность».
+                // Not a tab of the deal: «Редактировать» of the header «⋯» opens it (owner's decision 30.10.2026).
+                'isVisible' => false,
                 'priority' => \skeeks\cms\crm\CrmCardTabs::PRIORITY_EDIT,
                 'fields' => [$this, 'editFields'],
                 'accessCallback' => fn() => $this->canWorkWithModel(),

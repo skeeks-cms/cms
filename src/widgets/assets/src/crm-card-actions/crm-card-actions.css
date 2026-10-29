@@ -181,6 +181,14 @@
 [data-sx-crm-actions-deal][hidden] {
     display: none;
 }
+/* An action not available yet (a deal without a client): its label says why. */
+.sx-crm-actions__menu-item:disabled,
+.sx-crm-actions__menu-item:disabled:hover {
+    background: none;
+    color: var(--sx-color-text-muted);
+    white-space: normal;
+    cursor: not-allowed;
+}
 .sx-crm-actions__menu-separator {
     height: 1px;
     margin: 4px 6px;

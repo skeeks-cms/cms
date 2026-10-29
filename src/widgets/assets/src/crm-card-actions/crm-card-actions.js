@@ -77,6 +77,27 @@
         $block.get(0).scrollIntoView({block: "center", behavior: "smooth"});
         return true;
     };
+    // An opened menu stays inside the screen wherever its button is (a narrow header puts «⋯» at the left).
+    document.addEventListener("toggle", function (e) {
+        var details = e.target;
+        if (!details.open || !details.matches || !details.matches("[data-sx-crm-actions-menu]")) {
+            return;
+        }
+        var menu = details.querySelector(":scope > .sx-crm-actions__menu");
+        if (!menu) {
+            return;
+        }
+        menu.style.left = "";
+        menu.style.right = "";
+        var gap = 8, box = details.getBoundingClientRect(), rect = menu.getBoundingClientRect();
+        if (rect.left < gap) {
+            menu.style.right = "auto";
+            menu.style.left = (gap - box.left) + "px";
+        } else if (rect.right > window.innerWidth - gap) {
+            menu.style.left = "auto";
+            menu.style.right = (box.right - window.innerWidth + gap) + "px";
+        }
+    }, true);
     var timer = null;
     $(fitAll);
     $(function () {

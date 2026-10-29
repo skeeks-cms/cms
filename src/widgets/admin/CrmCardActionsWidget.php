@@ -235,8 +235,10 @@ class CrmCardActionsWidget extends Widget
      * button then (`actions => false`).
      *
      * @param \yii\base\Controller|null $controller the card controller (its delete action)
+     * @param array[] $recordItems the actions of the record itself first in «⋯», over a line
+     *   («Редактировать», «Сменить ответственного»…): items as {@see $actions} (`url` opens a window)
      */
-    public static function headerTools($record, bool $icons = true, $controller = null): string
+    public static function headerTools($record, bool $icons = true, $controller = null, array $recordItems = []): string
     {
         $config = self::cardConfig($record);
         if ($config === null) {
@@ -252,6 +254,12 @@ class CrmCardActionsWidget extends Widget
         }
 
         $menu = '';
+        foreach (array_filter($recordItems) as $id => $item) {
+            $menu .= $widget->renderMenuItems('header-record-'.$id, $item);
+        }
+        if ($menu !== '') {
+            $menu .= Html::tag('div', '', ['class' => 'sx-crm-actions__menu-separator', 'role' => 'separator']);
+        }
         if ($widget->commentUrl !== null) {
             // «Примечание» opens the note of the block (on another tab — the profile with #note).
             $viewRoute = $record instanceof \skeeks\cms\models\CmsLead ? '/cms/admin-cms-lead/view'
@@ -274,7 +282,9 @@ class CrmCardActionsWidget extends Widget
             ? \skeeks\cms\backend\widgets\BackendModelHeader::deleteActionData($controller) : null;
         if ($delete !== null) {
             $delete['confirm'] = self::deleteConfirm($record);
-            $menu .= Html::tag('div', '', ['class' => 'sx-crm-actions__menu-separator', 'role' => 'separator'])
+            $separator = Html::tag('div', '', ['class' => 'sx-crm-actions__menu-separator', 'role' => 'separator']);
+            // One line before «Удалить»: none when it is the only item, no second one after the record items.
+            $menu .= ($menu === '' || substr($menu, -strlen($separator)) === $separator ? '' : $separator)
                 .Html::a($widget->icon('trash').Html::tag('span', 'Удалить'), '#', [
                     'class' => 'sx-crm-actions__menu-item sx-crm-actions__menu-item--danger',
                     'role' => 'menuitem',
@@ -589,9 +599,18 @@ class CrmCardActionsWidget extends Widget
         }
         $access = \skeeks\cms\crm\CrmAccess::instance();
         $user = \Yii::$app->user->identity;
-        // These are records of the client: a deal without one (not sorted yet) has none.
+        // These are records of the client: a deal without one shows them inactive with the reason
+        // (the server requires the client of a bill and a service).
         $client = $lead->cms_company_id ? $lead->company : ($lead->cms_user_id ? $lead->client : null);
-        if (!$client || !$access->canActOnClient($user, $client, (int)$lead->id)) {
+        if (!$client) {
+            return ['records' => [
+                'label' => 'Услуга, счёт, платёж, документ — сначала укажите клиента сделки',
+                'icon' => 'invoice',
+                'more' => true,
+                'options' => ['disabled' => true, 'title' => 'Сначала укажите клиента сделки', 'aria-disabled' => 'true'],
+            ]];
+        }
+        if (!$access->canActOnClient($user, $client, (int)$lead->id)) {
             return [];
         }
         $id = (int)$lead->id;
