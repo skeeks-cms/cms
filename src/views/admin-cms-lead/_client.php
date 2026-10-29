@@ -26,6 +26,18 @@ $client = $model->client && $clientVisible ? $model->client : null;
 $rowOptions = static fn(bool $canEdit): array => ['editable' => $canEdit, 'call' => ['data-lead-id' => $leadId]];
 $peopleLimit = 3;
 $contactLimit = 5;
+// The addresses of the client card, as in that card (the deal only shows them; changed in the card with "edit" and above).
+$addressItems = static fn(array $addresses, string $controllerId, bool $canEdit): array => array_map(static fn($address) => [
+    'label' => $address->name ?: 'Адрес',
+    'value' => Html::encode($address->value),
+    'note' => implode(', ', array_filter([
+        $address->entrance ? 'подъезд '.$address->entrance : null,
+        $address->floor ? 'этаж '.$address->floor : null,
+        $address->apartment_number ? 'кв./офис '.$address->apartment_number : null,
+        $address->comment ?: null,
+    ])),
+    'actions' => $canEdit ? CrmContactBlockWidget::menu($controllerId, (int)$address->id, 'Изменить адрес') : '',
+], $addresses);
 
 if ($company) {
     $canEdit = $crmAccess->canEditClientData($viewerId, CmsCrmAccessRequest::RECORD_COMPANY, (int)$company->id);
@@ -110,6 +122,18 @@ if ($company) {
         'addRoute' => $canAdd ? ['/cms/admin-cms-company-email/create', 'CmsCompanyEmail' => ['cms_company_id' => (int)$company->id], 'lead_id' => (int)$leadId] : null,
         'addSize' => 'small',
     ]);
+
+    echo CrmContactBlockWidget::widget([
+        'title' => 'Адреса компании',
+        'hint' => 'Адреса из карточки компании «'.$company->name.'». Меняются в компании: с уровнем доступа «Свои сделки и данные компании» и выше.',
+        'icon' => 'map-pin',
+        'items' => $addressItems($company->addresses, '/cms/admin-cms-company-address', $canEdit),
+        'limit' => $contactLimit,
+        'moreUrl' => $companyUrl,
+        'emptyText' => 'Адресов пока нет',
+        'addLabel' => 'Добавить адрес',
+        'addRoute' => $canEdit ? ['/cms/admin-cms-company-address/create', 'CmsCompanyAddress' => ['cms_company_id' => (int)$company->id]] : null,
+    ]);
 } elseif ($client) {
     $canEdit = $crmAccess->canEditClientData($viewerId, CmsCrmAccessRequest::RECORD_CLIENT, (int)$client->id);
     $canAdd = $crmAccess->canAddClientContact($viewerId, [CmsCrmAccessRequest::RECORD_CLIENT, (int)$client->id], (int)$leadId);
@@ -139,5 +163,17 @@ if ($company) {
         'addLabel' => 'Добавить email',
         'addRoute' => $canAdd ? ['/cms/admin-user-email/create', 'CmsUserEmail' => ['cms_user_id' => (int)$client->id], 'lead_id' => (int)$leadId] : null,
         'addSize' => 'small',
+    ]);
+
+    echo CrmContactBlockWidget::widget([
+        'title' => 'Адреса клиента',
+        'hint' => 'Адреса из карточки клиента. Меняются в ней: с уровнем доступа «Свои сделки и данные компании» и выше.',
+        'icon' => 'map-pin',
+        'items' => $addressItems($client->cmsUserAddresses, '/cms/admin-user-address', $canEdit),
+        'limit' => $contactLimit,
+        'moreUrl' => $clientUrl,
+        'emptyText' => 'Адресов пока нет',
+        'addLabel' => 'Добавить адрес',
+        'addRoute' => $canEdit ? ['/cms/admin-user-address/create', 'CmsUserAddress' => ['cms_user_id' => (int)$client->id]] : null,
     ]);
 }
