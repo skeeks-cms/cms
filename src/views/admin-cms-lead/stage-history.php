@@ -43,7 +43,9 @@ $duration = static function (int $seconds): string {
     <?php if (!$rows) : ?>
         <p>Переходов пока нет.</p>
     <?php else : ?>
-        <table class="table sx-table">
+        <?php // The shared data matrix of a card (BackendUiAsset, both themes), as in the funnel report. ?>
+        <div class="sx-data-table-wrapper">
+        <table class="sx-data-table">
             <thead>
             <tr>
                 <th>Когда</th>
@@ -93,5 +95,6 @@ $duration = static function (int $seconds): string {
             <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
     <?php endif; ?>
 <?php BackendSurfaceWidget::end(); ?>
