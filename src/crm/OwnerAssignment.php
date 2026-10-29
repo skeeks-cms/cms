@@ -30,7 +30,14 @@ use skeeks\cms\models\CmsUser;
  * - other: links only to other employees — left as they are;
  * - none: no links at all — counted (client persons only when they are CRM
  *   clients: not in a company with employees, created by someone else or with
- *   a history).
+ *   a history);
+ * - contact: a client person without links of his own, a contact of companies
+ *   whose main responsible (after this plan) is one and the same employee — he
+ *   becomes the person's main one, so the personal orders of the person (seen
+ *   only through the access to the person himself) stay with the responsible of
+ *   his company; «always» when that employee is an owner (owner's decision
+ *   30.10.2026). Companies of different mains or a main from review make the
+ *   person contested (contact_contested), only listed.
  *
  * Other participants keep their links and levels. Each change is written to
  * the journal of the access («Доступы»); a repeated run changes nothing.
@@ -44,6 +51,8 @@ class OwnerAssignment
     public const REVIEW = 'review';
     public const OTHER = 'other';
     public const NONE = 'none';
+    public const CONTACT = 'contact';
+    public const CONTACT_CONTESTED = 'contact_contested';
 
     /** @var int[] */
     private array $owners;
@@ -88,7 +97,63 @@ class OwnerAssignment
             }
         }
 
-        return $plan;
+        return array_merge($plan, $this->contactRows($plan));
+    }
+
+    /**
+     * Client persons without links of their own who are contacts of companies with a main
+     * responsible (the planned one when the plan changes it).
+     *
+     * @param array[] $plan the rows of the linked records
+     */
+    private function contactRows(array $plan): array
+    {
+        $companyMain = [];
+        foreach ($plan as $row) {
+            if ($row['code'] === CmsCrmAccessRequest::RECORD_COMPANY && ($row['user_id'] ?? $row['main']) !== null) {
+                $companyMain[$row['id']] = (int)($row['user_id'] ?? $row['main']);
+            }
+        }
+        [$linkClass, $recordColumn] = CrmAccess::linkTable(CmsCrmAccessRequest::RECORD_CLIENT);
+        $table = CmsUser::tableName();
+        $companies = [];
+        foreach ((new \yii\db\Query())->select(['person' => 'cu.cms_user_id', 'company' => 'cu.cms_company_id'])->from(['cu' => '{{%cms_company2user}}'])
+                     ->innerJoin(['p' => $table], 'p.id = cu.cms_user_id')
+                     ->andWhere(['p.is_worker' => 0])
+                     ->andWhere(['not exists', $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression('cu.cms_user_id')])])
+                     ->orderBy(['cu.cms_user_id' => SORT_ASC, 'cu.cms_company_id' => SORT_ASC])->each(1000) as $link) {
+            $companies[(int)$link['person']][] = (int)$link['company'];
+        }
+        $rows = [];
+        foreach ($companies as $personId => $ids) {
+            $mains = array_values(array_unique(array_filter(array_map(static fn($id) => $companyMain[$id] ?? null, $ids))));
+            if (!$mains) {
+                continue;
+            }
+            $person = CmsUser::findOne($personId);
+            if (!$person) {
+                continue;
+            }
+            $contested = count($mains) > 1 || array_intersect($mains, $this->review);
+            $userId = $contested ? null : $mains[0];
+            $always = $userId !== null && in_array($userId, $this->owners, true);
+            $protection = $person->hasAttribute('crm_protection') ? (string)$person->crm_protection : null;
+            $rows[] = [
+                'code' => CmsCrmAccessRequest::RECORD_CLIENT,
+                'id' => $personId,
+                'name' => (string)$person->shortDisplayName,
+                'group' => $contested ? self::CONTACT_CONTESTED : self::CONTACT,
+                'users' => $mains,
+                'companies' => $ids,
+                'main' => null,
+                'user_id' => $userId,
+                'protection' => $protection,
+                'always' => $always,
+                'change' => $userId !== null,
+            ];
+        }
+
+        return $rows;
     }
 
     /** Records without any responsible: companies, and client persons that are CRM clients. */
@@ -131,7 +196,9 @@ class OwnerAssignment
                 $levelBefore = $access->linkLevel($userId, $code, $id);
                 $access->setMain($code, $id, $userId);
                 CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $code, $id, ['actor_id' => null, 'user_id' => $userId, 'level_from' => $levelBefore,
-                    'level_to' => CrmAccess::LEVEL_FULL, 'comment' => 'основной по прежним ответственным при переходе на новую модель доступа']);
+                    'level_to' => CrmAccess::LEVEL_FULL, 'comment' => $row['group'] === self::CONTACT
+                        ? 'основной контакта — основной его компании, при переходе на новую модель доступа'
+                        : 'основной по прежним ответственным при переходе на новую модель доступа']);
                 $mains++;
             }
             if ($row['always']) {

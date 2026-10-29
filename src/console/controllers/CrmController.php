@@ -257,6 +257,8 @@ class CrmController extends Controller
             \skeeks\cms\crm\OwnerAssignment::MANY_KEEP => 'СПОРНО: у нескольких сотрудников из --keep',
             \skeeks\cms\crm\OwnerAssignment::REVIEW => 'СПОРНО: есть сотрудник из --review',
             \skeeks\cms\crm\OwnerAssignment::OTHER => 'только у других сотрудников, не меняются',
+            \skeeks\cms\crm\OwnerAssignment::CONTACT => 'контакты компаний без своего ответственного: основной компании',
+            \skeeks\cms\crm\OwnerAssignment::CONTACT_CONTESTED => 'СПОРНО: контакт компаний с разными основными',
         ];
         $groups = [];
         $changes = [];
@@ -280,7 +282,7 @@ class CrmController extends Controller
         $this->stdout('  всего записей: '.array_sum($changes)."\n");
         $this->stdout("\nСпорные записи:\n");
         foreach ($plan as $row) {
-            if (in_array($row['group'], [\skeeks\cms\crm\OwnerAssignment::SHARED, \skeeks\cms\crm\OwnerAssignment::MANY_KEEP, \skeeks\cms\crm\OwnerAssignment::REVIEW], true)) {
+            if (in_array($row['group'], [\skeeks\cms\crm\OwnerAssignment::SHARED, \skeeks\cms\crm\OwnerAssignment::MANY_KEEP, \skeeks\cms\crm\OwnerAssignment::REVIEW, \skeeks\cms\crm\OwnerAssignment::CONTACT_CONTESTED], true)) {
                 $this->stdout(sprintf("  %s %d «%s»: %s; основной сейчас %s\n", $row['code'] === 'company' ? 'Компания' : 'Клиент', $row['id'], $row['name'],
                     implode(', ', $row['users']), $row['main'] ?? '—'));
             }
