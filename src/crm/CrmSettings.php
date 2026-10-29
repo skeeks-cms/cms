@@ -36,7 +36,11 @@ class CrmSettings extends Component
     /** П2д: a payment protects the client this many months (crm\CrmProtection). */
     public $protectionMonths = 12;
 
-    /** Who gets new companies of the flow, who gets its deals (П2д, «Исходящие продажи»). */
+    /**
+     * Who gets new companies of the flow, who gets its deals (П2д, «Исходящие
+     * продажи»). OWNER_NONE only in old saved settings (п. 13а: no pool), read
+     * as OWNER_SENDER.
+     */
     public const OWNER_NONE = 'none';
     public const OWNER_SENDER = 'sender';
     public const OWNER_WORKER = 'worker';
@@ -46,14 +50,14 @@ class CrmSettings extends Component
      * «Исходящие продажи» (П2д): «my defaults» of the flow — a bot through
      * MCP/API or a mailing campaign. A campaign copies them when created and
      * may change them; a bot without a campaign works by them. The flow:
-     * the responsible of NEW companies (none — the common pool, the sender,
-     * an employee); what makes a deal besides a reply (a view of the
+     * the responsible of NEW companies (the sender or an employee; a CRM
+     * client always has a main responsible, п. 13а); what makes a deal besides a reply (a view of the
      * presentation or offer, a visit by a link); who gets the deal
      * («Неразобранное», the sender, an employee); the call task on a view
      * when a view makes no deal. The pipeline is $outboundPipelineId, its
      * stages «Смотрел» and «Ответил» take the events (OutboundSales).
      */
-    public $outgoingNewCardOwner = self::OWNER_NONE;
+    public $outgoingNewCardOwner = self::OWNER_SENDER;
     /** @var int|null the employee of OWNER_WORKER */
     public $outgoingNewCardWorkerId;
     public $outgoingLeadOnView = 1;
@@ -130,7 +134,7 @@ class CrmSettings extends Component
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'outgoingNewCardOwner' => 'Для компаний, которых ещё нет в CRM: бот или рассылка создаёт их с этим ответственным. Без ответственного — общий пул: компанию берёт в работу первый менеджер. Существующие компании не меняются.',
+            'outgoingNewCardOwner' => 'Для компаний, которых ещё нет в CRM: бот или рассылка создаёт их с этим ответственным. Отправитель — тот, под чьей авторизацией работает бот. У клиента CRM всегда есть основной ответственный. Существующие компании не меняются.',
             'outgoingLeadOnView' => 'Ответ клиента создаёт сделку всегда. Отметьте, если и просмотр Презентации или КП — повод вести сделку. Открытие письма сделку не создаёт.',
             'outgoingTaskOnView' => 'Когда просмотр сделку не создаёт, ответственному ставится задача «Позвонить: смотрел Презентацию».',
             'outgoingLeadTo' => 'Отправитель — тот, от чьего имени ушло письмо. Если у компании нет основного ответственного, он им становится (как «Взять в работу»). Открытая сделка клиента дополняется, новая не создаётся.',
@@ -199,7 +203,7 @@ class CrmSettings extends Component
 
     public static function newCardOwners(): array
     {
-        return [self::OWNER_NONE => 'Без ответственного — общий пул', self::OWNER_SENDER => 'Отправитель', self::OWNER_WORKER => 'Сотрудник'];
+        return [self::OWNER_SENDER => 'Отправитель', self::OWNER_WORKER => 'Сотрудник'];
     }
 
     public static function leadReceivers(): array
