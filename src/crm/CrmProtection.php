@@ -404,6 +404,51 @@ class CrmProtection
         return $plan;
     }
 
+    /**
+     * Clients with participants and without a main responsible (owner's
+     * decision 29.10.2026: participants only with the main one) and who
+     * becomes it: an active participant with "full", else by the history
+     * (mainCandidate()), else $fallbackId. Applied by applyHistoryMainPlan().
+     *
+     * @return array[] code, id, name, user_id, user, source
+     */
+    public function orphanMainPlan(int $fallbackId = self::HISTORY_FALLBACK_USER_ID): array
+    {
+        if (!CrmAccess::mainReady()) {
+            return [];
+        }
+        $plan = [];
+        foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
+            [$linkClass, $recordColumn, $userColumn] = CrmAccess::linkTable($code);
+            $table = $class::tableName();
+            $links = static fn() => $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($table.'.id')]);
+            $query = $class::find()->andWhere(['exists', $links()])->andWhere(['not exists', $links()->andWhere(['is_main' => 1])])
+                ->orderBy([$table.'.id' => SORT_ASC]);
+            if ($code === CmsCrmAccessRequest::RECORD_CLIENT) {
+                $query->andWhere([$table.'.is_worker' => 0]);
+            }
+            foreach ($query->each(200) as $record) {
+                $full = CrmAccess::levelsReady() ? $linkClass::find()->alias('l')->select('l.'.$userColumn)
+                    ->innerJoin(['w' => CmsUser::tableName()], 'w.id = l.'.$userColumn.' AND w.is_active = 1 AND w.is_worker = 1')
+                    ->andWhere(['l.'.$recordColumn => (int)$record->id, 'l.access_level' => CrmAccess::LEVEL_FULL])
+                    ->orderBy(['l.id' => SORT_ASC])->scalar() : null;
+                [$userId, $source] = $full ? [(int)$full, 'участник с полным доступом']
+                    : $this->mainCandidate($code, (int)$record->id, $fallbackId, 'по умолчанию');
+                $user = $userId ? CmsUser::findOne($userId) : null;
+                $plan[] = [
+                    'code' => $code,
+                    'id' => (int)$record->id,
+                    'name' => $record instanceof CmsCompany ? (string)$record->name : (string)$record->shortDisplayName,
+                    'user_id' => $userId,
+                    'user' => $user ? (string)$user->shortDisplayName : '—',
+                    'source' => $source,
+                ];
+            }
+        }
+
+        return $plan;
+    }
+
     /** Applies historyMainPlan(): the main responsible with the ground in the journal of the access. */
     public function applyHistoryMainPlan(array $plan): int
     {

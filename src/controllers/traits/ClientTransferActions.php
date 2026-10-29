@@ -168,7 +168,8 @@ trait ClientTransferActions
         if (\Yii::$app->request->isPost) {
             $response = new RequestResponse();
             try {
-                $this->addAccess($code, $id, (int)\Yii::$app->request->post('user_id'), (string)\Yii::$app->request->post('level'));
+                $this->addAccess($code, $id, (int)\Yii::$app->request->post('user_id'), (string)\Yii::$app->request->post('level'),
+                    (bool)\Yii::$app->request->post('make_main'));
                 $response->message = 'Сотрудник добавлен.';
                 $response->success = true;
             } catch (\DomainException $e) {
@@ -183,7 +184,10 @@ trait ClientTransferActions
     }
 
     /** Gives an employee a link with a level; an employee already linked is changed in the list. */
-    protected function addAccess(string $code, int $id, int $userId, string $level): void
+    /**
+     * @param bool $makeMain a client without the main one: this employee becomes it (else the one who adds, CrmAccess::ensureMain())
+     */
+    protected function addAccess(string $code, int $id, int $userId, string $level, bool $makeMain = false): void
     {
         $access = CrmAccess::instance();
         if (!$access->canManageAccess((int)\Yii::$app->user->id, $code, $id)) {
@@ -197,6 +201,13 @@ trait ClientTransferActions
         }
         if ($access->linkLevel($userId, $code, $id) !== null) {
             throw new \DomainException('Этот сотрудник уже работает с клиентом: измените его уровень в списке.');
+        }
+        if ($makeMain && $access->mainResponsibleId($code, $id) === null) {
+            $access->setMain($code, $id, $userId);
+            CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $code, $id, ['actor_id' => (int)\Yii::$app->user->id, 'user_id' => $userId,
+                'level_to' => CrmAccess::LEVEL_FULL, 'comment' => 'сделан основным при добавлении']);
+
+            return;
         }
         $access->grantLink($code, $id, $userId, $level);
         CrmAccessLog::write(CrmAccessLog::GRANT, $code, $id, ['actor_id' => (int)\Yii::$app->user->id, 'user_id' => $userId, 'level_to' => $level]);

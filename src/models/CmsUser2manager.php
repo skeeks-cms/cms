@@ -84,12 +84,14 @@ class CmsUser2manager extends \skeeks\cms\base\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$this->client_id);
+        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$this->client_id, (bool)$insert);
     }
 
     public function afterDelete()
     {
         parent::afterDelete();
-        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$this->client_id);
+        // The main one left: the next one by the rule (a participant "full", his head, the default administrator).
+        \skeeks\cms\crm\CrmAccess::instance()->ensureMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$this->client_id, false,
+            $this->hasAttribute('is_main') && $this->is_main ? (int)$this->worker_id : null);
     }
 }

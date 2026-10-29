@@ -918,14 +918,34 @@ try {
         $check(CrmAccess::instance()->linkLevel($other->id, 'company', (int)$orphan->id) === CrmAccess::LEVEL_DEAL
             && CrmAccess::instance()->mainResponsibleId('company', (int)$orphan->id) === (int)$admin->id,
             'approved with "Свои сделки": the requester gets exactly "deal", the one who approved is the main responsible');
-        // An automatic choice of the main one never raises a level.
+        // Participants only with the main one (owner's decision 29.10.2026); an automatic choice never raises a level.
         $bare = new CmsCompany(['name' => 'Только сделки '.$uniq]);
         $bare->save(false);
         CmsCompany2manager::deleteAll(['cms_company_id' => $bare->id]);
         CrmAccess::instance()->grantLink('company', (int)$bare->id, (int)$other->id, CrmAccess::LEVEL_DEAL);
-        $check(CrmAccess::instance()->mainResponsibleId('company', (int)$bare->id) === null
-            && CrmAccess::instance()->linkLevel($other->id, 'company', (int)$bare->id) === CrmAccess::LEVEL_DEAL,
-            'a "deal" link never becomes the main one automatically (ensureMain)');
+        $bareMain = CrmAccess::instance()->mainResponsibleId('company', (int)$bare->id);
+        $otherHeads = CmsDepartment::leaderIdsOf((int)$other->id);
+        $check($bareMain !== null && $bareMain !== (int)$other->id
+            && CrmAccess::instance()->linkLevel($other->id, 'company', (int)$bare->id) === CrmAccess::LEVEL_DEAL
+            && ($otherHeads ? $bareMain === (int)$otherHeads[0] : true)
+            && !CrmAccess::instance()->inPool('company', (int)$bare->id) && !CrmAccess::instance()->canTakeIntoWork('company', (int)$bare->id),
+            'a participant never stays without the main one: his head (else the default administrator), he keeps "deal"; not the pool');
+        $as($admin);
+        $byAdmin = new CmsCompany(['name' => 'Первый участник '.$uniq]);
+        $byAdmin->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $byAdmin->id]);
+        CrmAccess::instance()->grantLink('company', (int)$byAdmin->id, (int)$other->id, CrmAccess::LEVEL_EDIT);
+        $check(CrmAccess::instance()->mainResponsibleId('company', (int)$byAdmin->id) === (int)$admin->id
+            && CrmAccess::instance()->linkLevel($other->id, 'company', (int)$byAdmin->id) === CrmAccess::LEVEL_EDIT,
+            'the first participant added by an administrator: the administrator is the main one, the employee keeps "edit"');
+        CrmAccess::instance()->setMain('company', (int)$byAdmin->id, (int)$other->id, CrmAccess::LEVEL_EDIT);
+        $check(CrmAccess::instance()->mainResponsibleId('company', (int)$byAdmin->id) === (int)$other->id,
+            '«сделать основным»: the employee is the main one');
+        CmsCompany2manager::findOne(['cms_company_id' => $byAdmin->id, 'cms_user_id' => $other->id])->delete();
+        $leftMain = CrmAccess::instance()->mainResponsibleId('company', (int)$byAdmin->id);
+        $check($leftMain !== null && $leftMain !== (int)$other->id && ($otherHeads ? $leftMain === (int)$otherHeads[0] : true),
+            'the main one left (no participant "full"): the head of the former main one, else the default administrator');
+        $as($other);
 
         // The journal of the access: every event is kept, seen by whom it concerns.
         if (\skeeks\cms\crm\CrmAccessLog::ready()) {
@@ -964,7 +984,11 @@ try {
                 $check(!$sees($strangerLog, $took), 'another employee does not see the events of a client not his');
             }
 
-            // The filters and bulk actions of the company list.
+            // The filters and bulk actions of the company list. $bare as the old data: a participant without the
+            // main one (no hooks of the links; assign-orphan-main fixes such clients).
+            CmsCompany2manager::deleteAll(['and', ['cms_company_id' => $bare->id], ['<>', 'cms_user_id', $other->id]]);
+            CmsCompany2manager::updateAll(['is_main' => 0, 'access_level' => CrmAccess::LEVEL_DEAL], ['cms_company_id' => $bare->id]);
+            \skeeks\cms\models\CmsCrmAccessLog::deleteAll(['record_code' => 'company', 'record_id' => $bare->id, 'event' => \skeeks\cms\crm\CrmAccessLog::MAIN_AUTO]);
             $as($admin);
             $listed = static function (string $filter, ?int $userId = null, bool $mainOnly = false) use ($bare) {
                 $query = CmsCompany::find()->andWhere([CmsCompany::tableName().'.id' => $bare->id]);
@@ -1185,6 +1209,15 @@ try {
             $check($bulkError === null, 'a bulk action «'.$operation.'» under a leader (the join of the managers): '.($bulkError ?? 'ok'));
         }
         $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$bulkSecond->id) === 'always', 'the bulk protection is applied');
+        // A company of the pool (as 579, 568 of the stand): the head gives its first participant and becomes the main one.
+        $bulkPool = new CmsCompany(['name' => 'Пул массово '.$uniq]);
+        $bulkPool->save(false);
+        CmsCompany2manager::deleteAll(['cms_company_id' => $bulkPool->id]);
+        $applySelection->invoke($bulkController->createAction('crm-bulk-grant'), [(int)$bulkPool->id],
+            new \skeeks\cms\crm\CrmBulkAccessForm(['operation' => \skeeks\cms\crm\CrmBulkAccessForm::GRANT, 'user_id' => (int)$subordinate->id, 'level' => CrmAccess::LEVEL_DEAL]));
+        $check(CrmAccess::instance()->mainResponsibleId('company', (int)$bulkPool->id) === (int)$leader->id
+            && CrmAccess::instance()->linkLevel($subordinate->id, 'company', (int)$bulkPool->id) === CrmAccess::LEVEL_DEAL,
+            'a bulk participant of a pool company by a head: the head is the main one, the employee gets the level chosen');
         $as($admin);
 
         // A request: decided by the main responsible and his leaders, never by the requester's leader.

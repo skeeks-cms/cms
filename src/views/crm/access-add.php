@@ -46,6 +46,14 @@ $hints = CrmAccess::levelHints();
             </label>
         <?php endforeach; ?>
     </fieldset>
+    <?php // A client without the main one (the pool): the first participant — the one who adds is the main one, or this employee. ?>
+    <?php if (CrmAccess::mainReady() && CrmAccess::instance()->mainResponsibleId($model instanceof \skeeks\cms\models\CmsCompany ? 'company' : 'client', (int)$model->id) === null) : ?>
+        <div class="form-check">
+            <?= Html::checkbox('make_main', false, ['id' => 'sx-crm-access-add-main', 'value' => 1, 'class' => 'form-check-input']); ?>
+            <label class="form-check-label" for="sx-crm-access-add-main">Сделать основным ответственным</label>
+            <p class="sx-lead-identity__note">У клиента нет основного ответственного. Без отметки основным станете вы, а сотрудник получит выбранный уровень.</p>
+        </div>
+    <?php endif; ?>
     <div class="sx-lead-hint__actions">
         <?= Html::submitButton('Добавить', ['class' => 'sx-button sx-button--primary']); ?>
         <?= Html::button('Отмена', [

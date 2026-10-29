@@ -219,8 +219,14 @@ class CrmAccess extends Component
 
             return;
         }
-        // The link first (its save keeps the current main, ensureMain()), then the mark moves.
-        $this->grantLink($recordCode, $recordId, $userId, self::LEVEL_FULL);
+        // The link first, then the mark moves; the automatic choice of ensureMain() waits (it would make the
+        // acting administrator the main one of a client without a main).
+        $this->settingMain = true;
+        try {
+            $this->grantLink($recordCode, $recordId, $userId, self::LEVEL_FULL);
+        } finally {
+            $this->settingMain = false;
+        }
         $condition = ['and', [$recordColumn => $recordId, 'is_main' => 1], ['<>', $userColumn, $userId]];
         if ($previousLevel !== null) {
             $class::updateAll(['is_main' => 0, 'access_level' => $previousLevel], $condition);
@@ -230,32 +236,80 @@ class CrmAccess extends Component
         $class::updateAll(['is_main' => 1, 'access_level' => self::LEVEL_FULL], [$recordColumn => $recordId, $userColumn => $userId]);
     }
 
+    /** @var bool setMain() is moving the mark: ensureMain() does not choose meanwhile */
+    private bool $settingMain = false;
+
     /**
-     * A record with links always has a main responsible: the author of the
-     * record when he is linked, otherwise the earliest link. Called after the
-     * links change (a link model saved or deleted, the managers of a form saved).
+     * Participants only with the main responsible (owner's decision 29.10.2026):
+     * a client with employees always has a main one, a client without a main
+     * one is the general pool without participants. Called after the links
+     * change (a link model saved or deleted, the managers of a form saved).
+     *
+     * - A participant with "full" (the responsible of an import, the API, a
+     *   campaign, the form).
+     * - A participant added with "deal"/"edit" to a client without a main one
+     *   (a link saved): an administrator or a head of a department who adds
+     *   him becomes the main one himself, the employee keeps the level chosen
+     *   («сделать основным» — setMain() of the employee instead).
+     * - Otherwise, and when the main one left (his link deleted): a head of the
+     *   department of the former main one (or of a participant), else the
+     *   administrator by default (CrmProtection::HISTORY_FALLBACK_USER_ID, else
+     *   the first one).
+     *
+     * @param int|null $formerMainId the main one whose link was just deleted
      */
-    public function ensureMain(string $recordCode, int $recordId): void
+    public function ensureMain(string $recordCode, int $recordId, bool $added = false, ?int $formerMainId = null): void
     {
-        if (!self::mainReady() || $recordId <= 0) {
+        if (!self::mainReady() || $recordId <= 0 || $this->settingMain) {
             return;
         }
         [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
         if ($class::find()->andWhere([$recordColumn => $recordId, 'is_main' => 1])->exists()) {
             return;
         }
-        $record = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne($recordId) : CmsUser::findOne($recordId);
-        // Only a link that already is "full" becomes the main one: an automatic choice never raises a level
-        // (an employee given "Свои сделки" on a client without a main must not get it in full).
-        $full = self::levelsReady() ? ['access_level' => self::LEVEL_FULL] : [];
-        $link = null;
-        if ($record && $record->created_by) {
-            $link = $class::find()->andWhere([$recordColumn => $recordId, $userColumn => (int)$record->created_by])->andWhere($full)->one();
+        $links = $class::find()->andWhere([$recordColumn => $recordId])->orderBy(['id' => SORT_ASC])->all();
+        // An employee is not a client: his record has no main responsible.
+        if (!$links || ($recordCode === CmsCrmAccessRequest::RECORD_CLIENT
+                && (int)CmsUser::find()->select('is_worker')->andWhere(['id' => $recordId])->scalar())) {
+            return;
         }
-        $link = $link ?: $class::find()->andWhere([$recordColumn => $recordId])->andWhere($full)->orderBy(['id' => SORT_ASC])->one();
-        if ($link) {
-            $class::updateAll(['is_main' => 1, 'access_level' => self::LEVEL_FULL], ['id' => (int)$link->id]);
+        $mainId = null;
+        $source = '';
+        $actorId = \Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User ? (int)\Yii::$app->user->id : 0;
+        // A participant "full" first: the responsible of an import, of the API, of a campaign is meant as the main one.
+        if (self::levelsReady()) {
+            foreach ($links as $link) {
+                if ($link->access_level === self::LEVEL_FULL) {
+                    [$mainId, $source] = [(int)$link->{$userColumn}, 'участник с полным доступом'];
+                    break;
+                }
+            }
         }
+        if (!$mainId && $added && $actorId && ($this->isAdmin($actorId) || $this->isDepartmentHead($actorId))) {
+            [$mainId, $source] = [$actorId, 'добавил первого участника'];
+        }
+        if (!$mainId) {
+            foreach (array_filter([$formerMainId, (int)$links[0]->{$userColumn}]) as $userId) {
+                if ($heads = CmsDepartment::leaderIdsOf((int)$userId)) {
+                    [$mainId, $source] = [(int)$heads[0], 'руководитель отдела'];
+                    break;
+                }
+            }
+        }
+        if (!$mainId) {
+            $fallback = (int)CrmProtection::HISTORY_FALLBACK_USER_ID;
+            $mainId = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $fallback, CmsUser::tableName().'.is_active' => 1])->exists()
+                ? $fallback : ($this->adminIds()[0] ?? null);
+            $source = 'администратор по умолчанию';
+        }
+        if (!$mainId) {
+            return;
+        }
+        $this->setMain($recordCode, $recordId, $mainId);
+        CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $recordCode, $recordId, [
+            'actor_id' => $actorId ?: null, 'user_id' => $mainId, 'level_to' => self::LEVEL_FULL,
+            'comment' => 'основной назначен автоматически: '.$source,
+        ]);
     }
 
     /**
@@ -713,7 +767,14 @@ class CrmAccess extends Component
      */
     public function canTakeIntoWork(string $recordCode, int $recordId): bool
     {
-        return self::mainReady() && $recordId > 0 && $this->mainResponsibleId($recordCode, $recordId) === null
+        if (!self::mainReady() || $recordId <= 0) {
+            return false;
+        }
+        [$class, $recordColumn] = self::linkTable($recordCode);
+
+        return $this->mainResponsibleId($recordCode, $recordId) === null
+            // The pool has no participants (owner's decision 29.10.2026).
+            && !$class::find()->andWhere([$recordColumn => $recordId])->exists()
             && !$this->approvalRequired($recordCode, $recordId)
             // A client with a history is never taken: he has a main responsible by his history.
             && !self::hasHistory($recordCode, $recordId)
@@ -732,8 +793,13 @@ class CrmAccess extends Component
         }
         $userId = $this->userId($user);
         $mainId = $this->mainResponsibleId($recordCode, $recordId);
+        if ($mainId === null) {
+            // A client of the general pool: a head of a department with the pool right gives it its first
+            // participants (he becomes the main one, ensureMain()).
+            return $this->isDepartmentHead($userId) && $this->canUsePool($userId) && $this->inPool($recordCode, $recordId);
+        }
 
-        return $mainId !== null && ($mainId === $userId || in_array($userId, CmsDepartment::leaderIdsOf($mainId), true));
+        return $mainId === $userId || in_array($userId, CmsDepartment::leaderIdsOf($mainId), true);
     }
 
     /**
