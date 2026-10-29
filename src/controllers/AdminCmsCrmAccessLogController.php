@@ -259,7 +259,10 @@ class AdminCmsCrmAccessLogController extends BackendModelStandartController
         // A client the viewer does not see (an event of his subordinate on a foreign client) is not named.
         $userId = (int)\Yii::$app->user->id;
         $access = CrmAccess::instance();
-        if ($record && !($record instanceof CmsCompany ? $access->canSeeCompany($userId, (int)$record->id) : $access->canSeeClient($userId, (int)$record->id))) {
+        // A client of the general pool is named to who has the pool right (canSeePool()).
+        $code = $record instanceof CmsCompany ? 'company' : 'client';
+        if ($record && !($record instanceof CmsCompany ? $access->canSeeCompany($userId, (int)$record->id) : $access->canSeeClient($userId, (int)$record->id))
+            && !$access->canSeePool($userId, $code, (int)$record->id)) {
             return 'клиент из базы';
         }
         if ($record instanceof CmsCompany) {

@@ -492,7 +492,7 @@
         if (!window.confirm(button.data('sxConfirm'))) {
             return false;
         }
-        var comment = window.prompt('Комментарий для основного ответственного (необязательно)', '');
+        var comment = window.prompt(button.data('sxPrompt') || 'Комментарий для основного ответственного (необязательно)', '');
         if (comment === null) {
             return false;
         }

@@ -31,11 +31,13 @@ LeadIdentityAsset::register($this);
 $decideUrl = Url::to(['/cms/admin-cms-crm-access-request/decide']);
 $levels = CrmAccess::levels();
 $lead = $model->cms_lead_id ? $model->lead : null;
-$what = [
+// «Попросить у руководителя»: a client of the general pool, the requester becomes its main responsible.
+$isPool = $model->isPending && CrmAccess::instance()->isPoolRequest($model);
+$what = $isPool ? 'запрос взять в работу клиента из общей базы' : ([
     CmsCrmAccessRequest::KIND_WORK => $model->cms_lead_id ? 'работа с клиентом по своей сделке, запрос уровня доступа' : 'запрос на работу с клиентом (доступ по согласованию)',
     CmsCrmAccessRequest::KIND_DELEGATE => 'запрос сделки по клиенту (старый вид запроса)',
     CmsCrmAccessRequest::KIND_ACCESS => 'запрос доступа к клиенту (старый вид запроса)',
-][$model->kind] ?? '';
+][$model->kind] ?? '');
 ?>
 <div class="sx-surface-stack">
     <?php BackendSurfaceWidget::begin([
@@ -61,17 +63,21 @@ $what = [
             <p class="sx-lead-identity__note">Запрос закрыт: доступ к клиентам теперь выдаётся по-новому — откройте клиента и нажмите «Работать с этим клиентом».</p>
         <?php elseif ($canDecide) : ?>
             <div class="sx-lead-hint__actions">
-                <?= Html::dropDownList('level', $model->level ?: CrmAccess::LEVEL_DEAL,
-                    array_map(static fn($name) => 'Доступ: '.mb_strtolower($name, 'UTF-8'), $levels),
-                    ['class' => 'form-control', 'data-sx-crm-request-level' => true, 'aria-label' => 'Уровень доступа']); ?>
+                <?php if (!$isPool) : ?>
+                    <?= Html::dropDownList('level', $model->level ?: CrmAccess::LEVEL_DEAL,
+                        array_map(static fn($name) => 'Доступ: '.mb_strtolower($name, 'UTF-8'), $levels),
+                        ['class' => 'form-control', 'data-sx-crm-request-level' => true, 'aria-label' => 'Уровень доступа']); ?>
+                <?php endif; ?>
                 <?= Html::button('Одобрить', [
                     'class' => 'sx-button sx-button--primary sx-button--sm',
                     'data-sx-crm-request-decide' => 'approve',
                     'data-id' => (int)$model->id,
                     'data-url' => $decideUrl,
-                    'data-sx-confirm' => !$model->cms_lead_id
+                    'data-sx-confirm' => $isPool
+                        ? 'Отдать клиента сотруднику? Сотрудник станет основным ответственным'.(!$model->cms_lead_id ? ', на него будет создана сделка.' : '.')
+                        : (!$model->cms_lead_id
                         ? 'Разрешить сотруднику работать с клиентом? На сотрудника будет создана сделка.'
-                        : 'Выдать сотруднику выбранный доступ к клиенту?',
+                        : 'Выдать сотруднику выбранный доступ к клиенту?'),
                 ]); ?>
                 <?= Html::button($model->cms_lead_id ? 'Не расширять' : 'Отказать', [
                     'class' => 'sx-button sx-button--secondary sx-button--sm',

@@ -1,0 +1,20 @@
+/* The shield of a protected client at its name (CrmProtection::shield()). */
+.sx-crm-shield {
+    display: inline-block;
+    margin-left: 6px;
+    color: var(--sx-color-warning-on-surface, var(--sx-color-warning, #d48806));
+    font-size: 0.95em;
+    vertical-align: baseline;
+    cursor: help;
+}
+
+.sx-crm-shield--always {
+    color: var(--sx-color-danger-on-surface, var(--sx-color-danger, #cf1322));
+}
+
+/* A name with the shield: the shield stays at the end of a long name. */
+.sx-crm-shield-title {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
+}

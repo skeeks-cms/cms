@@ -70,6 +70,14 @@ class AdminCmsCompanyController extends BackendModelStandartController
         $this->permissionName = 'cms/admin-company';
         $this->generateAccessActions = false;
 
+        // The standard header with the shield of a protected client (CrmProtection::shieldFor()).
+        $this->modelHeader = function () {
+            return \skeeks\cms\backend\widgets\BackendModelHeader::widget([
+                'model'       => $this->model,
+                'titleSuffix' => \skeeks\cms\crm\CrmProtection::shieldFor($this->model),
+            ]);
+        };
+
         /*$this->accessCallback = function () {
             return \Yii::$app->user->can($this->uniqueId);
         };*/
@@ -489,20 +497,15 @@ HTML
                                     ],
                                 ]);
 
-                                // The protection of the client at its name: free (open at once), protected, always by approval.
-                                $protection = '';
-                                if (\skeeks\cms\crm\CrmProtection::ready() && $model->hasAttribute('crm_protection')) {
-                                    $state = (string)$model->crm_protection ?: \skeeks\cms\crm\CrmProtection::FREE;
-                                    $protection = Html::tag('span', Html::encode(\skeeks\cms\crm\CrmProtection::states()[$state] ?? $state), [
-                                        'class' => 'sx-deal-badge'.($state === \skeeks\cms\crm\CrmProtection::FREE ? '' : ' sx-deal-badge--accent'),
-                                        'title' => \skeeks\cms\crm\CrmProtection::FREE === $state
-                                            ? 'Свободная: работать с клиентом можно сразу' : 'Работа с клиентом — по согласованию с основным ответственным',
-                                    ]);
+                                // The shield of a protected client at its name; a free one shows nothing (owner's decision 29.10.2026).
+                                $protection = \skeeks\cms\crm\CrmProtection::shieldFor($model);
+                                if ($protection !== '') {
+                                    $title = Html::tag('div', $title.$protection, ['class' => 'sx-crm-shield-title']);
                                 }
 
                                 return Html::tag('div',
                                     Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
-                                    Html::tag('div', $title.$protection.$meta, [
+                                    Html::tag('div', $title.$meta, [
                                         'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
                                     ]),
                                     ['class' => 'sx-preview-card']

@@ -558,6 +558,18 @@ class AdminWorkerController extends BackendModelStandartController
                 },
             ],
 
+            // «Клиенты в CRM» of the profile: the pool right and «Новые клиенты — всегда по согласованию».
+            'crm-settings' => [
+                'class'          => BackendModelAction::class,
+                'isVisible'      => false,
+                'name'           => 'Клиенты в CRM',
+                'generateAccess' => false,
+                'callback'       => [$this, 'crmSettings'],
+                "accessCallback" => function () {
+                    return $this->model && \skeeks\cms\crm\CrmAccess::instance()->canEditCrmSettings((int)\Yii::$app->user->id, (int)$this->model->id);
+                },
+            ],
+
             'update' => [
                 'fields'         => [$this, 'updateFields'],
                 'buttons'        => ["save"],
@@ -685,6 +697,50 @@ class AdminWorkerController extends BackendModelStandartController
         }
 
         return true;
+    }
+
+    /**
+     * POST op=pool|new_always, value=0|1: the pool right (an administrator, or the head to a subordinate) and
+     * «Новые компании и клиенты, которые я создаю, — „Всегда по согласованию“» (he, his head, an administrator).
+     */
+    public function crmSettings()
+    {
+        if (!\Yii::$app->request->isPost) {
+            return $this->redirect(['view', 'pk' => (int)$this->model->id]);
+        }
+        $response = new RequestResponse();
+        $access = \skeeks\cms\crm\CrmAccess::instance();
+        $actorId = (int)\Yii::$app->user->id;
+        $workerId = (int)$this->model->id;
+        $on = (string)\Yii::$app->request->post('value') === '1';
+        try {
+            switch ((string)\Yii::$app->request->post('op')) {
+                case 'pool':
+                    if (!$access->canGrantPool($actorId, $workerId)) {
+                        throw new \DomainException('Право на общий пул выдаёт администратор или руководитель сотрудника.');
+                    }
+                    $access->setPoolRight($workerId, $on);
+                    $response->message = $on ? 'Сотрудник видит общий пул и может брать клиентов в работу.'
+                        : 'Общий пул скрыт: клиентов из общей базы сотрудник берёт через запрос руководителю.';
+                    break;
+                case 'new_always':
+                    if (!\skeeks\cms\crm\CrmProtection::newAlwaysReady()) {
+                        throw new \DomainException('Настройка появится после обновления базы (миграции).');
+                    }
+                    CmsUser::updateAll(['crm_new_always' => $on ? 1 : 0], ['id' => $workerId]);
+                    $response->message = $on ? 'Новые компании и клиенты сотрудника будут «Всегда по согласованию».'
+                        : 'Новые компании и клиенты сотрудника — с обычной защитой.';
+                    break;
+                default:
+                    throw new \DomainException('Неизвестная настройка.');
+            }
+            $response->success = true;
+        } catch (\DomainException $e) {
+            $response->success = false;
+            $response->message = $e->getMessage();
+        }
+
+        return $response;
     }
 
     public function view()

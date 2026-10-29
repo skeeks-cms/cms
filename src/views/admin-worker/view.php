@@ -227,6 +227,8 @@ CSS
                 </div>
             </div>
 
+            <?= $this->render('@skeeks/cms/views/admin-worker/_crm-settings', ['model' => $model]); ?>
+
             <div class="sx-surface sx-surface--raised sx-surface--padded">
                 <div class="sx-surface__title">Телефон <i data-toggle="tooltip" data-html="true"
                                                        title="У пользователя может быть задано несколько телефонов. Первый из них является основным и используется по умолчанию."

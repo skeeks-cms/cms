@@ -149,6 +149,54 @@ class CrmProtection
         return $state;
     }
 
+    /** The column of the employee setting «Новые клиенты — всегда по согласованию» exists. */
+    public static function newAlwaysReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = CmsUser::getDb()->getTableSchema(CmsUser::tableName(), true);
+            $ready = $schema && $schema->getColumn('crm_new_always') !== null;
+        }
+
+        return $ready;
+    }
+
+    /**
+     * A company or a person was just created (owner's decision 29.10.2026):
+     * when the employee who creates it — the author (`created_by`), else the
+     * current user — has the setting «Новые компании и клиенты, которые я
+     * создаю, — „Всегда по согласованию“», the record gets `always` at once.
+     * Every way of creating goes through here: the forms, the deal form, an
+     * import, REST and MCP (they act as the authorized employee). The setting
+     * of the creator decides, not of the main responsible he assigns.
+     *
+     * @param CmsCompany|CmsUser $record
+     */
+    public static function onCreated($record, string $recordCode): void
+    {
+        if (!self::ready() || !self::newAlwaysReady() || !$record->hasAttribute('crm_protection')
+            || ($record->hasAttribute('is_worker') && $record->is_worker)) {
+            return;
+        }
+        $creatorId = $record->hasAttribute('created_by') ? (int)$record->created_by : 0;
+        if (!$creatorId && \Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User) {
+            $creatorId = (int)\Yii::$app->user->id;
+        }
+        if (!$creatorId || $creatorId === (int)$record->id
+            || !CmsUser::find()->andWhere(['id' => $creatorId, 'is_worker' => 1, 'crm_new_always' => 1])->exists()) {
+            return;
+        }
+        $class = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::class : CmsUser::class;
+        $reason = 'Включено настройкой сотрудника для новых клиентов';
+        $class::updateAll(['crm_protection' => self::ALWAYS, 'crm_protected_until' => null, 'crm_protection_reason' => $reason], ['id' => (int)$record->id]);
+        foreach (['crm_protection' => self::ALWAYS, 'crm_protected_until' => null, 'crm_protection_reason' => $reason] as $attribute => $value) {
+            $record->setAttribute($attribute, $value);
+            $record->setOldAttribute($attribute, $value);
+        }
+        CrmAccessLog::write(CrmAccessLog::PROTECTION, $recordCode, (int)$record->id, ['actor_id' => $creatorId,
+            'comment' => self::states()[self::FREE].' → '.self::states()[self::ALWAYS].', настройка сотрудника для новых клиентов']);
+    }
+
     /**
      * The daily agent and the migration: protected records whose protection may
      * have expired, or (with $all) every record that has payments or services.
@@ -453,14 +501,22 @@ class CrmProtection
      */
     public static function describe(string $recordCode, int $recordId, bool $withReason = true): string
     {
-        $record = self::ready() ? self::record($recordCode, $recordId) : null;
-        if (!$record) {
+        return self::describeRecord(self::ready() ? self::record($recordCode, $recordId) : null, $withReason);
+    }
+
+    /** describe() of a loaded company or person (a list row, no query). */
+    public static function describeRecord($record, bool $withReason = true): string
+    {
+        if (!$record || !self::ready() || !$record->hasAttribute('crm_protection')) {
             return 'Свободная';
         }
         $state = (string)$record->crm_protection ?: self::FREE;
         $reason = $withReason ? (string)$record->crm_protection_reason : '';
         if ($state === self::ALWAYS) {
-            return 'Всегда по согласованию: включено вручную';
+            // Who switched it on (by hand, by the setting of the employee who created the client) is no secret.
+            $why = trim((string)$record->crm_protection_reason) ?: 'Включено вручную';
+
+            return 'Всегда по согласованию: '.mb_strtolower(mb_substr($why, 0, 1)).mb_substr($why, 1);
         }
         if ($state === self::PROTECTED) {
             return 'Под защитой'.($record->crm_protected_until ? ' до '.date('d.m.Y', (int)$record->crm_protected_until) : '')
@@ -468,6 +524,67 @@ class CrmProtection
         }
 
         return 'Свободная'.($reason !== '' ? ': '.mb_strtolower(mb_substr($reason, 0, 1)).mb_substr($reason, 1) : '');
+    }
+
+    /**
+     * The shield at the name of a protected client (owner's decision
+     * 29.10.2026): «Под защитой» and «Всегда по согласованию» stand out
+     * everywhere, a free client shows nothing. The hint — the state, the term
+     * and, with $withReason, the reason (it names payments and services: only
+     * for who sees the whole client or manages the access).
+     *
+     * @param CmsCompany|CmsUser|null $record
+     */
+    public static function shield($record, bool $withReason = false): string
+    {
+        if (!$record || !self::ready() || !$record->hasAttribute('crm_protection')
+            || ((string)$record->crm_protection ?: self::FREE) === self::FREE) {
+            return '';
+        }
+
+        return self::shieldIcon((string)$record->crm_protection, self::describeRecord($record, $withReason));
+    }
+
+    /**
+     * The shield by a state and its description (a match of the duplicate
+     * search carries them, CrmAccess::presentCandidate()).
+     */
+    public static function shieldIcon(string $state, string $description): string
+    {
+        if ($state === '' || $state === self::FREE || !isset(self::states()[$state])) {
+            return '';
+        }
+        if (\Yii::$app->has('view') && \Yii::$app->view instanceof \yii\web\View) {
+            \skeeks\cms\assets\admin\CrmShieldAsset::register(\Yii::$app->view);
+        }
+        $title = ($description !== '' ? $description : self::states()[$state]).'. Работа с клиентом — по согласованию с основным ответственным.';
+
+        return \yii\helpers\Html::tag('i', '', [
+            'class' => 'fas fa-shield-alt sx-crm-shield'.($state === self::ALWAYS ? ' sx-crm-shield--always' : ''),
+            'title' => $title,
+            'aria-label' => $title,
+            'role' => 'img',
+            'data-toggle' => 'tooltip',
+        ]);
+    }
+
+    /**
+     * The shield for the current employee: the reason only when he sees the
+     * whole client or manages its access (as «Доступ», CrmAccess::seesWholeClient()).
+     */
+    public static function shieldFor($record, $user = null): string
+    {
+        if (!$record || !self::ready() || !$record->hasAttribute('crm_protection')
+            || ((string)$record->crm_protection ?: self::FREE) === self::FREE) {
+            return '';
+        }
+        $code = $record instanceof CmsCompany ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT;
+        $user = $user ?? (\Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User ? (int)\Yii::$app->user->id : 0);
+        $access = CrmAccess::instance();
+        $withReason = $user && ($access->canManageAccess($user, $code, (int)$record->id)
+            || CrmAccess::seesWholeClient($access->wholeClientLevel($user, $code, (int)$record->id)));
+
+        return self::shield($record, $withReason);
     }
 
     /** @return int|null the time of the last incoming payment */

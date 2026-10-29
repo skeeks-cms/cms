@@ -482,7 +482,9 @@ JS
 CSS
             );
             
+            // Only the tasks the employee sees (with «Свои сделки» — of his deals), as the tab «Задачи».
             $tasks = $model->getTasks()
+                ->forManager()
                 ->expired()
                 ->andWhere([
                     'not in',

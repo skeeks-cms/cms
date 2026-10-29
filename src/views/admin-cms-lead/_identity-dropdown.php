@@ -11,6 +11,7 @@
  */
 
 use skeeks\cms\crm\CrmMatcher;
+use skeeks\cms\crm\CrmProtection;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -45,14 +46,19 @@ $create = Json::encode($parsed + ['title' => $name]);
                 data-id="<?= (int)$candidate['id']; ?>"
                 data-title="<?= Html::encode((string)$candidate['title']); ?>"
                 data-companies="<?= Html::encode(Json::encode($candidate['companies'] ?? [])); ?>">
-                <span class="sx-lead-drop__title"><?= Html::encode((string)$candidate['title']); ?></span>
+                <span class="sx-lead-drop__title"><?= Html::encode((string)$candidate['title']); ?><?= CrmProtection::shieldIcon((string)($candidate['protection'] ?? ''), (string)($candidate['protectionText'] ?? '')); ?></span>
                 <span class="sx-lead-drop__meta"><?= Html::encode($meta); ?><?= $responsible !== '' ? ' · '.Html::encode($responsible) : ''; ?></span>
             </li>
         <?php else : ?>
             <?php // A client of another responsible: its name only for a company, the contacts are not shown. ?>
             <li class="sx-lead-drop__item is-hidden">
-                <span class="sx-lead-drop__title"><?= Html::encode($isCompany ? 'Такая компания уже есть: «'.$candidate['title'].'»' : 'Такой контакт уже есть в базе'); ?></span>
-                <span class="sx-lead-drop__meta"><?= Html::encode($meta); ?> · <?= $responsible !== '' ? 'ответственный '.Html::encode($responsible) : 'ответственного нет'; ?></span>
+                <?php if (!empty($candidate['inBase'])) : ?>
+                    <span class="sx-lead-drop__title"><?= $isCompany ? 'Компания в общей базе' : 'Контакт в общей базе'; ?></span>
+                    <span class="sx-lead-drop__meta"><?= Html::encode($meta); ?></span>
+                <?php else : ?>
+                    <span class="sx-lead-drop__title"><?= Html::encode($isCompany ? 'Такая компания уже есть: «'.$candidate['title'].'»' : 'Такой контакт уже есть в базе'); ?><?= CrmProtection::shieldIcon((string)($candidate['protection'] ?? ''), (string)($candidate['protectionText'] ?? '')); ?></span>
+                    <span class="sx-lead-drop__meta"><?= Html::encode($meta); ?> · <?= $responsible !== '' ? 'ответственный '.Html::encode($responsible) : 'ответственного нет'; ?></span>
+                <?php endif; ?>
                 <span class="sx-lead-drop__actions">
                     <?= $this->render('@skeeks/cms/views/admin-cms-lead/_identity-foreign-actions', [
                         'candidate' => $candidate, 'for' => $for, 'allowForeign' => $allowForeign,

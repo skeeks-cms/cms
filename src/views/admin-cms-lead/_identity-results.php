@@ -13,6 +13,7 @@
  */
 
 use skeeks\cms\crm\CrmMatcher;
+use skeeks\cms\crm\CrmProtection;
 use yii\helpers\Html;
 use yii\helpers\Json;
 
@@ -41,18 +42,20 @@ $hasStrong = (bool)array_filter($candidates, static fn($candidate) => $candidate
         <?php
         $responsible = implode(', ', array_column($candidate['responsible'], 'name'));
         $title = (string)$candidate['title'];
-        if (!$candidate['visible']) {
+        if (!empty($candidate['inBase'])) {
+            $title = $isCompany ? 'Компания в общей базе' : 'Контакт в общей базе';
+        } elseif (!$candidate['visible']) {
             $title = $isCompany ? 'Такая компания уже есть: «'.$title.'»' : 'Такой контакт уже есть в базе';
         }
         ?>
         <li class="sx-lead-results__item<?= $candidate['visible'] ? '' : ' is-hidden'; ?>">
             <div class="sx-lead-hint__main">
-                <span class="sx-lead-hint__title"><?= Html::encode($title); ?></span>
+                <span class="sx-lead-hint__title"><?= Html::encode($title); ?><?= CrmProtection::shieldIcon((string)($candidate['protection'] ?? ''), (string)($candidate['protectionText'] ?? '')); ?></span>
                 <span class="sx-lead-hint__meta">
                     <?= $candidate['strong'] ? 'Совпал ' : 'Похоже: '; ?><?= Html::encode(implode(', ', array_map($reasonText, $candidate['reasons']))); ?>
                 </span>
                 <span class="sx-lead-hint__meta">
-                    <?= $responsible !== '' ? 'Ответственный: '.Html::encode($responsible) : 'Ответственного нет'; ?>
+                    <?= !empty($candidate['inBase']) ? 'Без ответственного' : ($responsible !== '' ? 'Ответственный: '.Html::encode($responsible) : 'Ответственного нет'); ?>
                     <?php if ($candidate['hasOpenLeads']) : ?> · есть открытые сделки<?php endif; ?>
                 </span>
             </div>

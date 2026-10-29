@@ -265,6 +265,10 @@ class CrmAccess extends Component
      */
     public static function keepLinks(\yii\db\BaseActiveRecord $record, string $recordCode): void
     {
+        // A new client of an employee with «Новые клиенты — всегда по согласованию» (CrmProtection::onCreated()).
+        $record->on(\yii\db\BaseActiveRecord::EVENT_AFTER_INSERT, static function () use ($record, $recordCode) {
+            CrmProtection::onCreated($record, $recordCode);
+        });
         $snapshot = [];
         $record->on(\yii\db\BaseActiveRecord::EVENT_BEFORE_UPDATE, static function () use ($record, $recordCode, &$snapshot) {
             $snapshot = [];
@@ -395,6 +399,11 @@ class CrmAccess extends Component
     {
         $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_main' => 'Без основного ответственного',
             'no_responsible' => 'Без сотрудников', 'pool' => 'Общий пул'] : [];
+        // The pool filter only with the pool right (a console run keeps it).
+        if (isset($items['pool']) && \Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User
+            && !self::instance()->canUsePool((int)\Yii::$app->user->id)) {
+            unset($items['pool']);
+        }
         if (CrmProtection::ready()) {
             // П2д: the protection of the client.
             foreach (CrmProtection::states() as $state => $name) {
@@ -584,22 +593,113 @@ class CrmAccess extends Component
             ->andWhere('poolPersonCompany.cms_user_id = '.$personColumn);
     }
 
-    /** A CRM employee (the right to the companies or clients section) sees a record of the pool. */
+    /**
+     * The right «Общий пул клиентов» (owner's decision 29.10.2026, variant Б):
+     * see the general pool and take its clients into work. An RBAC permission
+     * given in a role or to one employee in his profile; administrators and
+     * heads of departments have it always.
+     */
+    public const PERMISSION_POOL = 'cms/crm-pool';
+
+    /** @var bool[] canUsePool() of the request, by user id */
+    private array $poolRight = [];
+
+    public function canUsePool($user): bool
+    {
+        $userId = $this->userId($user);
+        if ($userId <= 0) {
+            return false;
+        }
+        if (!isset($this->poolRight[$userId])) {
+            $this->poolRight[$userId] = $this->isAdmin($userId) || $this->isDepartmentHead($userId)
+                || \Yii::$app->authManager->checkAccess($userId, self::PERMISSION_POOL);
+        }
+
+        return $this->poolRight[$userId];
+    }
+
+    /** The employee heads a department (cms_department.worker_id). */
+    public function isDepartmentHead(int $userId): bool
+    {
+        return $userId > 0 && CmsDepartment::find()->andWhere(['worker_id' => $userId])->exists();
+    }
+
+    /** The right is given to this employee himself (not by a role, administrator or department). */
+    public function hasOwnPoolRight(int $workerId): bool
+    {
+        return $workerId > 0 && \Yii::$app->authManager->getAssignment(self::PERMISSION_POOL, $workerId) !== null;
+    }
+
+    /** Who gives the pool right to an employee: an administrator, or his head to a subordinate. */
+    public function canGrantPool($actor, int $workerId): bool
+    {
+        $actorId = $this->userId($actor);
+        if ($actorId <= 0 || $workerId <= 0 || $actorId === $workerId && !$this->isAdmin($actorId)) {
+            return false;
+        }
+
+        return $this->isAdmin($actorId) || in_array($workerId, array_map('intval', CmsDepartment::subordinateIds($actorId)), true);
+    }
+
+    /**
+     * Who changes «Новые компании и клиенты, которые я создаю, — „Всегда по
+     * согласованию“» of an employee (CrmProtection::onCreated()): he himself,
+     * his head, an administrator. The same people see the block «Клиенты в
+     * CRM» of his profile.
+     */
+    public function canEditCrmSettings($actor, int $workerId): bool
+    {
+        $actorId = $this->userId($actor);
+
+        return $actorId > 0 && $workerId > 0 && ($actorId === $workerId || $this->isAdmin($actorId)
+            || in_array($workerId, array_map('intval', CmsDepartment::subordinateIds($actorId)), true));
+    }
+
+    /** Gives or takes the right of one employee (an RBAC assignment of the permission). */
+    public function setPoolRight(int $workerId, bool $on): void
+    {
+        $auth = \Yii::$app->authManager;
+        $permission = $auth->getPermission(self::PERMISSION_POOL);
+        if (!$permission) {
+            throw new \DomainException('Право «Общий пул клиентов» не зарегистрировано: выполните rbac/init.');
+        }
+        $assigned = $auth->getAssignment(self::PERMISSION_POOL, $workerId) !== null;
+        if ($on && !$assigned) {
+            $auth->assign($permission, $workerId);
+        } elseif (!$on && $assigned) {
+            $auth->revoke($permission, $workerId);
+        }
+        unset($this->poolRight[$workerId]);
+    }
+
+    /**
+     * A client of the general pool the employee may not take himself: «Компания
+     * в общей базе», «Попросить у руководителя» sends a request to his head.
+     */
+    public function poolRequestNeeded($user, string $recordCode, int $recordId): bool
+    {
+        return !$this->canUsePool($user) && $this->canTakeIntoWork($recordCode, $recordId);
+    }
+
+    /** A CRM employee with the pool right (and the right to the section) sees a record of the pool. */
     public function canSeePool($user, string $recordCode, int $recordId): bool
     {
         $userId = $this->userId($user);
         $permission = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms/admin-company' : 'cms/admin-user';
 
-        return $userId > 0 && \Yii::$app->authManager->checkAccess($userId, $permission) && $this->inPool($recordCode, $recordId);
+        return $userId > 0 && \Yii::$app->authManager->checkAccess($userId, $permission) && $this->canUsePool($userId)
+            && $this->inPool($recordCode, $recordId);
     }
 
     /**
      * One visibility of the lists and the search of companies and clients (and
-     * the API): what the employee sees plus the general pool.
+     * the API): what the employee sees, plus the general pool with the pool
+     * right (canUsePool()).
      */
     public static function applyClientVisibility(\yii\db\ActiveQuery $query, $user = null): void
     {
-        if (method_exists($query, 'forManagerOrPool') && self::mainReady()) {
+        $viewer = $user ?? (\Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User ? \Yii::$app->user->identity : null);
+        if (method_exists($query, 'forManagerOrPool') && self::mainReady() && $viewer && self::instance()->canUsePool($viewer)) {
             $query->forManagerOrPool($user);
         } elseif (method_exists($query, 'forManager')) {
             $query->forManager($user);
@@ -1005,7 +1105,11 @@ class CrmAccess extends Component
      */
     private function clientOwnFeedCondition($user, $record, string $table): array
     {
-        $condition = ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]];
+        $condition = ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id],
+            // Comments and files of employees about the client (passwords, contracts, briefs) belong to the whole
+            // client (owner's decision 29.10.2026): «Свои сделки», "edit" and the pool see the client's own
+            // communications — calls, letters, chats — and the records of their deals only.
+            ['or', [$table.'.log_type' => null], ['<>', $table.'.log_type', \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT]]];
         if (!\Yii::$app->has('skeeks')) {
             return $condition;
         }
@@ -1181,10 +1285,29 @@ class CrmAccess extends Component
             'byApproval' => !$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
                 && $this->approvalRequired($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id),
             // A free client without a main responsible (the general pool): «Взять в работу».
-            'canTake' => !$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
-                && $this->canTakeIntoWork($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id),
+            'canTake' => false,
+            // The pool without the pool right: «Компания в общей базе», «Попросить у руководителя».
+            'inBase' => false,
         ];
+        if (!$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
+            && $this->canTakeIntoWork($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id)) {
+            $result[$this->canUsePool($viewer) ? 'canTake' : 'inBase'] = true;
+        }
 
+        if (in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true) && CrmProtection::ready()
+            && ($record = CrmProtection::record($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id))) {
+            // The shield of a protected client (CrmProtection::shieldIcon()); the reason only to who sees the client.
+            $result['protection'] = (string)$record->crm_protection ?: CrmProtection::FREE;
+            $result['protectionText'] = $result['protection'] === CrmProtection::FREE ? ''
+                : CrmProtection::describeRecord($record, $visible && self::seesWholeClient($this->wholeClientLevel($viewer,
+                    $type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id)));
+        }
+        if ($result['inBase']) {
+            // The pool without the pool right: no name, no employees — «Компания в общей базе».
+            $result['title'] = null;
+
+            return $result;
+        }
         if ($type === CrmMatcher::TYPE_COMPANY && ($company = CmsCompany::findOne($id))) {
             $result['title'] = (string)$company->name;
             $result['responsible'] = $this->names($this->companyResponsibleIds($id));
@@ -1333,9 +1456,17 @@ class CrmAccess extends Component
                         ['exists', $links()->andWhere([$userColumn => $ids, 'access_level' => self::LEVEL_FULL])]],
                 ]];
             };
+            // isPoolRequest() in SQL: a client without any employee — the heads of the requester decide.
+            $pool = static function (string $class, string $recordColumn, string $code) use ($table, $userId) {
+                return ['and', [$table.'.record_code' => $code],
+                    ['not exists', $class::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($table.'.record_id')])],
+                    [$table.'.requester_id' => array_map('intval', CmsDepartment::subordinateIds($userId)) ?: [0]]];
+            };
             $decides = ['or',
                 $main(CmsCompany2manager::class, 'cms_company_id', 'cms_user_id', CmsCrmAccessRequest::RECORD_COMPANY),
                 $main(CmsUser2manager::class, 'client_id', 'worker_id', CmsCrmAccessRequest::RECORD_CLIENT),
+                $pool(CmsCompany2manager::class, 'cms_company_id', CmsCrmAccessRequest::RECORD_COMPANY),
+                $pool(CmsUser2manager::class, 'client_id', CmsCrmAccessRequest::RECORD_CLIENT),
             ];
         }
         if ($scope === self::REQUESTS_TO_ME) {
@@ -1368,6 +1499,18 @@ class CrmAccess extends Component
         return array_values(array_diff($ids, [(int)$request->requester_id]));
     }
 
+    /**
+     * A request about a client of the general pool (no employee, may be taken
+     * into work): sent by an employee without the pool right.
+     */
+    public function isPoolRequest(CmsCrmAccessRequest $request): bool
+    {
+        [$class, $recordColumn] = self::linkTable((string)$request->record_code);
+
+        return self::mainReady() && !$class::find()->andWhere([$recordColumn => (int)$request->record_id])->exists()
+            && $this->canTakeIntoWork((string)$request->record_code, (int)$request->record_id);
+    }
+
     private function deciderIds(CmsCrmAccessRequest $request): array
     {
         // The current main responsible decides; a record without one — its "full" employees. Their leaders
@@ -1377,6 +1520,11 @@ class CrmAccess extends Component
         $owners = $mainId ? [$mainId] : ($request->record_code === CmsCrmAccessRequest::RECORD_COMPANY
             ? $this->companyResponsibleIds((int)$request->record_id)
             : $this->clientResponsibleIds((int)$request->record_id));
+        if (!$owners && $this->isPoolRequest($request)) {
+            // «Попросить у руководителя»: a client of the general pool — the heads of the requester decide
+            // (administrators when he has none, requestDeciderIds()).
+            return array_values(array_unique(array_map('intval', CmsDepartment::leaderIdsOf((int)$request->requester_id))));
+        }
         $ids = $owners;
         foreach (array_unique($owners) as $ownerId) {
             $ids = array_merge($ids, CmsDepartment::leaderIdsOf($ownerId));

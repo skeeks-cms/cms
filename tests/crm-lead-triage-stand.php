@@ -454,8 +454,8 @@ try {
     (new \skeeks\cms\crm\CrmClientCallNotifier())->notify($call);
     $check(!CmsWebNotify::find()->andWhere(['event_key' => 'crm.client_call:'.(int)$call->id])->exists(), 'no notification when the main responsible took the call');
     // The client feed for "deal": the client's own records and his deals' records; tasks of other deals are hidden.
-    $feedLog = static function ($model, string $text) {
-        $log = new \skeeks\cms\models\CmsLog(['model_code' => $model->skeeksModelCode, 'model_id' => $model->id, 'log_type' => 'comment', 'comment' => $text]);
+    $feedLog = static function ($model, string $text, string $type = 'comment') {
+        $log = new \skeeks\cms\models\CmsLog(['model_code' => $model->skeeksModelCode, 'model_id' => $model->id, 'log_type' => $type, 'comment' => $text]);
         $log->save(false);
 
         return $log;
@@ -465,7 +465,9 @@ try {
     $otherTask = new CmsTask(['name' => 'Чужая '.$uniq, 'executor_id' => $owner->id, 'cms_lead_id' => $ownersLead->id, 'cms_company_id' => $company->id]);
     $otherTask->save(false);
     CmsTask::updateAll(['cms_company_id' => $company->id], ['id' => [$ownTask->id, $otherTask->id]]);
-    $companyNote = $feedLog($company, 'Клиент звонил '.$uniq);
+    // A letter of the client is his own record; a comment of an employee about the company is the whole client's.
+    $companyNote = $feedLog($company, 'Клиент написал '.$uniq, 'message');
+    $staffNote = $feedLog($company, 'Пароль хостинга '.$uniq);
     $ownTaskNote = $feedLog($ownTask, 'По своей '.$uniq);
     $otherTaskNote = $feedLog($otherTask, 'По чужой '.$uniq);
     $as($other);
@@ -473,6 +475,7 @@ try {
     $seen = $feedIds();
     $check(in_array((int)$companyNote->id, $seen, true) && in_array((int)$ownTaskNote->id, $seen, true) && !in_array((int)$otherTaskNote->id, $seen, true),
         '"deal": the feed shows the client records and his deals, not the tasks of another deal');
+    $check(!in_array((int)$staffNote->id, $seen, true), '"deal": comments of employees about the company are hidden, decision 29.10.2026');
     $check(in_array((int)$companyNote->id, array_map('intval', CmsCompany::findOne($company->id)->getCompanyLogs()->select('id')->column()), true),
         '"deal": the card feed keeps the communication with the client');
     $as($owner);
@@ -761,6 +764,26 @@ try {
         $filtered = CmsCompany::find()->andWhere(['id' => $guarded->id]);
         $access2d->applyResponsibleFilter($filtered, 'company', 'protection_free', CmsCompany::tableName().'.id', (int)$owner->id);
         $check($filtered->exists() && isset(CrmAccess::responsibleFilterItems()['protection_protected']), 'the company list filters by the protection');
+        // «Новые компании и клиенты, которые я создаю, — „Всегда по согласованию“»: the setting of the creator.
+        if (\skeeks\cms\crm\CrmProtection::newAlwaysReady()) {
+            CmsUser::updateAll(['crm_new_always' => 1], ['id' => $owner->id]);
+            $mineAlways = new CmsCompany(['name' => 'Своя защита '.$uniq]);
+            $mineAlways->save(false);
+            $mineAlways->refresh();
+            $personAlways = new CmsUser(['first_name' => 'Своя защита'.$uniq, 'is_worker' => 0]);
+            $personAlways->save();
+            $check($mineAlways->crm_protection === 'always' && (int)$mineAlways->created_by === (int)$owner->id
+                && \skeeks\cms\crm\CrmProtection::state('client', (int)$personAlways->id) === 'always',
+                'the setting of the creator: his new company and person are «Всегда по согласованию»');
+            $check(strpos(\skeeks\cms\crm\CrmProtection::shield($mineAlways), 'sx-crm-shield--always') !== false
+                && \skeeks\cms\crm\CrmProtection::shield(CmsCompany::findOne($guarded->id)) === '', 'the shield: a protected client has it, a free one shows nothing');
+            CmsUser::updateAll(['crm_new_always' => 0], ['id' => $owner->id]);
+            $as($other);
+            $notMine = new CmsCompany(['name' => 'Без настройки '.$uniq]);
+            $notMine->save(false);
+            $check(\skeeks\cms\crm\CrmProtection::state('company', (int)$notMine->id) === 'free', 'without the setting a new company is free');
+            $as($owner);
+        }
 
         // The general pool: a free company without a main responsible — «Взять в работу».
         $pool = new CmsCompany(['name' => 'Пул '.$uniq]);
@@ -768,10 +791,59 @@ try {
         $check($access2d->canTakeIntoWork('company', (int)$pool->id) && !$access2d->canTakeIntoWork('company', (int)$guarded->id),
             'only a free company without a main responsible is taken into work');
         $poolRef = $access2d->candidateRef('company', (int)$pool->id);
+        // The pool right (owner's decision 29.10.2026): administrators and heads always, others when it is given.
+        $noPool = null;
+        foreach ($plain as $candidate) {
+            if (!$access2d->canUsePool($candidate)) {
+                $noPool = $candidate;
+                break;
+            }
+        }
+        $check($access2d->canUsePool($admin), 'an administrator has the pool right');
+        if ($noPool) {
+            $as($noPool);
+            $base = $access2d->presentCandidate(['type' => 'company', 'id' => (int)$pool->id], false, $noPool);
+            $check(!empty($base['inBase']) && empty($base['canTake']) && $base['title'] === null && $base['responsible'] === []
+                && !$access2d->canSeePool($noPool->id, 'company', (int)$pool->id), 'without the pool right: «Компания в общей базе» (no name), the card is closed');
+            $hiddenPool = CmsCompany::find()->andWhere([CmsCompany::tableName().'.id' => $pool->id]);
+            CrmAccess::applyClientVisibility($hiddenPool, $noPool);
+            $check(!$hiddenPool->exists() && !isset(CrmAccess::responsibleFilterItems()['pool']), 'without the pool right the lists and the filter «Общий пул» hide the pool');
+            try {
+                (new LeadTriage())->checkIdentity(new LeadIdentityForm(['company_mode' => LeadIdentityForm::MODE_FOREIGN, 'company_ref' => $poolRef]), (int)$noPool->id);
+                $check(false, 'without the pool right the deal form does not take a pool client');
+            } catch (\DomainException $e) {
+                $check($e->getMessage() === LeadTriage::POOL_REQUEST_MESSAGE, 'without the pool right the deal form does not take a pool client');
+            }
+            // «Попросить у руководителя»: a request to his heads (else administrators), approval makes him the main one.
+            $asked = (new LeadTriage())->workWithClient($poolRef, (int)$noPool->id, 'нужен клиент');
+            $askedRequest = $asked['request'];
+            $deciders = $access2d->requestDeciderIds($askedRequest);
+            $heads = array_values(array_diff(CmsDepartment::leaderIdsOf((int)$noPool->id), [(int)$noPool->id]));
+            $check($asked['lead'] === null && $askedRequest && $access2d->isPoolRequest($askedRequest)
+                && $access2d->mainResponsibleId('company', (int)$pool->id) === null
+                && ($heads ? $deciders === $heads : $deciders === array_values(array_diff($access2d->adminIds(), [(int)$noPool->id]))),
+                '«Попросить у руководителя»: the request goes to his heads, else to administrators');
+            $decider = CmsUser::findOne($deciders[0]);
+            $check(CmsCrmAccessRequest::find()->andWhere($access2d->requestsCondition($decider, CrmAccess::REQUESTS_TO_ME))->andWhere(['id' => $askedRequest->id])->exists(),
+                'the head sees the request in «Ждут моего решения»');
+            (new CrmAccessRequests())->decide($askedRequest, true, (int)$decider->id);
+            $check($access2d->mainResponsibleId('company', (int)$pool->id) === (int)$noPool->id
+                && CmsLead::find()->andWhere(['cms_company_id' => $pool->id, 'executor_id' => $noPool->id])->exists(),
+                'approved: the employee becomes the main responsible, the deal is created for him');
+            CmsLead::deleteAll(['cms_company_id' => $pool->id]);
+            $protection->returnToPool('company', (int)$pool->id, (int)$decider->id);
+            $as($owner);
+        }
+        // The right given to one employee: an RBAC assignment (rolled back with the test).
+        if (!$access2d->canUsePool($other)) {
+            $access2d->setPoolRight((int)$other->id, true);
+            $poolGranted = (int)$other->id;
+        }
+        $check($access2d->canUsePool($other), 'the pool right given to one employee');
         $presentedPool = $access2d->presentCandidate(['type' => 'company', 'id' => (int)$pool->id], false, $other);
         $check(!empty($presentedPool['canTake']) && empty($presentedPool['byApproval']), 'a match of the pool offers «Взять в работу»');
-        // Every CRM employee sees the pool in the lists and its card, read only; deals and the like stay hidden.
-        $check($access2d->inPool('company', (int)$pool->id) && $access2d->canSeePool($other->id, 'company', (int)$pool->id), 'the pool is seen by every CRM employee');
+        // An employee with the pool right sees the pool in the lists and its card, read only; deals and the like stay hidden.
+        $check($access2d->inPool('company', (int)$pool->id) && $access2d->canSeePool($other->id, 'company', (int)$pool->id), 'the pool is seen with the pool right');
         $listed = CmsCompany::find()->andWhere([CmsCompany::tableName().'.id' => $pool->id]);
         CrmAccess::applyClientVisibility($listed, $other);
         $check($listed->exists() && !CmsCompany::find()->forManager($other)->andWhere([CmsCompany::tableName().'.id' => $pool->id])->exists(),
@@ -1130,6 +1202,10 @@ try {
     }
 
 } finally {
+    // The rollback removes the assignment, the RBAC manager of this process remembers it: take it back first.
+    if (!empty($poolGranted)) {
+        CrmAccess::instance()->setPoolRight($poolGranted, false);
+    }
     $transaction->rollBack();
 }
 
@@ -1226,6 +1302,13 @@ try {
         $httpPool->save(false);
         CmsCompany2manager::deleteAll(['cms_company_id' => $httpPool->id]);
         $fixture[] = $httpPool;
+        // Without the pool right the card of the pool is closed; the right is given for the rest and taken back.
+        $httpHadPool = (new CrmAccess())->canUsePool($httpUser);
+        if (!$httpHadPool) {
+            [$code] = $http('/~sxx/cms/admin-cms-company/view?pk='.(int)$httpPool->id);
+            $check($code === 403, 'HTTP: without the pool right a company of the pool is closed (403)');
+            CrmAccess::instance()->setPoolRight((int)$httpUser->id, true);
+        }
         [$code, $poolCard] = $http('/~sxx/cms/admin-cms-company/view?pk='.(int)$httpPool->id);
         $check($code === 200 && strpos($poolCard, 'Взять в работу') !== false && strpos($poolCard, 'admin-cms-company/update?') === false
             && strpos($poolCard, 'admin-cms-company-phone/create') === false, 'HTTP: a company of the pool opens read only with «Взять в работу»');
@@ -1240,6 +1323,9 @@ try {
     }
     @unlink($jar);
 } finally {
+    if (isset($httpHadPool) && !$httpHadPool) {
+        CrmAccess::instance()->setPoolRight((int)$httpUser->id, false);
+    }
     foreach (array_reverse($fixture) as $record) {
         if ($record instanceof CmsLead) {
             CmsLead::deleteAll(['id' => $record->id]);

@@ -322,6 +322,10 @@ class AdminUserController extends BackendModelStandartController
                                         'class' => 'sx-preview-card__title sx-collection-cell__primary',
                                     ],
                                 ]);
+                                // The shield of a protected client at its name; a free one shows nothing.
+                                if (!$cmsUser->is_worker && ($shield = \skeeks\cms\crm\CrmProtection::shieldFor($cmsUser)) !== '') {
+                                    $content = Html::tag('div', $content.$shield, ['class' => 'sx-crm-shield-title']);
+                                }
 
                                 if ($rolesData) {
                                     $content .= Html::tag(

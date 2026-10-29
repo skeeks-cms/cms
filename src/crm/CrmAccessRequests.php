@@ -108,6 +108,9 @@ class CrmAccessRequests
     private function requestText(CmsCrmAccessRequest $request): string
     {
         $client = '«'.$this->recordName($request).'»';
+        if ($this->access->isPoolRequest($request)) {
+            return ': запрос взять в работу клиента '.$client.' из общей базы';
+        }
 
         return $request->cms_lead_id
             ? ': работа с клиентом '.$client.' по своей сделке, запрос уровня доступа'
@@ -269,9 +272,21 @@ class CrmAccessRequests
         $lead = $request->cms_lead_id ? CmsLead::findOne((int)$request->cms_lead_id) : null;
 
         $level = $request->hasAttribute('level') && $request->level ? (string)$request->level : CrmAccess::LEVEL_DEAL;
-        // A client without a main responsible (a protected one left without employees): the one who approves
-        // becomes the main one — never the requester, who gets exactly the level chosen.
-        if (CrmAccess::mainReady() && $this->access->mainResponsibleId((string)$request->record_code, (int)$request->record_id) === null && $actorId !== $requesterId) {
+        if ($this->access->isPoolRequest($request)) {
+            // «Попросить у руководителя» approved: the requester takes the client of the general pool, as
+            // «Взять в работу» — he becomes the main responsible (owner's decision 29.10.2026).
+            $this->access->setMain((string)$request->record_code, (int)$request->record_id, $requesterId);
+            CrmAccessLog::write(CrmAccessLog::TAKE, (string)$request->record_code, (int)$request->record_id, [
+                'actor_id' => $actorId, 'user_id' => $requesterId, 'level_to' => CrmAccess::LEVEL_FULL, 'request_id' => (int)$request->id,
+                'cms_lead_id' => $lead ? (int)$lead->id : null, 'comment' => 'из общей базы по запросу №'.(int)$request->id,
+            ]);
+            $level = CrmAccess::LEVEL_FULL;
+            if ($request->hasAttribute('level')) {
+                $request->level = $level;
+            }
+        } elseif (CrmAccess::mainReady() && $this->access->mainResponsibleId((string)$request->record_code, (int)$request->record_id) === null && $actorId !== $requesterId) {
+            // A client without a main responsible (a protected one left without employees): the one who approves
+            // becomes the main one — never the requester, who gets exactly the level chosen.
             $this->access->setMain((string)$request->record_code, (int)$request->record_id, $actorId);
             CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, (string)$request->record_code, (int)$request->record_id, [
                 'actor_id' => $actorId, 'user_id' => $actorId, 'level_to' => CrmAccess::LEVEL_FULL, 'request_id' => (int)$request->id,
@@ -302,6 +317,11 @@ class CrmAccessRequests
             return 'Запрос отклонён.';
         }
         $reason = $comment ? ': '.Html::encode($comment) : '.';
+        if ($this->access->isPoolRequest($request)) {
+            $lead->addSystemActivity('Запрос взять клиента из общей базы отклонён'.$reason.' Клиент остаётся в общей базе.', $actorId);
+
+            return 'Запрос отклонён. Клиент остаётся в общей базе.';
+        }
         if ((int)$lead->executor_id !== (int)$request->requester_id) {
             $lead->addSystemActivity('Запрос сотрудника '.Html::encode($this->userName((int)$request->requester_id))
                 .' отклонён'.$reason.' Сделка остаётся у ответственного.', $actorId);

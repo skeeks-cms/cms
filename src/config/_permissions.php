@@ -239,6 +239,8 @@ return [
 
                     "cms/admin-lead",
 
+                    "cms/crm-pool",
+
                 ],
             ],
         ],
@@ -331,6 +333,13 @@ return [
         [
             'name'        => 'cms/admin-lead',
             'description' => ['skeeks/cms', 'Сделки'],
+        ],
+
+        // The general pool of clients (crm\CrmAccess::canUsePool()): see it and take its clients into work.
+        // Heads of departments have it always; a role or one employee (his profile) gets it here.
+        [
+            'name'        => 'cms/crm-pool',
+            'description' => ['skeeks/cms', 'Общий пул клиентов: видеть и брать в работу'],
         ],
         
         

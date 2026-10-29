@@ -808,8 +808,14 @@ try {
     $report('Поиск повторов из формы компании: клиент Г', 'GET admin-cms-company/duplicate-check?for=client&q= → '.$code,
         (bool)preg_match('~admin-user/view[^"\']*pk(?:=|%3D)'.$G->id.'(?!\d)~', $dup) || (bool)$found($dup, ['платёж Г']), '');
     // Д: the pool — his data and «Взять в работу», not his deal and bill
-    [$code, $card] = $mustSeeClient('Клиент Д (пул): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
-    $mustFail('Клиент Д (пул): кнопка «Взять в работу»', 'GET view → '.$code, $code === 200 && mb_strpos($card, 'Взять в работу') !== false, 'кнопки нет');
+    // The pool right (owner's decision 29.10.2026): without it the pool is closed, with it — the data and «Взять в работу».
+    if (!(new CrmAccess())->canUsePool($worker)) {
+        $closed('Клиент Д (пул) без права на пул: карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
+        [$code, $card] = [403, ''];
+    } else {
+        [$code, $card] = $mustSeeClient('Клиент Д (пул): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
+        $mustFail('Клиент Д (пул): кнопка «Взять в работу»', 'GET view → '.$code, $code === 200 && mb_strpos($card, 'Взять в работу') !== false, 'кнопки нет');
+    }
     $hits = $code === 200 ? $found($card, ['сделка Д']) : [];
     $report('Клиент Д (пул): карточка без чужого', 'GET view → '.$code, (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
     foreach (['leads', 'bills', 'payments', 'tasks', 'log'] as $tab) {

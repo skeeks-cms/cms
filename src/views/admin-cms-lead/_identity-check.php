@@ -13,6 +13,7 @@
  */
 
 use skeeks\cms\crm\CrmMatcher;
+use skeeks\cms\crm\CrmProtection;
 use skeeks\cms\helpers\PhoneHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsUser;
@@ -98,15 +99,20 @@ $contacts = static function (array $candidate) use ($matched): array {
                             'target' => '_blank',
                             'data-pjax' => 0,
                         ]); ?>
+                    <?php elseif (!empty($candidate['inBase'])) : ?>
+                        <span class="sx-lead-check__title"><?= $isCompany ? 'Компания в общей базе' : 'Контакт в общей базе'; ?></span>
                     <?php else : ?>
                         <span class="sx-lead-check__title"><?= Html::encode($isCompany ? (string)$candidate['title'] : 'Такой контакт уже есть в базе'); ?></span>
                     <?php endif; ?>
+                    <?= CrmProtection::shieldIcon((string)($candidate['protection'] ?? ''), (string)($candidate['protectionText'] ?? '')); ?>
                     <?php if ($values = $contacts($candidate)) : ?>
                         <span class="sx-lead-check__contacts">
                             <?= implode(', ', array_map(static fn($item) => $item[1] ? Html::tag('b', Html::encode($item[0])) : Html::encode($item[0]), $values)); ?>
                         </span>
                     <?php endif; ?>
-                    <span class="sx-lead-check__meta"><?= $responsible !== '' ? 'Ответственный: '.Html::encode($responsible) : 'Ответственного нет'; ?></span>
+                    <?php if (empty($candidate['inBase'])) : ?>
+                        <span class="sx-lead-check__meta"><?= $responsible !== '' ? 'Ответственный: '.Html::encode($responsible) : 'Ответственного нет'; ?></span>
+                    <?php endif; ?>
                     <span class="sx-lead-check__actions">
                         <?php if ($candidate['visible']) : ?>
                             <?= Html::button('Использовать', [

@@ -46,6 +46,10 @@ class LeadTriage
     /** Application event after a deal is sorted (TriageEvent); configure 'on crm.leadTriaged'. */
     public const EVENT_LEAD_TRIAGED = 'crm.leadTriaged';
 
+    /** A client of the general pool chosen by an employee without the pool right (CrmAccess::poolRequestNeeded()). */
+    public const POOL_REQUEST_MESSAGE = 'Клиент в общей базе: взять его в работу можно с разрешения руководителя. '
+        .'Нажмите «Попросить у руководителя» в подсказке: запрос уйдёт руководителю отдела, сделка будет создана после одобрения.';
+
     private CrmAccess $access;
 
     public function __construct(?CrmAccess $access = null)
@@ -144,6 +148,16 @@ class LeadTriage
             throw new \DomainException('Совпадение устарело. Проверьте клиента ещё раз.');
         }
         $recordCode = $parsed[0] === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT;
+        if ($this->access->poolRequestNeeded($actorId, $recordCode, (int)$parsed[1])) {
+            // «Попросить у руководителя» (owner's decision 29.10.2026): the general pool without the pool right.
+            $request = (new CrmAccessRequests($this->access))->request($actorId, $recordCode, (int)$parsed[1], CmsCrmAccessRequest::KIND_WORK, null, $comment, CrmAccess::LEVEL_FULL);
+
+            return [
+                'lead' => null,
+                'request' => $request,
+                'message' => 'Запрос отправлен руководителю. После одобрения вы станете основным ответственным, сделка будет создана на вас.',
+            ];
+        }
         if ($this->access->approvalRequired($recordCode, (int)$parsed[1])) {
             $request = (new CrmAccessRequests($this->access))->request($actorId, $recordCode, (int)$parsed[1], CmsCrmAccessRequest::KIND_WORK, null, $comment);
 
@@ -185,6 +199,9 @@ class LeadTriage
                     throw new \DomainException('Совпадение устарело. Проверьте клиента ещё раз.');
                 }
                 $recordCode = $type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT;
+                if ($this->access->poolRequestNeeded($actorId, $recordCode, (int)$ref[1])) {
+                    throw new \DomainException(self::POOL_REQUEST_MESSAGE);
+                }
                 if ($this->access->approvalRequired($recordCode, (int)$ref[1])) {
                     throw new \DomainException('С этим клиентом работают только по согласованию с основным ответственным. '
                         .'Нажмите «Работать с этим клиентом» в подсказке: запрос уйдёт ответственному, сделка будет создана после одобрения.');
@@ -598,6 +615,9 @@ class LeadTriage
                 break;
         }
 
+        if ($foreign && !$incoming && $this->access->poolRequestNeeded($actorId, $foreign[0], (int)$foreign[1])) {
+            throw new \DomainException(self::POOL_REQUEST_MESSAGE);
+        }
         if ($foreign && $this->access->approvalRequired($foreign[0], (int)$foreign[1])) {
             if (!$incoming) {
                 throw new \DomainException('С этим клиентом работают только по согласованию с основным ответственным. '
@@ -728,7 +748,13 @@ class LeadTriage
                 // (owner's decision 29.10.2026), the actor works on his deal below.
                 (new CrmProtection())->assignHistoryMain($recordCode, $recordId);
             }
-            if ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null) {
+            if ((int)$lead->executor_id === $actorId && $this->access->poolRequestNeeded($actorId, $recordCode, $recordId)) {
+                // An incoming deal of a pool client sorted by an employee without the pool right: the deal is his,
+                // the client is asked from his head (owner's decision 29.10.2026).
+                $identity['request'] = (new CrmAccessRequests($this->access))->request(
+                    $actorId, $recordCode, $recordId, CmsCrmAccessRequest::KIND_WORK, (int)$lead->id, $form->foreign_comment, CrmAccess::LEVEL_FULL
+                );
+            } elseif ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null) {
                 // «Взять в работу» (П2д): a free client of the general pool — the actor becomes its main
                 // responsible ("full"), no request and no notification; the next one gets «Работать с этим клиентом».
                 $this->access->setMain($recordCode, $recordId, $actorId);

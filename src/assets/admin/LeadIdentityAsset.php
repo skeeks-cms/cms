@@ -14,5 +14,6 @@ class LeadIdentityAsset extends AssetBundle
     public $sourcePath = '@skeeks/cms/assets/admin/src';
     public $css = ['lead-identity.css'];
     public $js = ['lead-identity.js'];
-    public $depends = [BackendUiAsset::class];
+    // The matches come by AJAX: the shield of a protected client (CrmProtection::shield()) is styled at once.
+    public $depends = [BackendUiAsset::class, CrmShieldAsset::class];
 }
