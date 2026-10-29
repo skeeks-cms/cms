@@ -40,9 +40,11 @@ $migrations = [
     'm261029_100000__alter_table__cms_lead_outbound' => ['cms_lead'],
     'm261029_130000__create_table__cms_crm_access_log' => ['cms_crm_access_log'],
     'm261029_160000__alter_table__cms_user_crm_new_always' => ['cms_user'],
+    'm261029_210000__create_table__cms_crm_inbound_rotation' => ['cms_crm_inbound_rotation'],
+    'm261029_220000__alter_table__cms_lead_pipeline_inbound' => ['cms_lead_pipeline'],
 ];
 $copy = ['cms_site', 'cms_user', 'cms_company', 'cms_company2manager', 'cms_user2manager', 'cms_lead', 'cms_lead_stage', 'cms_lead_pipeline',
-    'cms_lead_stage_history', 'cms_crm_access_request', 'cms_crm_duplicate_mark', 'cms_crm_access_log', 'cms_log', 'cms_deal', 'cms_deal_type', 'shop_payment'];
+    'cms_lead_stage_history', 'cms_crm_access_request', 'cms_crm_duplicate_mark', 'cms_crm_access_log', 'cms_log', 'cms_deal', 'cms_deal_type', 'shop_payment', 'cms_crm_inbound_rotation'];
 
 $server = new PDO('mysql:host='.$host, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $server->exec("DROP DATABASE IF EXISTS `$name`; CREATE DATABASE `$name` CHARACTER SET utf8mb4");
@@ -109,6 +111,7 @@ try {
     $expect($error === null && !$db->getTableSchema('cms_lead_stage_history', true) && !$db->getTableSchema('cms_lead_pipeline', true),
         'no pipelines and no history: rollback drops them'.($error ? ' — '.$error : ''));
     $harness->run($db, 'm261028_130000__create_table__cms_lead_pipeline', 'safeUp');
+    $harness->run($db, 'm261029_220000__alter_table__cms_lead_pipeline_inbound', 'safeUp'); // its columns went with the table
     $expect($harness->snapshot($db, $pipelineTables) === $schemaBefore, 'pipelines: up brings the same schema back');
 
     // A repeated up keeps what users changed meanwhile.
@@ -131,6 +134,48 @@ try {
     $harness->run($db, 'm261029_130000__create_table__cms_crm_access_log', 'safeUp');
     $events = (new yii\db\Query())->select('event')->from('cms_crm_access_log')->where(['request_id' => 900001])->orderBy(['id' => SORT_ASC])->column($db);
     $expect($events === ['request', 'request_approved'], 'access journal: a repeated up copies a request once ('.implode(', ', $events).')');
+
+    // F4: a run stopped right after CREATE TABLE of the queue cursor, rows written meanwhile — up merges them
+    // (the latest stays) and restores the unique, the foreign key and the comment.
+    $rotation = 'm261029_210000__create_table__cms_crm_inbound_rotation';
+    $rotationSchema = $harness->snapshot($db, ['cms_crm_inbound_rotation']);
+    $harness->run($db, $rotation, 'safeDown');
+    $harness->run($db, $rotation, 'safeUp', 2);
+    $db->createCommand()->batchInsert('cms_crm_inbound_rotation', ['cms_site_id', 'queue', 'last_user_id', 'updated_at'],
+        [[1, 'Проверка: повтор', 11, 100], [1, 'Проверка: повтор', 12, 300], [1, 'Проверка: повтор', 13, 200], [1, 'Проверка: другая', 14, 100]])->execute();
+    $error = $harness->run($db, $rotation, 'safeUp');
+    $cursor = (new yii\db\Query())->select(['queue', 'last_user_id'])->from('cms_crm_inbound_rotation')->orderBy(['queue' => SORT_ASC])->all($db);
+    $duplicate = null;
+    try {
+        $db->createCommand()->insert('cms_crm_inbound_rotation', ['cms_site_id' => 1, 'queue' => 'Проверка: повтор'])->execute();
+    } catch (yii\db\IntegrityException $e) {
+        $duplicate = 'refused';
+    }
+    $expect($error === null && $harness->snapshot($db, ['cms_crm_inbound_rotation']) === $rotationSchema && $duplicate === 'refused'
+        && array_map(static fn($r) => $r['queue'].'='.$r['last_user_id'], $cursor) === ['Проверка: другая=14', 'Проверка: повтор=12'],
+        'queue cursor: up after a stop merges the duplicates (the latest stays) and restores the unique ('.json_encode($cursor, JSON_UNESCAPED_UNICODE).')'.($error ? ' — '.$error : ''));
+    $db->createCommand()->delete('cms_crm_inbound_rotation')->execute();
+
+    // F5: own queue settings of a pipeline refuse the rollback before the DDL; empty values do not.
+    $inbound = 'm261029_220000__alter_table__cms_lead_pipeline_inbound';
+    $inboundSchema = $harness->snapshot($db, ['cms_lead_pipeline']);
+    $db->createCommand()->insert('cms_lead_pipeline', ['id' => 900002, 'cms_site_id' => 1, 'name' => 'Проверка: очередь',
+        'inbound_worker_ids' => '[1663]', 'inbound_mode' => 'round'])->execute();
+    $error = $harness->run($db, $inbound, 'safeDown');
+    $expect($error !== null && strpos($error, 'настройками очереди «Неразобранного»: 1') !== false && $harness->snapshot($db, ['cms_lead_pipeline']) === $inboundSchema
+        && (new yii\db\Query())->select('inbound_mode')->from('cms_lead_pipeline')->where(['id' => 900002])->scalar($db) === 'round',
+        'pipeline queue settings: rollback refused, the columns and the settings stay'.($error ? ' — '.mb_substr($error, 0, 110) : ''));
+    $db->createCommand()->update('cms_lead_pipeline', ['inbound_worker_ids' => '[]', 'inbound_mode' => '', 'inbound_source_types' => 'null'], ['id' => 900002])->execute();
+    $error = $harness->run($db, $inbound, 'safeDown');
+    $expect($error === null && !in_array('inbound_mode', $columns('cms_lead_pipeline'), true), 'pipeline queue settings empty: rollback drops the columns'.($error ? ' — '.$error : ''));
+    $error = $harness->run($db, $inbound, 'safeDown');
+    $expect($error === null, 'pipeline queue settings: a repeated rollback is safe'.($error ? ' — '.$error : ''));
+    $harness->run($db, $inbound, 'safeUp');
+    $db->createCommand()->update('cms_lead_pipeline', ['inbound_mode' => 'all'], ['id' => 900002])->execute();
+    $harness->run($db, $inbound, 'safeUp');
+    $expect($harness->snapshot($db, ['cms_lead_pipeline']) === $inboundSchema
+        && (new yii\db\Query())->select('inbound_mode')->from('cms_lead_pipeline')->where(['id' => 900002])->scalar($db) === 'all',
+        'pipeline queue settings: up brings the columns back, a repeated up keeps a changed setting');
 } finally {
     if (isset($db)) {
         $db->close();
