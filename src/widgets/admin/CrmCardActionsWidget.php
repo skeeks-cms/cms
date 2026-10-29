@@ -125,12 +125,12 @@ class CrmCardActionsWidget extends Widget
     }
 
     /**
-     * Open deals of the employee by a company or a client when he works with
-     * it only through his deals: levels "Свои сделки" and "Свои сделки и
-     * данные компании" (CrmAccess: the client is seen, not in full —
-     * seesWholeClient()); his deals are those the deal scope shows him, as in
-     * CrmAccess::feedCondition(). Null — he sees the whole client (or it is
-     * an employee card): the usual block.
+     * Open deals of the employee by a company or a client when he acts on it
+     * only through his deals ("Свои сделки", "edit"): the server refuses such
+     * actions without one of them (CrmAccess::canActOnClient()), the list is
+     * CrmAccess::ownOpenLeads() — the same rule as the feed and the checks.
+     * Null — he acts on the client itself (or it is an employee card): the
+     * usual block.
      *
      * @return \skeeks\cms\models\CmsLead[]|null
      */
@@ -139,22 +139,14 @@ class CrmCardActionsWidget extends Widget
         if (!\Yii::$app->has('user') || \Yii::$app->user->isGuest) {
             return null;
         }
-        $code = \skeeks\cms\crm\CrmAccess::clientRecordOf($record);
-        if ($code === null || ($record instanceof \skeeks\cms\models\User && $record->is_worker)) {
-            return null;
-        }
         $access = \skeeks\cms\crm\CrmAccess::instance();
         $user = \Yii::$app->user->identity;
-        if ($access->clientDataLevel($user, $code[0], (int)$code[1]) === null
-            || \skeeks\cms\crm\CrmAccess::seesWholeClient($access->wholeClientLevel($user, $code[0], (int)$code[1]))) {
+        if (\skeeks\cms\crm\CrmAccess::clientRecordOf($record) === null || $access->canActOnClient($user, $record)) {
             return null;
         }
-        $table = \skeeks\cms\models\CmsLead::tableName();
 
-        return \skeeks\cms\models\CmsLead::find()->forManager($user)
-            ->andWhere([$table.'.'.($record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id') => (int)$record->id])
-            ->andWhere([$table.'.status' => [\skeeks\cms\models\CmsLead::STATUS_NEW, \skeeks\cms\models\CmsLead::STATUS_IN_WORK]])
-            ->orderBy([$table.'.id' => SORT_DESC])
+        return $access->ownOpenLeads($user, $record)
+            ->orderBy([\skeeks\cms\models\CmsLead::tableName().'.id' => SORT_DESC])
             ->limit(20)
             ->all();
     }
