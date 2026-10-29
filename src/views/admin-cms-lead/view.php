@@ -666,6 +666,10 @@ JS
                     'window' => ['size' => 'small'],
                 ];
             }
+            if ($canWork) {
+                // In "Ещё": the service, the bill, the payment and the document of the deal.
+                $cardActions += \skeeks\cms\widgets\admin\CrmCardActionsWidget::leadRecordTabs($model);
+            }
             if ($canTask && !$leadTasks) {
                 $nextStepActions[] = $openActionLink(\skeeks\cms\backend\helpers\BackendIcon::renderConfigured('plus', ['size' => 16]).' Поставить задачу', $taskUrl, 'primary');
             }

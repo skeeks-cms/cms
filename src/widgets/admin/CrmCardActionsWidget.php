@@ -83,7 +83,7 @@ class CrmCardActionsWidget extends Widget
      * ({@see contactTabs()}), the tabs of packages, and in "Ещё" the records
      * of the card tabs ({@see recordTabs()}). For an employee who works with the client only
      * through his deals the block looks the same, and the deal is chosen when
-     * an action is taken ({@see dealTabs()}).
+     * an action is taken ({@see dealTabs()}; the records — {@see leadRecordTabs()}).
      *
      * @param \skeeks\cms\models\CmsCompany|\skeeks\cms\models\User $record
      */
@@ -178,7 +178,8 @@ class CrmCardActionsWidget extends Widget
                     : ['cms_lead_id' => (int)$owner->id]]);
             }
 
-            return $tabs + self::contactTabs($owner, $phones, $emails, $call) + CrmCardBlocksWidget::actions($owner);
+            return $tabs + self::contactTabs($owner, $phones, $emails, $call) + CrmCardBlocksWidget::actions($owner)
+                + ($owner === $record ? [] : self::leadRecordTabs($owner));
         };
 
         if (!$deals) {
@@ -197,8 +198,13 @@ class CrmCardActionsWidget extends Widget
         $tabs = [];
         foreach ($deals as $lead) {
             foreach ($tabsOf($lead, ['data-lead-id' => (int)$lead->id]) as $id => $tab) {
+                // A payment is of the client (tied to a deal through its bill): once, without the choice of a deal.
+                if (!empty($tab['ofClient'])) {
+                    $tabs[$id] = $tabs[$id] ?? $tab;
+                    continue;
+                }
                 $tabs[$id] = $tabs[$id] ?? ['label' => $tab['label'], 'icon' => $tab['icon'] ?? null, 'items' => [],
-                    'choiceTitle' => $single ? null : 'Выберите сделку'];
+                    'choiceTitle' => $single ? null : 'Выберите сделку'] + array_intersect_key($tab, ['more' => 1]);
                 $subs = !empty($tab['items']) ? $tab['items'] : [array_intersect_key($tab, ['url' => 1, 'options' => 1, 'window' => 1]) + ['label' => '']];
                 foreach ($subs as $sub) {
                     $sub['label'] = $single ? ($sub['label'] !== '' ? $sub['label'] : $tab['label'])
@@ -233,8 +239,8 @@ class CrmCardActionsWidget extends Widget
      * "Счёт", "Платёж", "Документ" — in "Ещё", each opening the create form of
      * that tab with the client chosen. Shown under the same rule as the card
      * tab (cms/admin-company/manage, cms/admin-user/manage) and the create
-     * action of its controller; not for "Свои сделки" and "edit" (they have no
-     * link to a deal, ARCHITECTURE.md п. 11 of cms-communication).
+     * action of its controller. "Свои сделки" and "edit" get the records of
+     * their deals instead ({@see leadRecordTabs()} in {@see dealTabs()}).
      */
     protected static function recordTabs($record): array
     {
@@ -267,6 +273,66 @@ class CrmCardActionsWidget extends Widget
                     ->enableEmptyLayout()->enableNoActions()->url];
             }
             $tabs['document'] = ['label' => 'Документ', 'icon' => 'file-text', 'items' => $items] + $more;
+        }
+
+        return array_filter($tabs);
+    }
+
+    /**
+     * The records of a deal (owner's decision 29.10.2026, «Полноценная работа в
+     * рамках своих сделок») in "Ещё": "Услуга", "Счёт", "Документ" with the deal
+     * chosen (`<Form>[cms_lead_id]`, the form takes its client:
+     * LeadLinkField::applyLeadClient()) and "Платёж" of its client — a payment
+     * is tied to the deal through its bill (`ofClient`). Each needs the deal
+     * column (CrmAccess::leadLinkReady()) and the create action of its section;
+     * none when the server refuses the deal (CrmAccess::canActOnClient(): on
+     * «Свои сделки» and "edit" only an own open deal). The reconciliation act is
+     * of the company, not of a deal: only for who acts on the company itself.
+     */
+    public static function leadRecordTabs(\skeeks\cms\models\CmsLead $lead): array
+    {
+        if (!\Yii::$app->has('user') || \Yii::$app->user->isGuest) {
+            return [];
+        }
+        $access = \skeeks\cms\crm\CrmAccess::instance();
+        $user = \Yii::$app->user->identity;
+        // These are records of the client: a deal without one (not sorted yet) has none.
+        $client = $lead->cms_company_id ? $lead->company : ($lead->cms_user_id ? $lead->client : null);
+        if (!$client || !$access->canActOnClient($user, $client, (int)$lead->id)) {
+            return [];
+        }
+        $id = (int)$lead->id;
+        $more = ['more' => true];
+        $tabs = [];
+        if (\skeeks\cms\crm\CrmAccess::leadLinkReady('cms_deal')) {
+            $tabs['service'] = self::createTab('Услуга', 'tools', '/cms/admin-cms-deal', ['CmsDeal' => ['cms_lead_id' => $id]], $more);
+        }
+        if (\skeeks\cms\crm\CrmAccess::leadLinkReady('shop_bill')) {
+            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => ['cms_lead_id' => $id]], $more);
+        }
+        $payment = static fn(int $debit) => ['ShopPayment' => [$lead->cms_company_id ? 'cms_company_id' : 'cms_user_id' => (int)$client->id, 'is_debit' => $debit]];
+        $in = self::createTab('Заплатили нам', '', '/shop/admin-payment', $payment(1));
+        $out = self::createTab('Мы заплатили', '', '/shop/admin-payment', $payment(0));
+        if ($in && $out) {
+            $tabs['payment'] = ['label' => 'Платёж', 'icon' => 'credit-card', 'items' => [$in, $out], 'ofClient' => true] + $more;
+        }
+        if (\skeeks\cms\crm\CrmAccess::leadLinkReady('shop_document') && self::canCreate('/cms/admin-cms-document')) {
+            $items = [];
+            foreach (\skeeks\cms\shop\models\ShopDocument::optionsForType() as $type => $label) {
+                if ($type === \skeeks\cms\shop\models\ShopDocument::TYPE_RECONCILIATION_ACT) {
+                    if (!$lead->cms_company_id || !$access->canActOnClient($user, $client)) {
+                        continue;
+                    }
+                    $route = ['/cms/admin-cms-document/create-reconciliation', 'company_id' => (int)$lead->cms_company_id];
+                } else {
+                    $route = ['/cms/admin-cms-document/create', 'type' => $type, 'ShopDocument' => ['cms_lead_id' => $id]];
+                }
+                $items[] = ['label' => $label, 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($route)
+                    ->enableEmptyLayout()->enableNoActions()->url];
+            }
+            if ($items) {
+                $tabs['document'] = ['label' => 'Документ', 'icon' => 'file-text', 'items' => $items] + $more;
+            }
         }
 
         return array_filter($tabs);

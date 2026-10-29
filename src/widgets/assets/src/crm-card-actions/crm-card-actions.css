@@ -192,4 +192,13 @@
     .sx-crm-actions__body {
         padding: 8px;
     }
+    /* Long items (a deal and a phone, a deal and a document) wrap inside the screen. */
+    .sx-crm-actions__menu {
+        width: max-content;
+        min-width: 200px;
+        max-width: calc(100vw - 48px);
+    }
+    .sx-crm-actions__menu-item {
+        white-space: normal;
+    }
 }
