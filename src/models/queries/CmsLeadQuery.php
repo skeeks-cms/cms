@@ -63,10 +63,9 @@ class CmsLeadQuery extends CmsActiveQuery
             $availableCompanyIds->andWhere(['not in', CmsCompany::tableName().'.id', $dealOnly]);
         }
         $table = $this->getPrimaryTableName();
-        $condition = ['or',
+        $condition = array_merge(['or',
             [$table.'.executor_id' => $managerIds],
-            ['exists', $availableCompanyIds->andWhere($this->companyEvidenceCondition($table, (int)$user->id))],
-        ];
+        ], $this->companyEvidenceCondition($table, (int)$user->id, $availableCompanyIds));
         // A personal deal of a person (no company, owner's decision 29.10.2026): the access to the person
         // himself — a "full" link of the employee or a subordinate; his companies do not open it.
         if (\skeeks\cms\crm\CrmAccess::levelsReady()) {
@@ -77,42 +76,55 @@ class CmsLeadQuery extends CmsActiveQuery
         return $this->andWhere($condition);
     }
 
-    /** Read-only evidence; never automatically converts or links a lead. */
-    private function companyEvidenceCondition(string $lead, int $viewerId): array
+    /**
+     * Read-only evidence; never automatically converts or links a lead. OR branches: the deal of a visible
+     * company, or an incoming deal nobody works on yet whose person or contacts belong to a visible company.
+     *
+     * Every subquery is non-correlated: the visible companies, their people and the deals whose contacts
+     * match them are computed once per query (normalizing the CRM phones once), so the cost does not grow
+     * with the deals of a column times the companies of a leader's team (before: an EXISTS over every
+     * visible company with the contact normalization for each deal).
+     */
+    private function companyEvidenceCondition(string $lead, int $viewerId, \yii\db\ActiveQuery $companies): array
     {
-        $company = CmsCompany::tableName();
-        $links = (new Query())->select(new \yii\db\Expression('1'))->from(['leadCompanyUser' => '{{%cms_company2user}}'])
-            ->where('leadCompanyUser.cms_company_id = '.$company.'.id')
-            ->andWhere(['<>', 'leadCompanyUser.cms_user_id', $viewerId])
-            ->andWhere(['or',
-                'leadCompanyUser.cms_user_id = '.$lead.'.cms_user_id',
-                'leadCompanyUser.cms_user_id = '.$lead.'.submitted_by_id',
-                'leadCompanyUser.cms_user_id = '.$lead.'.partner_id',
-                ['exists', $this->contactEvidence('{{%cms_lead_phone}}', '{{%cms_user_phone}}', $lead, 'leadCompanyUser.cms_user_id', 'cms_user_id', true)],
-                ['exists', $this->contactEvidence('{{%cms_lead_email}}', '{{%cms_user_email}}', $lead, 'leadCompanyUser.cms_user_id', 'cms_user_id', false)],
-            ]);
+        $people = (new Query())->select('leadCompanyUser.cms_user_id')->from(['leadCompanyUser' => '{{%cms_company2user}}'])
+            ->where(['leadCompanyUser.cms_company_id' => $companies])
+            ->andWhere(['<>', 'leadCompanyUser.cms_user_id', $viewerId]);
 
-        return ['or',
-            $lead.'.cms_company_id = '.$company.'.id',
+        return [
+            [$lead.'.cms_company_id' => $companies],
             // A person or contacts of the company: the evidence of an incoming deal nobody works on yet
             // (the sorting). A deal in work of a person is his personal order, not the company's.
             ['and', [$lead.'.executor_id' => null], ['or',
-                ['exists', $links],
-                ['exists', $this->contactEvidence('{{%cms_lead_phone}}', '{{%cms_company_phone}}', $lead, $company.'.id', 'cms_company_id', true)],
-                ['exists', $this->contactEvidence('{{%cms_lead_email}}', '{{%cms_company_email}}', $lead, $company.'.id', 'cms_company_id', false)],
+                [$lead.'.cms_user_id' => $people],
+                [$lead.'.submitted_by_id' => $people],
+                [$lead.'.partner_id' => $people],
+                [$lead.'.id' => $this->contactEvidence('{{%cms_lead_phone}}', '{{%cms_user_phone}}', 'cms_user_id', $people, true)],
+                [$lead.'.id' => $this->contactEvidence('{{%cms_lead_email}}', '{{%cms_user_email}}', 'cms_user_id', $people, false)],
+                [$lead.'.id' => $this->contactEvidence('{{%cms_lead_phone}}', '{{%cms_company_phone}}', 'cms_company_id', $companies, true)],
+                [$lead.'.id' => $this->contactEvidence('{{%cms_lead_email}}', '{{%cms_company_email}}', 'cms_company_id', $companies, false)],
             ]],
         ];
     }
 
-    private function contactEvidence(string $leadContacts, string $crmContacts, string $lead, string $owner, string $ownerColumn, bool $phone): Query
+    /**
+     * Ids of the deals with a contact equal to a contact (a normalized phone or e-mail) of the given owners.
+     * Both sides are normalized once into derived tables (GROUP BY keeps them materialized, not merged back
+     * into the join), so the join compares ready keys instead of normalizing a pair of contacts per row.
+     */
+    private function contactEvidence(string $leadContacts, string $crmContacts, string $ownerColumn, Query $owners, bool $phone): Query
     {
-        $left = $phone ? $this->phoneKey('leadContact.value') : 'LOWER(TRIM(leadContact.value))';
-        $right = $phone ? $this->phoneKey('crmContact.value') : 'LOWER(TRIM(crmContact.value))';
-        return (new Query())->select(new \yii\db\Expression('1'))->from(['leadContact' => $leadContacts])
-            ->innerJoin(['crmContact' => $crmContacts], $left.' = '.$right)
-            ->where('leadContact.cms_lead_id = '.$lead.'.id')
-            ->andWhere('crmContact.'.$ownerColumn.' = '.$owner)
-            ->andWhere($phone ? 'LENGTH('.$left.') >= 10' : $left." <> ''");
+        $key = fn(string $column) => $phone ? $this->phoneKey($column) : 'LOWER(TRIM('.$column.'))';
+        $deal = (new Query())->select(['cms_lead_id' => 'leadValue.cms_lead_id', 'contact_key' => new \yii\db\Expression($key('leadValue.value'))])
+            ->from(['leadValue' => $leadContacts])
+            ->andWhere($phone ? 'LENGTH('.$key('leadValue.value').') >= 10' : $key('leadValue.value')." <> ''")
+            ->groupBy(['cms_lead_id', 'contact_key']);
+        $crm = (new Query())->select(['contact_key' => new \yii\db\Expression($key('crmValue.value'))])->from(['crmValue' => $crmContacts])
+            ->where(['crmValue.'.$ownerColumn => $owners])
+            ->groupBy(['contact_key']);
+
+        return (new Query())->select('leadContact.cms_lead_id')->from(['leadContact' => $deal])
+            ->innerJoin(['crmContact' => $crm], 'leadContact.contact_key = crmContact.contact_key');
     }
 
     private function phoneKey(string $column): string

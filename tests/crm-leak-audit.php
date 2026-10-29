@@ -22,6 +22,7 @@
  *   TEST_HTTP_BASE (http://nginx), TEST_HTTP_HOST (localhost:8080) — the local site
  *   AUDIT_KEEP=1    — keep the fixture for a manual check in the browser (ids are printed);
  *   AUDIT_CLEAN=1   — only remove every «Аудит: » record left by a kept run
+ *   AUDIT_PREFIX, AUDIT_KEY — unique marks of the fixture (default «Аудит: », audit-) for a parallel run
  */
 if (getenv('CRM_LEAK_AUDIT') !== 'local') {
     throw new RuntimeException('Set CRM_LEAK_AUDIT=local.');
@@ -53,7 +54,10 @@ use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopDocument;
 use skeeks\cms\shop\models\ShopPayment;
 
-const AUDIT_PREFIX = 'Аудит: ';
+// AUDIT_PREFIX / AUDIT_KEY override the marks of the fixture (names / external codes): a unique pair keeps
+// a run from touching (and AUDIT_CLEAN from removing) the fixture of another run on the same stand.
+define('AUDIT_PREFIX', getenv('AUDIT_PREFIX') ?: 'Аудит: ');
+define('AUDIT_KEY', getenv('AUDIT_KEY') ?: 'audit-');
 $db = Yii::$app->db;
 
 /** Removes every record of the audit: by the prefix and by the ids hanging on the audit companies and people. */
@@ -68,9 +72,9 @@ $clean = static function () use ($db) {
     $documents = ShopDocument::find()->select('id')->andWhere(['or', ['like', 'description', AUDIT_PREFIX.'%', false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
     $tasks = CmsTask::find()->select('id')->andWhere(['or', $like, ['cms_company_id' => $companies ?: [0]], ['cms_lead_id' => $leads ?: [0]], ['cms_deal_id' => $deals ?: [0]]])->column();
     $proposals = $db->createCommand('SELECT id FROM cms_proposal WHERE name LIKE :p OR cms_company_id IN ('.implode(',', array_map('intval', $companies ?: [0])).')', [':p' => AUDIT_PREFIX.'%'])->queryColumn();
-    $calls = $db->createCommand('SELECT id FROM cms_telephony_call WHERE provider_call_id LIKE :p', [':p' => 'audit-%'])->queryColumn();
+    $calls = $db->createCommand('SELECT id FROM cms_telephony_call WHERE provider_call_id LIKE :p', [':p' => AUDIT_KEY.'%'])->queryColumn();
     $messages = $db->createCommand('SELECT id FROM cms_comm_message WHERE subject LIKE :p', [':p' => AUDIT_PREFIX.'%'])->queryColumn();
-    $conversations = $db->createCommand('SELECT id FROM cms_comm_conversation WHERE thread_key LIKE :p', [':p' => 'audit-%'])->queryColumn();
+    $conversations = $db->createCommand('SELECT id FROM cms_comm_conversation WHERE thread_key LIKE :p', [':p' => AUDIT_KEY.'%'])->queryColumn();
     $codes = [
         (new CmsCompany())->skeeksModelCode => $companies, (new CmsUser())->skeeksModelCode => $people,
         (new CmsLead())->skeeksModelCode => $leads, (new CmsDeal())->skeeksModelCode => $deals,
@@ -223,7 +227,7 @@ try {
 
     $bill = static function (array $client, float $amount, string $what) use ($name) {
         $model = new ShopBill($client + ['amount' => $amount, 'currency_code' => 'RUB', 'shop_pay_system_id' => 8,
-            'code' => 'audit-'.Yii::$app->security->generateRandomString(16), 'description' => $name($what)]);
+            'code' => AUDIT_KEY.Yii::$app->security->generateRandomString(16), 'description' => $name($what)]);
         $model->save(false);
         return $model;
     };
@@ -244,7 +248,7 @@ try {
 
     $document = static function (array $client, string $what) use ($name) {
         $model = new ShopDocument($client + ['type' => ShopDocument::TYPE_ACT, 'status' => 'draft', 'amount' => 71337.71, 'currency_code' => 'RUB',
-            'issued_at' => time(), 'code' => 'audit-'.Yii::$app->security->generateRandomString(16), 'description' => $name($what)]);
+            'issued_at' => time(), 'code' => AUDIT_KEY.Yii::$app->security->generateRandomString(16), 'description' => $name($what)]);
         $model->save(false);
         return $model;
     };
@@ -276,21 +280,21 @@ try {
 
     // an outgoing call of the main responsible on the other deal (no notifier: not incoming)
     $db->createCommand()->insert('cms_telephony_call', ['created_at' => time(), 'updated_at' => time(), 'cms_company_id' => $A->id,
-        'cms_lead_id' => $foreign->id, 'cms_worker_user_id' => $admin->id, 'provider_call_id' => 'audit-'.$uniq, 'direction' => 'out',
+        'cms_lead_id' => $foreign->id, 'cms_worker_user_id' => $admin->id, 'provider_call_id' => AUDIT_KEY.$uniq, 'direction' => 'out',
         'status' => 'answered', 'duration' => 61, 'client_phone' => '+79990'.$uniq])->execute();
     $callId = (int)$db->getLastInsertID();
     $db->createCommand()->insert('cms_telephony_call', ['created_at' => time(), 'updated_at' => time(), 'cms_company_id' => $protected->id,
-        'cms_worker_user_id' => $admin->id, 'provider_call_id' => 'audit-p'.$uniq, 'direction' => 'out',
+        'cms_worker_user_id' => $admin->id, 'provider_call_id' => AUDIT_KEY.'p'.$uniq, 'direction' => 'out',
         'status' => 'answered', 'duration' => 62, 'client_phone' => '+79991'.$uniq])->execute();
     $callProt = (int)$db->getLastInsertID();
 
     // a letter linked only to the other deal and to the service, and one linked to the company (the client's own)
-    $db->createCommand()->insert('cms_comm_conversation', ['cms_site_id' => $siteId, 'channel' => 'email', 'thread_key' => 'audit-'.$uniq,
+    $db->createCommand()->insert('cms_comm_conversation', ['cms_site_id' => $siteId, 'channel' => 'email', 'thread_key' => AUDIT_KEY.$uniq,
         'subject' => $name('переписка'), 'created_at' => time(), 'updated_at' => time(), 'last_message_at' => time()])->execute();
     $conversation = (int)$db->getLastInsertID();
     $letter = static function (string $what, array $links) use ($db, $siteId, $conversation, $name, $uniq) {
         $db->createCommand()->insert('cms_comm_message', ['cms_site_id' => $siteId, 'cms_comm_conversation_id' => $conversation, 'channel' => 'email',
-            'direction' => 'in', 'status' => 'received', 'external_id' => 'audit-'.$what.'-'.$uniq, 'from_address' => 'audit-'.$uniq.'@example.test',
+            'direction' => 'in', 'status' => 'received', 'external_id' => AUDIT_KEY.$what.'-'.$uniq, 'from_address' => AUDIT_KEY.$uniq.'@example.test',
             'subject' => $name($what), 'body_text' => $name($what), 'created_at' => time(), 'updated_at' => time(), 'message_at' => time()])->execute();
         $id = (int)$db->getLastInsertID();
         foreach ($links as [$code, $modelId]) {

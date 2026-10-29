@@ -10,9 +10,10 @@ $phoneController = file_get_contents($root.'/controllers/AdminCmsLeadPhoneContro
 $emailController = file_get_contents($root.'/controllers/AdminCmsLeadEmailController.php');
 $leadContact = file_get_contents($root.'/controllers/traits/LeadContactActions.php');
 
-// Every condition on an empty executor is the first operand of an AND whose second one is the evidence (EXISTS).
+// Every condition on an empty executor is the first operand of an AND whose second one is the evidence:
+// people of the visible companies or deal contacts matching their contacts.
 $nullExecutorOnlyWithEvidence = static function (string $source): bool {
-    if (!preg_match_all("~\[(?:'and'|\"and\"),\s*\[[^\]]*executor_id' => null\],\s*\['or',\s*\['exists',~", $source, $guarded)) {
+    if (!preg_match_all("~\[(?:'and'|\"and\"),\s*\[[^\]]*executor_id' => null\],\s*\['or',\s*\[[^\n]*(?:\\\$people|contactEvidence\(|'exists')~", $source, $guarded)) {
         $guarded = [[]];
     }
 
