@@ -76,6 +76,9 @@ class AdminCmsCompanyController extends BackendModelStandartController
                 'controller'  => $this,
                 'model'       => $this->model,
                 'titleSuffix' => \skeeks\cms\crm\CrmProtection::shieldFor($this->model),
+                // «Позвонить», «Письмо» and «⋯» of the card block; «Удалить» is the last item of «⋯».
+                'toolbar'     => \skeeks\cms\widgets\admin\CrmCardActionsWidget::headerTools($this->model, true, $this),
+                'actions'     => false,
             ]);
         };
 

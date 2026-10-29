@@ -89,6 +89,12 @@ class CrmCardActionsWidget extends Widget
      */
     public static function client($record, iterable $phones = [], iterable $emails = []): string
     {
+        return self::widget(self::clientConfig($record, $phones, $emails));
+    }
+
+    /** The widget config of {@see client()}: also the source of {@see headerTools()}. */
+    public static function clientConfig($record, iterable $phones = [], iterable $emails = []): array
+    {
         $phones = is_array($phones) ? $phones : iterator_to_array($phones, false);
         $emails = is_array($emails) ? $emails : iterator_to_array($emails, false);
         $isCompany = $record instanceof \skeeks\cms\models\CmsCompany;
@@ -98,7 +104,7 @@ class CrmCardActionsWidget extends Widget
             $hint = !$deals ? 'Открытых сделок с клиентом у вас нет: действие начнётся с новой сделки'
                 : (count($deals) === 1 ? 'Действия — по сделке '.self::dealLabel(reset($deals)) : 'Действия — по вашим сделкам: сделку выберете при действии');
 
-            return self::widget([
+            return [
                 'model' => $record,
                 'commentUrl' => ['/cms/admin-cms-lead/add-comment'],
                 'notePlaceholder' => 'Напишите примечание к сделке…',
@@ -107,7 +113,7 @@ class CrmCardActionsWidget extends Widget
                 'dealHint' => $hint,
                 'packageActions' => false,
                 'actions' => self::withLeadTab($record, self::dealTabs($record, $deals, $phones, $emails, $createUrl)),
-            ]);
+            ];
         }
         // An employee card: only the note.
         $isClient = $isCompany || !$record->is_worker;
@@ -119,7 +125,243 @@ class CrmCardActionsWidget extends Widget
             $actions = self::withLeadTab($record, $actions + self::contactTabs($record, $phones, $emails)) + self::recordTabs($record);
         }
 
-        return self::widget(['model' => $record, 'commentUrl' => ['/cms/admin-cms-log/add-comment'], 'actions' => $actions]);
+        return ['model' => $record, 'commentUrl' => ['/cms/admin-cms-log/add-comment'], 'actions' => $actions];
+    }
+
+    /**
+     * The widget config of the deal card: «Примечание», «Задача», «Позвонить»,
+     * «Письмо», «Не дозвонились», the records of the deal ({@see leadRecordTabs()})
+     * and the tabs of packages — for who works with the deal
+     * (CmsLead::canBeWorkedBy()). The phone and email are those of the
+     * request, else of the contact, else of the company (only a card the
+     * employee sees).
+     */
+    public static function leadConfig(\skeeks\cms\models\CmsLead $lead): array
+    {
+        $userId = (int)\Yii::$app->user->id;
+        $canWork = $lead->canBeWorkedBy($userId);
+        $actions = [];
+        if ($canWork && \Yii::$app->user->can('cms/admin-task')) {
+            $actions['task'] = self::taskTab(['CmsTask' => ['cms_lead_id' => (int)$lead->id]]);
+        }
+        $access = \skeeks\cms\crm\CrmAccess::instance();
+        $contactOf = static function (string $kind) use ($lead, $access, $userId): string {
+            $own = $kind === 'phone' ? $lead->mainPhone : $lead->mainEmail;
+            if ($own) {
+                return (string)$own->value;
+            }
+            if ($lead->client && $access->canSeeClient($userId, (int)$lead->client->id) && trim((string)$lead->client->{$kind}) !== '') {
+                return (string)$lead->client->{$kind};
+            }
+            if ($lead->company && $access->canSeeCompany($userId, (int)$lead->company->id)) {
+                return (string)\yii\helpers\ArrayHelper::getValue($kind === 'phone' ? $lead->company->phones : $lead->company->emails, '0.value', '');
+            }
+
+            return '';
+        };
+        $phone = $canWork ? $contactOf('phone') : '';
+        if ($phone !== '') {
+            $actions['call'] = ['label' => 'Позвонить', 'icon' => 'phone', 'options' => [
+                'class' => 'sx-telephony-btn',
+                'data-value' => $phone,
+                'data-lead-id' => (int)$lead->id,
+                'title' => 'Позвонить на '.$phone,
+            ]];
+        }
+        $email = $canWork ? $contactOf('email') : '';
+        if ($email !== '') {
+            // The letter of the CRM mail (a package adds it to the email row); else the mail program.
+            $html = CrmContactBlockWidget::contactActions(CrmContactBlockWidget::CONTACT_EMAIL, $email, $lead, []);
+            $onclick = preg_match('/onclick="([^"]+)"/', $html, $match) ? html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5) : null;
+            $actions['mail'] = ['label' => 'Письмо', 'icon' => 'mail', 'options' => [
+                'onclick' => $onclick ?: 'window.location.href = '.Json::encode('mailto:'.$email).'; return false;',
+                'title' => 'Письмо на '.$email,
+            ]];
+        }
+        if ($canWork && $lead->status === \skeeks\cms\models\CmsLead::STATUS_IN_WORK) {
+            $actions['no-answer'] = [
+                'label' => 'Не дозвонились',
+                'icon' => 'phone-missed',
+                'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                    '/cms/admin-cms-lead/no-answer',
+                    'pk' => $lead->id,
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
+                'window' => ['size' => 'small'],
+            ];
+        }
+        if ($canWork) {
+            // In "Ещё": the service, the bill, the payment and the document of the deal.
+            $actions += self::leadRecordTabs($lead);
+        }
+
+        return [
+            'model' => $lead,
+            'commentUrl' => $canWork ? ['/cms/admin-cms-lead/add-comment', 'pk' => $lead->id] : null,
+            'noteLabel' => $lead->partner_id ? 'Партнёру' : 'Примечание',
+            'notePlaceholder' => $lead->partner_id ? 'Напишите партнёру…' : 'Напишите примечание…',
+            'actions' => $actions,
+            'packageActions' => $canWork,
+        ];
+    }
+
+    /**
+     * The widget config of a card: a deal, a company, a person client; null
+     * for an employee card.
+     */
+    public static function cardConfig($record): ?array
+    {
+        if ($record instanceof \skeeks\cms\models\CmsLead) {
+            return self::leadConfig($record);
+        }
+        if ($record instanceof \skeeks\cms\models\CmsCompany) {
+            return self::clientConfig($record, $record->phones, $record->emails);
+        }
+        if ($record instanceof \skeeks\cms\models\User && !$record->is_worker) {
+            return self::clientConfig($record, $record->cmsUserPhones, $record->cmsUserEmails);
+        }
+
+        return null;
+    }
+
+    /**
+     * The tools of a card header (owner's decision 30.10.2026): the icons
+     * «Позвонить» and «Письмо» — the very actions of the block (the same choice
+     * of a phone or an address, the CRM letter window, the choice of an own
+     * deal on «Свои сделки» and "edit"; absent action — no icon) — and the
+     * menu «⋯» with every action of the block and «Ещё», «Удалить» last under
+     * a line (the delete action of $controller, BackendModelHeader::deleteActionData(),
+     * with the name of the record and what is tied to it). On a narrow screen
+     * the icons hide: they are in «⋯» too. The header itself renders no delete
+     * button then (`actions => false`).
+     *
+     * @param \yii\base\Controller|null $controller the card controller (its delete action)
+     */
+    public static function headerTools($record, bool $icons = true, $controller = null): string
+    {
+        $config = self::cardConfig($record);
+        if ($config === null) {
+            return '';
+        }
+        $widget = new self($config);
+        $items = $widget->items();
+        $html = '';
+        foreach ($icons ? ['call', 'mail'] : [] as $id) {
+            if (isset($items[$id])) {
+                $html .= $widget->renderHeaderIcon($id, $items[$id]);
+            }
+        }
+
+        $menu = '';
+        if ($widget->commentUrl !== null) {
+            // «Примечание» opens the note of the block (on another tab — the profile with #note).
+            $viewRoute = $record instanceof \skeeks\cms\models\CmsLead ? '/cms/admin-cms-lead/view'
+                : ($record instanceof \skeeks\cms\models\CmsCompany ? '/cms/admin-cms-company/view' : '/cms/admin-user/view');
+            $viewUrl = \yii\helpers\Url::to([$viewRoute, 'pk' => $record->id]).'#sx-crm-note';
+            $menu .= Html::a($widget->icon('message').Html::tag('span', Html::encode($widget->noteLabel)), $viewUrl, [
+                'class' => 'sx-crm-actions__menu-item',
+                'role' => 'menuitem',
+                'data-pjax' => '0',
+                'data-sx-crm-actions-note' => true,
+            ]);
+        }
+        // As in the block: the tabs of the row, then those of «Ещё».
+        uasort($items, static fn($a, $b) => (int)!empty($a['more']) <=> (int)!empty($b['more']));
+        foreach ($items as $id => $item) {
+            $menu .= $widget->renderMenuItems('header-'.$id, $item);
+        }
+        // skeeks/cms-backend with BackendModelHeader::deleteActionData() (the delete action of the header).
+        $delete = method_exists(\skeeks\cms\backend\widgets\BackendModelHeader::class, 'deleteActionData')
+            ? \skeeks\cms\backend\widgets\BackendModelHeader::deleteActionData($controller) : null;
+        if ($delete !== null) {
+            $delete['confirm'] = self::deleteConfirm($record);
+            $menu .= Html::tag('div', '', ['class' => 'sx-crm-actions__menu-separator', 'role' => 'separator'])
+                .Html::a($widget->icon('trash').Html::tag('span', 'Удалить'), '#', [
+                    'class' => 'sx-crm-actions__menu-item sx-crm-actions__menu-item--danger',
+                    'role' => 'menuitem',
+                    'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode($delete).').go(); return false;',
+                ]);
+        }
+        if ($menu !== '') {
+            $html .= Html::tag('details',
+                Html::tag('summary', $widget->icon('more-horizontal'), [
+                    'class' => 'btn btn-default',
+                    'title' => 'Все действия',
+                    'aria-label' => 'Все действия',
+                ])
+                .Html::tag('div', $menu, ['class' => 'sx-crm-actions__menu', 'role' => 'menu']),
+                ['class' => 'sx-crm-actions__more sx-crm-header-menu', 'data-sx-crm-actions-menu' => true, 'data-sx-crm-actions-more' => true]
+            );
+        }
+        if ($html === '') {
+            return '';
+        }
+        CrmCardActionsAsset::register(\Yii::$app->view);
+
+        return Html::tag('div', $html, ['class' => 'sx-crm-header-tools']);
+    }
+
+    /** An icon of the header: one action at once, several (phones, deals) — its choice under the icon. */
+    protected function renderHeaderIcon(string $id, array $item): string
+    {
+        $label = (string)$item['label'];
+        if (empty($item['items'])) {
+            $options = ['class' => 'btn btn-default sx-crm-header-tools__icon', 'title' => $label, 'aria-label' => $label, 'data-sx-crm-action' => 'header-'.$id];
+            $url = trim((string)($item['url'] ?? ''));
+            if ($url !== '') {
+                return Html::a($this->icon((string)$item['icon']), $url, $options + [
+                    'data-pjax' => '0',
+                    'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode(['isOpenNewWindow' => true, 'url' => $url]).').go(); return false;',
+                ]);
+            }
+            $options = array_merge((array)$item['options'], ['aria-label' => $label, 'data-sx-crm-action' => 'header-'.$id]);
+            Html::addCssClass($options, 'btn btn-default sx-crm-header-tools__icon');
+
+            return Html::button($this->icon((string)$item['icon']), $options);
+        }
+        $choice = !empty($item['choiceTitle']) ? Html::tag('div', Html::encode($item['choiceTitle']), ['class' => 'sx-crm-actions__menu-title']) : '';
+        foreach ($item['items'] as $subId => $sub) {
+            $choice .= $this->renderItem('header-'.$id.'.'.$subId, ['icon' => null] + $sub, 'sx-crm-actions__menu-item', ['role' => 'menuitem']);
+        }
+
+        return Html::tag('details',
+            Html::tag('summary', $this->icon((string)$item['icon']), ['class' => 'btn btn-default sx-crm-header-tools__icon', 'title' => $label, 'aria-label' => $label])
+            .Html::tag('div', $choice, ['class' => 'sx-crm-actions__menu', 'role' => 'menu']),
+            ['class' => 'sx-crm-actions__more sx-crm-header-tools__choice', 'data-sx-crm-actions-menu' => true, 'data-sx-crm-actions-more' => true]
+        );
+    }
+
+    /**
+     * The confirmation of «Удалить»: the name of the record and the records
+     * tied to it (deals, services, bills, payments, documents) that the
+     * employee should know about before.
+     */
+    protected static function deleteConfirm($record): string
+    {
+        $isLead = $record instanceof \skeeks\cms\models\CmsLead;
+        $name = $isLead ? (string)$record->displayName : (string)$record->asText;
+        $column = $isLead ? 'cms_lead_id' : ($record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id');
+        $tied = [];
+        $count = static function (string $class, array $forms) use ($column, $record, &$tied): void {
+            if (!class_exists($class) || !in_array($column, $class::getTableSchema()->columnNames, true)) {
+                return;
+            }
+            $n = (int)$class::find()->andWhere([$class::tableName().'.'.$column => (int)$record->id])->count();
+            if ($n > 0) {
+                $mod10 = $n % 10;
+                $mod100 = $n % 100;
+                $tied[] = $n.' '.($mod10 === 1 && $mod100 !== 11 ? $forms[0]
+                    : ($mod10 >= 2 && $mod10 <= 4 && ($mod100 < 12 || $mod100 > 14) ? $forms[1] : $forms[2]));
+            }
+        };
+        if (!$isLead) {
+            $count(\skeeks\cms\models\CmsLead::class, ['сделка', 'сделки', 'сделок']);
+        }
+        $count(\skeeks\cms\models\CmsDeal::class, ['услуга', 'услуги', 'услуг']);
+        $count('skeeks\cms\shop\models\ShopBill', ['счёт', 'счёта', 'счетов']);
+        $count('skeeks\cms\shop\models\ShopPayment', ['платёж', 'платежа', 'платежей']);
+        $count('skeeks\cms\shop\models\ShopDocument', ['документ', 'документа', 'документов']);
+
+        return 'Удалить «'.$name.'»?'.($tied ? ' С этой записью связаны: '.implode(', ', $tied).'. Проверьте их перед удалением.' : '');
     }
 
     /** The create window of a deal with the client chosen; after the save the deal card opens (no `noa`). */
@@ -490,7 +732,11 @@ class CrmCardActionsWidget extends Widget
         return Html::tag('div', $head, ['class' => 'sx-crm-actions__deals-head']).$groups;
     }
 
-    public function run()
+    /**
+     * The actions of the block, the header icons and the menu «⋯»
+     * ({@see headerTools()}): one list, packages included.
+     */
+    protected function items(): array
     {
         $items = [];
         foreach ($this->actions as $id => $action) {
@@ -509,6 +755,13 @@ class CrmCardActionsWidget extends Widget
         if ($this->packageActions) {
             $items += CrmCardBlocksWidget::actions($this->model);
         }
+
+        return $items;
+    }
+
+    public function run()
+    {
+        $items = $this->items();
         if (!$items && $this->commentUrl === null) {
             return '';
         }

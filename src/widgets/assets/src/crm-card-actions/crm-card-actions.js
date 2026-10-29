@@ -67,8 +67,23 @@
     var fitAll = function () {
         Array.prototype.forEach.call(document.querySelectorAll("[data-sx-crm-actions]"), fit);
     };
+    // «Примечание» of the header menu «⋯»: the note of the block on this page, else the profile with #sx-crm-note.
+    var openNote = function () {
+        var $block = $("[data-sx-crm-actions]").first();
+        if (!$block.length || !$block.find("[data-sx-crm-actions-open]").length) {
+            return false;
+        }
+        toggle($block, true);
+        $block.get(0).scrollIntoView({block: "center", behavior: "smooth"});
+        return true;
+    };
     var timer = null;
     $(fitAll);
+    $(function () {
+        if (window.location.hash === "#sx-crm-note") {
+            openNote();
+        }
+    });
     $(window).off(".sxCrmActions").on("resize.sxCrmActions load.sxCrmActions", function () {
         window.clearTimeout(timer);
         timer = window.setTimeout(fitAll, 100);
@@ -84,6 +99,12 @@
                 this.hidden = String(this.getAttribute("data-sx-crm-actions-deal")) !== value;
             });
             fitAll();
+        })
+        .on("click.sxCrmActions", "[data-sx-crm-actions-note]", function (e) {
+            if (openNote()) {
+                e.preventDefault();
+                $(this).closest("[data-sx-crm-actions-menu]").removeAttr("open");
+            }
         })
         .on("click.sxCrmActions", "[data-sx-crm-actions-open]", function (e) {
             e.preventDefault();

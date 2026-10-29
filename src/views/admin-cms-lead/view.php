@@ -608,68 +608,11 @@ JS
                     'onclick' => 'new sx.classes.backend.widgets.Action('.$action.').go(); return false;',
                 ]);
             };
-            // The block of actions over the feed, as in Bitrix24 (CrmCardActionsWidget): «Примечание»,
-            // «Задача», «Позвонить», «Письмо», «Не дозвонились», then the tabs of packages
-            // (CrmCardBlocksWidget::EVENT_ACTIONS: «Отправить презентацию», «Отправить КП», …).
-            $cardActions = [];
             $taskUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                 '/cms/admin-cms-task/create',
                 'CmsTask' => ['cms_lead_id' => $model->id],
             ])->enableEmptyLayout()->enableNoActions()->url;
             $canTask = $canWork && \Yii::$app->user->can('cms/admin-task');
-            if ($canTask) {
-                $cardActions['task'] = ['label' => 'Задача', 'icon' => 'plus', 'url' => $taskUrl];
-            }
-            // The phone and email of the request, else of the contact, else of the company (only a visible card).
-            $contactOf = static function (string $kind) use ($model, $clientVisible, $companyVisible): string {
-                $own = $kind === 'phone' ? $model->mainPhone : $model->mainEmail;
-                if ($own) {
-                    return (string)$own->value;
-                }
-                if ($model->client && $clientVisible && trim((string)$model->client->{$kind}) !== '') {
-                    return (string)$model->client->{$kind};
-                }
-                if ($model->company && $companyVisible) {
-                    return (string)ArrayHelper::getValue($kind === 'phone' ? $model->company->phones : $model->company->emails, '0.value', '');
-                }
-
-                return '';
-            };
-            $callPhone = $contactOf('phone');
-            if ($canWork && $callPhone !== '') {
-                $cardActions['call'] = ['label' => 'Позвонить', 'icon' => 'phone', 'options' => [
-                    'class' => 'sx-telephony-btn',
-                    'data-value' => $callPhone,
-                    'data-lead-id' => (int)$model->id,
-                    'title' => 'Позвонить на '.$callPhone,
-                ]];
-            }
-            $mailTo = $contactOf('email');
-            if ($canWork && $mailTo !== '') {
-                // The letter of the CRM mail (a package adds it to the email row); else the mail program.
-                $mailHtml = \skeeks\cms\widgets\admin\CrmContactBlockWidget::contactActions(
-                    \skeeks\cms\widgets\admin\CrmContactBlockWidget::CONTACT_EMAIL, $mailTo, $model, []);
-                $mailOnClick = preg_match('/onclick="([^"]+)"/', $mailHtml, $match) ? html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5) : null;
-                $cardActions['mail'] = ['label' => 'Письмо', 'icon' => 'mail', 'options' => [
-                    'onclick' => $mailOnClick ?: 'window.location.href = '.\yii\helpers\Json::encode('mailto:'.$mailTo).'; return false;',
-                    'title' => 'Письмо на '.$mailTo,
-                ]];
-            }
-            if ($canWork && $isInWork) {
-                $cardActions['no-answer'] = [
-                    'label' => 'Не дозвонились',
-                    'icon' => 'phone-missed',
-                    'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                        '/cms/admin-cms-lead/no-answer',
-                        'pk' => $model->id,
-                    ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
-                    'window' => ['size' => 'small'],
-                ];
-            }
-            if ($canWork) {
-                // In "Ещё": the service, the bill, the payment and the document of the deal.
-                $cardActions += \skeeks\cms\widgets\admin\CrmCardActionsWidget::leadRecordTabs($model);
-            }
             if ($canTask && !$leadTasks) {
                 $nextStepActions[] = $openActionLink(\skeeks\cms\backend\helpers\BackendIcon::renderConfigured('plus', ['size' => 16]).' Поставить задачу', $taskUrl, 'primary');
             }
@@ -691,14 +634,8 @@ CSS
                 ?>
             <?php $pjax = Pjax::begin(['id' => 'cms-lead-comments', 'options' => ['class' => 'sx-surface-stack sx-activity-thread']]); ?>
             <?php // One block of actions with the note field, inside the feed pjax: a sent note reloads the feed. ?>
-            <?= \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget([
-                'model' => $model,
-                'commentUrl' => $canWork ? ['/cms/admin-cms-lead/add-comment', 'pk' => $model->id] : null,
-                'noteLabel' => $model->partner_id ? 'Партнёру' : 'Примечание',
-                'notePlaceholder' => $model->partner_id ? 'Напишите партнёру…' : 'Напишите примечание…',
-                'actions' => $cardActions,
-                'packageActions' => $canWork,
-            ]); ?>
+            <?php // The same actions as the header icons and «⋯» (CrmCardActionsWidget::leadConfig()). ?>
+            <?= \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget(\skeeks\cms\widgets\admin\CrmCardActionsWidget::leadConfig($model)); ?>
                 <?php // Pinned entries once, right under the block of actions, marked as in the feed; the feed below skips them. ?>
                 <?php $pinnedLeadLogsQuery = $model->getLogs()->activity()->pinned(); ?>
                 <?php if ($pinnedLeadLogsQuery->count()) : ?>

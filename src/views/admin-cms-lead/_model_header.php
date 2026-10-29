@@ -166,6 +166,10 @@ if (!$model->isTerminal && $model->status !== CmsLead::STATUS_NEW && $access->ca
     $toolbar[] = $windowLink('<i class="fas fa-share" aria-hidden="true"></i> Сменить ответственного', ['/cms/admin-cms-lead/assign', 'pk' => $model->id], 'secondary', 'small');
 }
 
+// «Позвонить», «Письмо» and «⋯» of the card block («Удалить» last in «⋯»). An unsorted request keeps the right
+// side for «Взять в работу» and «Не продажа»: only «⋯», the call and the letter are inside it.
+$toolbar[] = \skeeks\cms\widgets\admin\CrmCardActionsWidget::headerTools($model, $model->status !== CmsLead::STATUS_NEW, $this->context);
+
 echo BackendModelHeader::widget([
     'model' => $model,
     'title' => $model->displayName,

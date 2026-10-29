@@ -118,7 +118,7 @@ class CrmCardTabs
         return Html::tag('details',
             Html::tag('summary', $text.' '.Html::tag('span', '', ['class' => 'fa fa-angle-down']), ['class' => 'btn btn-primary'])
             .Html::tag('div', $menu, ['class' => 'sx-crm-actions__menu', 'role' => 'menu']),
-            ['class' => 'sx-crm-actions__more sx-crm-tab-create']
+            ['class' => 'sx-crm-actions__more sx-crm-tab-create', 'data-sx-crm-actions-menu' => true]
         ).'<br>';
     }
 

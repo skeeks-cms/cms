@@ -181,7 +181,43 @@
 [data-sx-crm-actions-deal][hidden] {
     display: none;
 }
+.sx-crm-actions__menu-separator {
+    height: 1px;
+    margin: 4px 6px;
+    background: var(--sx-menu-border-color, var(--sx-color-border));
+}
+.sx-crm-actions__menu-item--danger,
+.sx-crm-actions__menu-item--danger:hover,
+.sx-crm-actions__menu-item--danger:focus {
+    color: var(--sx-color-danger, #d64545);
+}
+/* The header tools of a card: «Позвонить», «Письмо», «⋯» (CrmCardActionsWidget::headerTools()). */
+.sx-crm-header-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.sx-crm-header-tools > .sx-crm-actions__more > summary {
+    display: inline-flex;
+    align-items: center;
+}
+.sx-crm-header-tools .sx-crm-actions__menu {
+    min-width: 240px;
+}
+/* «⋯» and a choice of the header open to the left of the button: the header is at the right. */
+.sx-crm-header-tools .sx-crm-actions__more > .sx-crm-actions__menu {
+    right: 0;
+    left: auto;
+}
+.sx-crm-tab-create {
+    display: inline-flex;
+}
 @media (max-width: 575px) {
+    /* The icons are in «⋯» too: a narrow header keeps only it and the main buttons. */
+    .sx-crm-header-tools__icon,
+    .sx-crm-header-tools__choice {
+        display: none !important;
+    }
     .sx-crm-actions__tabs {
         padding: 0 4px;
     }
