@@ -79,6 +79,8 @@ class LeadTriage
             $this->markTriaged($lead, $actorId);
             $this->save($lead);
             $this->afterIdentity($lead, $identity, $form, $actorId);
+            // The responsible works with the client of the deal ("Свои сделки" when he has no link yet).
+            $this->access->grantLeadExecutorLevel($lead, $actorId);
 
             $parts = $this->identityText($lead);
             $lead->addSystemActivity('Сделка принята в работу'.($parts ? ': '.$parts : '').'. Ответственный — '
@@ -483,6 +485,8 @@ class LeadTriage
                 $this->markTriaged($lead, $actorId);
             }
             $this->save($lead);
+            // The new responsible works with the client of the deal ("Свои сделки" when he has no link yet).
+            $this->access->grantLeadExecutorLevel($lead, $actorId);
             $lead->addSystemActivity('Ответственный сделки — '.Html::encode((string)$executor->shortDisplayName)
                 .($comment ? ': '.Html::encode($comment) : '.'), $actorId);
             $this->notifyAssigned($lead, $actorId);

@@ -2643,6 +2643,8 @@ HTML;
         }
 
         $model->load(\Yii::$app->request->get());
+        // Opened from a deal: the client of the deal.
+        \skeeks\cms\crm\LeadLinkField::applyLeadClient($model);
         if ($model->isNewRecord && !$model->due_at) {
             $model->due_at = strtotime('today +30 days');
         }
@@ -3119,14 +3121,16 @@ HTML
         $result['relations'] = [
             'class'  => FieldSet::class,
             'name'   => 'Связи',
-            'fields' => [
+            'fields' => array_filter([
+                // The deal of the bill (owner's decision 29.10.2026).
+                'cms_lead_id' => $model->hasAttribute('cms_lead_id') ? \skeeks\cms\crm\LeadLinkField::config($model) : null,
                 "deals" => [
                     'class'        => SelectField::class,
                     'multiple' => true,
                     'items'  => $dealData,
                 ]
 
-            ]
+            ])
         ];
 
 

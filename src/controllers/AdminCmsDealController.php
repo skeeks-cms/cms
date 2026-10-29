@@ -778,6 +778,8 @@ JS
          */
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
+        // Opened from a deal: the client of the deal.
+        \skeeks\cms\crm\LeadLinkField::applyLeadClient($model);
         $this->registerClientSwitcher($model, 'cmsdeal');
 
         if (!$model->name && $model->dealType && \Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
@@ -862,11 +864,15 @@ JS
                         ],
                     ],
 
-
+                    // The deal of the service (owner's decision 29.10.2026).
+                    'cms_lead_id' => $model->hasAttribute('cms_lead_id') ? \skeeks\cms\crm\LeadLinkField::config($model) : null,
                 ],
             ],
 
         ];
+        if (!$model->hasAttribute('cms_lead_id')) {
+            unset($result['client']['fields']['cms_lead_id']);
+        }
 
 
         $result['is_periodic'] = [

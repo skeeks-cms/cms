@@ -1276,6 +1276,126 @@ class CrmAccess extends Component
     }
 
     /**
+     * "Своё" of a record tied to a deal (owner's decision 29.10.2026, «Полноценная
+     * работа в рамках своих сделок»): $column is a deal of the employee or of his
+     * subordinates (the executor among ownerIds(), as ownLeads()). For the $own
+     * conditions of clientRecordCondition(): services, bills, documents, and
+     * payments through their bill.
+     */
+    public function ownLeadCondition($user, string $column, ?string $table = null): array
+    {
+        // $table — the real table when $column is qualified by an alias.
+        if (!self::leadLinkReady($table ?? explode('.', $column)[0])) {
+            return ['0=1'];
+        }
+        return [$column => CmsLead::find()->select(CmsLead::tableName().'.id')
+            ->andWhere([CmsLead::tableName().'.executor_id' => $this->ownerIds($user)])];
+    }
+
+    /**
+     * The new responsible of a deal works with its client (owner's decision
+     * 29.10.2026): a change of the responsible, «Разобрать», taking a deal give
+     * him "Свои сделки" to the company of the deal (a person without a company —
+     * to the person) when he has no link yet; an existing level, the main
+     * responsible and the links of others stay. Written to the access journal.
+     * Administrators see every client and get no link.
+     */
+    public function grantLeadExecutorLevel(CmsLead $lead, ?int $actorId = null): void
+    {
+        $executorId = (int)$lead->executor_id;
+        if (!$executorId || !self::levelsReady() || $this->isAdmin($executorId)) {
+            return;
+        }
+        if ($lead->cms_company_id) {
+            $record = [CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id];
+        } elseif ($lead->cms_user_id && ($person = CmsUser::findOne((int)$lead->cms_user_id)) && !$person->is_worker) {
+            $record = [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id];
+        } else {
+            return;
+        }
+        if ($this->linkLevel($executorId, $record[0], $record[1]) !== null) {
+            return;
+        }
+        $this->grantLink($record[0], $record[1], $executorId, self::LEVEL_DEAL);
+        CrmAccessLog::write(CrmAccessLog::GRANT, $record[0], $record[1], [
+            'actor_id' => $actorId ?: null, 'user_id' => $executorId, 'level_to' => self::LEVEL_DEAL,
+            'cms_lead_id' => (int)$lead->id, 'comment' => 'ответственный сделки №'.(int)$lead->id,
+        ]);
+    }
+
+    /** @var bool[] table => it has cms_lead_id */
+    private static array $leadLinkReady = [];
+
+    /**
+     * The table (cms_deal, shop_bill, shop_document) has its deal column: the
+     * code may run before the migrations m261029_190000 of skeeks/cms and cms-shop.
+     */
+    public static function leadLinkReady(string $table): bool
+    {
+        $table = trim(str_replace(['{{%', '}}', '`'], '', $table));
+        if (!array_key_exists($table, self::$leadLinkReady)) {
+            $schema = \Yii::$app->db->getTableSchema('{{%'.$table.'}}');
+            self::$leadLinkReady[$table] = $schema !== null && $schema->getColumn('cms_lead_id') !== null;
+        }
+
+        return self::$leadLinkReady[$table];
+    }
+
+    /**
+     * The deal of a record written for a client — a service, a bill, a
+     * document (owner's decision 29.10.2026): when the deal is chosen or
+     * changed it must be available to the acting employee and belong to the
+     * client of the record (a record without a client takes the client of the
+     * deal); a new record of a client the employee does not see in full
+     * («Свои сделки», "edit") needs his own open deal (canActOnClient(),
+     * OWN_LEAD_REQUIRED). The console and system work are not limited.
+     *
+     * @param \yii\db\BaseActiveRecord $model with cms_company_id and cms_user_id
+     */
+    public function validateLeadLink(\yii\db\BaseActiveRecord $model, string $attribute = 'cms_lead_id'): void
+    {
+        $leadId = (int)$model->$attribute ?: null;
+        $model->$attribute = $leadId;
+        $changed = $model->isNewRecord || $model->isAttributeChanged($attribute, false);
+        $worker = self::actingWorker();
+        if ($leadId && $changed) {
+            $query = CmsLead::find()->andWhere([CmsLead::tableName().'.id' => $leadId]);
+            if ($worker) {
+                $query->forManager($worker);
+            }
+            $lead = $query->one();
+            if (!$lead) {
+                $model->addError($attribute, 'Сделка не найдена или недоступна вам.');
+                return;
+            }
+            if (!$model->cms_company_id && !$model->cms_user_id) {
+                $model->cms_company_id = $lead->cms_company_id ? (int)$lead->cms_company_id : null;
+                $model->cms_user_id = $lead->cms_company_id ? null : ($lead->cms_user_id ? (int)$lead->cms_user_id : null);
+            } elseif ($lead->cms_company_id || $lead->cms_user_id) {
+                $sameClient = $model->cms_company_id
+                    ? (int)$lead->cms_company_id === (int)$model->cms_company_id
+                    : !$lead->cms_company_id && (int)$lead->cms_user_id === (int)$model->cms_user_id;
+                if (!$sameClient) {
+                    $model->addError($attribute, 'Сделка относится к другому клиенту.');
+                    return;
+                }
+            }
+        }
+        if (!$changed || !$worker || !self::levelsReady() || !($record = self::clientRecordOf($model))) {
+            return;
+        }
+        // Only a client he sees in part («Свои сделки», "edit"): the rule of the record without CRM access
+        // (a buyer of an order he does not see) stays as before.
+        if ($this->clientDataLevel($worker, $record[0], (int)$record[1]) === null) {
+            return;
+        }
+        $client = $record[0] === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne((int)$record[1]) : CmsUser::findOne((int)$record[1]);
+        if ($client && !$this->canActOnClient($worker, $client, $leadId)) {
+            $model->addError($attribute, self::OWN_LEAD_REQUIRED);
+        }
+    }
+
+    /**
      * The records of the client itself in a limited feed. Entries another
      * record writes there (a proposal of the company — ProposalFeed) are not
      * "the client's own": a log type whose renderer implements

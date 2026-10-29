@@ -1,7 +1,9 @@
 <?php
 /**
- * «Поручить»: the deal to another employee; the company stays with its
- * responsible (П2а). LeadTriageActions::assign().
+ * «Поручить»: the deal to another employee; the company keeps its main
+ * responsible, the new one gets "Свои сделки" when he has no link
+ * (CrmAccess::grantLeadExecutorLevel(), owner's decision 29.10.2026).
+ * LeadTriageActions::assign().
  *
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsLead $model
@@ -21,7 +23,7 @@ $this->title = 'Сменить ответственного: сделка №'.(
 <?php BackendSurfaceWidget::begin([
     'title' => 'Сменить ответственного',
     'titleTag' => 'h2',
-    'hint' => 'Сделку получит выбранный сотрудник. Компания останется у своего ответственного: новому сотруднику она видна только названием и ответственным.',
+    'hint' => 'Сделку получит выбранный сотрудник. Если у него ещё нет доступа к клиенту сделки, он получит доступ «Свои сделки»: увидит карточку клиента и будет работать с этой сделкой. Основной ответственный клиента и доступы других сотрудников не меняются.',
     'raised' => true,
     'responsive' => true,
 ]); ?>

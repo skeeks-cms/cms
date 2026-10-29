@@ -159,6 +159,8 @@ class CmsLeadBoardService
         } catch (StaleObjectException $e) {
             throw new \RuntimeException('Сделка уже изменена в другой вкладке. Обновите страницу.', 0, $e);
         }
+        // A deal taken from «Неразобранное»: its responsible works with the client.
+        \skeeks\cms\crm\CrmAccess::instance()->grantLeadExecutorLevel($lead, $actorId);
 
         return true;
     }

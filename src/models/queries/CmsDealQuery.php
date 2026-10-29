@@ -45,9 +45,12 @@ class CmsDealQuery extends CmsActiveQuery
             // A client seen in full, or "своё" for the level "Свои сделки" (CrmAccess::clientRecordCondition()).
             $access = \skeeks\cms\crm\CrmAccess::instance();
             $table = self::getPrimaryTableName();
-            $this->andWhere($access->clientRecordCondition($user, $table, [
-                [$table.'.created_by' => $access->ownerIds($user)],
-            ]));
+            $own = [[$table.'.created_by' => $access->ownerIds($user)]];
+            if (method_exists($access, 'ownLeadCondition')) {
+                // A service of his deal (or of a subordinate's deal), owner's decision 29.10.2026.
+                $own[] = $access->ownLeadCondition($user, $table.'.cms_lead_id', '{{%cms_deal}}');
+            }
+            $this->andWhere($access->clientRecordCondition($user, $table, $own));
         }
 
         return $this;

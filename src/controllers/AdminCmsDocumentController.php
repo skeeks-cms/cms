@@ -590,6 +590,8 @@ class AdminCmsDocumentController extends BackendModelStandartController
             throw new ForbiddenHttpException('Документ нельзя редактировать в текущем статусе');
         }
         $model->load(\Yii::$app->request->get());
+        // Opened from a deal: the client of the deal.
+        \skeeks\cms\crm\LeadLinkField::applyLeadClient($model);
         $this->prepareModelFromCreateRequest($model);
         $this->prepareModelFromBillRequest($model);
 
@@ -899,7 +901,9 @@ JS
             'relations' => [
                 'class' => FieldSet::class,
                 'name' => 'Связи',
-                'fields' => [
+                'fields' => array_filter([
+                    // The deal of the document (owner's decision 29.10.2026).
+                    'cms_lead_id' => $model->hasAttribute('cms_lead_id') ? \skeeks\cms\crm\LeadLinkField::config($model) : null,
                     'bills' => [
                         'class' => SelectField::class,
                         'multiple' => true,
@@ -918,7 +922,7 @@ JS
                             'options' => $selectedListOptions($selectedDealIds),
                         ],
                     ],
-                ],
+                ]),
             ],
             'description' => [
                 'class' => FieldSet::class,

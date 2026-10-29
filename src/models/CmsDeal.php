@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property int           $cms_deal_type_id Тип сделки
  * @property int           $cms_company_id Компания
  * @property int           $cms_user_id Контакт
+ * @property int|null      $cms_lead_id Сделка (продажа), по которой оказывается услуга
  * @property string        $name Название
  * @property string        $description
  * @property string        $amount Значение цены
@@ -175,6 +176,8 @@ class CmsDeal extends ActiveRecord
                 ],
                 'integer',
             ],
+            // The deal of the service (owner's decision 29.10.2026): before the client is required, it may give the client.
+            [['cms_lead_id'], 'validateLead', 'skipOnEmpty' => false, 'when' => fn() => $this->hasAttribute('cms_lead_id')],
             [['cms_deal_type_id', 'name'], 'required'],
             [['description'], 'string'],
 
@@ -256,6 +259,7 @@ class CmsDeal extends ActiveRecord
             'cms_deal_type_id' => 'Тип услуги',
             'cms_user_id'                 => "Клиент",
             'cms_company_id'   => 'Компания',
+            'cms_lead_id'      => 'Сделка',
             'name'             => 'Название',
             'description'      => 'Комментарий',
             'amount'           => 'Сумма',
@@ -503,6 +507,18 @@ class CmsDeal extends ActiveRecord
     public function getTasks()
     {
         return $this->hasMany(CmsTask::class, ['cms_deal_id' => 'id']);
+    }
+
+    /** The deal of the service: CrmAccess::validateLeadLink() (available, the same client, own deal on «Свои сделки»). */
+    public function validateLead($attribute)
+    {
+        \skeeks\cms\crm\CrmAccess::instance()->validateLeadLink($this, $attribute);
+    }
+
+    /** @return \yii\db\ActiveQuery */
+    public function getCmsLead()
+    {
+        return $this->hasOne(CmsLead::class, ['id' => 'cms_lead_id']);
     }
 
     /**

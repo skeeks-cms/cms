@@ -271,6 +271,10 @@ class AdminCmsLeadController extends BackendModelStandartController
                     }
                     $this->restoreAttributes($event->sender->model, $protected);
                 },
+                // A responsible chosen in the form works with the client of the deal ("Свои сделки" when he has no link yet).
+                'on afterSave' => function (Event $event) {
+                    \skeeks\cms\crm\CrmAccess::instance()->grantLeadExecutorLevel($event->sender->model, (int)\Yii::$app->user->id);
+                },
             ],
             'no-answer' => [
                 'class' => BackendModelUpdateAction::class,
@@ -344,6 +348,71 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'priority' => 35,
                 'controllerRoute' => '/cms/admin-cms-task',
                 'relation' => ['cms_lead_id' => 'id'],
+                'on gridInit' => function ($e) {
+                    $e->sender->relatedIndexAction->backendShowings = false;
+                },
+            ],
+            // What is tied to the deal (owner's decision 29.10.2026): the sections of services, bills and
+            // documents with their own scopes and «Добавить» (it passes cms_lead_id); payments through their bills.
+            'deals' => [
+                'class' => BackendGridModelRelatedAction::class,
+                'name' => 'Услуги',
+                'icon' => 'far fa-file',
+                'priority' => 36,
+                'controllerRoute' => '/cms/admin-cms-deal',
+                'relation' => ['cms_lead_id' => 'id'],
+                'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('cms_deal'),
+                'on gridInit' => function ($e) {
+                    $e->sender->relatedIndexAction->backendShowings = false;
+                },
+            ],
+            'bills' => [
+                'class' => BackendGridModelRelatedAction::class,
+                'name' => 'Счета',
+                'icon' => 'fas fa-credit-card',
+                'priority' => 37,
+                'controllerRoute' => '/cms/admin-cms-bill',
+                'relation' => ['cms_lead_id' => 'id'],
+                'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('shop_bill'),
+                'on gridInit' => function ($e) {
+                    $e->sender->relatedIndexAction->backendShowings = false;
+                },
+            ],
+            'payments' => [
+                'class' => BackendGridModelRelatedAction::class,
+                'name' => 'Платежи',
+                'icon' => 'fas fa-credit-card',
+                'priority' => 38,
+                'controllerRoute' => '/shop/admin-payment',
+                // A payment is tied to the deal through its bill: no own column, no «Добавить» here.
+                'isStandartBeforeRender' => false,
+                'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('shop_bill')
+                    && class_exists(\skeeks\cms\shop\models\ShopBill2payment::class),
+                'on gridInit' => function ($e) {
+                    $index = $e->sender->relatedIndexAction;
+                    $index->backendShowings = false;
+                    $baseOnInit = $index->grid['on init'] ?? null;
+                    $leadId = (int)$this->model->id;
+                    $index->grid['on init'] = function (Event $event) use ($baseOnInit, $leadId) {
+                        if ($baseOnInit) {
+                            $baseOnInit($event);
+                        }
+                        $query = $event->sender->dataProvider->query;
+                        $query->andWhere([\skeeks\cms\shop\models\ShopPayment::tableName().'.id' => \skeeks\cms\shop\models\ShopBill2payment::find()
+                            ->alias('leadBill2payment')->select('leadBill2payment.shop_payment_id')
+                            ->innerJoin(['leadBill' => \skeeks\cms\shop\models\ShopBill::tableName()], 'leadBill.id = leadBill2payment.shop_bill_id')
+                            ->andWhere(['leadBill.cms_lead_id' => $leadId])]);
+                    };
+                },
+            ],
+            'documents' => [
+                'class' => BackendGridModelRelatedAction::class,
+                'name' => 'Документы',
+                'icon' => 'fas fa-file-signature',
+                'priority' => 39,
+                'controllerRoute' => '/cms/admin-cms-document',
+                'relation' => ['cms_lead_id' => 'id'],
+                'accessCallback' => fn() => \skeeks\cms\crm\CrmAccess::leadLinkReady('shop_document'),
                 'on gridInit' => function ($e) {
                     $e->sender->relatedIndexAction->backendShowings = false;
                 },
@@ -822,6 +891,7 @@ JS
             if (!$this->model->save()) {
                 throw new \RuntimeException(implode('; ', $this->model->getFirstErrors()));
             }
+            \skeeks\cms\crm\CrmAccess::instance()->grantLeadExecutorLevel($this->model, (int)\Yii::$app->user->id);
         } catch (StaleObjectException $e) {
             throw new ConflictHttpException('Сделка уже закреплена другим менеджером.', 0, $e);
         }

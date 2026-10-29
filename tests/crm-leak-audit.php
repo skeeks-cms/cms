@@ -255,6 +255,24 @@ try {
     $docA = $document(['cms_company_id' => $A->id], 'документ компании А');
     $docP = $document(['cms_user_id' => $person->id], 'документ клиента Б');
 
+    // Tied to a deal (owner's decision 29.10.2026, «Полноценная работа в рамках своих сделок»): of the other deal —
+    // hidden; of his own deal — «своё», seen although another employee made it. A payment goes with its bill.
+    $leadLinks = CrmAccess::leadLinkReady('shop_bill') && CrmAccess::leadLinkReady('shop_document') && CrmAccess::leadLinkReady('cms_deal');
+    $linked = [];
+    if ($leadLinks) {
+        foreach (['foreign' => $foreign, 'own' => $own] as $whose => $linkLead) {
+            $tag = $whose === 'own' ? 'своей сделки' : 'чужой сделки';
+            $linked[$whose]['service'] = new CmsDeal(['name' => $name('услуга '.$tag), 'description' => '', 'cms_company_id' => $A->id, 'cms_lead_id' => $linkLead->id,
+                'cms_deal_type_id' => 13, 'start_at' => time() - 86400, 'amount' => 4323, 'currency_code' => 'RUB', 'is_periodic' => 0, 'is_active' => 1]);
+            $linked[$whose]['service']->save(false);
+            $linked[$whose]['bill'] = $bill(['cms_company_id' => $A->id, 'cms_lead_id' => $linkLead->id], $whose === 'own' ? 91342.76 : 91341.75, 'счёт '.$tag);
+            $linked[$whose]['payment'] = $payment(['cms_company_id' => $A->id], $whose === 'own' ? 81342.76 : 81341.75, 'платёж по счёту '.$tag);
+            $db->createCommand()->insert('shop_bill2payment', ['shop_bill_id' => $linked[$whose]['bill']->id,
+                'shop_payment_id' => $linked[$whose]['payment']->id, 'created_at' => time()])->execute();
+            $linked[$whose]['document'] = $document(['cms_company_id' => $A->id, 'cms_lead_id' => $linkLead->id], 'документ '.$tag);
+        }
+    }
+
     $proposal = static function (array $fields, string $what) use ($name, $siteId, $admin, $db) {
         $number = 900000 + (int)$db->createCommand('SELECT COUNT(*) FROM cms_proposal')->queryScalar() + mt_rand(1, 99999);
         $db->createCommand()->insert('cms_proposal', $fields + ['cms_site_id' => $siteId, 'kind' => 'proposal', 'number' => $number,
@@ -443,6 +461,17 @@ try {
             'защищённая компания' => ['admin-cms-company', $protected->id],
             'письмо компании' => ['admin-cms-comm-message', $letterCompany],
         ];
+        if ($leadLinks) {
+            $foreignMarkers += [
+                'услуга чужой сделки' => $linked['foreign']['service']->name, 'счёт чужой сделки' => '91 341',
+                'платёж по счёту чужой сделки' => '81 341', 'документ чужой сделки' => $linked['foreign']['document']->description,
+            ];
+            $routes += [
+                'услуга чужой сделки' => ['admin-cms-deal', $linked['foreign']['service']->id], 'счёт чужой сделки' => ['admin-cms-bill', $linked['foreign']['bill']->id],
+                'платёж по счёту чужой сделки' => ['admin-payment', $linked['foreign']['payment']->id],
+                'документ чужой сделки' => ['admin-cms-document', $linked['foreign']['document']->id],
+            ];
+        }
         $found = static function (string $body, array $keys = null) use (&$foreignMarkers, &$routes): array {
             $hits = [];
             foreach ($foreignMarkers as $key => $marker) {
@@ -573,6 +602,23 @@ try {
         $mustSee('Компания А: своя сделка', '/~sxx/cms/admin-cms-company/leads?pk='.$A->id, $own->name);
         $mustSee('Компания А: лента, свой комментарий', '/~sxx/cms/admin-cms-company/view?pk='.$A->id, AUDIT_PREFIX.'комментарий своей сделки '.$uniq);
         $mustSee('Своя сделка: карточка', '/~sxx/cms/admin-cms-lead/view?pk='.$own->id, $own->name);
+        if ($leadLinks) {
+            // What is tied to his deal: «своё» in the company tabs, the sections and the tabs of the deal card;
+            // the tabs of the other deal stay closed with the deal.
+            $ownLinked = [
+                'deals' => ['Услуги', '/~sxx/cms/admin-cms-deal/index', $linked['own']['service']->name],
+                'bills' => ['Счета', '/~sxx/cms/admin-cms-bill/index', '91 342'],
+                'payments' => ['Платежи', '/~sxx/shop/admin-payment/index', '81 342'],
+                'documents' => ['Документы', '/~sxx/cms/admin-cms-document/index', $linked['own']['document']->description],
+            ];
+            foreach ($ownLinked as $tab => [$label, $section, $marker]) {
+                $mustSee('Своя сделка: вкладка «'.$label.'»', '/~sxx/cms/admin-cms-lead/'.$tab.'?pk='.$own->id, $marker);
+                $mustSee('Компания А: вкладка «'.$label.'», по своей сделке', '/~sxx/cms/admin-cms-company/'.$tab.'?pk='.$A->id, $marker);
+                $mustSee('Раздел «'.$label.'», по своей сделке', $section, $marker);
+                $page('Своя сделка: вкладка «'.$label.'»', '/~sxx/cms/admin-cms-lead/'.$tab.'?pk='.$own->id);
+                $closed('Чужая сделка: вкладка «'.$label.'»', '/~sxx/cms/admin-cms-lead/'.$tab.'?pk='.$foreign->id, '');
+            }
+        }
         // the level decides only changing the client data: "edit" may, "deal" may not
         [$code] = $http('/~sxx/cms/admin-cms-company/update?pk='.$A->id);
         $mayEdit = $auditLevel !== CrmAccess::LEVEL_DEAL;
@@ -705,6 +751,21 @@ try {
             [$status, $out] = $tool($name, $args);
             $hits = $status === 'ok' ? $found($json($out)) : [];
             $report('MCP '.$name, 'executeTool '.http_build_query($args).($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
+        }
+        if ($leadLinks) {
+            // The records of the other deal: neither by id nor by the filter of the deal; his own deal's — seen.
+            foreach (['cms_deal_get' => 'service', 'shop_bill_get' => 'bill', 'shop_payment_get' => 'payment', 'shop_document_get' => 'document'] as $name => $kind) {
+                [$status] = $tool($name, ['id' => $linked['foreign'][$kind]->id]);
+                $report('MCP '.$name.' (запись чужой сделки)', 'executeTool id='.$linked['foreign'][$kind]->id, $status === 'ok', $status === 'ok' ? 'вернул запись' : '');
+                [$status] = $tool($name, ['id' => $linked['own'][$kind]->id]);
+                $results[] = [$levelTag.'MCP '.$name.' (запись своей сделки, должно быть видно)', 'executeTool id='.$linked['own'][$kind]->id,
+                    $status === 'ok' ? 'ok' : 'FAIL', $status === 'ok' ? '' : 'НЕ ВИДНО своего'];
+            }
+            foreach (['cms_deal_list', 'shop_bill_list', 'shop_document_list'] as $name) {
+                [$status, $out] = $tool($name, ['cms_lead_id' => $foreign->id]);
+                $hits = $status === 'ok' ? $found($json($out)) : [];
+                $report('MCP '.$name.' (по чужой сделке)', 'executeTool cms_lead_id='.$foreign->id.($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
+            }
         }
     }
 
