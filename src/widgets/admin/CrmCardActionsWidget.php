@@ -79,8 +79,9 @@ class CrmCardActionsWidget extends Widget
 
     /**
      * The block of a company or a client card in one line: the note, "Задача"
-     * with the record chosen, "Позвонить" and "Письмо" ({@see contactTabs()})
-     * and the tabs of packages. For an employee who works with the client only
+     * and "Сделка" with the record chosen, "Позвонить" and "Письмо"
+     * ({@see contactTabs()}), the tabs of packages, and in "Ещё" the records
+     * of the card tabs ({@see recordTabs()}). For an employee who works with the client only
      * through his deals the block looks the same, and the deal is chosen when
      * an action is taken ({@see dealTabs()}).
      *
@@ -108,7 +109,7 @@ class CrmCardActionsWidget extends Widget
                 'createDealUrl' => $createUrl,
                 'dealHint' => $hint,
                 'packageActions' => false,
-                'actions' => self::dealTabs($record, $deals, $phones, $emails, $createUrl),
+                'actions' => self::withLeadTab($record, self::dealTabs($record, $deals, $phones, $emails, $createUrl)),
             ]);
         }
         // An employee card: only the note.
@@ -118,7 +119,7 @@ class CrmCardActionsWidget extends Widget
             $actions['task'] = self::taskTab(['CmsTask' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id]]);
         }
         if ($isClient) {
-            $actions += self::contactTabs($record, $phones, $emails);
+            $actions = self::withLeadTab($record, $actions + self::contactTabs($record, $phones, $emails)) + self::recordTabs($record);
         }
 
         return self::widget(['model' => $record, 'commentUrl' => ['/cms/admin-cms-log/add-comment'], 'actions' => $actions]);
@@ -208,6 +209,110 @@ class CrmCardActionsWidget extends Widget
         }
 
         return $tabs;
+    }
+
+    /**
+     * "Сделка" after "Задача": the create window of a deal with the client
+     * chosen; after the save the deal card opens (no `noa`). It is also the
+     * only record tab of "Свои сделки" and "edit": a new deal is their own.
+     */
+    protected static function withLeadTab($record, array $tabs): array
+    {
+        if (!\Yii::$app->user->can('cms/admin-lead') || !($tab = self::createTab('Сделка', 'handshake', '/cms/admin-cms-lead',
+                ['CmsLead' => [$record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id]], [], false))) {
+            return $tabs;
+        }
+        $at = array_search('task', array_keys($tabs), true);
+        $at = $at === false ? 0 : $at + 1;
+
+        return array_slice($tabs, 0, $at, true) + ['lead' => $tab] + array_slice($tabs, $at, null, true);
+    }
+
+    /**
+     * The records of the card tabs that the client itself owns — "Услуга",
+     * "Счёт", "Платёж", "Документ" — in "Ещё", each opening the create form of
+     * that tab with the client chosen. Shown under the same rule as the card
+     * tab (cms/admin-company/manage, cms/admin-user/manage) and the create
+     * action of its controller; not for "Свои сделки" and "edit" (they have no
+     * link to a deal, ARCHITECTURE.md п. 11 of cms-communication).
+     */
+    protected static function recordTabs($record): array
+    {
+        $isCompany = $record instanceof \skeeks\cms\models\CmsCompany;
+        if (!\Yii::$app->user->can($isCompany ? 'cms/admin-company/manage' : 'cms/admin-user/manage', ['model' => $record])) {
+            return [];
+        }
+        $id = (int)$record->id;
+        $more = ['more' => true];
+        $payment = static fn(int $debit) => ['ShopPayment' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => $id, 'is_debit' => $debit]];
+        $tabs = [];
+        if ($isCompany) {
+            $tabs['service'] = self::createTab('Услуга', 'tools', '/cms/admin-cms-deal', ['CmsDeal' => ['cms_company_id' => $id]], $more);
+            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/cms/admin-cms-bill', ['ShopBill' => ['cms_company_id' => $id]], $more);
+        } else {
+            $tabs['bill'] = self::createTab('Счёт', 'invoice', '/shop/admin-bill', ['ShopBill' => ['cms_user_id' => $id]], $more);
+        }
+        $in = self::createTab('Заплатили нам', '', '/shop/admin-payment', $payment(1));
+        $out = self::createTab('Мы заплатили', '', '/shop/admin-payment', $payment(0));
+        if ($in && $out) {
+            $tabs['payment'] = ['label' => 'Платёж', 'icon' => 'credit-card', 'items' => [$in, $out]] + $more;
+        }
+        if ($isCompany && self::canCreate('/cms/admin-cms-document')) {
+            $items = [];
+            foreach (\skeeks\cms\shop\models\ShopDocument::optionsForType() as $type => $label) {
+                $route = $type === \skeeks\cms\shop\models\ShopDocument::TYPE_RECONCILIATION_ACT
+                    ? ['/cms/admin-cms-document/create-reconciliation', 'company_id' => $id]
+                    : ['/cms/admin-cms-document/create', 'type' => $type, 'cms_company_id' => $id];
+                $items[] = ['label' => $label, 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($route)
+                    ->enableEmptyLayout()->enableNoActions()->url];
+            }
+            $tabs['document'] = ['label' => 'Документ', 'icon' => 'file-text', 'items' => $items] + $more;
+        }
+
+        return array_filter($tabs);
+    }
+
+    /**
+     * A tab opening the create form of a backend controller ($controllerRoute,
+     * e.g. /cms/admin-cms-bill) with GET parameters; null when its create
+     * action is not allowed to the employee ({@see canCreate()}).
+     */
+    protected static function createTab(string $label, string $icon, string $controllerRoute, array $params, array $extra = [], bool $noActions = true): ?array
+    {
+        if (!self::canCreate($controllerRoute)) {
+            return null;
+        }
+        $url = \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(array_merge([$controllerRoute.'/create'], $params))->enableEmptyLayout();
+        if ($noActions) {
+            $url->enableNoActions();
+        }
+
+        return array_filter(['label' => $label, 'icon' => $icon]) + ['url' => (string)$url->url] + $extra;
+    }
+
+    /** @var bool[] controller route => its create action is allowed to the current employee */
+    private static array $_canCreate = [];
+
+    /** The create action of a backend controller is allowed: its permissions and accessCallback decide. */
+    protected static function canCreate(string $controllerRoute): bool
+    {
+        $key = (int)\Yii::$app->user->id.':'.$controllerRoute;
+        if (!array_key_exists($key, self::$_canCreate)) {
+            $allowed = false;
+            try {
+                $result = \Yii::$app->createController(ltrim($controllerRoute, '/'));
+                $controller = $result ? $result[0] : null;
+                $create = $controller ? $controller->createAction('create') : null;
+                $allowed = $create
+                    && (!$controller instanceof \skeeks\cms\IHasPermissions || $controller->isAllow)
+                    && (!$create instanceof \skeeks\cms\IHasPermissions || $create->isAllow);
+            } catch (\Throwable $e) {
+                \Yii::warning('CrmCardActionsWidget: '.$controllerRoute.': '.$e->getMessage(), self::class);
+            }
+            self::$_canCreate[$key] = (bool)$allowed;
+        }
+
+        return self::$_canCreate[$key];
     }
 
     /** "Задача": the create window of a task with the given GET parameters (CmsTask[...]). */
