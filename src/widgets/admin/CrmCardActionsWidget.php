@@ -60,8 +60,179 @@ class CrmCardActionsWidget extends Widget
     /** @var int action tabs in the row besides "Примечание"; the rest go to "Ещё" */
     public int $rowLimit = 6;
 
+    /** @var bool the block is a raised surface; false — inside another block (a deal of {@see $deals}) */
+    public bool $framed = true;
+
+    /**
+     * Company or client card of an employee who works with the client only
+     * through his deals ({@see ownDeals()}): his open deals; every action goes
+     * to a deal — one is taken as is, several are chosen first, none gives
+     * "Создать сделку". Null — the usual block of the card.
+     *
+     * @var \skeeks\cms\models\CmsLead[]|null
+     */
+    public ?array $deals = null;
+
+    /** @var array phones of the client for the deals of {@see $deals} */
+    public array $phones = [];
+
+    /** @var array emails of the client for the deals of {@see $deals} */
+    public array $emails = [];
+
+    /**
+     * The block of a company or a client card in one line: the note, "Задача"
+     * with the record chosen, "Позвонить" and "Письмо" ({@see contactTabs()})
+     * and the tabs of packages; for an employee who works with the client only
+     * through his deals — the same actions of his deal ({@see $deals}).
+     *
+     * @param \skeeks\cms\models\CmsCompany|\skeeks\cms\models\User $record
+     */
+    public static function client($record, iterable $phones = [], iterable $emails = []): string
+    {
+        $phones = is_array($phones) ? $phones : iterator_to_array($phones, false);
+        $emails = is_array($emails) ? $emails : iterator_to_array($emails, false);
+        $deals = self::ownDeals($record);
+        if ($deals !== null) {
+            return self::widget(['model' => $record, 'deals' => $deals, 'phones' => $phones, 'emails' => $emails]);
+        }
+        $isCompany = $record instanceof \skeeks\cms\models\CmsCompany;
+        // An employee card: only the note.
+        $isClient = $isCompany || !$record->is_worker;
+        $actions = [];
+        if ($isClient && \Yii::$app->user->can('cms/admin-task')) {
+            $actions['task'] = self::taskTab(['CmsTask' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id]]);
+        }
+        if ($isClient) {
+            $actions += self::contactTabs($record, $phones, $emails);
+        }
+
+        return self::widget(['model' => $record, 'commentUrl' => ['/cms/admin-cms-log/add-comment'], 'actions' => $actions]);
+    }
+
+    /**
+     * Open deals of the employee by a company or a client when he works with
+     * it only through his deals: levels "Свои сделки" and "Свои сделки и
+     * данные компании" (CrmAccess: the client is seen, not in full —
+     * seesWholeClient()); his deals are those the deal scope shows him, as in
+     * CrmAccess::feedCondition(). Null — he sees the whole client (or it is
+     * an employee card): the usual block.
+     *
+     * @return \skeeks\cms\models\CmsLead[]|null
+     */
+    public static function ownDeals($record): ?array
+    {
+        if (!\Yii::$app->has('user') || \Yii::$app->user->isGuest) {
+            return null;
+        }
+        $code = \skeeks\cms\crm\CrmAccess::clientRecordOf($record);
+        if ($code === null || ($record instanceof \skeeks\cms\models\User && $record->is_worker)) {
+            return null;
+        }
+        $access = \skeeks\cms\crm\CrmAccess::instance();
+        $user = \Yii::$app->user->identity;
+        if ($access->clientDataLevel($user, $code[0], (int)$code[1]) === null
+            || \skeeks\cms\crm\CrmAccess::seesWholeClient($access->wholeClientLevel($user, $code[0], (int)$code[1]))) {
+            return null;
+        }
+        $table = \skeeks\cms\models\CmsLead::tableName();
+
+        return \skeeks\cms\models\CmsLead::find()->forManager($user)
+            ->andWhere([$table.'.'.($record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id') => (int)$record->id])
+            ->andWhere([$table.'.status' => [\skeeks\cms\models\CmsLead::STATUS_NEW, \skeeks\cms\models\CmsLead::STATUS_IN_WORK]])
+            ->orderBy([$table.'.id' => SORT_DESC])
+            ->limit(20)
+            ->all();
+    }
+
+    /** "Задача": the create window of a task with the given GET parameters (CmsTask[...]). */
+    protected static function taskTab(array $params): array
+    {
+        return ['label' => 'Задача', 'icon' => 'plus', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(
+            array_merge(['/cms/admin-cms-task/create'], $params)
+        )->enableEmptyLayout()->enableNoActions()->url];
+    }
+
+    /** A backend window over the card. */
+    protected static function windowOnClick(string $url): string
+    {
+        return 'new sx.classes.backend.widgets.Action('.Json::encode(['isOpenNewWindow' => true, 'url' => $url]).').go(); return false;';
+    }
+
+    /**
+     * The block of {@see $deals}: "по сделке №…" or the choice of the deal over
+     * the actions of each deal, or "Создать сделку" without deals (its card
+     * opens after the save, and the work goes on there).
+     */
+    protected function renderDeals(): string
+    {
+        CrmCardActionsAsset::register($this->view);
+        $isCompany = $this->model instanceof \skeeks\cms\models\CmsCompany;
+        if (!$this->deals) {
+            if (!\Yii::$app->user->can('cms/admin-lead')) {
+                return '';
+            }
+            $url = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                '/cms/admin-cms-lead/create',
+                'CmsLead' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => (int)$this->model->id],
+            ])->enableEmptyLayout()->url;
+            $body = Html::tag('div',
+                Html::tag('span', 'С этим клиентом вы работаете через свои сделки. Открытых сделок нет.', ['class' => 'sx-crm-actions__deals-text'])
+                .Html::a($this->icon('plus').Html::tag('span', 'Создать сделку'), $url, [
+                    'class' => 'sx-button sx-button--primary sx-button--sm',
+                    'data-pjax' => '0',
+                    'onclick' => self::windowOnClick($url),
+                ]),
+                ['class' => 'sx-crm-actions__deals-empty']
+            );
+
+            return Html::tag('div', $body, ['id' => $this->getId(), 'class' => 'sx-surface sx-surface--raised sx-crm-actions sx-crm-actions--deals']);
+        }
+
+        $canTask = \Yii::$app->user->can('cms/admin-task');
+        $groups = '';
+        $choices = [];
+        foreach (array_values($this->deals) as $i => $lead) {
+            $id = (int)$lead->id;
+            $actions = $canTask ? ['task' => self::taskTab(['CmsTask' => ['cms_lead_id' => $id]])] : [];
+            $actions += self::contactTabs($lead, $this->phones, $this->emails, ['data-lead-id' => $id]);
+            $groups .= Html::tag('div', self::widget([
+                'model' => $lead,
+                'framed' => false,
+                'commentUrl' => ['/cms/admin-cms-lead/add-comment', 'pk' => $id],
+                'notePlaceholder' => 'Примечание к сделке №'.$id.'…',
+                'actions' => $actions,
+            ]), ['data-sx-crm-actions-deal' => $id, 'hidden' => $i > 0]);
+            $choices[$id] = '№'.$id.($lead->name ? ' · '.$lead->name : '');
+        }
+
+        if (count($choices) === 1) {
+            $id = (int)key($choices);
+            $url = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-lead/view', 'pk' => $id])
+                ->enableEmptyLayout()->url;
+            $head = Html::tag('span', 'по сделке', ['class' => 'sx-crm-actions__deals-text']).' '
+                .Html::a(Html::encode(reset($choices)), $url, ['data-pjax' => '0', 'onclick' => self::windowOnClick($url)]);
+        } else {
+            $head = Html::label('По сделке', $this->getId().'-deal', ['class' => 'sx-crm-actions__deals-text']).' '
+                .Html::dropDownList('', null, $choices, [
+                    'id' => $this->getId().'-deal',
+                    'class' => 'sx-crm-actions__deals-select',
+                    'data-sx-crm-actions-deal-select' => true,
+                ]);
+        }
+
+        return Html::tag('div',
+            Html::tag('div', $head, ['class' => 'sx-crm-actions__deals-head'])
+            .$groups,
+            ['id' => $this->getId(), 'class' => 'sx-surface sx-surface--raised sx-crm-actions sx-crm-actions--deals']
+        );
+    }
+
     public function run()
     {
+        if ($this->deals !== null) {
+            return $this->renderDeals();
+        }
+
         $items = [];
         foreach ($this->actions as $id => $action) {
             if (!is_array($action) || trim((string)($action['label'] ?? '')) === '') {
@@ -139,7 +310,7 @@ class CrmCardActionsWidget extends Widget
         return Html::tag('div',
             Html::tag('div', $tabs, ['class' => 'sx-crm-actions__tabs', 'role' => 'toolbar', 'aria-label' => 'Действия'])
             .$body,
-            ['id' => $this->getId(), 'class' => 'sx-surface sx-surface--raised sx-crm-actions', 'data-sx-crm-actions' => true]
+            ['id' => $this->getId(), 'class' => $this->framed ? 'sx-surface sx-surface--raised sx-crm-actions' : 'sx-crm-actions sx-crm-actions--plain', 'data-sx-crm-actions' => true]
         );
     }
 

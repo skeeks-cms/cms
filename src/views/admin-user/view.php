@@ -424,15 +424,8 @@ JS
                 'options' => ['class' => 'sx-surface-stack sx-activity-thread'],
             ]); ?>
 
-                <?php // One block of actions over the feed, as in the deal card; a task, a call and a letter — for a client, not an employee. ?>
-                <?php echo \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget([
-                    'model'      => $model,
-                    'commentUrl' => ['/cms/admin-cms-log/add-comment'],
-                    'actions'    => $model->is_worker ? [] : (\Yii::$app->user->can('cms/admin-task') ? ['task' => ['label' => 'Задача', 'icon' => 'plus', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                        '/cms/admin-cms-task/create', 'CmsTask' => ['cms_user_id' => $model->id],
-                    ])->enableEmptyLayout()->enableNoActions()->url]] : [])
-                        + \skeeks\cms\widgets\admin\CrmCardActionsWidget::contactTabs($model, $model->cmsUserPhones, $model->cmsUserEmails),
-                ]); ?>
+                <?php // One block of actions over the feed, as in the deal card; through his deals for «Свои сделки» (CrmCardActionsWidget::client()). ?>
+                <?php echo \skeeks\cms\widgets\admin\CrmCardActionsWidget::client($model, $model->cmsUserPhones, $model->cmsUserEmails); ?>
 
                 <?php // Pinned entries once, right under the block, marked as in the feed; the feed below skips them. ?>
                 <?php $pinnedUserLogsQuery = $model->getUserLogs()->activity()->pinned(); ?>

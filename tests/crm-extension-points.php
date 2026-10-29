@@ -345,7 +345,8 @@ Event::off(\skeeks\cms\widgets\admin\CrmCardBlocksWidget::class, \skeeks\cms\wid
 crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/widgets/admin/CrmCardActionsWidget.php'), 'CrmCardBlocksWidget::actions(') !== false,
     'The block of actions of a card offers the actions of packages.');
 foreach (['admin-cms-lead/view.php', 'admin-cms-company/view.php', 'admin-user/view.php'] as $cardView) {
-    crmExtensionExpect(strpos(file_get_contents(dirname(__DIR__).'/src/views/'.$cardView), 'CrmCardActionsWidget::widget(') !== false,
+    $cardSource = file_get_contents(dirname(__DIR__).'/src/views/'.$cardView);
+    crmExtensionExpect(strpos($cardSource, 'CrmCardActionsWidget::widget(') !== false || strpos($cardSource, 'CrmCardActionsWidget::client(') !== false,
         'The card '.$cardView.' shows the block of actions.');
 }
 

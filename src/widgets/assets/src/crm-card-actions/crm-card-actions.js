@@ -77,6 +77,14 @@
     $(document)
         .off(".sxCrmActions")
         .on("pjax:end.sxCrmActions", fitAll)
+        // The choice of the deal: its actions are shown, then measured.
+        .on("change.sxCrmActions", "[data-sx-crm-actions-deal-select]", function () {
+            var value = String(this.value);
+            $(this).closest(".sx-crm-actions--deals").find("[data-sx-crm-actions-deal]").each(function () {
+                this.hidden = String(this.getAttribute("data-sx-crm-actions-deal")) !== value;
+            });
+            fitAll();
+        })
         .on("click.sxCrmActions", "[data-sx-crm-actions-open]", function (e) {
             e.preventDefault();
             toggle($(this).closest("[data-sx-crm-actions]"), true);

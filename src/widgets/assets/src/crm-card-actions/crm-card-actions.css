@@ -127,6 +127,45 @@
 .sx-crm-actions__form[hidden] {
     display: none;
 }
+/* Through the deals of the employee: "по сделке №…" or its choice over the actions of the deal. */
+.sx-crm-actions--plain {
+    padding: 0;
+}
+.sx-crm-actions__deals-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px 0;
+    font-size: 0.8125rem;
+}
+.sx-crm-actions__deals-text {
+    margin: 0;
+    color: var(--sx-color-text-muted);
+    font-weight: normal;
+}
+.sx-crm-actions__deals-select {
+    flex: 1 1 200px;
+    max-width: 100%;
+    min-width: 0;
+    padding: 4px 8px;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-color-surface);
+    color: var(--sx-color-text);
+    font: inherit;
+}
+.sx-crm-actions__deals-empty {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+}
+[data-sx-crm-actions-deal][hidden] {
+    display: none;
+}
 @media (max-width: 575px) {
     .sx-crm-actions__tabs {
         padding: 0 4px;
