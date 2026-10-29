@@ -334,6 +334,26 @@ class CmsTask extends ActiveRecord
             [['cms_lead_id'], 'default', 'value' => null],
             [['cms_lead_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLead::class, 'targetAttribute' => 'id'],
             [['cms_lead_id'], 'validateLead'],
+            // A task of a client (owner's decision 29.10.2026): «Свои сделки» and "edit" set it only on their open
+            // deal of this client; a task of a service or a project follows those (crm\CrmAccess::canActOnClient()).
+            [
+                ['cms_lead_id'],
+                function ($attribute) {
+                    if (!$this->isNewRecord && !$this->isAttributeChanged('cms_company_id') && !$this->isAttributeChanged('cms_user_id')
+                        && !$this->isAttributeChanged('cms_lead_id')) {
+                        return;
+                    }
+                    if (($this->hasAttribute('cms_deal_id') && $this->cms_deal_id) || $this->cms_project_id) {
+                        return;
+                    }
+                    $error = \skeeks\cms\crm\CrmAccess::instance()->clientActionError($this->cms_company_id ? (int)$this->cms_company_id : null,
+                        $this->cms_company_id ? null : ($this->cms_user_id ? (int)$this->cms_user_id : null), $this->cms_lead_id ? (int)$this->cms_lead_id : null);
+                    if ($error) {
+                        $this->addError($attribute, $error);
+                    }
+                },
+                'skipOnEmpty' => false,
+            ],
 
             //"Сделка как услуга": the deal of the task, a resource of that deal, internal tasks hidden from the client.
             [['cms_deal_id', 'deal_resource_id'], 'integer', 'when' => function () { return $this->hasAttribute('cms_deal_id'); }],

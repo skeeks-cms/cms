@@ -39,6 +39,12 @@ class CmsLogQuery extends CmsActiveQuery
         if (!$leads) {
             return ['and', '0=1'];
         }
+        // A limited feed («Свои сделки», "edit": only the records of his deals, crm\CrmAccess::feedCondition())
+        // never shows the client's copy of a letter or a call: the copy of the deal must stay, no twin is dropped.
+        if (\Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User && \Yii::$app->user->identity
+            && \skeeks\cms\crm\CrmAccess::instance()->feedCondition(\Yii::$app->user->identity, $record) !== null) {
+            return ['and', [$table.'.model_code' => (new \skeeks\cms\models\CmsLead())->skeeksModelCode], [$table.'.model_id' => $leads]];
+        }
         $twinId = static fn(string $alias) => "JSON_UNQUOTE(JSON_EXTRACT($alias.data, '$.id'))";
         $twin = (new \yii\db\Query())->select(new \yii\db\Expression('1'))->from(['twin' => $table])
             ->andWhere(['twin.model_code' => $record->skeeksModelCode, 'twin.model_id' => (int)$record->id])

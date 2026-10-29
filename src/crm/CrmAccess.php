@@ -1149,17 +1149,110 @@ class CrmAccess extends Component
         if ($level === null || self::seesWholeClient($this->wholeClientLevel($user, $code[0], (int)$code[1]))) {
             return null;
         }
+        // «Свои сделки» and "edit" work only through their deals (owner's decision 29.10.2026): the records of
+        // his deals (letters, calls, chats, notes linked to them) and their tasks; nothing of the client itself.
         $table = \skeeks\cms\models\CmsLog::tableName();
-        $identity = $this->identity($user);
-        $ownLeads = CmsLead::find()->forManager($identity)->select(CmsLead::tableName().'.id')
-            ->andWhere([CmsLead::tableName().($record instanceof CmsCompany ? '.cms_company_id' : '.cms_user_id') => (int)$record->id]);
+        $ownLeads = $this->ownLeads($user, $record, false)->select(CmsLead::tableName().'.id');
         $condition = ['or',
-            $this->clientOwnFeedCondition($user, $record, $table),
             ['and', [$table.'.model_code' => (new CmsLead())->skeeksModelCode], [$table.'.model_id' => $ownLeads]],
             ['and', [$table.'.model_code' => (new \skeeks\cms\models\CmsTask())->skeeksModelCode],
                 [$table.'.model_id' => \skeeks\cms\models\CmsTask::find()->select('id')->andWhere(['cms_lead_id' => $ownLeads])]],
         ];
+        if ($level === self::LEVEL_FULL) {
+            // A person of a company the employee has in full: the person is its data — his own records are seen;
+            // his personal orders (deals, services, bills) only through the access to him (personalLevel()).
+            $condition[] = $this->clientOwnFeedCondition($user, $record, $table, true);
+        }
+
         return $condition;
+    }
+
+    /**
+     * The deals of the employee by a company or a person (owner's decision
+     * 29.10.2026, one rule for the feed, the card actions and the server
+     * checks): the deals the deal scope shows him (forManager()) whose
+     * executor is he or his subordinate. Open — new or in work.
+     *
+     * @param CmsCompany|User $record
+     */
+    public function ownLeads($user, $record, bool $openOnly = true): \yii\db\ActiveQuery
+    {
+        $table = CmsLead::tableName();
+        $query = CmsLead::find()->forManager($this->identity($user))
+            ->andWhere([$table.'.'.($record instanceof CmsCompany ? 'cms_company_id' : 'cms_user_id') => (int)$record->id])
+            ->andWhere([$table.'.executor_id' => $this->ownerIds($user)]);
+        if ($openOnly) {
+            $query->andWhere([$table.'.status' => [CmsLead::STATUS_NEW, CmsLead::STATUS_IN_WORK]]);
+        }
+
+        return $query;
+    }
+
+    /** The open deals of the employee by the client (ownLeads()): the card actions choose among them. */
+    public function ownOpenLeads($user, $record): \yii\db\ActiveQuery
+    {
+        return $this->ownLeads($user, $record, true);
+    }
+
+    /** The refusal of an action of a client card without his own deal (canActOnClient()). */
+    public const OWN_LEAD_REQUIRED = 'С этим клиентом вы работаете только через свои сделки: выберите свою открытую сделку — действие будет привязано к ней.';
+
+    /**
+     * An action of a company or a person card — a note, a task, a proposal, a
+     * presentation, a letter, a call, a message (owner's decision 29.10.2026):
+     * who sees the whole client ("full", the main one, a leader through a
+     * subordinate, an administrator) acts on the client itself; «Свои сделки»
+     * and "edit" only through one of their open deals ($leadId, ownOpenLeads()).
+     * Employees and records that are not clients are not limited.
+     *
+     * @param CmsCompany|User $record
+     */
+    public function canActOnClient($user, $record, ?int $leadId = null): bool
+    {
+        $code = self::clientRecordOf($record);
+        if ($code === null || ($record instanceof User && $record->is_worker) || $this->isAdmin($user)) {
+            return true;
+        }
+        if (self::seesWholeClient($this->wholeClientLevel($user, $code[0], (int)$code[1]))) {
+            return true;
+        }
+
+        return $leadId > 0 && $this->ownOpenLeads($user, $record)->andWhere([CmsLead::tableName().'.id' => $leadId])->exists();
+    }
+
+    /**
+     * The employee who acts now (a web or API session), null in the console
+     * and for system work (receiving, agents): canActOnClient() checks only him.
+     */
+    public static function actingWorker(): ?User
+    {
+        if (!\Yii::$app->has('user') || !(\Yii::$app->user instanceof \yii\web\User) || \Yii::$app->user->isGuest) {
+            return null;
+        }
+        $identity = \Yii::$app->user->identity;
+
+        return $identity instanceof User && $identity->is_worker ? $identity : null;
+    }
+
+    /**
+     * A record about to be written for a client (a task, a proposal…): the
+     * error of canActOnClient() for the acting employee, null when allowed.
+     *
+     * @param int|null $companyId the client company of the record
+     * @param int|null $clientId the client person of the record (without a company)
+     */
+    public function clientActionError(?int $companyId, ?int $clientId, ?int $leadId): ?string
+    {
+        $worker = self::actingWorker();
+        if (!$worker || !self::levelsReady()) {
+            return null;
+        }
+        $record = $companyId ? CmsCompany::findOne($companyId) : ($clientId ? CmsUser::findOne($clientId) : null);
+        if (!$record) {
+            return null;
+        }
+
+        return $this->canActOnClient($worker, $record, $leadId) ? null : self::OWN_LEAD_REQUIRED;
     }
 
     /**
@@ -1169,13 +1262,14 @@ class CrmAccess extends Component
      * CmsLogFeedVisibilityInterface shows only the entries of records the
      * employee sees (a proposal without a deal or of a service is "своё" only).
      */
-    private function clientOwnFeedCondition($user, $record, string $table): array
+    private function clientOwnFeedCondition($user, $record, string $table, bool $withComments = false): array
     {
-        $condition = ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id],
+        $condition = ['and', [$table.'.model_code' => $record->skeeksModelCode], [$table.'.model_id' => (int)$record->id]];
+        if (!$withComments) {
             // Comments and files of employees about the client (passwords, contracts, briefs) belong to the whole
-            // client (owner's decision 29.10.2026): «Свои сделки», "edit" and the pool see the client's own
-            // communications — calls, letters, chats — and the records of their deals only.
-            ['or', [$table.'.log_type' => null], ['<>', $table.'.log_type', \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT]]];
+            // client (owner's decision 29.10.2026): the pool shows the client's own communications only.
+            $condition[] = ['or', [$table.'.log_type' => null], ['<>', $table.'.log_type', \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT]];
+        }
         if (!\Yii::$app->has('skeeks')) {
             return $condition;
         }

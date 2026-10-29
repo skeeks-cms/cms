@@ -163,6 +163,31 @@ class CmsLog extends ActiveRecord
                 },
             ],
 
+            // A note on a company or a person (owner's decision 29.10.2026): who sees the whole client; «Свои
+            // сделки» and "edit" write in the feed of their deal (crm\CrmAccess::canActOnClient()).
+            [
+                ['comment'],
+                function ($attribute) {
+                    if (!$this->isNewRecord || $this->log_type !== self::LOG_TYPE_COMMENT || !$this->model_id) {
+                        return;
+                    }
+                    $worker = \skeeks\cms\crm\CrmAccess::actingWorker();
+                    if (!$worker) {
+                        return;
+                    }
+                    $record = null;
+                    if ($this->model_code === (new CmsCompany())->skeeksModelCode) {
+                        $record = CmsCompany::findOne((int)$this->model_id);
+                    } elseif ($this->model_code === (new CmsUser())->skeeksModelCode) {
+                        $record = CmsUser::findOne((int)$this->model_id);
+                    }
+                    if ($record && !\skeeks\cms\crm\CrmAccess::instance()->canActOnClient($worker, $record)) {
+                        $this->addError($attribute, \skeeks\cms\crm\CrmAccess::OWN_LEAD_REQUIRED);
+                    }
+                },
+                'skipOnEmpty' => false,
+            ],
+
             [['fileIds'], 'safe'],
 
             [

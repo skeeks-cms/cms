@@ -58,9 +58,14 @@ class TelephonyController extends Controller
             return ['success' => false, 'message' => 'Telephony not configured'];
         }
 
+        $leadId = (int)Yii::$app->request->post('lead_id');
+        // «Свои сделки» and "edit" call a client only by their deal (CrmAccess::canActOnClient()).
+        if ($error = (new CmsLeadTelephonyService())->outgoingCallError((string)$phone, $leadId ?: null)) {
+            return ['success' => false, 'message' => $error];
+        }
+
         $result = $telephonyUser->provider->handler->call($phone, $telephonyUser);
 
-        $leadId = (int)Yii::$app->request->post('lead_id');
         if (!empty($result['success']) && !empty($result['provider_call_id'])) {
             try {
                 (new CmsLeadTelephonyService())->registerOutgoingCall(

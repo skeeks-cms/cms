@@ -50,7 +50,7 @@ trait LeadTriageActions
                 'fields' => [$this, 'createFields'],
                 'activeFormConfig' => ['clientCallback' => $this->createFormCallback()],
                 'on '.BackendModelCreateAction::EVENT_INIT_FORM_MODELS => function (Event $event) {
-                    $event->sender->formModels['identity'] = $this->presetCreateCompany(new LeadIdentityForm(['executor_id' => (int)\Yii::$app->user->id]));
+                    $event->sender->formModels['identity'] = $this->presetCreateClient($this->presetCreateCompany(new LeadIdentityForm(['executor_id' => (int)\Yii::$app->user->id])));
                 },
                 'on '.BackendModelCreateAction::EVENT_BEFORE_VALIDATE => function (Event $event) {
                     $this->checkCreateIdentity($event->sender);
@@ -283,6 +283,22 @@ JS
         if ($companyId && CrmAccess::instance()->canSeeCompany((int)\Yii::$app->user->id, $companyId)) {
             $form->company_mode = LeadIdentityForm::MODE_EXISTING;
             $form->company_id = $companyId;
+        }
+
+        return $form;
+    }
+
+    /**
+     * «Создать сделку» from the card of a client person (CmsLead[cms_user_id] in the address): the person is chosen
+     * in «Кто это», as presetCreateCompany() does for a company; a person the employee does not see is ignored.
+     */
+    protected function presetCreateClient(LeadIdentityForm $form): LeadIdentityForm
+    {
+        $preset = (array)\Yii::$app->request->get((new CmsLead())->formName());
+        $clientId = (int)($preset['cms_user_id'] ?? 0);
+        if ($clientId && CrmAccess::instance()->canSeeClient((int)\Yii::$app->user->id, $clientId)) {
+            $form->client_mode = LeadIdentityForm::MODE_EXISTING;
+            $form->client_id = $clientId;
         }
 
         return $form;

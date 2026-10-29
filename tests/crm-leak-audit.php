@@ -737,7 +737,14 @@ try {
 
         // В is seen as a contact of A, with the level of A for his data
         $mustSeeClient('Клиент В: карточка', '/~sxx/cms/admin-user/view?pk='.$V->id, $V->first_name);
-        $mustSeeClient('Клиент В: лента, комментарий клиента', '/~sxx/cms/admin-user/view?pk='.$V->id, AUDIT_PREFIX.'комментарий клиента В '.$uniq);
+        // «Свои сделки» and "edit" work only through their deals (owner's decision 29.10.2026): no record of the client itself.
+        if ($auditLevel === CrmAccess::LEVEL_FULL) {
+            $mustSeeClient('Клиент В: лента, комментарий клиента', '/~sxx/cms/admin-user/view?pk='.$V->id, AUDIT_PREFIX.'комментарий клиента В '.$uniq);
+        } else {
+            [$code, $body] = $http('/~sxx/cms/admin-user/view?pk='.$V->id);
+            $seenComment = $code === 200 && mb_strpos($body, AUDIT_PREFIX.'комментарий клиента В '.$uniq) !== false;
+            $report('Клиент В: лента без записей самого клиента', 'GET view → '.$code, $seenComment, $seenComment ? 'комментарий клиента виден' : '');
+        }
         $mustSeeClient('Компания А: В среди людей', '/~sxx/cms/admin-cms-company/view?pk='.$A->id, $V->first_name);
         [$code] = $http('/~sxx/cms/admin-user/update?pk='.$V->id);
         $mayEdit = $auditLevel !== CrmAccess::LEVEL_DEAL;

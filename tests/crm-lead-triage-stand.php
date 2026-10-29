@@ -465,19 +465,41 @@ try {
     $otherTask = new CmsTask(['name' => 'Чужая '.$uniq, 'executor_id' => $owner->id, 'cms_lead_id' => $ownersLead->id, 'cms_company_id' => $company->id]);
     $otherTask->save(false);
     CmsTask::updateAll(['cms_company_id' => $company->id], ['id' => [$ownTask->id, $otherTask->id]]);
-    // A letter of the client is his own record; a comment of an employee about the company is the whole client's.
+    // «Свои сделки» works only through its deals (owner's decision 29.10.2026): a letter of the client linked to
+    // the company only and a comment of an employee about it are the whole client's; a letter of his deal is his.
     $companyNote = $feedLog($company, 'Клиент написал '.$uniq, 'message');
     $staffNote = $feedLog($company, 'Пароль хостинга '.$uniq);
+    $leadLetter = $feedLog($lead, 'Ответ клиента по сделке '.$uniq, 'message');
     $ownTaskNote = $feedLog($ownTask, 'По своей '.$uniq);
     $otherTaskNote = $feedLog($otherTask, 'По чужой '.$uniq);
     $as($other);
     $feedIds = static fn() => array_map('intval', CmsCompany::findOne($company->id)->getLogs()->select(\skeeks\cms\models\CmsLog::tableName().'.id')->column());
     $seen = $feedIds();
-    $check(in_array((int)$companyNote->id, $seen, true) && in_array((int)$ownTaskNote->id, $seen, true) && !in_array((int)$otherTaskNote->id, $seen, true),
-        '"deal": the feed shows the client records and his deals, not the tasks of another deal');
-    $check(!in_array((int)$staffNote->id, $seen, true), '"deal": comments of employees about the company are hidden, decision 29.10.2026');
-    $check(in_array((int)$companyNote->id, array_map('intval', CmsCompany::findOne($company->id)->getCompanyLogs()->select('id')->column()), true),
-        '"deal": the card feed keeps the communication with the client');
+    $cardSeen = array_map('intval', CmsCompany::findOne($company->id)->getCardLogs()->select(\skeeks\cms\models\CmsLog::tableName().'.id')->column());
+    $check(in_array((int)$ownTaskNote->id, $seen, true) && in_array((int)$leadLetter->id, $cardSeen, true) && !in_array((int)$otherTaskNote->id, $seen, true),
+        '"deal": the feed shows the records of his deals and their tasks, not the tasks of another deal');
+    $check(!in_array((int)$staffNote->id, $seen, true) && !in_array((int)$companyNote->id, $seen, true)
+        && !in_array((int)$companyNote->id, array_map('intval', CmsCompany::findOne($company->id)->getCompanyLogs()->select('id')->column()), true),
+        '"deal": nothing of the client itself — no letter of the company, no comment of employees (only through his deals)');
+    // The actions of the card: only through his open deal (CrmAccess::canActOnClient()), refused by the server.
+    $check($levelAccess->canActOnClient($other->id, $company, (int)$lead->id) && !$levelAccess->canActOnClient($other->id, $company)
+        && !$levelAccess->canActOnClient($other->id, $company, (int)$ownersLead->id)
+        && in_array((int)$lead->id, array_map('intval', $levelAccess->ownOpenLeads($other->id, $company)->select(CmsLead::tableName().'.id')->column()), true),
+        '"deal": an action of the card only by his own open deal (ownOpenLeads())');
+    $note = new \skeeks\cms\models\CmsLog(['model_code' => $company->skeeksModelCode, 'model_id' => $company->id, 'comment' => 'В общую ленту '.$uniq]);
+    $check(!$note->validate() && $note->getFirstError('comment') === CrmAccess::OWN_LEAD_REQUIRED, '"deal": a note in the feed of the client itself is refused');
+    $noLeadTask = new CmsTask(['name' => 'Без сделки '.$uniq, 'executor_id' => $other->id, 'cms_company_id' => $company->id]);
+    $noLeadTask->validate();
+    $foreignLeadTask = new CmsTask(['name' => 'Чужая сделка '.$uniq, 'executor_id' => $other->id, 'cms_company_id' => $company->id, 'cms_lead_id' => $ownersLead->id]);
+    $foreignLeadTask->validate();
+    $ownLeadTask = new CmsTask(['name' => 'Своя сделка '.$uniq, 'executor_id' => $other->id, 'cms_company_id' => $company->id, 'cms_lead_id' => $lead->id]);
+    $ownLeadTask->validate();
+    $check($noLeadTask->getFirstError('cms_lead_id') === CrmAccess::OWN_LEAD_REQUIRED && $foreignLeadTask->getFirstError('cms_lead_id') !== null
+        && $ownLeadTask->getFirstError('cms_lead_id') === null, '"deal": a task of the client only on his own deal');
+    if (class_exists(\skeeks\cms\proposal\models\CmsProposal::class)) {
+        $check(\skeeks\cms\proposal\models\CmsProposal::clientActionError($company->id, null) === CrmAccess::OWN_LEAD_REQUIRED,
+            '"deal": a proposal of the company itself is refused (in his deal it is allowed)');
+    }
     $as($owner);
     $check(in_array((int)$otherTaskNote->id, $feedIds(), true), '"full" sees the whole feed');
     // Pinning: who works on the record of the comment.
@@ -505,8 +527,11 @@ try {
     $check(in_array((int)$ownLeadNote->id, $card, true), 'a record pinned in its deal stays in the company feed');
     $as($other);
     $card = $cardIds();
-    $check(in_array((int)$ownLeadNote->id, $card, true) && !in_array((int)$leadNote->id, $card, true) && in_array((int)$companyNote->id, $card, true),
-        '"deal": the card feed shows his deal records, not the records of another deal');
+    $check(in_array((int)$ownLeadNote->id, $card, true) && !in_array((int)$leadNote->id, $card, true) && !in_array((int)$companyNote->id, $card, true),
+        '"deal": the card feed shows his deal records, not the records of another deal or of the company itself');
+    // A letter written to the company and to his deal: the copy of the company is hidden, so the copy of the deal stays.
+    $check(in_array((int)$twinOnLead->id, $card, true) && !in_array((int)$twinOnCompany->id, $card, true),
+        '"deal": a letter of the company and of his deal is seen in his deal (the twin is not dropped)');
     $as($other);
     // "full" (the main responsible): everything.
     $as($owner);

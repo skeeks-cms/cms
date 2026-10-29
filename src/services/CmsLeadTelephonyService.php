@@ -3,11 +3,16 @@
 namespace skeeks\cms\services;
 
 use RuntimeException;
+use skeeks\cms\crm\CrmAccess;
 use skeeks\cms\helpers\PhoneHelper;
+use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsCompanyPhone;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsLeadPhone;
 use skeeks\cms\models\CmsTelephonyCall;
 use skeeks\cms\models\CmsTelephonyUser;
+use skeeks\cms\models\CmsUser;
+use skeeks\cms\models\CmsUserPhone;
 use yii\db\IntegrityException;
 
 /**
@@ -126,6 +131,54 @@ class CmsLeadTelephonyService
                 return true;
             }
         }
+        // A phone of the client of the deal: the deal only shows the client's contacts (a call from the card of
+        // the client by the chosen deal lands in that deal).
+        foreach ([$lead->cms_company_id ? $lead->company : null, $lead->cms_user_id ? $lead->client : null] as $client) {
+            foreach ($client ? $client->phones : [] as $clientPhone) {
+                if ($this->isSamePhone($clientPhone->value, $phone)) {
+                    return true;
+                }
+            }
+        }
         return false;
+    }
+
+    /**
+     * An outgoing call (owner's decision 29.10.2026): to a phone of a client the employee sees only by his deals
+     * («Свои сделки», "edit") he calls only by one of his open deals of that client ($leadId), so the call lands in
+     * it. A phone of a client he sees in full, or of nobody he sees, is not limited.
+     *
+     * @return string|null the refusal, null when allowed
+     */
+    public function outgoingCallError(?string $phone, ?int $leadId): ?string
+    {
+        $worker = CrmAccess::actingWorker();
+        if (!$worker || !CrmAccess::levelsReady()) {
+            return null;
+        }
+        $access = CrmAccess::instance();
+        $limited = [];
+        foreach ([[CmsCompany::class, CmsCompanyPhone::class, 'cms_company_id'], [CmsUser::class, CmsUserPhone::class, 'cms_user_id']] as [$class, $phoneClass, $column]) {
+            $condition = PhoneHelper::equalCondition($phoneClass::tableName().'.value', $phone);
+            if (!$condition) {
+                return null;
+            }
+            $ids = $phoneClass::find()->select($column)->andWhere($condition)->column();
+            if (!$ids) {
+                continue;
+            }
+            $query = $class::find()->forManager($worker)->andWhere([$class::tableName().'.id' => $ids]);
+            if ($class === CmsUser::class) {
+                $query->andWhere([CmsUser::tableName().'.is_worker' => 0]);
+            }
+            foreach ($query->all() as $client) {
+                if ($access->canActOnClient($worker, $client, $leadId)) {
+                    return null;
+                }
+                $limited[] = $client;
+            }
+        }
+
+        return $limited ? CrmAccess::OWN_LEAD_REQUIRED : null;
     }
 }
