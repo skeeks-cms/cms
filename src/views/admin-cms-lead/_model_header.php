@@ -118,11 +118,12 @@ $windowLink = static function (string $label, array $route, string $variant = 's
 };
 $access = \skeeks\cms\crm\CrmAccess::instance();
 $userId = (int)Yii::$app->user->id;
+// The AJAX forms of the header and the rows of «Найдены совпадения» (loaded later): lead-identity.js/.css.
+\skeeks\cms\assets\admin\LeadIdentityAsset::register($this);
 
 if ($model->status === CmsLead::STATUS_NEW && $access->canTriage($userId, $model)) {
     // Two buttons, as «Принять / Отклонить» in amoCRM (п. 13б): «Взять в работу» — one window with the client
     // (the found one already chosen), the responsible is me; «Не продажа» — spam, an open deal, support.
-    \skeeks\cms\assets\admin\LeadIdentityAsset::register($this);
     $toolbar[] = $windowLink('<i class="fas fa-anchor" aria-hidden="true"></i> Взять в работу',
         ['/cms/admin-cms-lead/triage', 'pk' => $model->id, 'from' => 'card'], 'primary');
     $toolbar[] = Html::tag('details',

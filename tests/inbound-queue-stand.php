@@ -147,6 +147,27 @@ try {
     $check($lead->status === CmsLead::STATUS_NEW && !$lead->executor_id, 'several main responsibles: the request stays in «Неразобранное»');
     $check($sees($out, $lead), 'several main responsibles: the queue sees it');
 
+    // 5. The queue of a pipeline: a request lands in the pipeline of its source, its own queue sorts it;
+    // moved to the default pipeline, the queue of the CRM settings does.
+    if (\skeeks\cms\models\CmsLeadPipeline::inboundReady() && \skeeks\cms\models\CmsLeadPipeline::defaultFor($siteId)) {
+        $queue([(int)$in->id], InboundQueue::MODE_ALL);
+        $support = new \skeeks\cms\models\CmsLeadPipeline(['cms_site_id' => $siteId, 'name' => 'Проверка: поддержка '.$uniq, 'sort' => 900]);
+        $support->inboundSourceTypes = [CmsLead::SOURCE_EMAIL];
+        $support->inboundWorkerIds = [(int)$out->id];
+        $check($support->save(), 'a pipeline with its own queue is saved: '.implode(' ', $support->getFirstErrors()));
+        InboundQueue::reset();
+        $lead = (new CmsLeadService())->createFromSource([
+            'name' => 'Проверка: письмо в поддержку '.$uniq, 'cms_site_id' => $siteId, 'source_type' => CmsLead::SOURCE_EMAIL,
+            'source_ref' => 'inbound-queue-test:'.$uniq.':email', 'phones' => [$freshPhone()],
+        ]);
+        $check((int)$lead->cms_lead_pipeline_id === (int)$support->id, 'the request lands in the pipeline of its source');
+        $check($sees($out, $lead) && !$sees($in, $lead) && $told($out, $lead) && !$told($in, $lead),
+            'the queue of the pipeline sees and is told; the queue of the CRM settings is not');
+        $lead->cms_lead_pipeline_id = \skeeks\cms\models\CmsLeadPipeline::defaultFor($siteId)->id;
+        $lead->save(false, ['cms_lead_pipeline_id']);
+        $check($sees($in, $lead) && !$sees($out, $lead), 'moved to another pipeline: the queue of the new one sees it');
+    }
+
     echo 'OK inbound-queue-stand: '.$checks." checks\n";
 } finally {
     if ($transaction->isActive) {

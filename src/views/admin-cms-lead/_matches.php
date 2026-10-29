@@ -1,11 +1,19 @@
 <?php
+/**
+ * «Найдены совпадения в CRM» of the deal card: one line per match, as the
+ * repeats list of amoCRM and Bitrix24 — the kind, the name, №, the main
+ * responsible, what matched, «возможный дубль» (an open cms_crm_duplicate_mark
+ * between the found records) and «Это он» / «Привязать». Three lines, the rest
+ * under «ещё N». The shared rows of the CRM matches (lead-identity.css,
+ * registered by the card header); no styles of its own.
+ */
 
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use skeeks\cms\models\CmsCompany;
+use skeeks\cms\models\CmsCrmDuplicateMark;
 use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsUser;
-use skeeks\cms\widgets\admin\CmsUserViewWidget;
 use yii\helpers\Html;
 
 /** @var CmsLead $model */
@@ -14,119 +22,133 @@ use yii\helpers\Html;
 /** @var bool $canTake an unsorted deal the employee sorts: «Это он» takes it into work with the record (п. 13б) */
 
 $canTake = $canTake ?? false;
-// «Это он»: «Взять в работу» with this record, the responsible is me (LeadTriageActions::triagePlain()).
-$takeButton = static function (?int $companyId, ?int $clientId, string $title) use ($model): string {
-    return Html::beginForm(['/cms/admin-cms-lead/triage', 'pk' => $model->id], 'post', [
-        'class' => 'sx-lead-match__form',
-    ])
+$access = \skeeks\cms\crm\CrmAccess::instance();
+
+// «Это он» (LeadTriageActions::triagePlain()) or «Привязать» (link-identity) of a deal in work.
+$button = static function (?int $companyId, ?int $clientId, string $title) use ($model, $canTake): string {
+    return Html::beginForm([$canTake ? '/cms/admin-cms-lead/triage' : '/cms/admin-cms-lead/link-identity', 'pk' => $model->id], 'post')
         .Html::hiddenInput('company_id', $companyId)
         .Html::hiddenInput('client_id', $clientId)
-        .Html::submitButton('Это он', [
-            'class' => 'sx-button sx-button--primary sx-button--sm',
-            'data-confirm' => 'Взять сделку в работу с клиентом «'.$title.'»? Ответственный — вы.',
+        .Html::submitButton($canTake ? 'Это он' : 'Привязать', [
+            'class' => 'sx-button sx-button--'.($canTake ? 'primary' : 'secondary').' sx-button--sm',
+            'data-confirm' => $canTake
+                ? 'Взять сделку в работу с клиентом «'.$title.'»? Ответственный — вы.'
+                : 'Привязать «'.$title.'» к сделке?',
         ])
         .Html::endForm();
 };
-// Two records with one name (duplicates of the base) differ by the number and the main responsible.
-$companyMeta = static function (CmsCompany $company): string {
-    $mainId = \skeeks\cms\crm\CrmAccess::instance()->mainResponsibleId('company', (int)$company->id);
+$mainName = static function (string $code, int $id) use ($access): string {
+    $mainId = $access->mainResponsibleId($code, $id);
     $main = $mainId ? CmsUser::findOne($mainId) : null;
 
-    return '№'.(int)$company->id.($main ? ' · ответственный '.$main->shortDisplayName : '');
+    return $main ? (string)$main->shortDisplayName : '';
 };
 
-$linkButton = static function (?int $companyId, ?int $clientId, string $label, string $confirm) use ($model): string {
-    return Html::beginForm(['/cms/admin-cms-lead/link-identity', 'pk' => $model->id], 'post', [
-        'class' => 'sx-lead-match__form',
-    ])
-        .Html::hiddenInput('company_id', $companyId)
-        .Html::hiddenInput('client_id', $clientId)
-        .Html::submitButton($label, [
-            'class' => 'sx-button sx-button--secondary sx-button--sm',
-            'data-confirm' => $confirm,
-        ])
-        .Html::endForm();
+// Open «возможный дубль» marks between the found records (CrmDuplicateGuard, LeadTriage «Это другая компания»).
+$found = [];
+foreach ($matches['companies'] as $match) {
+    $found[] = ['company', (int)$match['model']->id];
+}
+foreach ($matches['clients'] as $match) {
+    $found[] = ['client', (int)$match['model']->id];
+}
+$duplicates = [];
+if (count($found) > 1 && \skeeks\cms\crm\CrmDuplicateGuard::ready()) {
+    $keys = array_map(static fn($record) => $record[0].':'.$record[1], $found);
+    foreach (CmsCrmDuplicateMark::find()->andWhere(['status' => CmsCrmDuplicateMark::STATUS_OPEN])->andWhere(['or',
+        ['record_id' => array_column($found, 1)], ['other_id' => array_column($found, 1)],
+    ])->all() as $mark) {
+        $a = $mark->record_code.':'.(int)$mark->record_id;
+        $b = $mark->other_code.':'.(int)$mark->other_id;
+        if (in_array($a, $keys, true) && in_array($b, $keys, true)) {
+            $duplicates[$a] = $duplicates[$b] = (string)$mark->reason;
+        }
+    }
+}
+
+$rows = [];
+foreach ($matches['companies'] as $match) {
+    /** @var CmsCompany $company */
+    $company = $match['model'];
+    $rows[] = [
+        'code' => 'company', 'id' => (int)$company->id, 'icon' => 'fas fa-building', 'kind' => 'Компания',
+        'controller' => '/cms/admin-cms-company', 'title' => (string)$company->asText, 'reasons' => $match['reasons'],
+        'extra' => '', 'linked' => (int)$model->cms_company_id === (int)$company->id,
+        'button' => ($canTake || ($canLink && !$model->cms_company_id)) ? $button((int)$company->id, null, (string)$company->asText) : '',
+    ];
+}
+foreach ($matches['clients'] as $match) {
+    /** @var CmsUser $client */
+    $client = $match['model'];
+    $companies = $match['companies'] ?? [];
+    // A person of one company is taken with it.
+    $companyId = count($companies) === 1 && !$model->cms_company_id ? (int)$companies[0]->id : null;
+    $rows[] = [
+        'code' => 'client', 'id' => (int)$client->id, 'icon' => 'fas fa-user', 'kind' => 'Контакт',
+        'controller' => '/cms/admin-user', 'title' => (string)$client->shortDisplayName, 'reasons' => $match['reasons'],
+        'extra' => $companies ? 'компании: '.implode(', ', array_map(static fn($c) => (string)$c->asText, $companies)) : '',
+        'linked' => (int)$model->cms_user_id === (int)$client->id,
+        'button' => ($canTake || ($canLink && !$model->cms_user_id)) ? $button($companyId, (int)$client->id, (string)$client->shortDisplayName) : '',
+    ];
+}
+
+$renderRow = static function (array $row) use ($mainName, $duplicates): string {
+    $main = $mainName($row['code'], $row['id']);
+    $meta = array_filter([
+        '№'.$row['id'],
+        $main !== '' ? 'ответственный '.$main : 'без ответственного',
+        mb_strtolower(implode(', ', $row['reasons']), 'UTF-8'),
+        $row['extra'],
+    ]);
+    $duplicate = $duplicates[$row['code'].':'.$row['id']] ?? null;
+
+    return Html::tag('li',
+        Html::tag('span',
+            Html::tag('i', '', ['class' => $row['icon'].' sx-lead-hint__kind', 'title' => $row['kind'], 'aria-label' => $row['kind']])
+            .BackendEntityLink::widget([
+                'controllerId' => $row['controller'],
+                'modelId' => $row['id'],
+                'label' => $row['title'],
+                'options' => ['class' => 'sx-lead-hint__title'],
+            ])
+            .Html::tag('span', Html::encode(implode(' · ', $meta)), ['class' => 'sx-lead-hint__meta'])
+            .($duplicate !== null ? Html::tag('span', 'возможный дубль', [
+                'class' => 'sx-status sx-status--warning',
+                'title' => 'Отмечены как возможный повтор'.($duplicate !== '' ? ': '.$duplicate : '').'. Объединить их может администратор.',
+            ]) : '')
+            .($row['linked'] ? Html::tag('span', 'уже в сделке', ['class' => 'sx-status sx-status--success']) : ''),
+            ['class' => 'sx-lead-triage__actions']
+        )
+        .($row['button'] !== '' && !$row['linked'] ? Html::tag('span', $row['button'], ['class' => 'sx-lead-hint__actions']) : ''),
+        ['class' => 'sx-lead-hint is-strong']
+    );
 };
 
 BackendSurfaceWidget::begin([
     'id' => 'cms-lead-matches-surface',
     'title' => 'Найдены совпадения в CRM',
-    'hint' => 'Проверьте найденные записи перед созданием новых.',
+    'actions' => Html::tag('span', $canTake ? '«Это он» — взять в работу с этим клиентом' : 'Проверьте перед созданием новой записи', [
+        'class' => 'sx-collection-cell__secondary',
+    ]),
     'titleTag' => 'h2',
     'raised' => true,
     'responsive' => true,
     'options' => ['class' => 'sx-lead-matches-surface'],
 ]);
 ?>
-    <div class="sx-lead-matches__list">
-        <?php foreach ($matches['clients'] as $match) : ?>
-            <?php /** @var CmsUser $client */ $client = $match['model']; ?>
-            <article class="sx-lead-match">
-                <div class="sx-lead-match__main">
-                    <span class="sx-lead-match__kind">Клиент</span>
-                    <?= CmsUserViewWidget::widget(['cmsUser' => $client, 'isSmall' => true]); ?>
-                    <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
-                </div>
-                <?php if ($canTake) : ?>
-                    <?= $takeButton(null, (int)$client->id, (string)$client->shortDisplayName); ?>
-                <?php elseif ($canLink && !$model->cms_user_id) : ?>
-                    <?= $linkButton(null, (int)$client->id, 'Привязать клиента', 'Привязать этого клиента к сделке?'); ?>
-                <?php endif; ?>
-
-                <?php if ($match['companies']) : ?>
-                    <div class="sx-lead-match__relations">
-                        <span class="sx-lead-match__relations-title">Связан с компаниями</span>
-                        <?php foreach ($match['companies'] as $company) : ?>
-                            <?php /** @var CmsCompany $company */ ?>
-                            <div class="sx-lead-match__relation">
-                                <?= BackendEntityLink::widget([
-                                    'controllerId' => '/cms/admin-cms-company',
-                                    'modelId' => $company->id,
-                                    'label' => $company->asText,
-                                ]); ?>
-                                <span class="sx-lead-match__reason"><?= Html::encode($companyMeta($company)); ?></span>
-                                <?php if ((int)$model->cms_company_id === (int)$company->id) : ?>
-                                    <span class="sx-lead-match__reason">Уже привязана к сделке</span>
-                                <?php elseif ($canTake) : ?>
-                                    <?= $takeButton((int)$company->id, (int)$client->id, (string)$company->asText); ?>
-                                <?php elseif ($canLink && !$model->cms_company_id) : ?>
-                                    <?= $linkButton(
-                                        (int)$company->id,
-                                        (int)$client->id,
-                                        $model->cms_user_id ? 'Привязать компанию' : 'Привязать оба',
-                                        'Привязать к сделке клиента и связанную с ним компанию?'
-                                    ); ?>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </article>
+    <ul class="sx-lead-hints">
+        <?php foreach (array_slice($rows, 0, 3) as $row) : ?>
+            <?= $renderRow($row); ?>
         <?php endforeach; ?>
-
-        <?php foreach ($matches['companies'] as $match) : ?>
-            <?php /** @var CmsCompany $company */ $company = $match['model']; ?>
-            <article class="sx-lead-match">
-                <div class="sx-lead-match__main">
-                    <span class="sx-lead-match__kind">Компания</span>
-                    <?= BackendEntityLink::widget([
-                        'controllerId' => '/cms/admin-cms-company',
-                        'modelId' => $company->id,
-                        'label' => $company->asText,
-                    ]); ?>
-                    <span class="sx-lead-match__reason"><?= Html::encode($companyMeta($company)); ?></span>
-                    <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
-                </div>
-                <?php if ($canTake) : ?>
-                    <?= $takeButton((int)$company->id, null, (string)$company->asText); ?>
-                <?php elseif ($canLink && !$model->cms_company_id) : ?>
-                    <?= $linkButton((int)$company->id, null, 'Привязать компанию', 'Привязать эту компанию к сделке?'); ?>
-                <?php endif; ?>
-            </article>
-        <?php endforeach; ?>
-
-        <?php if ($canTake) : ?>
-            <p class="sx-lead-matches__notice">«Это он» — взять сделку в работу с этим клиентом, ответственный — вы.</p>
-        <?php endif; ?>
-    </div>
+    </ul>
+    <?php if (count($rows) > 3) : ?>
+        <details>
+            <summary class="sx-collection-cell__secondary">ещё <?= count($rows) - 3; ?></summary>
+            <ul class="sx-lead-hints">
+                <?php foreach (array_slice($rows, 3) as $row) : ?>
+                    <?= $renderRow($row); ?>
+                <?php endforeach; ?>
+            </ul>
+        </details>
+    <?php endif; ?>
 <?php BackendSurfaceWidget::end(); ?>

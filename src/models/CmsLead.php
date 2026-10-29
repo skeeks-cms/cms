@@ -419,7 +419,8 @@ class CmsLead extends Core
      */
     protected function preparePipeline(): void
     {
-        if (!$this->cms_lead_pipeline_id && ($default = CmsLeadPipeline::defaultFor((int)$this->cms_site_id))) {
+        // A new request goes to the pipeline of its source (п. 13б), else to the default one.
+        if (!$this->cms_lead_pipeline_id && ($default = CmsLeadPipeline::forSource((int)$this->cms_site_id, $this->isNewRecord ? (string)$this->source_type : null))) {
             $this->cms_lead_pipeline_id = (int)$default->id;
         }
         if ($this->status === self::STATUS_NEW) {

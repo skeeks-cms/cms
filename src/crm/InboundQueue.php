@@ -5,6 +5,7 @@ namespace skeeks\cms\crm;
 use skeeks\cms\models\CmsCrmAccessRequest;
 use skeeks\cms\models\CmsDepartment2worker;
 use skeeks\cms\models\CmsLead;
+use skeeks\cms\models\CmsLeadPipeline;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\rbac\CmsManager;
 use yii\db\Query;
@@ -12,9 +13,13 @@ use yii\helpers\Html;
 
 /**
  * «Входящие заявки» (owner's decision 29.10.2026, cms-communication
- * ARCHITECTURE.md п. 13б): who sorts the requests of «Неразобранное» —
- * employees and departments of the CRM settings (CrmSettings::$inboundWorkerIds,
- * $inboundDepartmentIds) — and how:
+ * ARCHITECTURE.md п. 13б): who sorts the requests of «Неразобранное» and how.
+ * The queue belongs to the pipeline the deal is in (CmsLeadPipeline: its
+ * employees, departments and mode; a request lands in a pipeline by its source,
+ * CmsLeadPipeline::forSource()); a pipeline without its own queue takes the
+ * CRM settings «Входящие заявки» (CrmSettings::$inboundWorkerIds,
+ * $inboundDepartmentIds, $inboundMode). A deal moved to another pipeline is
+ * seen and told by the queue of the new one.
  *
  * - MODE_ALL — every employee of the queue sees every unsorted deal
  *   (CmsLeadQuery::forManager()) and is notified;
@@ -35,7 +40,7 @@ class InboundQueue
 
     public const QUEUE_DEFAULT = 'default';
 
-    /** @var int[][] site id => members, per request */
+    /** @var int[][] "site:workers:departments" => members, per request */
     private static array $members = [];
 
     public static function modes(): array
@@ -62,6 +67,7 @@ class InboundQueue
         return $ready;
     }
 
+    /** The mode of the CRM settings (the default of the pipelines). */
     public static function mode(): string
     {
         $settings = self::settings();
@@ -69,33 +75,65 @@ class InboundQueue
         return $settings && $settings->inboundMode === self::MODE_ROUND ? self::MODE_ROUND : self::MODE_ALL;
     }
 
-    /** The queue is set: the employees or the departments of «Входящие заявки». */
+    /**
+     * The queue of a pipeline: its own employees and departments, else those
+     * of the CRM settings; its own mode, else the one of the CRM settings.
+     *
+     * @return array ['key' => string (the turn), 'members' => int[], 'mode' => string]
+     */
+    public static function queueOf(?CmsLeadPipeline $pipeline, ?int $siteId = null): array
+    {
+        $settings = self::settings();
+        $mode = $pipeline && CmsLeadPipeline::inboundReady() && $pipeline->inbound_mode ? (string)$pipeline->inbound_mode : self::mode();
+        if ($pipeline && CmsLeadPipeline::inboundReady() && $pipeline->hasOwnQueue) {
+            return ['key' => 'pipeline:'.(int)$pipeline->id, 'members' => self::membersOf($pipeline->inboundWorkerIds, $pipeline->inboundDepartmentIds, $siteId), 'mode' => $mode];
+        }
+
+        return [
+            'key' => $pipeline && $mode !== self::mode() ? 'pipeline:'.(int)$pipeline->id : self::QUEUE_DEFAULT,
+            'members' => $settings ? self::membersOf((array)$settings->inboundWorkerIds, (array)$settings->inboundDepartmentIds, $siteId) : [],
+            'mode' => $mode,
+        ];
+    }
+
+    /** The queue of the pipeline a deal is in. */
+    public static function queueOfLead(CmsLead $lead): array
+    {
+        $siteId = $lead->cms_site_id ? (int)$lead->cms_site_id : null;
+
+        return self::queueOf($lead->getEffectivePipeline(), $siteId);
+    }
+
+    /** The queue of the CRM settings is set (the default of the pipelines). */
     public static function configured(?int $siteId = null): bool
     {
         return (bool)self::memberIds($siteId);
     }
 
+    /** @return int[] the employees of the queue of the CRM settings */
+    public static function memberIds(?int $siteId = null): array
+    {
+        return self::queueOf(null, $siteId)['members'];
+    }
+
     /**
-     * Active employees of the queue with the deals right, ordered by id (the
-     * order of the turn).
+     * Active employees with the deals right among the given ones and the
+     * employees of the departments, ordered by id (the order of the turn).
      *
      * @return int[]
      */
-    public static function memberIds(?int $siteId = null): array
+    public static function membersOf(array $workerIds, array $departmentIds, ?int $siteId = null): array
     {
-        $settings = self::settings();
-        if (!$settings) {
-            return [];
-        }
-        $key = (int)$siteId;
+        $workerIds = array_values(array_unique(array_filter(array_map('intval', $workerIds))));
+        $departmentIds = array_values(array_unique(array_filter(array_map('intval', $departmentIds))));
+        $key = (int)$siteId.':'.implode(',', $workerIds).':'.implode(',', $departmentIds);
         if (array_key_exists($key, self::$members)) {
             return self::$members[$key];
         }
-        $ids = array_map('intval', (array)$settings->inboundWorkerIds);
-        $departments = array_filter(array_map('intval', (array)$settings->inboundDepartmentIds));
-        if ($departments) {
+        $ids = $workerIds;
+        if ($departmentIds) {
             $ids = array_merge($ids, array_map('intval', CmsDepartment2worker::find()
-                ->andWhere(['cms_department_id' => $departments])->select('worker_id')->column()));
+                ->andWhere(['cms_department_id' => $departmentIds])->select('worker_id')->column()));
         }
         $ids = array_values(array_unique(array_filter($ids)));
         $result = [];
@@ -120,33 +158,60 @@ class InboundQueue
         return in_array($userId, self::memberIds($siteId), true);
     }
 
-    /** The queue sees every unsorted deal (MODE_ALL); by turns only the given one sees it (as its responsible). */
-    public static function seesAllUnsorted(int $userId): bool
+    /**
+     * The unsorted deals nobody was given that the employee sees as a member
+     * of a queue «видят все из списка» (CmsLeadQuery::forManager()): of the
+     * pipelines whose queue he is in; by turns only the given one sees a deal
+     * (as its responsible). Null — none.
+     */
+    public static function unsortedCondition(int $userId, string $leadTable): ?array
     {
-        return self::mode() === self::MODE_ALL && self::isMember($userId);
+        $siteId = \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site ? (int)\Yii::$app->skeeks->site->id : null;
+        $pipelines = CmsLead::pipelineReady() ? CmsLeadPipeline::forSite($siteId) : [];
+        $where = [];
+        if (!$pipelines) {
+            $queue = self::queueOf(null, $siteId);
+            if ($queue['mode'] === self::MODE_ALL && in_array($userId, $queue['members'], true)) {
+                $where[] = '1=1';
+            }
+        }
+        foreach ($pipelines as $pipeline) {
+            $queue = self::queueOf($pipeline, $siteId);
+            if ($queue['mode'] === self::MODE_ALL && in_array($userId, $queue['members'], true)) {
+                $where[] = $pipeline->leadCondition($leadTable);
+            }
+        }
+        if (!$where) {
+            return null;
+        }
+
+        return ['and', [$leadTable.'.status' => CmsLead::STATUS_NEW], [$leadTable.'.executor_id' => null],
+            count($where) === 1 ? $where[0] : array_merge(['or'], $where)];
     }
 
     /** Forgets the members read in this request (tests, a changed setting). */
     public static function reset(): void
     {
         self::$members = [];
+        CmsLeadPipeline::clearCache();
     }
 
     /**
-     * Who is notified about a new unsorted deal: the queue (MODE_ALL) and the
-     * administrators with the deals right (their own notification settings
-     * decide). Null — no queue: the old rule (CmsLead::availableManagerIds()).
+     * Who is notified about a new unsorted deal: the queue of its pipeline
+     * (MODE_ALL), the employee it was given to and the administrators with the
+     * deals right (their own notification settings decide). Null — no queue:
+     * the old rule (CmsLead::availableManagerIds()).
      *
      * @return int[]|null
      */
     public static function notifyIds(CmsLead $lead): ?array
     {
         $siteId = $lead->cms_site_id ? (int)$lead->cms_site_id : null;
-        $members = self::memberIds($siteId);
-        if (!$members) {
+        $queue = self::queueOfLead($lead);
+        if (!$queue['members']) {
             return null;
         }
-        $ids = self::mode() === self::MODE_ALL ? $members : [];
+        $ids = $queue['mode'] === self::MODE_ALL ? $queue['members'] : [];
         $admins = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.is_active' => 1]);
         if ($siteId) {
             $admins->cmsSite($siteId);
@@ -165,13 +230,15 @@ class InboundQueue
     }
 
     /**
-     * The next employee of the turn. Locks the row of the site, so it must run
-     * in the transaction that saves the deal: a parallel request waits and gets
-     * the employee after.
+     * The next employee of the turn of a queue. Locks the row of the queue, so
+     * it must run in the transaction that saves the deal: a parallel request
+     * waits and gets the employee after.
+     *
+     * @param int[]|null $members the queue; null — the one of the CRM settings
      */
-    public static function next(int $siteId, string $queue = self::QUEUE_DEFAULT): ?int
+    public static function next(int $siteId, string $queue = self::QUEUE_DEFAULT, ?array $members = null): ?int
     {
-        $members = self::memberIds($siteId);
+        $members = $members ?? self::memberIds($siteId);
         if (!$members || !self::ready()) {
             return null;
         }
@@ -287,7 +354,12 @@ class InboundQueue
 
             return 'main';
         }
-        if (self::mode() === self::MODE_ROUND && ($next = self::next($siteId))) {
+        // The queue of the pipeline the request lands in (its source, else the default one).
+        if (!$lead->cms_lead_pipeline_id && ($pipeline = CmsLeadPipeline::forSource($siteId, (string)$lead->source_type))) {
+            $lead->cms_lead_pipeline_id = (int)$pipeline->id;
+        }
+        $queue = self::queueOfLead($lead);
+        if ($queue['mode'] === self::MODE_ROUND && ($next = self::next($siteId, $queue['key'], $queue['members']))) {
             $lead->executor_id = $next;
 
             return 'round';

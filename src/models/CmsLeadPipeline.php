@@ -18,6 +18,11 @@ use yii\helpers\ArrayHelper;
  * status `new`, the stages split `in_work`, «Успешно»/«Отказ» are the
  * terminal statuses. `success_rule` only suggests closing; a person closes.
  *
+ * The queue of «Неразобранное» (п. 13б, crm\InboundQueue): the sources whose
+ * new requests land in the pipeline (`inbound_source_types`, forSource()) and
+ * who sorts them — employees, departments and the mode; without them the
+ * CRM settings «Входящие заявки» are the default.
+ *
  * @property int         $id
  * @property int|null    $created_by
  * @property int|null    $updated_by
@@ -29,6 +34,14 @@ use yii\helpers\ArrayHelper;
  * @property int         $sort
  * @property int         $is_default
  * @property string      $success_rule
+ * @property string|null $inbound_source_types JSON of CmsLead::sources() keys
+ * @property string|null $inbound_worker_ids JSON
+ * @property string|null $inbound_department_ids JSON
+ * @property string|null $inbound_mode crm\InboundQueue::MODE_ALL | MODE_ROUND; null — the CRM settings
+ *
+ * @property int[]    $inboundWorkerIds
+ * @property int[]    $inboundDepartmentIds
+ * @property string[] $inboundSourceTypes
  *
  * @property CmsLeadStage[] $stages
  */
@@ -100,7 +113,95 @@ class CmsLeadPipeline extends ActiveRecord
             [['success_rule'], 'in', 'range' => array_keys(self::successRules())],
             [['name'], 'unique', 'targetAttribute' => ['cms_site_id', 'name'], 'message' => 'Такая воронка уже есть.'],
             [['code'], 'unique', 'targetAttribute' => ['cms_site_id', 'code'], 'skipOnEmpty' => true],
-        ]);
+        ], static::inboundReady() ? [
+            [['inboundWorkerIds', 'inboundDepartmentIds', 'inboundSourceTypes'], 'safe'],
+            [['inbound_mode'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
+            [['inbound_mode'], 'in', 'range' => array_keys(\skeeks\cms\crm\InboundQueue::modes())],
+        ] : []);
+    }
+
+    /** The columns of the queue exist (the migration may run after the code update). */
+    public static function inboundReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::ready() ? static::getDb()->getTableSchema(static::tableName(), true) : null;
+            $ready = $schema !== null && $schema->getColumn('inbound_worker_ids') !== null;
+        }
+
+        return $ready;
+    }
+
+    private function jsonList(string $column, bool $ints): array
+    {
+        if (!$this->hasAttribute($column) || !$this->{$column}) {
+            return [];
+        }
+        $values = (array)json_decode((string)$this->{$column}, true);
+
+        return array_values(array_filter($ints ? array_map('intval', $values) : array_map('strval', $values)));
+    }
+
+    private function setJsonList(string $column, $values, bool $ints): void
+    {
+        if (!$this->hasAttribute($column)) {
+            return;
+        }
+        $values = array_values(array_unique(array_filter($ints ? array_map('intval', (array)$values) : array_map('strval', (array)$values))));
+        $this->{$column} = $values ? json_encode($values) : null;
+    }
+
+    public function getInboundWorkerIds(): array
+    {
+        return $this->jsonList('inbound_worker_ids', true);
+    }
+
+    public function setInboundWorkerIds($values): void
+    {
+        $this->setJsonList('inbound_worker_ids', $values, true);
+    }
+
+    public function getInboundDepartmentIds(): array
+    {
+        return $this->jsonList('inbound_department_ids', true);
+    }
+
+    public function setInboundDepartmentIds($values): void
+    {
+        $this->setJsonList('inbound_department_ids', $values, true);
+    }
+
+    public function getInboundSourceTypes(): array
+    {
+        return $this->jsonList('inbound_source_types', false);
+    }
+
+    public function setInboundSourceTypes($values): void
+    {
+        $this->setJsonList('inbound_source_types', $values, false);
+    }
+
+    /** The pipeline has its own queue (employees or departments); otherwise the CRM settings decide. */
+    public function getHasOwnQueue(): bool
+    {
+        return (bool)($this->inboundWorkerIds || $this->inboundDepartmentIds);
+    }
+
+    /**
+     * The pipeline a new request of the source lands in: the first one (switcher order) whose sources
+     * include it, else the default one; null on a site without pipelines.
+     */
+    public static function forSource(?int $siteId, ?string $sourceType): ?self
+    {
+        if ($sourceType !== null && $sourceType !== '' && static::inboundReady()) {
+            foreach (static::forSite($siteId) as $pipeline) {
+                if (in_array($sourceType, $pipeline->inboundSourceTypes, true)) {
+                    return $pipeline;
+                }
+            }
+        }
+
+        return static::defaultFor($siteId);
     }
 
     public function attributeLabels()
@@ -111,6 +212,10 @@ class CmsLeadPipeline extends ActiveRecord
             'sort' => 'Порядок',
             'is_default' => 'Основная',
             'success_rule' => 'Критерий успеха',
+            'inboundSourceTypes' => 'Заявки из источников',
+            'inboundWorkerIds' => 'Кто разбирает: сотрудники',
+            'inboundDepartmentIds' => 'Кто разбирает: отделы',
+            'inbound_mode' => 'Как распределять',
         ]);
     }
 
@@ -122,6 +227,10 @@ class CmsLeadPipeline extends ActiveRecord
             'success_rule' => 'Автоматический критерий только предлагает закрыть сделку, закрывает её менеджер.',
             'sort' => 'Воронки идут в переключателе по возрастанию числа.',
             'code' => 'Необязательно. Нужен скриптам и интеграциям.',
+            'inboundSourceTypes' => 'Новые заявки из этих источников попадают в эту воронку. Остальные — в основную.',
+            'inboundWorkerIds' => 'Кто разбирает «Неразобранное» этой воронки. Если никого не выбрать, действуют настройки CRM «Входящие заявки».',
+            'inboundDepartmentIds' => 'Все сотрудники выбранных отделов тоже разбирают заявки этой воронки.',
+            'inbound_mode' => '«Видят все из списка» — каждый видит новые заявки и получает уведомление. «По кругу» — заявка сразу назначается следующему сотруднику очереди.',
         ]);
     }
 

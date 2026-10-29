@@ -140,6 +140,12 @@ class AdminCmsLeadPipelineController extends BackendModelStandartController
             ],
             'sort' => ['class' => NumberField::class],
             'code',
-        ];
+        ] + (CmsLeadPipeline::inboundReady() ? [
+            // The queue of «Неразобранное» of the pipeline (п. 13б, crm\InboundQueue); empty — the CRM settings.
+            'inboundSourceTypes' => ['class' => SelectField::class, 'items' => \skeeks\cms\models\CmsLead::sources(), 'multiple' => true],
+            'inboundWorkerIds' => ['class' => SelectField::class, 'items' => \skeeks\cms\crm\CrmSettings::workerItems(), 'multiple' => true],
+            'inboundDepartmentIds' => ['class' => SelectField::class, 'items' => \skeeks\cms\crm\CrmSettings::departmentItems(), 'multiple' => true],
+            'inbound_mode' => ['class' => SelectField::class, 'items' => \skeeks\cms\crm\InboundQueue::modes(), 'nullLabel' => 'Как в настройках CRM «Входящие заявки»'],
+        ] : []);
     }
 }
