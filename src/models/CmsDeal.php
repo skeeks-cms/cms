@@ -403,6 +403,10 @@ class CmsDeal extends ActiveRecord
         //$bill->description = "Оплата по договору: «" . $this->asText . "»";
 
         $bill->deals = [$this->id];
+        // The bill of the service belongs to its deal (owner's decision 29.10.2026, CrmAccess::validateLeadLink()).
+        if ($this->hasAttribute('cms_lead_id') && $bill->hasAttribute('cms_lead_id') && $this->cms_lead_id) {
+            $bill->cms_lead_id = (int)$this->cms_lead_id;
+        }
         $bill->description = "Оплата по договору: «{$this->asText}»";
         $bill->currency_code = $this->currency_code;
         //$bill->sender_crm_contractor_id = $this->cms_company_id;

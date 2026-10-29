@@ -1357,30 +1357,98 @@ class CrmAccess extends Component
     }
 
     /**
-     * The deal of a record written for a client — a service, a bill, a
-     * document (owner's decision 29.10.2026): when the deal is chosen or
-     * changed it must be available to the acting employee and belong to the
-     * client of the record (a record without a client takes the client of the
-     * deal); a new record of a client the employee does not see in full
-     * («Свои сделки», "edit") needs his own open deal (canActOnClient(),
-     * OWN_LEAD_REQUIRED). The console and system work are not limited.
+     * A refused hidden client or deal is not kept in the model: the form drawn
+     * again with the error (its selects show the name of the chosen record) and
+     * any serialization show the previous belonging, never the hidden one.
+     */
+    private static function forgetHiddenBelonging(\yii\db\BaseActiveRecord $model): void
+    {
+        foreach (['cms_company_id', 'cms_user_id', 'cms_lead_id'] as $attribute) {
+            if ($model->hasAttribute($attribute)) {
+                $model->$attribute = $model->isNewRecord ? null : $model->getOldAttribute($attribute);
+            }
+        }
+    }
+
+    /** The refusals of validateLeadLink(): they never name the other client. */
+    public const CLIENT_NOT_AVAILABLE = 'Клиент недоступен вам.';
+    public const LEAD_NOT_AVAILABLE = 'Сделка не найдена или недоступна вам.';
+    public const LEAD_OTHER_CLIENT = 'Сделка относится к другому клиенту.';
+    public const LEAD_CLOSED = 'Сделка закрыта: новые счета, документы и услуги по ней не создаются. Чтобы продолжить, верните сделку в работу.';
+
+    /** @var int depth of systemWrite() */
+    private static int $systemWrite = 0;
+
+    /**
+     * System work that writes client records on behalf of no employee (a bill of
+     * an order by its payment system): validateLeadLink() does not judge it by
+     * the employee whose request happens to run it. The console, agents and
+     * customers of the site are not employees anyway (actingWorker()).
+     *
+     * @return mixed what $work returns
+     */
+    public static function systemWrite(callable $work)
+    {
+        self::$systemWrite++;
+        try {
+            return $work();
+        } finally {
+            self::$systemWrite--;
+        }
+    }
+
+    /**
+     * Who a client record belongs to — a service, a bill, a document (with
+     * cms_lead_id), a payment (without) — when an employee writes it (owner's
+     * decisions 29.10.2026, audit F1/F2/F6). Checked when the record is new or any
+     * field of its belonging (the deal, the company, the person) changes; other
+     * edits of an existing record keep their rules:
+     * - the client must be available to him (clientDataLevel() not null; an
+     *   administrator — any): no access is never a permission;
+     * - the deal must be available (CmsLeadQuery::forManager()) and of the same
+     *   client; a record without a client takes the client of the deal;
+     * - a closed deal gets no new records, from anyone (administrators too);
+     * - a client he sees in part («Свои сделки», "edit", a leader through such a
+     *   subordinate) only within his own open deal (canActOnClient(), OWN_LEAD_REQUIRED);
+     *   a record without cms_lead_id (a payment, tied to a deal through its bill) — only the client.
+     * The refusals never name the other client. The console, customers of the
+     * site and systemWrite() are not limited.
      *
      * @param \yii\db\BaseActiveRecord $model with cms_company_id and cms_user_id
+     * @param string $attribute the deal attribute, or the attribute to report on for a model without one
      */
     public function validateLeadLink(\yii\db\BaseActiveRecord $model, string $attribute = 'cms_lead_id'): void
     {
-        $leadId = (int)$model->$attribute ?: null;
-        $model->$attribute = $leadId;
-        $changed = $model->isNewRecord || $model->isAttributeChanged($attribute, false);
-        $worker = self::actingWorker();
-        if ($leadId && $changed) {
+        $hasLead = $model->hasAttribute('cms_lead_id');
+        $leadId = $hasLead ? ((int)$model->cms_lead_id ?: null) : null;
+        if ($hasLead) {
+            $model->cms_lead_id = $leadId;
+        }
+        $worker = self::$systemWrite ? null : self::actingWorker();
+        if (!$worker) {
+            return;
+        }
+        $leadChanged = $hasLead && ($model->isNewRecord || $model->isAttributeChanged('cms_lead_id', false));
+        $clientChanged = $model->isNewRecord || $model->isAttributeChanged('cms_company_id', false) || $model->isAttributeChanged('cms_user_id', false);
+        if (!$leadChanged && !$clientChanged) {
+            return;
+        }
+        $isAdmin = $this->isAdmin($worker);
+
+        $lead = null;
+        if ($leadId) {
             $query = CmsLead::find()->andWhere([CmsLead::tableName().'.id' => $leadId]);
-            if ($worker) {
+            if (!$isAdmin) {
                 $query->forManager($worker);
             }
             $lead = $query->one();
             if (!$lead) {
-                $model->addError($attribute, 'Сделка не найдена или недоступна вам.');
+                $model->addError($attribute, self::LEAD_NOT_AVAILABLE);
+                self::forgetHiddenBelonging($model);
+                return;
+            }
+            if ($leadChanged && $lead->isTerminal) {
+                $model->addError($attribute, self::LEAD_CLOSED);
                 return;
             }
             if (!$model->cms_company_id && !$model->cms_user_id) {
@@ -1391,21 +1459,27 @@ class CrmAccess extends Component
                     ? (int)$lead->cms_company_id === (int)$model->cms_company_id
                     : !$lead->cms_company_id && (int)$lead->cms_user_id === (int)$model->cms_user_id;
                 if (!$sameClient) {
-                    $model->addError($attribute, 'Сделка относится к другому клиенту.');
+                    $model->addError($attribute, self::LEAD_OTHER_CLIENT);
                     return;
                 }
             }
         }
-        if (!$changed || !$worker || !self::levelsReady() || !($record = self::clientRecordOf($model))) {
-            return;
-        }
-        // Only a client he sees in part («Свои сделки», "edit"): the rule of the record without CRM access
-        // (a buyer of an order he does not see) stays as before.
-        if ($this->clientDataLevel($worker, $record[0], (int)$record[1]) === null) {
+
+        if ($isAdmin || !self::levelsReady() || !($record = self::clientRecordOf($model))) {
             return;
         }
         $client = $record[0] === CmsCrmAccessRequest::RECORD_COMPANY ? CmsCompany::findOne((int)$record[1]) : CmsUser::findOne((int)$record[1]);
-        if ($client && !$this->canActOnClient($worker, $client, $leadId)) {
+        if ($client instanceof User && $client->is_worker) {
+            // An employee is not a client (canActOnClient()).
+            return;
+        }
+        if (!$client || $this->clientDataLevel($worker, $record[0], (int)$record[1]) === null) {
+            $model->addError($attribute, self::CLIENT_NOT_AVAILABLE);
+            self::forgetHiddenBelonging($model);
+            return;
+        }
+        // A record without a deal of its own (a payment: through its bill) — only the available client.
+        if ($hasLead && !$this->canActOnClient($worker, $client, $leadId)) {
             $model->addError($attribute, self::OWN_LEAD_REQUIRED);
         }
     }

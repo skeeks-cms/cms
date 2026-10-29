@@ -766,6 +766,55 @@ try {
                 $hits = $status === 'ok' ? $found($json($out)) : [];
                 $report('MCP '.$name.' (по чужой сделке)', 'executeTool cms_lead_id='.$foreign->id.($status === 'ok' ? '' : ' → ошибка: '.mb_substr($out, 0, 80)), (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
             }
+
+            // Writing (audit F1/F2/F6): a record of a hidden client, on another employee's deal, moved to a hidden
+            // client keeping its deal — refused before any row, and the answer never names the hidden client.
+            $writes = [
+                'shop_bill' => ['shop_bill_create', 'shop_bill_update', ['amount' => 100, 'currency_code' => 'RUB', 'shop_pay_system_id' => 8, 'description' => AUDIT_PREFIX.'запись']],
+                'shop_document' => ['shop_document_create', 'shop_document_update', ['type' => 'act', 'status' => 'draft', 'amount' => 100, 'currency_code' => 'RUB', 'description' => AUDIT_PREFIX.'запись']],
+                'cms_deal' => ['cms_deal_create', 'cms_deal_update', ['name' => AUDIT_PREFIX.'запись', 'description' => '', 'cms_deal_type_id' => 13, 'currency_code' => 'RUB', 'amount' => 100]],
+            ];
+            $countFor = static fn(string $table, array $where) => (int)(new \yii\db\Query())->from($table)->where($where)->count();
+            foreach ($writes as $table => [$createTool, $updateTool, $fields]) {
+                foreach (['скрытой компании' => ['cms_company_id' => $protected->id], 'по чужой сделке' => ['cms_company_id' => $A->id, 'cms_lead_id' => $foreign->id],
+                             'без своей сделки' => ['cms_company_id' => $A->id]] as $what => $attrs) {
+                    $before = $countFor($table, $attrs);
+                    [$status, $out] = $tool($createTool, ['attributes' => $fields + $attrs]);
+                    $leaked = $status === 'ok' || $countFor($table, $attrs) !== $before || mb_strpos((string)$out, $protected->name) !== false;
+                    $report('MCP '.$createTool.' ('.$what.')', 'executeTool → '.($status === 'ok' ? 'создано' : 'отказ'), $leaked, $leaked ? 'запись создана или имя раскрыто' : '');
+                }
+                $ownRecord = $linked['own'][$table === 'cms_deal' ? 'service' : ($table === 'shop_bill' ? 'bill' : 'document')];
+                [$status, $out] = $tool($updateTool, ['id' => $ownRecord->id, 'attributes' => ['cms_company_id' => $protected->id]]);
+                $moved = (int)(new \yii\db\Query())->select('cms_company_id')->from($table)->where(['id' => $ownRecord->id])->scalar() !== (int)$A->id;
+                $leaked = $status === 'ok' || $moved || mb_strpos((string)$out, $protected->name) !== false;
+                $report('MCP '.$updateTool.' (перенос записи своей сделки в скрытую компанию)', 'executeTool → '.($status === 'ok' ? 'сохранено' : 'отказ'), $leaked, $leaked ? 'перенесено или имя раскрыто' : '');
+            }
+            $before = $countFor('shop_payment', ['cms_company_id' => $protected->id]);
+            [$status, $out] = $tool('shop_payment_create', ['attributes' => ['cms_company_id' => $protected->id, 'amount' => 100, 'currency_code' => 'RUB', 'is_debit' => 1,
+                'shop_pay_system_id' => 8, 'comment' => AUDIT_PREFIX.'платёж', 'operation_at' => time()]]);
+            $leaked = $status === 'ok' || $countFor('shop_payment', ['cms_company_id' => $protected->id]) !== $before || mb_strpos((string)$out, $protected->name) !== false;
+            $report('MCP shop_payment_create (скрытой компании)', 'executeTool → '.($status === 'ok' ? 'создано' : 'отказ'), $leaked, $leaked ? 'запись создана или имя раскрыто' : '');
+
+            // The same through the form, as the browser sends it: a pjax POST with a valid CSRF token
+            // (a session of its own: the HTTP part above has removed its cookies).
+            $jar = tempnam(sys_get_temp_dir(), 'crm-leak');
+            $http('/site?id='.(int)$worker->id);
+            [, $form] = $http('/~sxx/cms/admin-cms-deal/create');
+            preg_match('~<meta name="csrf-param" content="([^"]+)">\s*<meta name="csrf-token" content="([^"]+)">~', $form, $csrf);
+            $before = $countFor('cms_deal', ['cms_company_id' => $protected->id]);
+            $curl = curl_init($base.'/~sxx/cms/admin-cms-deal/create');
+            curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $jar, CURLOPT_COOKIEFILE => $jar, CURLOPT_TIMEOUT => 60, CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Host: '.(getenv('TEST_HTTP_HOST') ?: 'localhost:8080'), 'X-Requested-With: XMLHttpRequest', 'X-PJAX: true', 'X-PJAX-Container: #sx-pjax-form'],
+                CURLOPT_POSTFIELDS => http_build_query([($csrf[1] ?? '_csrf') => ($csrf[2] ?? ''), 'CmsDeal' => ['cms_company_id' => $protected->id] + $writes['cms_deal'][2]])]);
+            $body = html_entity_decode((string)curl_exec($curl), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $code = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($curl);
+            curl_close($curl);
+            $leaked = $countFor('cms_deal', ['cms_company_id' => $protected->id]) !== $before || mb_strpos($body, $protected->name) !== false
+                || mb_strpos($body, CrmAccess::CLIENT_NOT_AVAILABLE) === false;
+            $report('Форма услуги (POST с CSRF): скрытая компания', 'POST /~sxx/cms/admin-cms-deal/create → '.$code.($curlError ? ' ('.$curlError.')' : ''),
+                $leaked, $leaked ? 'создано, имя раскрыто или нет отказа' : '');
+            @unlink($jar);
         }
     }
 
