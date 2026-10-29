@@ -354,8 +354,8 @@ class CrmAccess extends Component
      *   («сделать основным» — setMain() of the employee instead).
      * - Otherwise, and when the main one left (his link deleted): a head of the
      *   department of the former main one (or of a participant), else the
-     *   administrator by default (CrmProtection::HISTORY_FALLBACK_USER_ID, else
-     *   the first one).
+     *   responsible by default (defaultResponsible(): the setting, else the
+     *   first administrator).
      *
      * @param int|null $formerMainId the main one whose link was just deleted
      */
@@ -397,11 +397,9 @@ class CrmAccess extends Component
                 }
             }
         }
-        if (!$mainId) {
-            $fallback = (int)CrmProtection::HISTORY_FALLBACK_USER_ID;
-            $mainId = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $fallback, CmsUser::tableName().'.is_active' => 1])->exists()
-                ? $fallback : ($this->adminIds()[0] ?? null);
-            $source = 'администратор по умолчанию';
+        if (!$mainId && ($default = $this->defaultResponsible())) {
+            [$mainId, $why] = $default;
+            $source = 'ответственный по умолчанию ('.$why.')';
         }
         if (!$mainId) {
             return;
@@ -445,9 +443,7 @@ class CrmAccess extends Component
                 // A user of the site (п. 14): not a CRM client until an employee or an order makes him one.
                 return;
             }
-            $fallback = (int)CrmProtection::HISTORY_FALLBACK_USER_ID;
-            $creatorId = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $fallback, CmsUser::tableName().'.is_active' => 1])->exists()
-                ? $fallback : (int)($this->adminIds()[0] ?? 0);
+            $creatorId = (int)($this->defaultResponsible()[0] ?? 0);
             if (!$creatorId) {
                 return;
             }
@@ -2045,6 +2041,30 @@ class CrmAccess extends Component
         }
 
         return false;
+    }
+
+    public const DEFAULT_FROM_SETTINGS = 'из настроек CRM';
+    public const DEFAULT_FIRST_ADMIN = 'первый администратор';
+
+    /**
+     * The employee who takes what has nobody else (a client left without the main
+     * one and without a head of a department, a company created without an
+     * employee, a client with a history, the default of the console plans): the
+     * setting «Ответственный по умолчанию» of crmSettings when he is an active
+     * employee, else the first active administrator (adminIds()), else nobody.
+     * Never a fixed id in the code: on another site id 1 may be anyone.
+     *
+     * @return array|null [int the employee, string why: DEFAULT_FROM_SETTINGS | DEFAULT_FIRST_ADMIN]
+     */
+    public function defaultResponsible(): ?array
+    {
+        $chosen = \Yii::$app->has('crmSettings') ? (int)(\Yii::$app->crmSettings->defaultResponsibleId ?? 0) : 0;
+        if ($chosen && CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $chosen, CmsUser::tableName().'.is_active' => 1])->exists()) {
+            return [$chosen, self::DEFAULT_FROM_SETTINGS];
+        }
+        $adminId = (int)($this->adminIds()[0] ?? 0);
+
+        return $adminId ? [$adminId, self::DEFAULT_FIRST_ADMIN] : null;
     }
 
     public function adminIds(): array

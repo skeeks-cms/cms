@@ -37,6 +37,14 @@ class CrmSettings extends Component
 
     public $duplicateMode = self::DUPLICATES_STRICT;
 
+    /**
+     * @var int|null «Ответственный по умолчанию»: the main responsible of a client
+     * left without one and without a head of a department, of a company created
+     * without an employee, of a client with a history (CrmAccess::defaultResponsible()).
+     * Empty — the first active administrator. Never a fixed id in the code.
+     */
+    public $defaultResponsibleId;
+
     /** П2д: a payment protects the client this many months (crm\CrmProtection). */
     public $protectionMonths = 12;
 
@@ -121,6 +129,8 @@ class CrmSettings extends Component
             [['outgoingLeadWorkerId'], 'required', 'when' => static fn(self $m) => $m->outgoingLeadTo === self::OWNER_WORKER,
                 'whenClient' => "function () { return $('#crmsettings-outgoingleadto').val() === '".self::OWNER_WORKER."'; }"],
             [['protectionMonths'], 'integer', 'min' => 1, 'max' => 120],
+            [['defaultResponsibleId'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
+            [['defaultResponsibleId'], 'integer'],
             [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
             [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'integer'],
             [['inboundWorkerIds', 'inboundDepartmentIds'], 'filter', 'filter' => static fn($value) => array_values(array_filter(array_map('intval', (array)$value)))],
@@ -134,6 +144,7 @@ class CrmSettings extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'duplicateMode' => 'Повторы клиентов',
+            'defaultResponsibleId' => 'Ответственный по умолчанию',
             'outgoingNewCardOwner' => 'Ответственный за новые компании',
             'outgoingNewCardWorkerId' => 'Сотрудник для новых компаний',
             'outgoingLeadOnView' => 'Сделка при просмотре Презентации или КП',
@@ -155,6 +166,7 @@ class CrmSettings extends Component
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'defaultResponsibleId' => 'Получает клиентов, у которых не осталось основного ответственного и нет руководителя отдела, и компании, созданные без сотрудника (импорт из системы, фоновые задачи). Если не выбран или сотрудник неактивен — первый активный администратор.',
             'outgoingNewCardOwner' => 'Для компаний, которых ещё нет в CRM: бот или рассылка создаёт их с этим ответственным. Отправитель — тот, под чьей авторизацией работает бот. У клиента CRM всегда есть основной ответственный. Существующие компании не меняются.',
             'outgoingLeadOnView' => 'Ответ клиента создаёт сделку всегда. Отметьте, если и просмотр Презентации или КП — повод вести сделку. Открытие письма сделку не создаёт.',
             'outgoingTaskOnView' => 'Когда просмотр сделку не создаёт, ответственному ставится задача «Позвонить: смотрел Презентацию».',
@@ -182,6 +194,18 @@ class CrmSettings extends Component
                         'class' => SelectField::class,
                         'items' => self::duplicateModes(),
                         'allowNull' => false,
+                    ],
+                ],
+            ],
+            'responsible' => [
+                'class' => FieldSet::class,
+                'name' => 'Ответственный по умолчанию',
+                'fields' => [
+                    'defaultResponsibleId' => [
+                        'class' => SelectField::class,
+                        'items' => self::workerItems(),
+                        'allowNull' => true,
+                        'nullLabel' => 'Первый активный администратор',
                     ],
                 ],
             ],

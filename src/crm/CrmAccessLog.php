@@ -126,7 +126,7 @@ class CrmAccessLog
         return trim($from.($from !== '' || $log->level_to ? ' → ' : '').$name($log->level_to), ' →');
     }
 
-    /** «Фирстова Елизавета: клиент взят в работу из общего пула» — the event in words, without a grammatical gender. */
+    /** «Петрова Анна: доступ выдан — Смирнов Олег: нет доступа → Свои сделки» — the event in words, without a grammatical gender. */
     public static function text(CmsCrmAccessLog $log): string
     {
         $name = static fn($id) => $id && ($user = CmsUser::findOne((int)$id)) ? (string)$user->shortDisplayName : '';

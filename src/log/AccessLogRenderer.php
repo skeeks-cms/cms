@@ -8,8 +8,8 @@ use yii\helpers\Url;
 
 /**
  * A record of the journal of the access to a client in its feed
- * (crm\CrmAccessLog, log type `crm_access`): «Фирстова Елизавета: клиент
- * взят в работу из общего пула».
+ * (crm\CrmAccessLog, log type `crm_access`): «Петрова Анна: доступ выдан —
+ * Смирнов Олег: нет доступа → Свои сделки».
  */
 class AccessLogRenderer extends CmsLogEntryRenderer
 {

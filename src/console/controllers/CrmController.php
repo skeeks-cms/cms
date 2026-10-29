@@ -43,12 +43,12 @@ class CrmController extends Controller
      * not an unsorted incoming deal — and without a main responsible (owner's
      * decision 29.10.2026: such a client always has one, it is not in the
      * general pool). The main one: by the last payment or service, else --user
-     * (Семенов Александр by default). Each one is written to the journal.
+     * (the responsible by default, CrmAccess::defaultResponsible()). Each one is written to the journal.
      */
     public function actionAssignHistoryMain()
     {
-        $fallback = (int)($this->user ?: CrmProtection::HISTORY_FALLBACK_USER_ID);
         $service = new CrmProtection();
+        $fallback = $this->fallbackUser($service);
         $plan = $service->historyMainPlan($fallback);
         $byCode = [];
         $bySource = [];
@@ -88,15 +88,15 @@ class CrmController extends Controller
     /**
      * Clients without any employee — the former general pool (owner's decision
      * 29.10.2026, п. 13а: a CRM client always has a main responsible). The main
-     * one: by the last payment or service, else --user (Семенов Александр by
+     * one: by the last payment or service, else --user (the responsible by
      * default). Users of the site who registered themselves and ordered nothing
      * are not CRM clients and are left out. The plan by default; --apply
      * writes, each one to the journal.
      */
     public function actionAssignPoolMain()
     {
-        $fallback = (int)($this->user ?: CrmProtection::HISTORY_FALLBACK_USER_ID);
         $service = new CrmProtection();
+        $fallback = $this->fallbackUser($service);
         $plan = $service->poolMainPlan($fallback);
         $byCode = [];
         $bySource = [];
@@ -130,13 +130,13 @@ class CrmController extends Controller
      * Clients with participants and without a main responsible (owner's
      * decision 29.10.2026: participants only with the main one, the pool has
      * none). The main one: an active participant with "full", else by the last
-     * payment or service, else --user (Семенов Александр by default). The plan
+     * payment or service, else --user (the responsible by default). The plan
      * by default; --apply writes, each one to the journal.
      */
     public function actionAssignOrphanMain()
     {
-        $fallback = (int)($this->user ?: CrmProtection::HISTORY_FALLBACK_USER_ID);
         $service = new CrmProtection();
+        $fallback = $this->fallbackUser($service);
         $plan = $service->orphanMainPlan($fallback);
         $byCode = [];
         $bySource = [];
@@ -236,5 +236,19 @@ class CrmController extends Controller
         $this->stdout("Пересчитана защита клиентов: {$count}.\n");
 
         return ExitCode::OK;
+    }
+
+    /**
+     * The employee of `--user`, else the responsible by default
+     * (CrmAccess::defaultResponsible(): the CRM setting, else the first
+     * administrator); the plan says who it is and why.
+     */
+    private function fallbackUser(CrmProtection $service): ?int
+    {
+        [$userId, $why] = $service->fallback($this->user ? (int)$this->user : null);
+        $user = $userId ? \skeeks\cms\models\CmsUser::findOne($userId) : null;
+        $this->stdout('Если по истории никого: '.($user ? $user->shortDisplayName.' (id '.$userId.')' : 'никого').' — '.$why."\n");
+
+        return $userId;
     }
 }

@@ -280,8 +280,7 @@ class CrmProtection
         if (!self::ready() || !CrmAccess::mainReady()) {
             return [];
         }
-        $access = CrmAccess::instance();
-        $admins = $access->adminIds();
+        [$fallbackId, $fallbackSource] = $this->fallback();
         $plan = [];
         foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
             [$linkClass, $recordColumn] = CrmAccess::linkTable($code);
@@ -289,7 +288,7 @@ class CrmProtection
                 ->andWhere(['not exists', $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($class::tableName().'.id')])->andWhere(['is_main' => 1])])
                 ->orderBy(['id' => SORT_ASC])->all();
             foreach ($records as $record) {
-                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $admins ? (int)$admins[0] : null, 'администратор по умолчанию');
+                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, $fallbackSource);
                 $user = $userId ? CmsUser::findOne($userId) : null;
                 $plan[] = [
                     'code' => $code,
@@ -307,8 +306,28 @@ class CrmProtection
 
     public const OLD_BASE_COMMENT = 'Назначен основным: старая база без ответственного';
 
-    /** The default main responsible of a client with a history and nobody by it (owner's decision 29.10.2026). */
+    /**
+     * @deprecated a fixed employee id; the code no longer reads it. The default
+     * main responsible is the setting «Ответственный по умолчанию»
+     * (CrmAccess::defaultResponsible(): the setting, else the first administrator).
+     */
     public const HISTORY_FALLBACK_USER_ID = 1;
+
+    /**
+     * The employee who takes a client nobody else takes, and why: $fallbackId
+     * chosen by the caller (a console `--user`), else CrmAccess::defaultResponsible().
+     *
+     * @return array [int|null the employee, string the ground in words]
+     */
+    public function fallback(?int $fallbackId = null): array
+    {
+        if ($fallbackId) {
+            return [$fallbackId, 'выбран в команде'];
+        }
+        $default = CrmAccess::instance()->defaultResponsible();
+
+        return $default ? [(int)$default[0], 'ответственный по умолчанию ('.$default[1].')'] : [null, 'никого нет'];
+    }
 
     /**
      * Who becomes the main responsible of a client by its history: the creator
@@ -349,8 +368,9 @@ class CrmProtection
      *
      * @return array[] code, id, name, user_id, user, source
      */
-    public function historyMainPlan(int $fallbackId = self::HISTORY_FALLBACK_USER_ID): array
+    public function historyMainPlan(?int $fallbackId = null): array
     {
+        [$fallbackId, $fallbackSource] = $this->fallback($fallbackId);
         if (!CrmAccess::mainReady()) {
             return [];
         }
@@ -365,7 +385,7 @@ class CrmProtection
                 $query->andWhere([$table.'.is_worker' => 0]);
             }
             foreach ($query->each(200) as $record) {
-                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, 'по умолчанию');
+                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, $fallbackSource);
                 $user = $userId ? CmsUser::findOne($userId) : null;
                 $plan[] = [
                     'code' => $code,
@@ -389,8 +409,9 @@ class CrmProtection
      *
      * @return array[] code, id, name, user_id, user, source
      */
-    public function orphanMainPlan(int $fallbackId = self::HISTORY_FALLBACK_USER_ID): array
+    public function orphanMainPlan(?int $fallbackId = null): array
     {
+        [$fallbackId, $fallbackSource] = $this->fallback($fallbackId);
         if (!CrmAccess::mainReady()) {
             return [];
         }
@@ -410,7 +431,7 @@ class CrmProtection
                     ->andWhere(['l.'.$recordColumn => (int)$record->id, 'l.access_level' => CrmAccess::LEVEL_FULL])
                     ->orderBy(['l.id' => SORT_ASC])->scalar() : null;
                 [$userId, $source] = $full ? [(int)$full, 'участник с полным доступом']
-                    : $this->mainCandidate($code, (int)$record->id, $fallbackId, 'по умолчанию');
+                    : $this->mainCandidate($code, (int)$record->id, $fallbackId, $fallbackSource);
                 $user = $userId ? CmsUser::findOne($userId) : null;
                 $plan[] = [
                     'code' => $code,
@@ -437,8 +458,9 @@ class CrmProtection
      *
      * @return array[] code, id, name, user_id, user, source
      */
-    public function poolMainPlan(int $fallbackId = self::HISTORY_FALLBACK_USER_ID): array
+    public function poolMainPlan(?int $fallbackId = null): array
     {
+        [$fallbackId, $fallbackSource] = $this->fallback($fallbackId);
         if (!CrmAccess::mainReady()) {
             return [];
         }
@@ -458,7 +480,7 @@ class CrmProtection
                     ]);
             }
             foreach ($query->each(200) as $record) {
-                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, 'по умолчанию');
+                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, $fallbackSource);
                 $user = $userId ? CmsUser::findOne($userId) : null;
                 $plan[] = [
                     'code' => $code,
@@ -491,7 +513,7 @@ class CrmProtection
     /** One client with a history and no main one (a deal of «Работать с этим клиентом» comes first). */
     public function assignHistoryMain(string $code, int $id): ?int
     {
-        [$userId, $source] = $this->mainCandidate($code, $id, self::HISTORY_FALLBACK_USER_ID, 'по умолчанию');
+        [$userId, $source] = $this->mainCandidate($code, $id, ...$this->fallback());
         if ($userId && CrmAccess::instance()->mainResponsibleId($code, $id) === null) {
             $this->setHistoryMain($code, $id, $userId, $source);
         }

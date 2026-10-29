@@ -23,7 +23,7 @@ use yii\helpers\Html;
  *   (closeLegacy(), m261028_150000), the cards stay read only.
  *
  * Texts name the employee and the event without a grammatical gender
- * («Фирстова Елизавета: запрос на работу с клиентом …»).
+ * («Петрова Анна: запрос на работу с клиентом …»).
  *
  * A new request notifies the main responsible and his leaders
  * (CrmAccess::requestDeciderIds()); any of them decides, the others see the
