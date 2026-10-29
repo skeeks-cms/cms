@@ -77,10 +77,10 @@
     $(document)
         .off(".sxCrmActions")
         .on("pjax:end.sxCrmActions", fitAll)
-        // The choice of the deal: its actions are shown, then measured.
+        // The deal of the note: its form is shown.
         .on("change.sxCrmActions", "[data-sx-crm-actions-deal-select]", function () {
             var value = String(this.value);
-            $(this).closest(".sx-crm-actions--deals").find("[data-sx-crm-actions-deal]").each(function () {
+            $(this).closest("[data-sx-crm-actions]").find("[data-sx-crm-actions-deal]").each(function () {
                 this.hidden = String(this.getAttribute("data-sx-crm-actions-deal")) !== value;
             });
             fitAll();

@@ -127,16 +127,24 @@
 .sx-crm-actions__form[hidden] {
     display: none;
 }
-/* Through the deals of the employee: "по сделке №…" or its choice over the actions of the deal. */
-.sx-crm-actions--plain {
-    padding: 0;
+/* Through the deals of the employee: the deal of the note over its editor. */
+.sx-crm-actions__hint {
+    padding: 8px 12px 0;
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+}
+.sx-crm-actions__menu-title {
+    padding: 6px 10px 4px;
+    color: var(--sx-color-text-muted);
+    font-size: 0.75rem;
+    white-space: nowrap;
 }
 .sx-crm-actions__deals-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
-    padding: 10px 12px 0;
+    margin-bottom: 8px;
     font-size: 0.8125rem;
 }
 .sx-crm-actions__deals-text {
@@ -159,9 +167,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
     gap: 10px;
-    padding: 12px;
 }
 [data-sx-crm-actions-deal][hidden] {
     display: none;

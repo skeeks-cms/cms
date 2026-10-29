@@ -47,7 +47,8 @@ class CrmCardActionsWidget extends Widget
      * of sx.classes.backend.widgets.Action) or `options` (attributes of a
      * button: onclick, data-*) or `items` (a choice under the tab, e.g. one of
      * several phones: id => `label`, `url` or `options`; one item makes a
-     * plain tab); `more` => true puts the tab into "Ещё".
+     * plain tab unless `choice` => true; `choiceTitle` heads the choice);
+     * `more` => true puts the tab into "Ещё".
      * {@see contactTabs()} builds "Позвонить" and "Письмо" of a card.
      *
      * @var array[]
@@ -60,30 +61,28 @@ class CrmCardActionsWidget extends Widget
     /** @var int action tabs in the row besides "Примечание"; the rest go to "Ещё" */
     public int $rowLimit = 6;
 
-    /** @var bool the block is a raised surface; false — inside another block (a deal of {@see $deals}) */
-    public bool $framed = true;
-
     /**
-     * Company or client card of an employee who works with the client only
-     * through his deals ({@see ownDeals()}): his open deals; every action goes
-     * to a deal — one is taken as is, several are chosen first, none gives
-     * "Создать сделку". Null — the usual block of the card.
+     * The note of an employee who works with the client only through his
+     * deals ({@see ownDeals()}): it goes to the feed of his deal — one is
+     * taken, several are chosen over the editor, none offers "Создать сделку".
+     * Null — the note goes to {@see $commentUrl} of the card record.
      *
      * @var \skeeks\cms\models\CmsLead[]|null
      */
-    public ?array $deals = null;
+    public ?array $noteDeals = null;
 
-    /** @var array phones of the client for the deals of {@see $deals} */
-    public array $phones = [];
+    /** @var string|null a muted line under the tabs: whose deal the actions go to */
+    public ?string $dealHint = null;
 
-    /** @var array emails of the client for the deals of {@see $deals} */
-    public array $emails = [];
+    /** @var string|null the create window of a deal with the client chosen (no deals of {@see $noteDeals}) */
+    public ?string $createDealUrl = null;
 
     /**
      * The block of a company or a client card in one line: the note, "Задача"
      * with the record chosen, "Позвонить" and "Письмо" ({@see contactTabs()})
-     * and the tabs of packages; for an employee who works with the client only
-     * through his deals — the same actions of his deal ({@see $deals}).
+     * and the tabs of packages. For an employee who works with the client only
+     * through his deals the block looks the same, and the deal is chosen when
+     * an action is taken ({@see dealTabs()}).
      *
      * @param \skeeks\cms\models\CmsCompany|\skeeks\cms\models\User $record
      */
@@ -91,11 +90,27 @@ class CrmCardActionsWidget extends Widget
     {
         $phones = is_array($phones) ? $phones : iterator_to_array($phones, false);
         $emails = is_array($emails) ? $emails : iterator_to_array($emails, false);
+        $isCompany = $record instanceof \skeeks\cms\models\CmsCompany;
         $deals = self::ownDeals($record);
         if ($deals !== null) {
-            return self::widget(['model' => $record, 'deals' => $deals, 'phones' => $phones, 'emails' => $emails]);
+            $createUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                '/cms/admin-cms-lead/create',
+                'CmsLead' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id],
+            ])->enableEmptyLayout()->url;
+            $hint = !$deals ? 'Открытых сделок с клиентом у вас нет: действие начнётся с новой сделки'
+                : (count($deals) === 1 ? 'Действия — по сделке '.self::dealLabel(reset($deals)) : 'Действия — по вашим сделкам: сделку выберете при действии');
+
+            return self::widget([
+                'model' => $record,
+                'commentUrl' => ['/cms/admin-cms-lead/add-comment'],
+                'notePlaceholder' => 'Напишите примечание к сделке…',
+                'noteDeals' => $deals,
+                'createDealUrl' => $createUrl,
+                'dealHint' => $hint,
+                'packageActions' => false,
+                'actions' => self::dealTabs($record, $deals, $phones, $emails, $createUrl),
+            ]);
         }
-        $isCompany = $record instanceof \skeeks\cms\models\CmsCompany;
         // An employee card: only the note.
         $isClient = $isCompany || !$record->is_worker;
         $actions = [];
@@ -144,6 +159,65 @@ class CrmCardActionsWidget extends Widget
             ->all();
     }
 
+    /** "№927 · Ромашка" */
+    protected static function dealLabel($lead): string
+    {
+        return '№'.(int)$lead->id.($lead->name ? ' · '.$lead->name : '');
+    }
+
+    /**
+     * The usual tabs of a client card for an employee who works only through
+     * his deals: each action is that of a deal (as in the deal card: a task of
+     * the deal, a call with data-lead-id, a letter in the context of the deal,
+     * package tabs of the deal). One deal — the tab acts at once; several —
+     * the tab opens "Выберите сделку"; none — the tab offers "Создать сделку".
+     *
+     * @param \skeeks\cms\models\CmsLead[] $deals
+     */
+    protected static function dealTabs($record, array $deals, array $phones, array $emails, string $createUrl): array
+    {
+        $canTask = \Yii::$app->user->can('cms/admin-task');
+        $tabsOf = static function ($owner, array $call) use ($canTask, $phones, $emails, $record): array {
+            $tabs = [];
+            if ($canTask) {
+                $tabs['task'] = self::taskTab(['CmsTask' => $owner === $record
+                    ? [$record instanceof \skeeks\cms\models\CmsCompany ? 'cms_company_id' : 'cms_user_id' => (int)$record->id]
+                    : ['cms_lead_id' => (int)$owner->id]]);
+            }
+
+            return $tabs + self::contactTabs($owner, $phones, $emails, $call) + CrmCardBlocksWidget::actions($owner);
+        };
+
+        if (!$deals) {
+            // The same tabs; each offers to create the deal first.
+            $tabs = [];
+            foreach ($tabsOf($record, []) as $id => $tab) {
+                $tabs[$id] = ['label' => $tab['label'], 'icon' => $tab['icon'] ?? null, 'choice' => true,
+                    'choiceTitle' => 'Нет открытой сделки с клиентом',
+                    'items' => [['label' => 'Создать сделку', 'url' => $createUrl]]];
+            }
+
+            return $tabs;
+        }
+
+        $single = count($deals) === 1;
+        $tabs = [];
+        foreach ($deals as $lead) {
+            foreach ($tabsOf($lead, ['data-lead-id' => (int)$lead->id]) as $id => $tab) {
+                $tabs[$id] = $tabs[$id] ?? ['label' => $tab['label'], 'icon' => $tab['icon'] ?? null, 'items' => [],
+                    'choiceTitle' => $single ? null : 'Выберите сделку'];
+                $subs = !empty($tab['items']) ? $tab['items'] : [array_intersect_key($tab, ['url' => 1, 'options' => 1, 'window' => 1]) + ['label' => '']];
+                foreach ($subs as $sub) {
+                    $sub['label'] = $single ? ($sub['label'] !== '' ? $sub['label'] : $tab['label'])
+                        : self::dealLabel($lead).($sub['label'] !== '' ? ' — '.$sub['label'] : '');
+                    $tabs[$id]['items'][] = $sub;
+                }
+            }
+        }
+
+        return $tabs;
+    }
+
     /** "Задача": the create window of a task with the given GET parameters (CmsTask[...]). */
     protected static function taskTab(array $params): array
     {
@@ -159,87 +233,58 @@ class CrmCardActionsWidget extends Widget
     }
 
     /**
-     * The block of {@see $deals}: "по сделке №…" or the choice of the deal over
-     * the actions of each deal, or "Создать сделку" without deals (its card
-     * opens after the save, and the work goes on there).
+     * The note form under the tabs: of the card record, or of the deal of
+     * {@see $noteDeals} (a select of the deals over the editor; without deals
+     * "Создать сделку" instead of the editor).
      */
-    protected function renderDeals(): string
+    protected function renderNoteForm(): string
     {
-        CrmCardActionsAsset::register($this->view);
-        $isCompany = $this->model instanceof \skeeks\cms\models\CmsCompany;
-        if (!$this->deals) {
-            if (!\Yii::$app->user->can('cms/admin-lead')) {
-                return '';
-            }
-            $url = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-                '/cms/admin-cms-lead/create',
-                'CmsLead' => [$isCompany ? 'cms_company_id' : 'cms_user_id' => (int)$this->model->id],
-            ])->enableEmptyLayout()->url;
-            $body = Html::tag('div',
-                Html::tag('span', 'С этим клиентом вы работаете через свои сделки. Открытых сделок нет.', ['class' => 'sx-crm-actions__deals-text'])
-                .Html::a($this->icon('plus').Html::tag('span', 'Создать сделку'), $url, [
+        $form = static fn($model, $url, $placeholder, $pin) => CmsCommentWidget::widget([
+            'model' => $model,
+            'backend_url' => $url,
+            'isShowPin' => $pin,
+            'placeholder' => $placeholder,
+            'isShowCancel' => true,
+        ]);
+        if ($this->noteDeals === null) {
+            return $form($this->model, $this->commentUrl, $this->notePlaceholder, $this->isShowPin);
+        }
+        if (!$this->noteDeals) {
+            return Html::tag('div',
+                Html::tag('span', 'Примечание пишется в ленту вашей сделки, а открытых сделок с клиентом нет.', ['class' => 'sx-crm-actions__deals-text'])
+                .Html::a($this->icon('plus').Html::tag('span', 'Создать сделку'), (string)$this->createDealUrl, [
                     'class' => 'sx-button sx-button--primary sx-button--sm',
                     'data-pjax' => '0',
-                    'onclick' => self::windowOnClick($url),
-                ]),
+                    'onclick' => self::windowOnClick((string)$this->createDealUrl),
+                ])
+                .Html::button('Отмена', ['class' => 'sx-button sx-button--secondary sx-button--sm', 'data-sx-comment-cancel' => true]),
                 ['class' => 'sx-crm-actions__deals-empty']
             );
-
-            return Html::tag('div', $body, ['id' => $this->getId(), 'class' => 'sx-surface sx-surface--raised sx-crm-actions sx-crm-actions--deals']);
         }
-
-        $canTask = \Yii::$app->user->can('cms/admin-task');
-        $groups = '';
         $choices = [];
-        foreach (array_values($this->deals) as $i => $lead) {
-            $id = (int)$lead->id;
-            $actions = $canTask ? ['task' => self::taskTab(['CmsTask' => ['cms_lead_id' => $id]])] : [];
-            $actions += self::contactTabs($lead, $this->phones, $this->emails, ['data-lead-id' => $id]);
-            $groups .= Html::tag('div', self::widget([
-                'model' => $lead,
-                'framed' => false,
-                'commentUrl' => ['/cms/admin-cms-lead/add-comment', 'pk' => $id],
-                'notePlaceholder' => 'Примечание к сделке №'.$id.'…',
-                'actions' => $actions,
-            ]), ['data-sx-crm-actions-deal' => $id, 'hidden' => $i > 0]);
-            $choices[$id] = '№'.$id.($lead->name ? ' · '.$lead->name : '');
+        $groups = '';
+        foreach (array_values($this->noteDeals) as $i => $lead) {
+            $choices[(int)$lead->id] = self::dealLabel($lead);
+            $groups .= Html::tag('div', $form($lead, ['/cms/admin-cms-lead/add-comment', 'pk' => (int)$lead->id], $this->notePlaceholder, $this->isShowPin),
+                ['data-sx-crm-actions-deal' => (int)$lead->id, 'hidden' => $i > 0]);
         }
+        $head = count($choices) === 1
+            ? Html::tag('span', 'В ленту сделки '.Html::encode(reset($choices)), ['class' => 'sx-crm-actions__deals-text'])
+            : Html::label('В ленту сделки', $this->getId().'-deal', ['class' => 'sx-crm-actions__deals-text']).' '
+                .Html::dropDownList('', null, $choices, ['id' => $this->getId().'-deal', 'class' => 'sx-crm-actions__deals-select', 'data-sx-crm-actions-deal-select' => true]);
 
-        if (count($choices) === 1) {
-            $id = (int)key($choices);
-            $url = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-lead/view', 'pk' => $id])
-                ->enableEmptyLayout()->url;
-            $head = Html::tag('span', 'по сделке', ['class' => 'sx-crm-actions__deals-text']).' '
-                .Html::a(Html::encode(reset($choices)), $url, ['data-pjax' => '0', 'onclick' => self::windowOnClick($url)]);
-        } else {
-            $head = Html::label('По сделке', $this->getId().'-deal', ['class' => 'sx-crm-actions__deals-text']).' '
-                .Html::dropDownList('', null, $choices, [
-                    'id' => $this->getId().'-deal',
-                    'class' => 'sx-crm-actions__deals-select',
-                    'data-sx-crm-actions-deal-select' => true,
-                ]);
-        }
-
-        return Html::tag('div',
-            Html::tag('div', $head, ['class' => 'sx-crm-actions__deals-head'])
-            .$groups,
-            ['id' => $this->getId(), 'class' => 'sx-surface sx-surface--raised sx-crm-actions sx-crm-actions--deals']
-        );
+        return Html::tag('div', $head, ['class' => 'sx-crm-actions__deals-head']).$groups;
     }
 
     public function run()
     {
-        if ($this->deals !== null) {
-            return $this->renderDeals();
-        }
-
         $items = [];
         foreach ($this->actions as $id => $action) {
             if (!is_array($action) || trim((string)($action['label'] ?? '')) === '') {
                 continue;
             }
             // A choice of one is a plain tab with the label of the tab.
-            if (!empty($action['items']) && count($action['items']) === 1) {
+            if (!empty($action['items']) && count($action['items']) === 1 && empty($action['choice'])) {
                 $action = array_merge($action, array_intersect_key(reset($action['items']), ['url' => 1, 'options' => 1, 'window' => 1]));
                 unset($action['items']);
             }
@@ -296,21 +341,16 @@ class CrmCardActionsWidget extends Widget
         if ($this->commentUrl !== null) {
             $body = Html::tag('div',
                 Html::button(Html::encode($this->notePlaceholder), ['class' => 'sx-crm-actions__placeholder', 'data-sx-crm-actions-open' => true])
-                .Html::tag('div', CmsCommentWidget::widget([
-                    'model' => $this->model,
-                    'backend_url' => $this->commentUrl,
-                    'isShowPin' => $this->isShowPin,
-                    'placeholder' => $this->notePlaceholder,
-                    'isShowCancel' => true,
-                ]), ['class' => 'sx-crm-actions__form', 'hidden' => true]),
+                .Html::tag('div', $this->renderNoteForm(), ['class' => 'sx-crm-actions__form', 'hidden' => true]),
                 ['class' => 'sx-crm-actions__body']
             );
         }
 
         return Html::tag('div',
             Html::tag('div', $tabs, ['class' => 'sx-crm-actions__tabs', 'role' => 'toolbar', 'aria-label' => 'Действия'])
+            .($this->dealHint !== null ? Html::tag('div', Html::encode($this->dealHint), ['class' => 'sx-crm-actions__hint']) : '')
             .$body,
-            ['id' => $this->getId(), 'class' => $this->framed ? 'sx-surface sx-surface--raised sx-crm-actions' : 'sx-crm-actions sx-crm-actions--plain', 'data-sx-crm-actions' => true]
+            ['id' => $this->getId(), 'class' => 'sx-surface sx-surface--raised sx-crm-actions', 'data-sx-crm-actions' => true]
         );
     }
 
@@ -320,7 +360,7 @@ class CrmCardActionsWidget extends Widget
         if (empty($item['items'])) {
             return $this->renderItem($id, $item, 'sx-crm-actions__tab', ['data-sx-crm-actions-fit' => $id]);
         }
-        $choice = '';
+        $choice = !empty($item['choiceTitle']) ? Html::tag('div', Html::encode($item['choiceTitle']), ['class' => 'sx-crm-actions__menu-title']) : '';
         foreach ($item['items'] as $subId => $sub) {
             $choice .= $this->renderItem($id.'.'.$subId, ['icon' => null] + $sub, 'sx-crm-actions__menu-item', ['role' => 'menuitem']);
         }
