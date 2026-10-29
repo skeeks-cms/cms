@@ -23,45 +23,28 @@ $isCompany = $for === 'company';
 $responsible = implode(', ', array_column($candidate['responsible'], 'name'));
 $responsibleName = $candidate['responsible'][0]['name'] ?? '';
 $byApproval = !empty($candidate['byApproval']);
-// П2д: a free client without a main responsible (the general pool).
-$canTake = !empty($candidate['canTake']);
-$workLabel = $canTake ? 'Взять в работу' : 'Работать с этим клиентом';
+$workLabel = 'Работать с этим клиентом';
 $withDuplicate = $withDuplicate ?? true;
-// The pool without the pool right (owner's decision 29.10.2026): a request to the head of the department.
-$inBase = !empty($candidate['inBase']);
 ?>
-<?php if ($allowForeign && $inBase) : ?>
-    <?= Html::button('Попросить у руководителя', [
-        'class' => 'sx-button sx-button--primary sx-button--sm',
-        'title' => 'Взять клиента из общей базы можно с разрешения руководителя: запрос уйдёт руководителю отдела, если его нет — администратору.',
-        'data-sx-identity-work' => $for,
-        'data-ref' => $candidate['ref'],
-        'data-url' => $requestUrl,
-        'data-sx-confirm' => 'Клиент в общей базе: взять его в работу можно с разрешения руководителя. Отправить запрос? После одобрения вы станете основным ответственным, сделка будет создана на вас.',
-        'data-sx-prompt' => 'Комментарий для руководителя (необязательно)',
-    ]); ?>
-<?php elseif ($allowForeign) : ?>
+<?php if ($allowForeign) : ?>
     <?php if ($byApproval || !empty($sendAtOnce)) : ?>
         <?= Html::button($workLabel, [
             'class' => 'sx-button sx-button--primary sx-button--sm',
             'title' => $byApproval
                 ? 'Клиент под защитой: запрос уйдёт основному ответственному, сделка будет создана после одобрения.'
-                : ($canTake ? 'У клиента нет ответственного: вы станете основным ответственным, сделка будет создана на вас.'
-                    : 'Сделка будет создана на вас, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.'),
+                : 'Сделка будет создана на вас, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.',
             'data-sx-identity-work' => $for,
             'data-ref' => $candidate['ref'],
             'data-url' => $requestUrl,
             // Not data-confirm: yii.js would submit the form around the button after the confirmation.
             'data-sx-confirm' => $byApproval
                 ? 'Клиент под защитой: работать с ним можно по согласованию'.($responsibleName !== '' ? ' с сотрудником '.$responsibleName : '').'. Отправить запрос? Сделка будет создана после одобрения.'
-                : ($canTake ? 'Взять клиента в работу? Вы станете его основным ответственным, сделка будет создана на вас.'
-                    : 'Создать сделку на вас по этому клиенту? У вас будет доступ «Свои сделки», основному ответственному'.($responsibleName !== '' ? ' ('.$responsibleName.')' : '').' уйдёт уведомление.'),
+                : 'Создать сделку на вас по этому клиенту? У вас будет доступ «Свои сделки», основному ответственному'.($responsibleName !== '' ? ' ('.$responsibleName.')' : '').' уйдёт уведомление.',
         ]); ?>
     <?php else : ?>
         <?= Html::button($workLabel, [
             'class' => 'sx-button sx-button--primary sx-button--sm',
-            'title' => $canTake ? 'У клиента нет ответственного: вы станете основным ответственным.'
-                : 'Сделка будет ваша, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.',
+            'title' => 'Сделка будет ваша, у вас будет доступ «Свои сделки», основному ответственному уйдёт уведомление.',
             'data-sx-identity-foreign' => $for,
             'data-action' => LeadIdentityForm::FOREIGN_WORK,
             'data-ref' => $candidate['ref'],
@@ -79,10 +62,6 @@ $inBase = !empty($candidate['inBase']);
         'data-create' => $create ?? null,
     ], static fn($value) => $value !== null)); ?>
 <?php endif; ?>
-<?php if ($inBase) : ?>
-    <span class="sx-lead-hint__meta">В общей базе: взять в работу можно с разрешения руководителя</span>
-<?php elseif ($byApproval) : ?>
+<?php if ($byApproval) : ?>
     <span class="sx-lead-hint__meta">Клиент под защитой: работа по согласованию с основным ответственным</span>
-<?php elseif ($canTake) : ?>
-    <span class="sx-lead-hint__meta">Свободный клиент без ответственного</span>
 <?php endif; ?>

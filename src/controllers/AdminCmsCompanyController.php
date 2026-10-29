@@ -703,9 +703,9 @@ HTML
                 'icon'     => 'fa fa-user',
                 "callback" => [$this, 'view'],
                 "accessCallback" => function () {
-                    // П2д: a company of the general pool opens read only for every CRM employee.
+                    // A company without the main responsible (old data, п. 13а) opens read only for a head of a department.
                     return \Yii::$app->user->can("cms/admin-company/manage", ['model' => $this->model])
-                        || ($this->model && \skeeks\cms\crm\CrmAccess::instance()->canSeePool((int)\Yii::$app->user->id, 'company', (int)$this->model->id));
+                        || ($this->model && \skeeks\cms\crm\CrmAccess::instance()->canSeeOrphan((int)\Yii::$app->user->id, 'company', (int)$this->model->id));
                 },
             ],
 
@@ -1048,7 +1048,6 @@ HTML
             // П2а: a leader or an administrator gives the client to another employee.
             'transfer' => $this->clientTransferAction(),
             'crm-access' => $this->clientAccessAction(),
-            'crm-take' => $this->clientTakeAction(),
             // The journal of the access to clients: a tab of the section («Список», «Импорт», «Добавить», «Доступы»).
             'crm-access-log' => $this->clientAccessLogAction(),
             // Bulk actions of the access over the marked rows or «для всех» (crm\CrmBulkAccessAction).

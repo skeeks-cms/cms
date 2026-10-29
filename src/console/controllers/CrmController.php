@@ -35,7 +35,7 @@ class CrmController extends Controller
     {
         return array_merge(parent::options($actionID), $actionID === 'protection' ? ['all'] : [], $actionID === 'assign-main' ? ['apply'] : [],
             $actionID === 'assign-old-clients' ? ['apply', 'user', 'before'] : [], $actionID === 'assign-history-main' ? ['apply', 'user'] : [],
-            $actionID === 'assign-orphan-main' ? ['apply', 'user'] : []);
+            $actionID === 'assign-orphan-main' ? ['apply', 'user'] : [], $actionID === 'assign-pool-main' ? ['apply', 'user'] : []);
     }
 
     /**
@@ -80,6 +80,47 @@ class CrmController extends Controller
         } else {
             $this->stdout("Ничего не записано. Записать: --apply
 ");
+        }
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Clients without any employee — the former general pool (owner's decision
+     * 29.10.2026, п. 13а: a CRM client always has a main responsible). The main
+     * one: by the last payment or service, else --user (Семенов Александр by
+     * default). Users of the site who registered themselves and ordered nothing
+     * are not CRM clients and are left out. The plan by default; --apply
+     * writes, each one to the journal.
+     */
+    public function actionAssignPoolMain()
+    {
+        $fallback = (int)($this->user ?: CrmProtection::HISTORY_FALLBACK_USER_ID);
+        $service = new CrmProtection();
+        $plan = $service->poolMainPlan($fallback);
+        $byCode = [];
+        $bySource = [];
+        $byUser = [];
+        foreach ($plan as $row) {
+            $byCode[$row['code']] = ($byCode[$row['code']] ?? 0) + 1;
+            $bySource[$row['source']] = ($bySource[$row['source']] ?? 0) + 1;
+            $byUser[$row['user']] = ($byUser[$row['user']] ?? 0) + 1;
+        }
+        $this->stdout('Клиенты без основного ответственного (бывший общий пул): '.count($plan)
+            .' (компаний '.($byCode['company'] ?? 0).', людей '.($byCode['client'] ?? 0).")\n");
+        $this->stdout("По основанию:\n");
+        foreach ($bySource as $source => $count) {
+            $this->stdout("  {$source}: {$count}\n");
+        }
+        arsort($byUser);
+        $this->stdout("Кому:\n");
+        foreach ($byUser as $user => $count) {
+            $this->stdout("  {$user}: {$count}\n");
+        }
+        if ($this->apply) {
+            $this->stdout('Назначено: '.$service->applyHistoryMainPlan($plan)."\n");
+        } else {
+            $this->stdout("Ничего не записано. Записать: --apply\n");
         }
 
         return ExitCode::OK;

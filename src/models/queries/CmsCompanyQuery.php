@@ -58,13 +58,14 @@ class CmsCompanyQuery extends CmsActiveQuery
     }
 
     /**
-     * П2д: the companies the employee sees plus the general pool — companies
-     * without any employee (no main responsible), seen by every CRM employee
-     * read only until one takes it into work (crm\CrmAccess::applyClientVisibility()).
-     * For lists, the search of a card and the API only: deals, bills, payments and
-     * other records of a company keep forManager().
+     * The companies the employee sees plus those without any employee (old
+     * data, owner's decision 29.10.2026, п. 13а: there is no general pool) —
+     * for a head of a department, who gives them a main responsible
+     * (crm\CrmAccess::applyClientVisibility(), canSeeOrphan()). For lists, the
+     * search of a card and the API only: deals, bills, payments and other
+     * records of a company keep forManager().
      */
-    public function forManagerOrPool(User $user = null)
+    public function forManagerOrOrphans(User $user = null)
     {
         if ($user === null) {
             $user = \Yii::$app->user->identity;
@@ -80,9 +81,7 @@ class CmsCompanyQuery extends CmsActiveQuery
             $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
         }
         $this->joinWith("managers as managers");
-        // The pool: no employee and no history (a company with a history has a main responsible).
-        $this->andWhere(['or', ["managers.id" => $managers], ['and', ['managers.id' => null],
-            ['not', \skeeks\cms\crm\CrmAccess::historyCondition('company', $this->getPrimaryTableName().'.id')]]]);
+        $this->andWhere(['or', ["managers.id" => $managers], ['managers.id' => null]]);
 
         return $this;
     }

@@ -484,9 +484,9 @@ class AdminUserController extends BackendModelStandartController
                         return false;
                     }
 
-                    // П2д: a client of the general pool opens read only for every CRM employee.
+                    // A client without the main responsible (old data, п. 13а) opens read only for a head of a department.
                     return \Yii::$app->user->can("cms/admin-user/manage", ['model' => $this->model])
-                        || ($this->model && \skeeks\cms\crm\CrmAccess::instance()->canSeePool((int)\Yii::$app->user->id, 'client', (int)$this->model->id));
+                        || ($this->model && \skeeks\cms\crm\CrmAccess::instance()->canSeeOrphan((int)\Yii::$app->user->id, 'client', (int)$this->model->id));
                 },
             ],
 
@@ -882,7 +882,6 @@ class AdminUserController extends BackendModelStandartController
             // П2а: a leader or an administrator gives the client to another employee.
             'transfer' => $this->clientTransferAction(),
             'crm-access' => $this->clientAccessAction(),
-            'crm-take' => $this->clientTakeAction(),
             'crm-access-add' => $this->clientAccessAddAction(),
             'duplicate-check' => $this->duplicateCheckAction(),
             'duplicate-request' => $this->duplicateRequestAction(),

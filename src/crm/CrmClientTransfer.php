@@ -50,6 +50,116 @@ class CrmClientTransfer
     }
 
     /**
+     * «Передать всех клиентов» of an employee (owner's decision 29.10.2026, п. 13а):
+     * the clients he is the main responsible of, his open deals of them and his
+     * open tasks of them and of those deals.
+     *
+     * @return array clients (code, id, name), leads (CmsLead[]), tasks (CmsTask[])
+     */
+    public function workOf(int $userId): array
+    {
+        $clients = [];
+        $companies = CmsCompany::find()->andWhere(['id' => \skeeks\cms\models\CmsCompany2manager::find()->select('cms_company_id')
+            ->andWhere(['cms_user_id' => $userId, 'is_main' => 1])])->orderBy(['name' => SORT_ASC])->all();
+        foreach ($companies as $company) {
+            $clients[] = ['code' => CmsCrmAccessRequest::RECORD_COMPANY, 'id' => (int)$company->id, 'name' => (string)$company->name];
+        }
+        $persons = CmsUser::find()->andWhere(['id' => \skeeks\cms\models\CmsUser2manager::find()->select('client_id')
+            ->andWhere(['worker_id' => $userId, 'is_main' => 1])])->andWhere(['is_worker' => 0])->all();
+        foreach ($persons as $person) {
+            $clients[] = ['code' => CmsCrmAccessRequest::RECORD_CLIENT, 'id' => (int)$person->id, 'name' => (string)$person->shortDisplayName];
+        }
+        $companyIds = array_map(static fn($company) => (int)$company->id, $companies);
+        $personIds = array_map(static fn($person) => (int)$person->id, $persons);
+        $leads = $companyIds || $personIds ? CmsLead::find()->andWhere(['executor_id' => $userId, 'status' => [CmsLead::STATUS_NEW, CmsLead::STATUS_IN_WORK]])
+            ->andWhere(['or', ['cms_company_id' => $companyIds ?: [0]], ['cms_user_id' => $personIds ?: [0]]])
+            ->orderBy(['id' => SORT_DESC])->all() : [];
+        $task = CmsTask::tableName();
+        $tasks = $companyIds || $personIds ? CmsTask::find()->andWhere([$task.'.executor_id' => $userId, $task.'.status' => CmsTask::activeStatuses()])
+            ->andWhere(['or', [$task.'.cms_company_id' => $companyIds ?: [0]], [$task.'.cms_user_id' => $personIds ?: [0]],
+                [$task.'.cms_lead_id' => array_map(static fn($lead) => (int)$lead->id, $leads) ?: [0]]])
+            ->orderBy([$task.'.id' => SORT_DESC])->all() : [];
+
+        return ['clients' => $clients, 'leads' => $leads, 'tasks' => $tasks];
+    }
+
+    /**
+     * Gives every client of $fromUserId (he is the main one) to $toUserId: the
+     * main responsible, his open deals and tasks of them (except the kept
+     * ones). The former main one stays with "edit" or, $removeFormer (a
+     * dismissal), leaves the client. Each client is written to the journal.
+     *
+     * @return string the result in words
+     */
+    public function transferAllOf(int $fromUserId, int $toUserId, int $actorId, array $keepLeadIds = [], array $keepTaskIds = [], bool $removeFormer = false): string
+    {
+        if (!$this->access->canTransferClientsOf($actorId, $fromUserId)) {
+            throw new \DomainException('Передать клиентов сотрудника может его руководитель или администратор.');
+        }
+        $newUser = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $toUserId, CmsUser::tableName().'.is_active' => 1])->one();
+        if (!$newUser || $toUserId === $fromUserId) {
+            throw new \DomainException('Выберите другого активного сотрудника.');
+        }
+        $keepLeadIds = array_map('intval', $keepLeadIds);
+        $keepTaskIds = array_map('intval', $keepTaskIds);
+        $work = $this->workOf($fromUserId);
+        $from = CmsUser::findOne($fromUserId);
+        $fromName = $from ? (string)$from->shortDisplayName : '';
+
+        $transaction = CmsLead::getDb()->beginTransaction();
+        try {
+            foreach ($work['clients'] as $client) {
+                $this->access->setMain($client['code'], $client['id'], $toUserId, CrmAccess::LEVEL_EDIT);
+                CrmAccessLog::write(CrmAccessLog::TRANSFER, $client['code'], $client['id'], [
+                    'actor_id' => $actorId, 'user_id' => $toUserId, 'level_to' => CrmAccess::LEVEL_FULL,
+                    'comment' => 'все клиенты сотрудника '.$fromName.($removeFormer ? ', при увольнении' : ''),
+                ]);
+                if ($removeFormer) {
+                    $this->access->removeLink($client['code'], $client['id'], $fromUserId);
+                    CrmAccessLog::write(CrmAccessLog::REMOVE, $client['code'], $client['id'], [
+                        'actor_id' => $actorId, 'user_id' => $fromUserId, 'level_from' => CrmAccess::LEVEL_EDIT, 'comment' => 'увольнение',
+                    ]);
+                }
+            }
+            $leads = 0;
+            foreach ($work['leads'] as $lead) {
+                if (in_array((int)$lead->id, $keepLeadIds, true)) {
+                    continue;
+                }
+                $lead->executor_id = $toUserId;
+                if (!$lead->save(false, ['executor_id', 'updated_at'])) {
+                    throw new \DomainException('Сделка №'.(int)$lead->id.' не передана.');
+                }
+                $lead->addSystemActivity('Клиенты сотрудника '.Html::encode($fromName).' переданы сотруднику '
+                    .Html::encode((string)$newUser->shortDisplayName).', сделка перешла к нему.', $actorId);
+                $leads++;
+            }
+            $tasks = 0;
+            foreach ($work['tasks'] as $task) {
+                if (in_array((int)$task->id, $keepTaskIds, true) || ($task->cms_lead_id && in_array((int)$task->cms_lead_id, $keepLeadIds, true))) {
+                    continue;
+                }
+                $task->updateAttributes(['executor_id' => $toUserId]);
+                $tasks++;
+            }
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+            throw $e;
+        }
+        if ($work['clients'] && \Yii::$app->has('notifications')) {
+            \Yii::$app->notifications->notify(array_values(array_diff([$toUserId], [$actorId])) ?: [], 'crm.access_decided', [
+                'name' => 'Вам переданы клиенты сотрудника '.$fromName.': '.count($work['clients']),
+                'eventKey' => 'crm.transfer_all:'.$fromUserId.':'.$toUserId.':'.time(),
+            ]);
+        }
+
+        return 'Клиентов передано: '.count($work['clients']).', открытых сделок: '.$leads.', задач: '.$tasks.'.';
+    }
+
+    /**
      * @param int[] $keepLeadIds open deals that stay with their executors
      * @param int[] $keepTaskIds open tasks that stay with their executors
      */

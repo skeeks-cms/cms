@@ -172,6 +172,22 @@ class User
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
 
+        // An employee with clients is not deactivated, made a non-employee or deleted until his clients are given
+        // away («Передать всех клиентов», owner's decision 29.10.2026, п. 13а): every way goes through these events.
+        $this->on(self::EVENT_BEFORE_UPDATE, function (\yii\base\ModelEvent $e) {
+            $leaves = ($this->isAttributeChanged('is_active') && (int)$this->getOldAttribute('is_active') === 1 && !(int)$this->is_active)
+                || ($this->isAttributeChanged('is_worker') && (int)$this->getOldAttribute('is_worker') === 1 && !(int)$this->is_worker);
+            if ($leaves && ($error = \skeeks\cms\crm\CrmAccess::instance()->deactivationError((int)$this->id))) {
+                $this->addError('is_active', $error);
+                $e->isValid = false;
+            }
+        });
+        $this->on(self::EVENT_BEFORE_DELETE, function () {
+            if ($this->is_worker && ($error = \skeeks\cms\crm\CrmAccess::instance()->deactivationError((int)$this->id))) {
+                throw new Exception($error);
+            }
+        });
+
         // A client: the managers field rewrites the links, their levels and the main responsible are kept.
         \skeeks\cms\crm\CrmAccess::keepLinks($this, CmsCrmAccessRequest::RECORD_CLIENT);
     }

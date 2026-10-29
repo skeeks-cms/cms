@@ -46,10 +46,6 @@ class LeadTriage
     /** Application event after a deal is sorted (TriageEvent); configure 'on crm.leadTriaged'. */
     public const EVENT_LEAD_TRIAGED = 'crm.leadTriaged';
 
-    /** A client of the general pool chosen by an employee without the pool right (CrmAccess::poolRequestNeeded()). */
-    public const POOL_REQUEST_MESSAGE = 'Клиент в общей базе: взять его в работу можно с разрешения руководителя. '
-        .'Нажмите «Попросить у руководителя» в подсказке: запрос уйдёт руководителю отдела, сделка будет создана после одобрения.';
-
     private CrmAccess $access;
 
     public function __construct(?CrmAccess $access = null)
@@ -148,16 +144,6 @@ class LeadTriage
             throw new \DomainException('Совпадение устарело. Проверьте клиента ещё раз.');
         }
         $recordCode = $parsed[0] === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT;
-        if ($this->access->poolRequestNeeded($actorId, $recordCode, (int)$parsed[1])) {
-            // «Попросить у руководителя» (owner's decision 29.10.2026): the general pool without the pool right.
-            $request = (new CrmAccessRequests($this->access))->request($actorId, $recordCode, (int)$parsed[1], CmsCrmAccessRequest::KIND_WORK, null, $comment, CrmAccess::LEVEL_FULL);
-
-            return [
-                'lead' => null,
-                'request' => $request,
-                'message' => 'Запрос отправлен руководителю. После одобрения вы станете основным ответственным, сделка будет создана на вас.',
-            ];
-        }
         if ($this->access->approvalRequired($recordCode, (int)$parsed[1])) {
             $request = (new CrmAccessRequests($this->access))->request($actorId, $recordCode, (int)$parsed[1], CmsCrmAccessRequest::KIND_WORK, null, $comment);
 
@@ -171,9 +157,7 @@ class LeadTriage
         $form = new LeadIdentityForm([$part.'_mode' => LeadIdentityForm::MODE_FOREIGN, $part.'_ref' => $ref, 'foreign_comment' => $comment]);
         $siteId = \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site ? (int)\Yii::$app->skeeks->site->id : null;
         $result = $this->createLead(new CmsLead(['cms_site_id' => $siteId, 'description' => $comment]), $form, $actorId);
-        $result['message'] = $this->access->mainResponsibleId($parsed[0] === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, (int)$parsed[1]) === $actorId
-            ? 'Клиент взят в работу: вы его основной ответственный, сделка №'.(int)$result['lead']->id.' создана на вас.'
-            : 'Сделка №'.(int)$result['lead']->id.' создана на вас, у вас доступ «Свои сделки» к клиенту. Основной ответственный получил уведомление.';
+        $result['message'] = 'Сделка №'.(int)$result['lead']->id.' создана на вас, у вас доступ «Свои сделки» к клиенту. Основной ответственный получил уведомление.';
 
         return $result;
     }
@@ -199,9 +183,6 @@ class LeadTriage
                     throw new \DomainException('Совпадение устарело. Проверьте клиента ещё раз.');
                 }
                 $recordCode = $type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT;
-                if ($this->access->poolRequestNeeded($actorId, $recordCode, (int)$ref[1])) {
-                    throw new \DomainException(self::POOL_REQUEST_MESSAGE);
-                }
                 if ($this->access->approvalRequired($recordCode, (int)$ref[1])) {
                     throw new \DomainException('С этим клиентом работают только по согласованию с основным ответственным. '
                         .'Нажмите «Работать с этим клиентом» в подсказке: запрос уйдёт ответственному, сделка будет создана после одобрения.');
@@ -615,9 +596,6 @@ class LeadTriage
                 break;
         }
 
-        if ($foreign && !$incoming && $this->access->poolRequestNeeded($actorId, $foreign[0], (int)$foreign[1])) {
-            throw new \DomainException(self::POOL_REQUEST_MESSAGE);
-        }
         if ($foreign && $this->access->approvalRequired($foreign[0], (int)$foreign[1])) {
             if (!$incoming) {
                 throw new \DomainException('С этим клиентом работают только по согласованию с основным ответственным. '
@@ -640,7 +618,7 @@ class LeadTriage
             if (!$company->save()) {
                 throw new \DomainException('Не удалось создать компанию: '.implode('; ', $company->getFirstErrors()));
             }
-            $this->addCompanyManager((int)$company->id, (int)($executorId ?: $actorId));
+            $this->newClientMain(CmsCrmAccessRequest::RECORD_COMPANY, (int)$company->id, (int)($executorId ?: $actorId), $actorId);
             // Phones and emails of a pasted line go to the new company card.
             foreach (LeadIdentityForm::splitList($form->company_phones) as $index => $phone) {
                 $row = new CmsCompanyPhone(['cms_company_id' => (int)$company->id, 'value' => $phone, 'sort' => 100 + $index, 'duplicate_reason' => (string)$form->duplicate_reason]);
@@ -682,10 +660,7 @@ class LeadTriage
             if (trim((string)$form->client_email) !== '') {
                 $this->addClientContact($client, 'email', (string)$form->client_email);
             }
-            $manager = new CmsUser2manager(['client_id' => (int)$client->id, 'worker_id' => (int)($executorId ?: $actorId)]);
-            if (!$manager->save()) {
-                throw new \DomainException('Не удалось закрепить контакт: '.implode('; ', $manager->getFirstErrors()));
-            }
+            $this->newClientMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$client->id, (int)($executorId ?: $actorId), $actorId);
             $clientId = (int)$client->id;
             $newClient = $client;
         }
@@ -742,25 +717,12 @@ class LeadTriage
 
         if ($identity['foreign']) {
             [$recordCode, $recordId] = [$identity['foreign'][0], (int)$identity['foreign'][1]];
-            if ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null
-                && \skeeks\cms\crm\CrmAccess::hasHistory($recordCode, $recordId, (int)$lead->id)) {
-                // A client with a history and still without a main one: the main one by the history first
-                // (owner's decision 29.10.2026), the actor works on his deal below.
+            if ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null) {
+                // A client still without a main one (old data; there is no general pool, owner's decision 29.10.2026,
+                // п. 13а): the main one by the history, else the administrator by default; the actor works on his deal.
                 (new CrmProtection())->assignHistoryMain($recordCode, $recordId);
             }
-            if ((int)$lead->executor_id === $actorId && $this->access->poolRequestNeeded($actorId, $recordCode, $recordId)) {
-                // An incoming deal of a pool client sorted by an employee without the pool right: the deal is his,
-                // the client is asked from his head (owner's decision 29.10.2026).
-                $identity['request'] = (new CrmAccessRequests($this->access))->request(
-                    $actorId, $recordCode, $recordId, CmsCrmAccessRequest::KIND_WORK, (int)$lead->id, $form->foreign_comment, CrmAccess::LEVEL_FULL
-                );
-            } elseif ((int)$lead->executor_id === $actorId && $this->access->mainResponsibleId($recordCode, $recordId) === null) {
-                // «Взять в работу» (П2д): a free client of the general pool — the actor becomes its main
-                // responsible ("full"), no request and no notification; the next one gets «Работать с этим клиентом».
-                $this->access->setMain($recordCode, $recordId, $actorId);
-                CrmAccessLog::write(CrmAccessLog::TAKE, $recordCode, $recordId,
-                    ['actor_id' => $actorId, 'user_id' => $actorId, 'level_to' => CrmAccess::LEVEL_FULL, 'cms_lead_id' => (int)$lead->id]);
-            } elseif ((int)$lead->executor_id === $actorId) {
+            if ((int)$lead->executor_id === $actorId) {
                 // «Работать с этим клиентом»: the deal is the actor's, the level "Свои сделки" at once, no request
                 // (owner's decision 28.10.2026): the main responsible and his leaders are notified; the level is
                 // raised in «Доступ» of the client.
@@ -950,14 +912,15 @@ class LeadTriage
         return true;
     }
 
-    private function addCompanyManager(int $companyId, int $userId): void
+    /**
+     * A client created with a deal belongs to the deal's responsible: he is its main one (the creator was made
+     * the main one when the record was inserted, CrmAccess::assignCreatorMain(); that link goes).
+     */
+    private function newClientMain(string $recordCode, int $recordId, int $userId, int $actorId): void
     {
-        if (CmsCompany2manager::find()->andWhere(['cms_company_id' => $companyId, 'cms_user_id' => $userId])->exists()) {
-            return;
-        }
-        $manager = new CmsCompany2manager(['cms_company_id' => $companyId, 'cms_user_id' => $userId]);
-        if (!$manager->save()) {
-            throw new \DomainException('Не удалось закрепить компанию: '.implode('; ', $manager->getFirstErrors()));
+        $this->access->setMain($recordCode, $recordId, $userId);
+        if ($actorId !== $userId && $this->access->linkLevel($actorId, $recordCode, $recordId) !== null) {
+            $this->access->removeLink($recordCode, $recordId, $actorId);
         }
     }
 

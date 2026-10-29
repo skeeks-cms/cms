@@ -160,12 +160,14 @@ class CmsUserQuery extends CmsActiveQuery
      * @return $this
      */
     /**
-     * П2д: the clients the employee sees plus client persons of the general pool
-     * (no employee of their own and no company that has employees: a person of
-     * a company is its data, CrmAccess::inPool()), read only until one takes it
-     * into work. For the client list, its card and the API only.
+     * The clients the employee sees plus client persons without any employee
+     * (old data, п. 13а) — for a head of a department: no employee of their
+     * own, no company that has employees (a person of a company is its data),
+     * created by an employee (a person who registered on the site himself is a
+     * user of the site, not a CRM client, п. 14). For the client list, its card
+     * and the API only.
      */
-    public function forManagerOrPool(User $user = null)
+    public function forManagerOrOrphans(User $user = null)
     {
         if ($user === null) {
             $user = \Yii::$app->user->identity;
@@ -189,8 +191,8 @@ class CmsUserQuery extends CmsActiveQuery
             ["companies.id" => $cmsCompanyQuery],
             ['and', ['managers.id' => null], [$this->getPrimaryTableName().'.is_worker' => 0],
                 ['not exists', \skeeks\cms\crm\CrmAccess::personCompanyLinks($this->getPrimaryTableName().'.id')],
-                // A person with a history has a main responsible, he is not in the pool.
-                ['not', \skeeks\cms\crm\CrmAccess::historyCondition('client', $this->getPrimaryTableName().'.id')]],
+                ['not', [$this->getPrimaryTableName().'.created_by' => null]],
+                ['<>', $this->getPrimaryTableName().'.created_by', new \yii\db\Expression($this->getPrimaryTableName().'.id')]],
         ]);
 
         return $this;

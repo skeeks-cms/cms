@@ -194,14 +194,6 @@ $workerSearch = static function ($word = '') {
                     'data-sx-crm-access' => 'protection',
                     'data-url' => $url,
                 ]); ?>
-                <?php if ($canManage && $main && $protectionState === 'free') : ?>
-                    <?= Html::button('Вернуть в общий пул', [
-                        'class' => 'sx-button sx-button--secondary sx-button--sm',
-                        'data-sx-crm-access' => 'pool',
-                        'data-url' => $url,
-                        'data-sx-confirm' => 'Вернуть клиента в общий пул? У него не останется ответственных сотрудников, его возьмёт в работу первый, кто его найдёт.',
-                    ]); ?>
-                <?php endif; ?>
             </div>
         <?php BackendSurfaceWidget::end(); ?>
     <?php else : ?>

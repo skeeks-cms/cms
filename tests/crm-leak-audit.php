@@ -4,7 +4,7 @@
  * second run, with `edit` (it only adds changing the client data) — must not see
  * other employees' deals, services (CmsDeal), bills, payments, documents, proposals and tasks
  * that are not tied to his own deals; a protected client without his link is not visible at all;
- * a client of the general pool shows its data and its own feed only, until «Взять в работу».
+ * a client without the main responsible (old data, there is no general pool) is closed to an employee.
  * People (owner's decision 29.10.2026): a person of a company is its data, seen with the level of
  * the company (the best of several); his personal orders — deals, services, bills, payments,
  * documents, proposals where he is the customer — only through his own access, no level of the
@@ -814,22 +814,18 @@ try {
     [$code, $dup] = $http('/~sxx/cms/admin-cms-company/duplicate-check?for=client&q='.urlencode($G->first_name), null, true);
     $report('Поиск повторов из формы компании: клиент Г', 'GET admin-cms-company/duplicate-check?for=client&q= → '.$code,
         (bool)preg_match('~admin-user/view[^"\']*pk(?:=|%3D)'.$G->id.'(?!\d)~', $dup) || (bool)$found($dup, ['платёж Г']), '');
-    // Д: the pool — his data and «Взять в работу», not his deal and bill
-    // The pool right (owner's decision 29.10.2026): without it the pool is closed, with it — the data and «Взять в работу».
-    if (!(new CrmAccess())->canUsePool($worker)) {
-        $closed('Клиент Д (пул) без права на пул: карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
-        [$code, $card] = [403, ''];
-    } else {
-        [$code, $card] = $mustSeeClient('Клиент Д (пул): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
-        $mustFail('Клиент Д (пул): кнопка «Взять в работу»', 'GET view → '.$code, $code === 200 && mb_strpos($card, 'Взять в работу') !== false, 'кнопки нет');
-    }
+    // Д: no main responsible (old data; there is no general pool, owner's decision 29.10.2026, п. 13а) — closed to an
+    // employee who is not a head of a department, no «Взять в работу».
+    [$code, $card] = $closed('Клиент Д (без основного): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
+    $takeable = $code === 200 && mb_strpos($card, 'Взять в работу') !== false;
+    $report('Клиент Д: нет «Взять в работу»', 'GET view → '.$code, $takeable, $takeable ? 'кнопка есть' : '');
     $hits = $code === 200 ? $found($card, ['сделка Д']) : [];
     $report('Клиент Д (пул): карточка без чужого', 'GET view → '.$code, (bool)$hits, $hits ? 'видно: '.implode(', ', $hits) : '');
     foreach (['leads', 'bills', 'payments', 'tasks', 'log'] as $tab) {
         $closed('Клиент Д (пул): вкладка '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$D->id, '');
     }
     $closed('Клиент Д (пул): сделка по ссылке', '/~sxx/cms/admin-cms-lead/view?pk='.$leadD->id, '');
-    // Ж: a history without a main responsible — not the pool, no «Взять в работу», closed without a link
+    // Ж: a history without a main responsible (old data) — no «Взять в работу», closed without a link
     foreach (['view', 'leads', 'bills', 'payments', 'log', 'crm-access', 'update'] as $tab) {
         [$code, $card] = $closed('Клиент Ж (давний платёж, без основного): '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$Zh->id, '');
         if ($tab === 'view') {
@@ -838,7 +834,9 @@ try {
         }
     }
     $closed('Клиент Ж: платёж по ссылке', '/~sxx/shop/admin-payment/view?pk='.$payZh->id, '');
-    $mustFail('Клиент Ж: не в общем пуле', 'CrmAccess::inPool()', !CrmAccess::instance()->inPool(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT, (int)$Zh->id), 'в пуле');
+    // Without the main one it is old data for assign-pool-main (by the history), never seen by an employee.
+    $mustFail('Клиент Ж: в плане assign-pool-main', 'CrmProtection::poolMainPlan()', in_array((int)$Zh->id,
+        array_column(array_filter((new \skeeks\cms\crm\CrmProtection())->poolMainPlan(), static fn($row) => $row['code'] === 'client'), 'id'), true), 'нет в плане');
     // Е: two companies, "deal" and "edit" — the best one, "edit", changes his data
     $mustSeeClient('Клиент Е: карточка', '/~sxx/cms/admin-user/view?pk='.$E->id, $E->first_name);
     [$code] = $http('/~sxx/cms/admin-user/update?pk='.$E->id);

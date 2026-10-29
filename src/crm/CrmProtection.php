@@ -268,29 +268,6 @@ class CrmProtection
     }
 
     /**
-     * «Вернуть в общий пул» (the main responsible, his leaders, an
-     * administrator): the client has no employees any more, the next one who
-     * finds it takes it into work. A protected client is not returned.
-     */
-    public function returnToPool(string $recordCode, int $recordId, int $actorId): void
-    {
-        if (!CrmAccess::instance()->canManageAccess($actorId, $recordCode, $recordId)) {
-            throw new \DomainException('Вернуть клиента в общий пул может основной ответственный, его руководитель или администратор.');
-        }
-        $state = $this->recalc($recordCode, $recordId);
-        if ($state !== self::FREE) {
-            throw new \DomainException('Клиент под защитой — его нельзя вернуть в общий пул. Сначала переключите защиту на «Авто», и она должна истечь.');
-        }
-        $mainBefore = CrmAccess::instance()->mainResponsibleId($recordCode, $recordId);
-        if ($recordCode === CmsCrmAccessRequest::RECORD_COMPANY) {
-            CmsCompany2manager::deleteAll(['cms_company_id' => $recordId]);
-        } else {
-            CmsUser2manager::deleteAll(['client_id' => $recordId]);
-        }
-        CrmAccessLog::write(CrmAccessLog::POOL, $recordCode, $recordId, ['actor_id' => $actorId, 'user_id' => $mainBefore]);
-    }
-
-    /**
      * Protected clients without a main responsible and who becomes it (a paying
      * client always has one): the creator of the bill of its last incoming
      * payment, else who registered that payment, else the creator of its last
@@ -449,6 +426,54 @@ class CrmProtection
         return $plan;
     }
 
+    /**
+     * Clients without any employee — the former general pool (owner's decision
+     * 29.10.2026, п. 13а: a CRM client always has a main responsible) — and who
+     * becomes the main one: by the history (mainCandidate()), else $fallbackId.
+     * Companies; persons that are CRM clients — created by an employee or with
+     * a history, not of a company with employees (a person who registered on
+     * the site himself and ordered nothing is a user of the site, п. 14).
+     * Applied by applyHistoryMainPlan().
+     *
+     * @return array[] code, id, name, user_id, user, source
+     */
+    public function poolMainPlan(int $fallbackId = self::HISTORY_FALLBACK_USER_ID): array
+    {
+        if (!CrmAccess::mainReady()) {
+            return [];
+        }
+        $plan = [];
+        foreach ([CmsCrmAccessRequest::RECORD_COMPANY => CmsCompany::class, CmsCrmAccessRequest::RECORD_CLIENT => CmsUser::class] as $code => $class) {
+            [$linkClass, $recordColumn] = CrmAccess::linkTable($code);
+            $table = $class::tableName();
+            $query = $class::find()
+                ->andWhere(['not exists', $linkClass::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($table.'.id')])])
+                ->orderBy([$table.'.id' => SORT_ASC]);
+            if ($code === CmsCrmAccessRequest::RECORD_CLIENT) {
+                $query->andWhere([$table.'.is_worker' => 0])
+                    ->andWhere(['not exists', CrmAccess::personCompanyLinks($table.'.id')])
+                    ->andWhere(['or',
+                        ['and', ['not', [$table.'.created_by' => null]], ['<>', $table.'.created_by', new \yii\db\Expression($table.'.id')]],
+                        CrmAccess::historyCondition($code, $table.'.id'),
+                    ]);
+            }
+            foreach ($query->each(200) as $record) {
+                [$userId, $source] = $this->mainCandidate($code, (int)$record->id, $fallbackId, 'по умолчанию');
+                $user = $userId ? CmsUser::findOne($userId) : null;
+                $plan[] = [
+                    'code' => $code,
+                    'id' => (int)$record->id,
+                    'name' => $record instanceof CmsCompany ? (string)$record->name : (string)$record->shortDisplayName,
+                    'user_id' => $userId,
+                    'user' => $user ? (string)$user->shortDisplayName : '—',
+                    'source' => $source,
+                ];
+            }
+        }
+
+        return $plan;
+    }
+
     /** Applies historyMainPlan(): the main responsible with the ground in the journal of the access. */
     public function applyHistoryMainPlan(array $plan): int
     {
@@ -512,7 +537,7 @@ class CrmProtection
     {
         $count = 0;
         foreach ($people as $person) {
-            if (CrmAccess::instance()->inPool(CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id)) {
+            if (CrmAccess::instance()->isOrphan(CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id)) {
                 CrmAccess::instance()->setMain(CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id, $userId);
                 CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, CmsCrmAccessRequest::RECORD_CLIENT, (int)$person->id, ['actor_id' => null, 'user_id' => $userId,
                     'level_to' => CrmAccess::LEVEL_FULL, 'comment' => self::OLD_BASE_COMMENT]);

@@ -42,9 +42,7 @@ $hasStrong = (bool)array_filter($candidates, static fn($candidate) => $candidate
         <?php
         $responsible = implode(', ', array_column($candidate['responsible'], 'name'));
         $title = (string)$candidate['title'];
-        if (!empty($candidate['inBase'])) {
-            $title = $isCompany ? 'Компания в общей базе' : 'Контакт в общей базе';
-        } elseif (!$candidate['visible']) {
+        if (!$candidate['visible']) {
             $title = $isCompany ? 'Такая компания уже есть: «'.$title.'»' : 'Такой контакт уже есть в базе';
         }
         ?>
@@ -55,7 +53,7 @@ $hasStrong = (bool)array_filter($candidates, static fn($candidate) => $candidate
                     <?= $candidate['strong'] ? 'Совпал ' : 'Похоже: '; ?><?= Html::encode(implode(', ', array_map($reasonText, $candidate['reasons']))); ?>
                 </span>
                 <span class="sx-lead-hint__meta">
-                    <?= !empty($candidate['inBase']) ? 'Без ответственного' : ($responsible !== '' ? 'Ответственный: '.Html::encode($responsible) : 'Ответственного нет'); ?>
+                    <?= $responsible !== '' ? 'Ответственный: '.Html::encode($responsible) : 'Ответственного нет'; ?>
                     <?php if ($candidate['hasOpenLeads']) : ?> · есть открытые сделки<?php endif; ?>
                 </span>
             </div>

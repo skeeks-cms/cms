@@ -313,6 +313,108 @@ class CrmAccess extends Component
     }
 
     /**
+     * A new CRM client always has the main responsible (owner's decision
+     * 29.10.2026, п. 13а): the links given with it (a form, an import, the
+     * API, a campaign — ensureMain() makes one of them the main) or else the
+     * employee who creates it — the author (`created_by`), else the current
+     * employee (a web or API session). A company without both (a console job)
+     * gets the administrator by default. A person who registered on the site
+     * himself (no employee creates him) is a user of the site, not a CRM
+     * client (п. 14): he gets nobody.
+     */
+    public function assignCreatorMain(\yii\db\BaseActiveRecord $record, string $recordCode): void
+    {
+        if (!self::mainReady() || self::isWorkerRecord($record) || $this->mainResponsibleId($recordCode, (int)$record->id) !== null) {
+            return;
+        }
+        [$class, $recordColumn] = self::linkTable($recordCode);
+        if ($class::find()->andWhere([$recordColumn => (int)$record->id])->exists()) {
+            $this->ensureMain($recordCode, (int)$record->id);
+
+            return;
+        }
+        $creatorId = $record->hasAttribute('created_by') ? (int)$record->created_by : 0;
+        if (!$creatorId || $creatorId === (int)$record->id) {
+            $worker = self::actingWorker();
+            $creatorId = $worker ? (int)$worker->id : 0;
+        }
+        $isWorker = $creatorId && CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $creatorId])->exists();
+        if (!$isWorker) {
+            if ($recordCode !== CmsCrmAccessRequest::RECORD_COMPANY) {
+                // A user of the site (п. 14): not a CRM client until an employee or an order makes him one.
+                return;
+            }
+            $fallback = (int)CrmProtection::HISTORY_FALLBACK_USER_ID;
+            $creatorId = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $fallback, CmsUser::tableName().'.is_active' => 1])->exists()
+                ? $fallback : (int)($this->adminIds()[0] ?? 0);
+            if (!$creatorId) {
+                return;
+            }
+        }
+        $this->setMain($recordCode, (int)$record->id, $creatorId);
+        // The code that creates the client may give its responsible right after (an import, the API, a campaign,
+        // the deal form): that link takes the place of this one (onLinkInserted()).
+        self::$autoMain[$recordCode.':'.(int)$record->id] = $creatorId;
+        CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $recordCode, (int)$record->id, [
+            'actor_id' => $isWorker ? $creatorId : null, 'user_id' => $creatorId, 'level_to' => self::LEVEL_FULL,
+            'comment' => $isWorker ? 'создал клиента' : 'создан без сотрудника — администратор по умолчанию',
+        ]);
+    }
+
+    /** @var int[] "code:id" => the employee assignCreatorMain() made the main one in this process */
+    private static array $autoMain = [];
+
+    /** The link of the employee is the one assignCreatorMain() has just made (a repeated insert merges into it). */
+    public static function isAutoCreatorLink(string $recordCode, int $recordId, int $userId): bool
+    {
+        return (self::$autoMain[$recordCode.':'.$recordId] ?? null) === $userId;
+    }
+
+    /** The creating code gave the creator himself (a merged insert): he stays the main one. */
+    public static function confirmAutoMain(string $recordCode, int $recordId): void
+    {
+        unset(self::$autoMain[$recordCode.':'.$recordId]);
+    }
+
+    /**
+     * A link inserted right after the client was created: the responsible the
+     * creating code gives (an import «я / сотрудник», the API `manager_ids`, a
+     * campaign, the deal form) — with "full" it becomes the main one instead of
+     * the creator, whose automatic link goes; the same employee only confirms it.
+     */
+    public function onLinkInserted(string $recordCode, int $recordId, int $userId, ?string $level): void
+    {
+        $key = $recordCode.':'.$recordId;
+        // A link setMain() inserts itself (ensureMain(), a transfer) is not the responsible of the creating code.
+        if (!isset(self::$autoMain[$key]) || $this->settingMain) {
+            return;
+        }
+        $creatorId = self::$autoMain[$key];
+        [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
+        if (!$class::find()->andWhere([$recordColumn => $recordId, $userColumn => $creatorId, 'is_main' => 1])->exists()) {
+            // The automatic link is gone or is not the main one any more: nothing to replace.
+            unset(self::$autoMain[$key]);
+
+            return;
+        }
+        if ($userId === $creatorId) {
+            // The creating code gave the creator himself: he stays the main one, later links are participants.
+            unset(self::$autoMain[$key]);
+
+            return;
+        }
+        if ($level !== null && $level !== self::LEVEL_FULL) {
+            return;
+        }
+        unset(self::$autoMain[$key]);
+        $this->setMain($recordCode, $recordId, $userId);
+        $this->removeLink($recordCode, $recordId, $creatorId);
+        CrmAccessLog::write(CrmAccessLog::MAIN_AUTO, $recordCode, $recordId, [
+            'actor_id' => $creatorId, 'user_id' => $userId, 'level_to' => self::LEVEL_FULL, 'comment' => 'ответственный, заданный при создании',
+        ]);
+    }
+
+    /**
      * The managers field of a company or client form rewrites its links
      * (RelationalBehavior deletes and inserts them): the levels and the main
      * responsible of the employees who stay are kept, a record keeps a main.
@@ -321,6 +423,7 @@ class CrmAccess extends Component
     {
         // A new client of an employee with «Новые клиенты — всегда по согласованию» (CrmProtection::onCreated()).
         $record->on(\yii\db\BaseActiveRecord::EVENT_AFTER_INSERT, static function () use ($record, $recordCode) {
+            self::instance()->assignCreatorMain($record, $recordCode);
             CrmProtection::onCreated($record, $recordCode);
         });
         $snapshot = [];
@@ -452,12 +555,7 @@ class CrmAccess extends Component
     public static function responsibleFilterItems(): array
     {
         $items = self::mainReady() ? ['my_main' => 'Мои клиенты (основной)', 'no_main' => 'Без основного ответственного',
-            'no_responsible' => 'Без сотрудников', 'pool' => 'Общий пул'] : [];
-        // The pool filter only with the pool right (a console run keeps it).
-        if (isset($items['pool']) && \Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User
-            && !self::instance()->canUsePool((int)\Yii::$app->user->id)) {
-            unset($items['pool']);
-        }
+            'no_responsible' => 'Без сотрудников'] : [];
         if (CrmProtection::ready()) {
             // П2д: the protection of the client.
             foreach (CrmProtection::states() as $state => $name) {
@@ -490,13 +588,6 @@ class CrmAccess extends Component
             $query->andWhere(['exists', $links->andWhere([$userColumn => $viewerId, 'is_main' => 1])]);
         } elseif ($value === 'no_main') {
             $query->andWhere(['not exists', $links->andWhere(['is_main' => 1])]);
-        } elseif ($value === 'pool') {
-            // П2д: no employee, not protected and no history — taken into work by whoever finds it first.
-            $query->andWhere(['not exists', $links]);
-            $query->andWhere(['not', self::historyCondition($recordCode, $idColumn)]);
-            if (CrmProtection::ready()) {
-                $query->andWhere([substr($idColumn, 0, (int)strrpos($idColumn, '.')).'.crm_protection' => CrmProtection::FREE]);
-            }
         } else {
             $query->andWhere(['not exists', $links]);
         }
@@ -559,12 +650,14 @@ class CrmAccess extends Component
     }
 
     /**
-     * The general pool (П2д): a client without any employee (no main
-     * responsible). Every CRM employee sees it read only — its data and its own
-     * feed, no deals, services, bills, payments, documents or projects — until
-     * one takes it into work.
+     * A client without the main responsible (owner's decision 29.10.2026, п. 13а:
+     * there is no general pool, a CRM client always has a main one): old data
+     * with no employee at all. Not an employee; a person of a company with
+     * employees is its data. Administrators and heads of departments see it
+     * (canSeeOrphan()) and give it a main one; `cms/crm/assign-pool-main` assigns
+     * the old ones.
      */
-    public function inPool(string $recordCode, int $recordId): bool
+    public function isOrphan(string $recordCode, int $recordId): bool
     {
         if (!self::mainReady() || $recordId <= 0) {
             return false;
@@ -573,17 +666,10 @@ class CrmAccess extends Component
         if ($recordCode === CmsCrmAccessRequest::RECORD_CLIENT && (int)CmsUser::find()->select('is_worker')->andWhere(['id' => $recordId])->scalar()) {
             return false;
         }
-
         if ($class::find()->andWhere([$recordColumn => $recordId])->exists()) {
             return false;
         }
 
-        // A client with a history always has a main responsible (owner's decision 29.10.2026).
-        if (self::hasHistory($recordCode, $recordId)) {
-            return false;
-        }
-
-        // A person of a company that has employees is its data, not a free client.
         return $recordCode !== CmsCrmAccessRequest::RECORD_CLIENT
             || !self::personCompanyLinks((string)(int)$recordId)->exists();
     }
@@ -647,139 +733,39 @@ class CrmAccess extends Component
             ->andWhere('poolPersonCompany.cms_user_id = '.$personColumn);
     }
 
-    /**
-     * The right «Общий пул клиентов» (owner's decision 29.10.2026, variant Б):
-     * see the general pool and take its clients into work. An RBAC permission
-     * given in a role or to one employee in his profile; administrators and
-     * heads of departments have it always.
-     */
-    public const PERMISSION_POOL = 'cms/crm-pool';
-
-    /** @var bool[] canUsePool() of the request, by user id */
-    private array $poolRight = [];
-
-    public function canUsePool($user): bool
-    {
-        $userId = $this->userId($user);
-        if ($userId <= 0) {
-            return false;
-        }
-        if (!isset($this->poolRight[$userId])) {
-            $this->poolRight[$userId] = $this->isAdmin($userId) || $this->isDepartmentHead($userId)
-                || \Yii::$app->authManager->checkAccess($userId, self::PERMISSION_POOL);
-        }
-
-        return $this->poolRight[$userId];
-    }
-
     /** The employee heads a department (cms_department.worker_id). */
     public function isDepartmentHead(int $userId): bool
     {
         return $userId > 0 && CmsDepartment::find()->andWhere(['worker_id' => $userId])->exists();
     }
 
-    /** The right is given to this employee himself (not by a role, administrator or department). */
-    public function hasOwnPoolRight(int $workerId): bool
-    {
-        return $workerId > 0 && \Yii::$app->authManager->getAssignment(self::PERMISSION_POOL, $workerId) !== null;
-    }
-
-    /** Who gives the pool right to an employee: an administrator, or his head to a subordinate. */
-    public function canGrantPool($actor, int $workerId): bool
-    {
-        $actorId = $this->userId($actor);
-        if ($actorId <= 0 || $workerId <= 0 || $actorId === $workerId && !$this->isAdmin($actorId)) {
-            return false;
-        }
-
-        return $this->isAdmin($actorId) || in_array($workerId, array_map('intval', CmsDepartment::subordinateIds($actorId)), true);
-    }
-
     /**
-     * Who changes «Новые компании и клиенты, которые я создаю, — „Всегда по
-     * согласованию“» of an employee (CrmProtection::onCreated()): he himself,
-     * his head, an administrator. The same people see the block «Клиенты в
-     * CRM» of his profile.
+     * A client without the main responsible (isOrphan(), old data) is seen by an
+     * administrator and the heads of departments (with the right to the
+     * section): they give it a main one.
      */
-    public function canEditCrmSettings($actor, int $workerId): bool
-    {
-        $actorId = $this->userId($actor);
-
-        return $actorId > 0 && $workerId > 0 && ($actorId === $workerId || $this->isAdmin($actorId)
-            || in_array($workerId, array_map('intval', CmsDepartment::subordinateIds($actorId)), true));
-    }
-
-    /** Gives or takes the right of one employee (an RBAC assignment of the permission). */
-    public function setPoolRight(int $workerId, bool $on): void
-    {
-        $auth = \Yii::$app->authManager;
-        $permission = $auth->getPermission(self::PERMISSION_POOL);
-        if (!$permission) {
-            throw new \DomainException('Право «Общий пул клиентов» не зарегистрировано: выполните rbac/init.');
-        }
-        $assigned = $auth->getAssignment(self::PERMISSION_POOL, $workerId) !== null;
-        if ($on && !$assigned) {
-            $auth->assign($permission, $workerId);
-        } elseif (!$on && $assigned) {
-            $auth->revoke($permission, $workerId);
-        }
-        unset($this->poolRight[$workerId]);
-    }
-
-    /**
-     * A client of the general pool the employee may not take himself: «Компания
-     * в общей базе», «Попросить у руководителя» sends a request to his head.
-     */
-    public function poolRequestNeeded($user, string $recordCode, int $recordId): bool
-    {
-        return !$this->canUsePool($user) && $this->canTakeIntoWork($recordCode, $recordId);
-    }
-
-    /** A CRM employee with the pool right (and the right to the section) sees a record of the pool. */
-    public function canSeePool($user, string $recordCode, int $recordId): bool
+    public function canSeeOrphan($user, string $recordCode, int $recordId): bool
     {
         $userId = $this->userId($user);
         $permission = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY ? 'cms/admin-company' : 'cms/admin-user';
 
-        return $userId > 0 && \Yii::$app->authManager->checkAccess($userId, $permission) && $this->canUsePool($userId)
-            && $this->inPool($recordCode, $recordId);
+        return $userId > 0 && ($this->isAdmin($userId) || $this->isDepartmentHead($userId))
+            && \Yii::$app->authManager->checkAccess($userId, $permission) && $this->isOrphan($recordCode, $recordId);
     }
 
     /**
      * One visibility of the lists and the search of companies and clients (and
-     * the API): what the employee sees, plus the general pool with the pool
-     * right (canUsePool()).
+     * the API): what the employee sees; a head of a department also the
+     * clients without the main responsible (old data, canSeeOrphan()).
      */
     public static function applyClientVisibility(\yii\db\ActiveQuery $query, $user = null): void
     {
         $viewer = $user ?? (\Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User ? \Yii::$app->user->identity : null);
-        if (method_exists($query, 'forManagerOrPool') && self::mainReady() && $viewer && self::instance()->canUsePool($viewer)) {
-            $query->forManagerOrPool($user);
+        if (method_exists($query, 'forManagerOrOrphans') && self::mainReady() && $viewer && self::instance()->isDepartmentHead((int)$viewer->id)) {
+            $query->forManagerOrOrphans($user);
         } elseif (method_exists($query, 'forManager')) {
             $query->forManager($user);
         }
-    }
-
-    /**
-     * «Взять в работу» (П2д): a free client without a main responsible — the
-     * general pool; the first employee who takes it becomes the main one
-     * (`full`), no request and no notification.
-     */
-    public function canTakeIntoWork(string $recordCode, int $recordId): bool
-    {
-        if (!self::mainReady() || $recordId <= 0) {
-            return false;
-        }
-        [$class, $recordColumn] = self::linkTable($recordCode);
-
-        return $this->mainResponsibleId($recordCode, $recordId) === null
-            // The pool has no participants (owner's decision 29.10.2026).
-            && !$class::find()->andWhere([$recordColumn => $recordId])->exists()
-            && !$this->approvalRequired($recordCode, $recordId)
-            // A client with a history is never taken: he has a main responsible by his history.
-            && !self::hasHistory($recordCode, $recordId)
-            // A person of a company with employees is taken through the company.
-            && ($recordCode !== CmsCrmAccessRequest::RECORD_CLIENT || !self::personCompanyLinks((string)(int)$recordId)->exists());
     }
 
     /**
@@ -794,9 +780,8 @@ class CrmAccess extends Component
         $userId = $this->userId($user);
         $mainId = $this->mainResponsibleId($recordCode, $recordId);
         if ($mainId === null) {
-            // A client of the general pool: a head of a department with the pool right gives it its first
-            // participants (he becomes the main one, ensureMain()).
-            return $this->isDepartmentHead($userId) && $this->canUsePool($userId) && $this->inPool($recordCode, $recordId);
+            // A client without the main one (old data): a head of a department gives it one (ensureMain()).
+            return $this->isDepartmentHead($userId) && $this->isOrphan($recordCode, $recordId);
         }
 
         return $mainId === $userId || in_array($userId, CmsDepartment::leaderIdsOf($mainId), true);
@@ -1139,8 +1124,8 @@ class CrmAccess extends Component
             return null;
         }
         $level = $this->clientDataLevel($user, $code[0], (int)$code[1]);
-        if ($level === null && !$this->isAdmin($user) && $this->inPool($code[0], (int)$code[1])) {
-            // The general pool: the client's own records only, until somebody takes it.
+        if ($level === null && !$this->isAdmin($user) && $this->isOrphan($code[0], (int)$code[1])) {
+            // A client without the main one seen by a head: the client's own records only, until it has one.
             $table = \skeeks\cms\models\CmsLog::tableName();
 
             return $this->clientOwnFeedCondition($user, $record, $table);
@@ -1444,15 +1429,7 @@ class CrmAccess extends Component
             // A protected client: «Работать с этим клиентом» sends a request first.
             'byApproval' => !$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
                 && $this->approvalRequired($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id),
-            // A free client without a main responsible (the general pool): «Взять в работу».
-            'canTake' => false,
-            // The pool without the pool right: «Компания в общей базе», «Попросить у руководителя».
-            'inBase' => false,
         ];
-        if (!$visible && in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true)
-            && $this->canTakeIntoWork($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id)) {
-            $result[$this->canUsePool($viewer) ? 'canTake' : 'inBase'] = true;
-        }
 
         if (in_array($type, [CrmMatcher::TYPE_COMPANY, CrmMatcher::TYPE_CLIENT], true) && CrmProtection::ready()
             && ($record = CrmProtection::record($type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id))) {
@@ -1461,12 +1438,6 @@ class CrmAccess extends Component
             $result['protectionText'] = $result['protection'] === CrmProtection::FREE ? ''
                 : CrmProtection::describeRecord($record, $visible && self::seesWholeClient($this->wholeClientLevel($viewer,
                     $type === CrmMatcher::TYPE_COMPANY ? CmsCrmAccessRequest::RECORD_COMPANY : CmsCrmAccessRequest::RECORD_CLIENT, $id)));
-        }
-        if ($result['inBase']) {
-            // The pool without the pool right: no name, no employees — «Компания в общей базе».
-            $result['title'] = null;
-
-            return $result;
         }
         if ($type === CrmMatcher::TYPE_COMPANY && ($company = CmsCompany::findOne($id))) {
             $result['title'] = (string)$company->name;
@@ -1616,17 +1587,9 @@ class CrmAccess extends Component
                         ['exists', $links()->andWhere([$userColumn => $ids, 'access_level' => self::LEVEL_FULL])]],
                 ]];
             };
-            // isPoolRequest() in SQL: a client without any employee — the heads of the requester decide.
-            $pool = static function (string $class, string $recordColumn, string $code) use ($table, $userId) {
-                return ['and', [$table.'.record_code' => $code],
-                    ['not exists', $class::find()->select('id')->andWhere([$recordColumn => new \yii\db\Expression($table.'.record_id')])],
-                    [$table.'.requester_id' => array_map('intval', CmsDepartment::subordinateIds($userId)) ?: [0]]];
-            };
             $decides = ['or',
                 $main(CmsCompany2manager::class, 'cms_company_id', 'cms_user_id', CmsCrmAccessRequest::RECORD_COMPANY),
                 $main(CmsUser2manager::class, 'client_id', 'worker_id', CmsCrmAccessRequest::RECORD_CLIENT),
-                $pool(CmsCompany2manager::class, 'cms_company_id', CmsCrmAccessRequest::RECORD_COMPANY),
-                $pool(CmsUser2manager::class, 'client_id', CmsCrmAccessRequest::RECORD_CLIENT),
             ];
         }
         if ($scope === self::REQUESTS_TO_ME) {
@@ -1659,18 +1622,6 @@ class CrmAccess extends Component
         return array_values(array_diff($ids, [(int)$request->requester_id]));
     }
 
-    /**
-     * A request about a client of the general pool (no employee, may be taken
-     * into work): sent by an employee without the pool right.
-     */
-    public function isPoolRequest(CmsCrmAccessRequest $request): bool
-    {
-        [$class, $recordColumn] = self::linkTable((string)$request->record_code);
-
-        return self::mainReady() && !$class::find()->andWhere([$recordColumn => (int)$request->record_id])->exists()
-            && $this->canTakeIntoWork((string)$request->record_code, (int)$request->record_id);
-    }
-
     private function deciderIds(CmsCrmAccessRequest $request): array
     {
         // The current main responsible decides; a record without one — its "full" employees. Their leaders
@@ -1680,17 +1631,81 @@ class CrmAccess extends Component
         $owners = $mainId ? [$mainId] : ($request->record_code === CmsCrmAccessRequest::RECORD_COMPANY
             ? $this->companyResponsibleIds((int)$request->record_id)
             : $this->clientResponsibleIds((int)$request->record_id));
-        if (!$owners && $this->isPoolRequest($request)) {
-            // «Попросить у руководителя»: a client of the general pool — the heads of the requester decide
-            // (administrators when he has none, requestDeciderIds()).
-            return array_values(array_unique(array_map('intval', CmsDepartment::leaderIdsOf((int)$request->requester_id))));
-        }
         $ids = $owners;
         foreach (array_unique($owners) as $ownerId) {
             $ids = array_merge($ids, CmsDepartment::leaderIdsOf($ownerId));
         }
 
         return array_values(array_unique(array_map('intval', $ids)));
+    }
+
+    /**
+     * Who changes «Новые компании и клиенты, которые я создаю, — „Всегда по
+     * согласованию“» of an employee (CrmProtection::onCreated()): he himself,
+     * his head, an administrator. The same people see the block «Клиенты в
+     * CRM» of his profile.
+     */
+    public function canEditCrmSettings($actor, int $workerId): bool
+    {
+        $actorId = $this->userId($actor);
+
+        return $actorId > 0 && $workerId > 0 && ($actorId === $workerId || $this->isAdmin($actorId)
+            || in_array($workerId, array_map('intval', CmsDepartment::subordinateIds($actorId)), true));
+    }
+
+    /**
+     * The nearest head of an employee: the head of his own department, else
+     * the first of CmsDepartment::leaderIdsOf() (the default receiver of his
+     * clients).
+     */
+    public function nearestHeadId(int $workerId): ?int
+    {
+        $own = CmsDepartment::find()->alias('d')
+            ->innerJoin(['dw' => \skeeks\cms\models\CmsDepartment2worker::tableName()], 'dw.cms_department_id = d.id')
+            ->andWhere(['dw.worker_id' => $workerId])->andWhere(['not', ['d.worker_id' => null]])->andWhere(['<>', 'd.worker_id', $workerId])
+            ->select('d.worker_id')->scalar();
+        if ($own) {
+            return (int)$own;
+        }
+        $heads = CmsDepartment::leaderIdsOf($workerId);
+
+        return $heads ? (int)$heads[0] : null;
+    }
+
+    /**
+     * «Передать всех клиентов» of an employee (owner's decision 29.10.2026,
+     * п. 13а): an administrator or his head.
+     */
+    public function canTransferClientsOf($actor, int $workerId): bool
+    {
+        $actorId = $this->userId($actor);
+
+        return $actorId > 0 && $workerId > 0 && $actorId !== $workerId
+            && ($this->isAdmin($actorId) || in_array($workerId, array_map('intval', CmsDepartment::subordinateIds($actorId)), true));
+    }
+
+    /** How many clients the employee is the main responsible of. */
+    public function mainClientsCount(int $userId): int
+    {
+        if (!self::mainReady() || $userId <= 0) {
+            return 0;
+        }
+
+        return (int)CmsCompany2manager::find()->andWhere(['cms_user_id' => $userId, 'is_main' => 1])->count()
+            + (int)CmsUser2manager::find()->andWhere(['worker_id' => $userId, 'is_main' => 1])->count();
+    }
+
+    /**
+     * An employee with clients is not deactivated, made a non-employee or
+     * deleted until his clients are given away (owner's decision 29.10.2026,
+     * п. 13а): the refusal, null when allowed. User::init() checks every save
+     * and delete of an employee record.
+     */
+    public function deactivationError(int $userId): ?string
+    {
+        $count = $this->mainClientsCount($userId);
+
+        return $count ? 'У сотрудника есть клиенты, он их основной ответственный ('.$count.'). Сначала передайте их: «Передать всех клиентов» в карточке сотрудника.' : null;
     }
 
     /**

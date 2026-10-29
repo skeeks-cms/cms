@@ -1,11 +1,11 @@
 <?php
 /**
  * «Клиенты в CRM» of an employee profile (owner's decision 29.10.2026):
- * the right to the general pool (CrmAccess::canUsePool(): administrators and
- * heads of departments always; one employee — here, by an administrator or his
- * head; a role — in «Роли») and «Новые компании и клиенты, которые я создаю, —
- * „Всегда по согласованию“» (CrmProtection::onCreated()). Seen by the employee,
- * his head and an administrator (CrmAccess::canEditCrmSettings()).
+ * «Новые компании и клиенты, которые я создаю, — „Всегда по согласованию“»
+ * (CrmProtection::onCreated(); he, his head, an administrator —
+ * CrmAccess::canEditCrmSettings()) and, for his head or an administrator, the
+ * clients he is the main one of with «Передать всех клиентов»
+ * (crm-transfer-clients, also the dismissal).
  *
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsUser $model
@@ -22,17 +22,9 @@ if (!$model->is_worker || !CrmAccess::mainReady() || !$access->canEditCrmSetting
     return;
 }
 $workerId = (int)$model->id;
-if ($access->isAdmin($workerId)) {
-    $poolSource = 'администратор';
-} elseif ($access->isDepartmentHead($workerId)) {
-    $poolSource = 'руководитель отдела';
-} elseif ($access->canUsePool($workerId) && !$access->hasOwnPoolRight($workerId)) {
-    $poolSource = 'по роли';
-} else {
-    $poolSource = null;
-}
-$canGrant = $poolSource === null && $access->canGrantPool($actorId, $workerId);
 $url = Url::to(['crm-settings', 'pk' => $workerId]);
+$clients = $access->mainClientsCount($workerId);
+$canTransfer = $clients && $access->canTransferClientsOf($actorId, $workerId);
 
 $this->registerJs(<<<JS
 $(document).off('change.sxCrmSettings').on('change.sxCrmSettings', '[data-sx-crm-setting]', function () {
@@ -59,23 +51,16 @@ JS
 ?>
 <div class="sx-surface sx-surface--raised sx-surface--padded">
     <div class="sx-surface__title">Клиенты в CRM</div>
-    <div class="form-check mb-2">
-        <?= Html::checkbox('crm_pool', $poolSource !== null || $access->hasOwnPoolRight($workerId), [
-            'id' => 'sx-crm-setting-pool',
-            'class' => 'form-check-input',
-            'disabled' => !$canGrant,
-            'data-sx-crm-setting' => 'pool',
-            'data-url' => $url,
-        ]); ?>
-        <label class="form-check-label" for="sx-crm-setting-pool">
-            Видит общий пул и берёт клиентов в работу
-            <?php if ($poolSource !== null) : ?>
-                <span class="sx-text--muted">— всегда: <?= Html::encode($poolSource); ?></span>
-            <?php elseif (!$canGrant) : ?>
-                <span class="sx-text--muted">— выдаёт администратор или руководитель</span>
-            <?php endif; ?>
-        </label>
-    </div>
+    <p class="mb-2">Основной ответственный у клиентов: <strong><?= (int)$clients; ?></strong></p>
+    <?php if ($canTransfer) : ?>
+        <?php $transferAction = ['isOpenNewWindow' => true, 'size' => 'small', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(
+            ['crm-transfer-clients', 'pk' => $workerId])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url]; ?>
+        <p class="mb-2"><?= Html::a('Передать всех клиентов', '#', [
+            'class' => 'sx-button sx-button--secondary sx-button--sm',
+            'data-pjax' => 0,
+            'onclick' => 'new sx.classes.backend.widgets.Action('.\yii\helpers\Json::encode($transferAction).').go(); return false;',
+        ]); ?></p>
+    <?php endif; ?>
     <?php if (CrmProtection::newAlwaysReady()) : ?>
         <div class="form-check">
             <?= Html::checkbox('crm_new_always', (bool)$model->crm_new_always, [

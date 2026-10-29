@@ -570,6 +570,19 @@ class AdminWorkerController extends BackendModelStandartController
                 },
             ],
 
+            // «Передать всех клиентов» (owner's decision 29.10.2026, п. 13а): also the dismissal of an employee with clients.
+            'crm-transfer-clients' => [
+                'class'          => BackendModelAction::class,
+                'isVisible'      => false,
+                'name'           => 'Передать всех клиентов',
+                'generateAccess' => false,
+                'size'           => BackendAction::SIZE_SMALL,
+                'callback'       => [$this, 'crmTransferClients'],
+                "accessCallback" => function () {
+                    return $this->model && \skeeks\cms\crm\CrmAccess::instance()->canTransferClientsOf((int)\Yii::$app->user->id, (int)$this->model->id);
+                },
+            ],
+
             'update' => [
                 'fields'         => [$this, 'updateFields'],
                 'buttons'        => ["save"],
@@ -700,8 +713,8 @@ class AdminWorkerController extends BackendModelStandartController
     }
 
     /**
-     * POST op=pool|new_always, value=0|1: the pool right (an administrator, or the head to a subordinate) and
-     * «Новые компании и клиенты, которые я создаю, — „Всегда по согласованию“» (he, his head, an administrator).
+     * POST op=new_always, value=0|1: «Новые компании и клиенты, которые я создаю, — „Всегда по согласованию“»
+     * (he, his head, an administrator).
      */
     public function crmSettings()
     {
@@ -715,14 +728,6 @@ class AdminWorkerController extends BackendModelStandartController
         $on = (string)\Yii::$app->request->post('value') === '1';
         try {
             switch ((string)\Yii::$app->request->post('op')) {
-                case 'pool':
-                    if (!$access->canGrantPool($actorId, $workerId)) {
-                        throw new \DomainException('Право на общий пул выдаёт администратор или руководитель сотрудника.');
-                    }
-                    $access->setPoolRight($workerId, $on);
-                    $response->message = $on ? 'Сотрудник видит общий пул и может брать клиентов в работу.'
-                        : 'Общий пул скрыт: клиентов из общей базы сотрудник берёт через запрос руководителю.';
-                    break;
                 case 'new_always':
                     if (!\skeeks\cms\crm\CrmProtection::newAlwaysReady()) {
                         throw new \DomainException('Настройка появится после обновления базы (миграции).');
@@ -741,6 +746,44 @@ class AdminWorkerController extends BackendModelStandartController
         }
 
         return $response;
+    }
+
+    /**
+     * «Передать всех клиентов»: the employee who gets them (his head by default), the open deals and tasks that
+     * move (any may be kept), «Сотрудник увольняется» — the former main one leaves the clients and the employee is
+     * deactivated (crm\CrmClientTransfer::transferAllOf()).
+     */
+    public function crmTransferClients()
+    {
+        $worker = $this->model;
+        $transfer = new \skeeks\cms\crm\CrmClientTransfer();
+        $request = \Yii::$app->request;
+        if ($request->isPost) {
+            $response = new RequestResponse();
+            try {
+                $dismiss = (bool)$request->post('dismiss');
+                $response->message = $transfer->transferAllOf((int)$worker->id, (int)$request->post('user_id'), (int)\Yii::$app->user->id,
+                    (array)$request->post('keep_leads', []), (array)$request->post('keep_tasks', []), $dismiss);
+                if ($dismiss) {
+                    $worker->is_active = 0;
+                    if (!$worker->save(false, ['is_active'])) {
+                        throw new \DomainException(implode(' ', $worker->getFirstErrors()) ?: 'Не удалось деактивировать сотрудника.');
+                    }
+                    $response->message .= ' Сотрудник деактивирован.';
+                }
+                $response->success = true;
+            } catch (\DomainException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+            }
+
+            return $response;
+        }
+        return $this->render('@skeeks/cms/views/admin-worker/crm-transfer-clients', [
+            'model' => $worker,
+            'work' => $transfer->workOf((int)$worker->id),
+            'defaultUserId' => \skeeks\cms\crm\CrmAccess::instance()->nearestHeadId((int)$worker->id),
+        ]);
     }
 
     public function view()
