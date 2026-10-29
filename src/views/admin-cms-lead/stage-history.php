@@ -1,27 +1,27 @@
 <?php
 /**
  * «История этапов» of a deal: every transition, who and when, the time spent
- * before the next one (CmsLeadStageHistory).
+ * before the next one (CmsLeadStageHistory). The standard backend grid
+ * (GridViewWidget), as the tabs «Задачи», «Счета» and «Платежи» of the card:
+ * the history has no section of its own, so the grid is rendered here.
  *
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsLead $model
  */
 
-use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+use skeeks\cms\backend\widgets\GridViewWidget;
 use skeeks\cms\crm\LeadPipelines;
 use skeeks\cms\models\CmsLeadPipeline;
 use skeeks\cms\models\CmsLeadStageHistory;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
-/** @var CmsLeadStageHistory[] $rows */
-$rows = $model->getStageHistory()->with('createdBy')->all();
 $pipelines = [];
 foreach (CmsLeadPipeline::forSite((int)$model->cms_site_id) as $pipeline) {
     $pipelines[(int)$pipeline->id] = $pipeline->name;
 }
-$showPipeline = count($pipelines) > 1;
 $formatter = Yii::$app->formatter;
-$duration = static function (int $seconds): string {
+$durationText = static function (int $seconds): string {
     if ($seconds < 3600) {
         return max(1, (int)round($seconds / 60)).' мин';
     }
@@ -32,69 +32,74 @@ $duration = static function (int $seconds): string {
 
     return $days.' '.LeadPipelines::plural($days, 'день', 'дня', 'дней');
 };
-?>
-<?php BackendSurfaceWidget::begin([
-    'title' => 'История этапов',
-    'titleTag' => 'h2',
-    'hint' => 'Каждый переход сделки: откуда и куда, кто и когда, сколько сделка пробыла на этапе. По этим записям считается отчёт по воронке.',
-    'raised' => true,
-    'responsive' => true,
-]); ?>
-    <?php if (!$rows) : ?>
-        <p>Переходов пока нет.</p>
-    <?php else : ?>
-        <?php // The shared data matrix of a card (BackendUiAsset, both themes), as in the funnel report. ?>
-        <div class="sx-data-table-wrapper">
-        <table class="sx-data-table">
-            <thead>
-            <tr>
-                <th>Когда</th>
-                <th>Что</th>
-                <th>Откуда → куда</th>
-                <?php if ($showPipeline) : ?><th>Воронка</th><?php endif; ?>
-                <th>Кто</th>
-                <th>Пробыла на этапе</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($rows as $index => $row) : ?>
-                <?php $next = $rows[$index + 1] ?? null; ?>
-                <tr>
-                    <td><?= $formatter->asDatetime($row->created_at, 'd MMM yyyy, HH:mm'); ?></td>
-                    <td>
-                        <?= Html::encode($row->kindName); ?>
-                        <?php if ($row->is_migrated) : ?>
-                            <div class="sx-collection-cell__secondary">Более ранняя история не сохранялась</div>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if ($row->from_status !== null) : ?>
-                            <?= Html::encode($row->fromName); ?> →
-                        <?php endif; ?>
-                        <strong><?= Html::encode($row->toName); ?></strong>
-                    </td>
-                    <?php if ($showPipeline) : ?>
-                        <td>
-                            <?php if ($row->from_pipeline_id && (int)$row->from_pipeline_id !== (int)$row->to_pipeline_id) : ?>
-                                <?= Html::encode($pipelines[(int)$row->from_pipeline_id] ?? '—'); ?> →
-                            <?php endif; ?>
-                            <?= Html::encode($pipelines[(int)$row->to_pipeline_id] ?? '—'); ?>
-                        </td>
-                    <?php endif; ?>
-                    <td><?= $row->createdBy ? Html::encode($row->createdBy->shortDisplayName) : 'Система'; ?></td>
-                    <td>
-                        <?php if ($next) : ?>
-                            <?= $duration((int)$next->created_at - (int)$row->created_at); ?>
-                        <?php elseif (!$model->isTerminal) : ?>
-                            <?= $duration(time() - (int)$row->created_at); ?> <span class="sx-collection-cell__secondary">и сейчас</span>
-                        <?php else : ?>
-                            —
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
-        </div>
-    <?php endif; ?>
-<?php BackendSurfaceWidget::end(); ?>
+// Time on a stage is up to the next transition in time, whatever order the grid is sorted in.
+$timeline = CmsLeadStageHistory::find()->select(['id', 'created_at'])->andWhere(['cms_lead_id' => (int)$model->id])
+    ->orderBy(['created_at' => SORT_ASC, 'id' => SORT_ASC])->asArray()->all();
+$nextAt = [];
+foreach ($timeline as $index => $point) {
+    $nextAt[(int)$point['id']] = isset($timeline[$index + 1]) ? (int)$timeline[$index + 1]['created_at'] : null;
+}
+
+echo GridViewWidget::widget([
+    'dataProvider' => new ActiveDataProvider([
+        'query' => CmsLeadStageHistory::find()->andWhere(['cms_lead_id' => (int)$model->id])->with('createdBy'),
+        'sort' => [
+            'attributes' => ['created_at', 'kind', 'created_by'],
+            'defaultOrder' => ['created_at' => SORT_ASC],
+        ],
+        'pagination' => ['defaultPageSize' => 50],
+    ]),
+    'visibleColumns' => array_merge(['created_at', 'kind', 'stage'], count($pipelines) > 1 ? ['pipeline'] : [], ['created_by', 'duration']),
+    'emptyText' => 'Переходов пока нет.',
+    'columns' => [
+        'created_at' => [
+            'attribute' => 'created_at',
+            'label' => 'Когда',
+            'value' => static fn(CmsLeadStageHistory $row) => $formatter->asDatetime($row->created_at, 'd MMM yyyy, HH:mm'),
+        ],
+        'kind' => [
+            'attribute' => 'kind',
+            'label' => 'Что',
+            'format' => 'raw',
+            'value' => static fn(CmsLeadStageHistory $row) => Html::encode($row->kindName)
+                .($row->is_migrated ? Html::tag('div', 'Более ранняя история не сохранялась', ['class' => 'sx-collection-cell__secondary']) : ''),
+        ],
+        'stage' => [
+            'label' => 'Откуда → куда',
+            'format' => 'raw',
+            'value' => static fn(CmsLeadStageHistory $row) => ($row->from_status !== null ? Html::encode($row->fromName).' → ' : '')
+                .Html::tag('strong', Html::encode($row->toName)),
+        ],
+        'pipeline' => [
+            'label' => 'Воронка',
+            'value' => static function (CmsLeadStageHistory $row) use ($pipelines) {
+                $to = $pipelines[(int)$row->to_pipeline_id] ?? '—';
+                if ($row->from_pipeline_id && (int)$row->from_pipeline_id !== (int)$row->to_pipeline_id) {
+                    return ($pipelines[(int)$row->from_pipeline_id] ?? '—').' → '.$to;
+                }
+
+                return $to;
+            },
+        ],
+        'created_by' => [
+            'attribute' => 'created_by',
+            'label' => 'Кто',
+            'value' => static fn(CmsLeadStageHistory $row) => $row->createdBy ? $row->createdBy->shortDisplayName : 'Система',
+        ],
+        'duration' => [
+            'label' => 'Пробыла на этапе',
+            'format' => 'raw',
+            'value' => static function (CmsLeadStageHistory $row) use ($nextAt, $model, $durationText) {
+                $next = $nextAt[(int)$row->id] ?? null;
+                if ($next !== null) {
+                    return Html::encode($durationText($next - (int)$row->created_at));
+                }
+                if (!$model->isTerminal) {
+                    return Html::encode($durationText(time() - (int)$row->created_at)).' '.Html::tag('span', 'и сейчас', ['class' => 'sx-collection-cell__secondary']);
+                }
+
+                return '—';
+            },
+        ],
+    ],
+]);
