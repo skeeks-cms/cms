@@ -1,5 +1,6 @@
 <?php
 
+use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
@@ -9,13 +10,15 @@ use yii\db\Migration;
  */
 class m261028_160000__alter_table__cms_log_model_index extends Migration
 {
+    use RepeatableMigrationTrait;
+
     public function safeUp()
     {
-        $this->createIndex('cms_log__model_code_id', '{{%cms_log}}', ['model_code', 'model_id']);
+        $this->createIndexIfMissing('cms_log__model_code_id', '{{%cms_log}}', ['model_code', 'model_id']);
     }
 
     public function safeDown()
     {
-        $this->dropIndex('cms_log__model_code_id', '{{%cms_log}}');
+        $this->dropIndexIfExists('cms_log__model_code_id', '{{%cms_log}}');
     }
 }

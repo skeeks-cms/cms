@@ -1,5 +1,6 @@
 <?php
 
+use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
@@ -10,9 +11,15 @@ use yii\db\Migration;
  * as before: its stages and deals have no pipeline and form one implicit
  * pipeline. Pipelines and the moving of existing deals are created by
  * `php yii cms/lead-pipeline/init` (a report by default, --apply to apply).
+ *
+ * safeDown refuses before the first DDL while pipelines, their use by stages
+ * and deals or the stage history exist (release audit N4, 29.10.2026), and
+ * while the old unique stage name per site cannot come back.
  */
 class m261028_130000__create_table__cms_lead_pipeline extends Migration
 {
+    use RepeatableMigrationTrait;
+
     public function safeUp()
     {
         $tableOptions = $this->db->driverName === 'mysql'
@@ -20,7 +27,7 @@ class m261028_130000__create_table__cms_lead_pipeline extends Migration
             : null;
 
         $pipeline = '{{%cms_lead_pipeline}}';
-        $this->createTable($pipeline, [
+        $this->createTableIfMissing($pipeline, [
             'id'           => $this->primaryKey(),
             'created_by'   => $this->integer()->null(),
             'updated_by'   => $this->integer()->null(),
@@ -33,30 +40,30 @@ class m261028_130000__create_table__cms_lead_pipeline extends Migration
             'is_default'   => $this->tinyInteger(1)->notNull()->defaultValue(0)->comment('Сюда попадают новые обращения'),
             'success_rule' => $this->string(16)->notNull()->defaultValue('manual')->comment('Критерий успеха: manual, order, payment'),
         ], $tableOptions);
-        $this->createIndex('cms_lead_pipeline__site_sort', $pipeline, ['cms_site_id', 'sort']);
-        $this->createIndex('cms_lead_pipeline__site_code', $pipeline, ['cms_site_id', 'code'], true);
+        $this->createIndexIfMissing('cms_lead_pipeline__site_sort', $pipeline, ['cms_site_id', 'sort']);
+        $this->createIndexIfMissing('cms_lead_pipeline__site_code', $pipeline, ['cms_site_id', 'code'], true);
         foreach (['created_by', 'updated_by'] as $column) {
-            $this->addForeignKey('cms_lead_pipeline__'.$column, $pipeline, $column, '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL');
+            $this->addForeignKeyIfMissing('cms_lead_pipeline__'.$column, $pipeline, $column, '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL');
         }
-        $this->addForeignKey('cms_lead_pipeline__cms_site_id', $pipeline, 'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKeyIfMissing('cms_lead_pipeline__cms_site_id', $pipeline, 'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE');
         $this->addCommentOnTable($pipeline, 'Воронки продаж (сделки CmsLead)');
 
         // Stages belong to a pipeline; the same name may repeat in different pipelines.
         $stage = '{{%cms_lead_stage}}';
-        $this->addColumn($stage, 'cms_lead_pipeline_id', $this->integer()->null()->after('cms_site_id')->comment('Воронка'));
-        $this->addForeignKey('cms_lead_stage__cms_lead_pipeline_id', $stage, 'cms_lead_pipeline_id', $pipeline, 'id', 'CASCADE', 'CASCADE');
-        $this->createIndex('cms_lead_stage__site_pipeline_name', $stage, ['cms_site_id', 'cms_lead_pipeline_id', 'name'], true);
-        $this->dropIndex('cms_lead_stage__site_name', $stage);
+        $this->addColumnIfMissing($stage, 'cms_lead_pipeline_id', $this->integer()->null()->after('cms_site_id')->comment('Воронка'));
+        $this->addForeignKeyIfMissing('cms_lead_stage__cms_lead_pipeline_id', $stage, 'cms_lead_pipeline_id', $pipeline, 'id', 'CASCADE', 'CASCADE');
+        $this->createIndexIfMissing('cms_lead_stage__site_pipeline_name', $stage, ['cms_site_id', 'cms_lead_pipeline_id', 'name'], true);
+        $this->dropIndexIfExists('cms_lead_stage__site_name', $stage);
 
         $lead = '{{%cms_lead}}';
-        $this->addColumn($lead, 'cms_lead_pipeline_id', $this->integer()->null()->after('status')->comment('Воронка'));
-        $this->addColumn($lead, 'stage_changed_at', $this->integer()->null()->comment('Когда сделка попала на текущий этап'));
-        $this->createIndex('cms_lead__pipeline_status', $lead, ['cms_lead_pipeline_id', 'status']);
+        $this->addColumnIfMissing($lead, 'cms_lead_pipeline_id', $this->integer()->null()->after('status')->comment('Воронка'));
+        $this->addColumnIfMissing($lead, 'stage_changed_at', $this->integer()->null()->comment('Когда сделка попала на текущий этап'));
+        $this->createIndexIfMissing('cms_lead__pipeline_status', $lead, ['cms_lead_pipeline_id', 'status']);
         // Deleting a pipeline is refused while deals use it; SET NULL is the last safety net.
-        $this->addForeignKey('cms_lead__cms_lead_pipeline_id', $lead, 'cms_lead_pipeline_id', $pipeline, 'id', 'SET NULL', 'CASCADE');
+        $this->addForeignKeyIfMissing('cms_lead__cms_lead_pipeline_id', $lead, 'cms_lead_pipeline_id', $pipeline, 'id', 'SET NULL', 'CASCADE');
 
         $history = '{{%cms_lead_stage_history}}';
-        $this->createTable($history, [
+        $this->createTableIfMissing($history, [
             'id'               => $this->primaryKey(),
             'cms_site_id'      => $this->integer()->notNull(),
             'cms_lead_id'      => $this->integer()->notNull(),
@@ -73,18 +80,29 @@ class m261028_130000__create_table__cms_lead_pipeline extends Migration
             'to_stage_name'    => $this->string(255)->null(),
             'is_migrated'      => $this->tinyInteger(1)->notNull()->defaultValue(0)->comment('Состояние на дату миграции, а не настоящий переход'),
         ], $tableOptions);
-        $this->createIndex('cms_lead_stage_history__lead', $history, ['cms_lead_id', 'id']);
-        $this->createIndex('cms_lead_stage_history__site_time', $history, ['cms_site_id', 'created_at']);
-        $this->createIndex('cms_lead_stage_history__pipeline_time', $history, ['to_pipeline_id', 'created_at']);
+        $this->createIndexIfMissing('cms_lead_stage_history__lead', $history, ['cms_lead_id', 'id']);
+        $this->createIndexIfMissing('cms_lead_stage_history__site_time', $history, ['cms_site_id', 'created_at']);
+        $this->createIndexIfMissing('cms_lead_stage_history__pipeline_time', $history, ['to_pipeline_id', 'created_at']);
         // Stage and pipeline ids have no foreign keys: the history outlives a deleted stage (its name is kept).
-        $this->addForeignKey('cms_lead_stage_history__cms_lead_id', $history, 'cms_lead_id', $lead, 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey('cms_lead_stage_history__created_by', $history, 'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL');
-        $this->addForeignKey('cms_lead_stage_history__cms_site_id', $history, 'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKeyIfMissing('cms_lead_stage_history__cms_lead_id', $history, 'cms_lead_id', $lead, 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKeyIfMissing('cms_lead_stage_history__created_by', $history, 'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL');
+        $this->addForeignKeyIfMissing('cms_lead_stage_history__cms_site_id', $history, 'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE');
         $this->addCommentOnTable($history, 'История переходов сделки по этапам и воронкам');
     }
 
     public function safeDown()
     {
+        $this->refuseRollbackWithData([
+            'история этапов сделок' => $this->hasTable('{{%cms_lead_stage_history}}') ? (new \yii\db\Query())->from('{{%cms_lead_stage_history}}') : null,
+            'воронки' => $this->hasTable('{{%cms_lead_pipeline}}') ? (new \yii\db\Query())->from('{{%cms_lead_pipeline}}') : null,
+            'этапы в воронках' => $this->hasColumn('{{%cms_lead_stage}}', 'cms_lead_pipeline_id')
+                ? (new \yii\db\Query())->from('{{%cms_lead_stage}}')->andWhere(['not', ['cms_lead_pipeline_id' => null]]) : null,
+            'сделки в воронках' => $this->hasColumn('{{%cms_lead}}', 'cms_lead_pipeline_id')
+                ? (new \yii\db\Query())->from('{{%cms_lead}}')->andWhere(['not', ['cms_lead_pipeline_id' => null]]) : null,
+            'сделки с датой перехода на этап' => $this->hasColumn('{{%cms_lead}}', 'stage_changed_at')
+                ? (new \yii\db\Query())->from('{{%cms_lead}}')->andWhere(['not', ['stage_changed_at' => null]]) : null,
+        ]);
+
         // MySQL does not roll DDL back: check that the old unique (site, name) index can come back
         // before anything is dropped. Pipelines allow the same stage name twice on one site.
         $duplicates = (new \yii\db\Query())
@@ -99,15 +117,15 @@ class m261028_130000__create_table__cms_lead_pipeline extends Migration
                 .'Переименуйте или удалите лишние этапы, чтобы названия на сайте не повторялись, и повторите откат. Схема не изменена.');
         }
 
-        $this->dropTable('{{%cms_lead_stage_history}}');
-        $this->dropForeignKey('cms_lead__cms_lead_pipeline_id', '{{%cms_lead}}');
-        $this->dropIndex('cms_lead__pipeline_status', '{{%cms_lead}}');
-        $this->dropColumn('{{%cms_lead}}', 'stage_changed_at');
-        $this->dropColumn('{{%cms_lead}}', 'cms_lead_pipeline_id');
-        $this->createIndex('cms_lead_stage__site_name', '{{%cms_lead_stage}}', ['cms_site_id', 'name'], true);
-        $this->dropIndex('cms_lead_stage__site_pipeline_name', '{{%cms_lead_stage}}');
-        $this->dropForeignKey('cms_lead_stage__cms_lead_pipeline_id', '{{%cms_lead_stage}}');
-        $this->dropColumn('{{%cms_lead_stage}}', 'cms_lead_pipeline_id');
-        $this->dropTable('{{%cms_lead_pipeline}}');
+        $this->dropTableIfExists('{{%cms_lead_stage_history}}');
+        $this->dropForeignKeyIfExists('cms_lead__cms_lead_pipeline_id', '{{%cms_lead}}');
+        $this->dropIndexIfExists('cms_lead__pipeline_status', '{{%cms_lead}}');
+        $this->dropColumnIfExists('{{%cms_lead}}', 'stage_changed_at');
+        $this->dropColumnIfExists('{{%cms_lead}}', 'cms_lead_pipeline_id');
+        $this->createIndexIfMissing('cms_lead_stage__site_name', '{{%cms_lead_stage}}', ['cms_site_id', 'name'], true);
+        $this->dropIndexIfExists('cms_lead_stage__site_pipeline_name', '{{%cms_lead_stage}}');
+        $this->dropForeignKeyIfExists('cms_lead_stage__cms_lead_pipeline_id', '{{%cms_lead_stage}}');
+        $this->dropColumnIfExists('{{%cms_lead_stage}}', 'cms_lead_pipeline_id');
+        $this->dropTableIfExists('{{%cms_lead_pipeline}}');
     }
 }

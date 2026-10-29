@@ -1,5 +1,6 @@
 <?php
 
+use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
@@ -12,12 +13,14 @@ use yii\db\Migration;
  */
 class m261028_140000__alter_table__crm_main_responsible extends Migration
 {
+    use RepeatableMigrationTrait;
+
     public function safeUp()
     {
-        $this->addColumn('{{%cms_company2manager}}', 'is_main', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Основной ответственный'));
-        $this->addColumn('{{%cms_user2manager}}', 'is_main', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Основной ответственный'));
-        $this->addColumn('{{%cms_company}}', 'crm_access_by_approval', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Доступ только по согласованию'));
-        $this->addColumn('{{%cms_user}}', 'crm_access_by_approval', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Доступ только по согласованию'));
+        $this->addColumnIfMissing('{{%cms_company2manager}}', 'is_main', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Основной ответственный'));
+        $this->addColumnIfMissing('{{%cms_user2manager}}', 'is_main', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Основной ответственный'));
+        $this->addColumnIfMissing('{{%cms_company}}', 'crm_access_by_approval', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Доступ только по согласованию'));
+        $this->addColumnIfMissing('{{%cms_user}}', 'crm_access_by_approval', $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('Доступ только по согласованию'));
 
         foreach (['{{%cms_company2manager}}', '{{%cms_user2manager}}'] as $table) {
             $this->update($table, ['access_level' => 'edit'], ['access_level' => 'sales']);
@@ -30,13 +33,17 @@ class m261028_140000__alter_table__crm_main_responsible extends Migration
         $this->backfill('{{%cms_user2manager}}', 'client_id', 'worker_id', '{{%cms_user}}');
     }
 
-    /** The author's link, else the earliest one, becomes main and "full". */
+    /**
+     * The author's link, else the earliest one, becomes main and "full" — only for
+     * a record without a main yet, so a repeated run keeps the mains chosen since.
+     */
     private function backfill(string $table, string $recordColumn, string $userColumn, string $recordTable): void
     {
         $db = $this->db;
         $rows = (new \yii\db\Query())->from(['m' => $table])
             ->leftJoin(['r' => $recordTable], 'r.id = m.'.$recordColumn)
             ->select(['m.id', 'record' => 'm.'.$recordColumn, 'user' => 'm.'.$userColumn, 'author' => 'r.created_by'])
+            ->andWhere(['not in', 'm.'.$recordColumn, (new \yii\db\Query())->select($recordColumn)->from($table)->andWhere(['is_main' => 1])])
             ->orderBy(['m.id' => SORT_ASC])->all($db);
         $main = [];
         foreach ($rows as $row) {
@@ -56,41 +63,22 @@ class m261028_140000__alter_table__crm_main_responsible extends Migration
     public function safeDown()
     {
         $this->refuseRollbackWithData([
-            'основные ответственные компаний' => (new \yii\db\Query())->from('{{%cms_company2manager}}')->andWhere(['is_main' => 1]),
-            'основные ответственные клиентов' => (new \yii\db\Query())->from('{{%cms_user2manager}}')->andWhere(['is_main' => 1]),
-            'компании «по согласованию»' => (new \yii\db\Query())->from('{{%cms_company}}')->andWhere(['crm_access_by_approval' => 1]),
-            'клиенты «по согласованию»' => (new \yii\db\Query())->from('{{%cms_user}}')->andWhere(['crm_access_by_approval' => 1]),
+            'основные ответственные компаний' => $this->hasColumn('{{%cms_company2manager}}', 'is_main')
+                ? (new \yii\db\Query())->from('{{%cms_company2manager}}')->andWhere(['is_main' => 1]) : null,
+            'основные ответственные клиентов' => $this->hasColumn('{{%cms_user2manager}}', 'is_main')
+                ? (new \yii\db\Query())->from('{{%cms_user2manager}}')->andWhere(['is_main' => 1]) : null,
+            'компании «по согласованию»' => $this->hasColumn('{{%cms_company}}', 'crm_access_by_approval')
+                ? (new \yii\db\Query())->from('{{%cms_company}}')->andWhere(['crm_access_by_approval' => 1]) : null,
+            'клиенты «по согласованию»' => $this->hasColumn('{{%cms_user}}', 'crm_access_by_approval')
+                ? (new \yii\db\Query())->from('{{%cms_user}}')->andWhere(['crm_access_by_approval' => 1]) : null,
         ]);
         $this->update('{{%cms_crm_access_request}}', ['level' => 'sales'], ['level' => 'edit']);
         foreach (['{{%cms_company2manager}}', '{{%cms_user2manager}}'] as $table) {
             $this->update($table, ['access_level' => 'sales'], ['access_level' => ['edit', 'deal']]);
         }
-        $this->dropColumn('{{%cms_user}}', 'crm_access_by_approval');
-        $this->dropColumn('{{%cms_company}}', 'crm_access_by_approval');
-        $this->dropColumn('{{%cms_user2manager}}', 'is_main');
-        $this->dropColumn('{{%cms_company2manager}}', 'is_main');
-    }
-
-    /**
-     * MySQL does not roll DDL back, so the data this rollback would destroy is
-     * checked before the first DDL (release audit F06, 29.10.2026): with any of
-     * it the rollback is refused and the schema stays as it is.
-     *
-     * @param array $checks label => a query counting the rows that would be lost
-     */
-    private function refuseRollbackWithData(array $checks): void
-    {
-        $found = [];
-        foreach ($checks as $label => $query) {
-            $count = (int)$query->count('*', $this->db);
-            if ($count > 0) {
-                $found[] = $label.': '.$count;
-            }
-        }
-        if ($found) {
-            throw new \yii\base\Exception('Откат невозможен: он безвозвратно удалит данные CRM ('.implode('; ', $found).'). Схема не изменена. '
-                .'Чтобы откатить: снимите дамп базы (mysqldump) и сохраните эти данные; если они действительно не нужны, удалите их вручную '
-                .'и повторите откат. Вернуть их можно только из резервной копии базы.');
-        }
+        $this->dropColumnIfExists('{{%cms_user}}', 'crm_access_by_approval');
+        $this->dropColumnIfExists('{{%cms_company}}', 'crm_access_by_approval');
+        $this->dropColumnIfExists('{{%cms_user2manager}}', 'is_main');
+        $this->dropColumnIfExists('{{%cms_company2manager}}', 'is_main');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
@@ -8,14 +9,17 @@ use yii\db\Migration;
  * работу», an access given, changed or removed, a transfer, an automatic main
  * responsible, a return to the pool — with who, to whom, the client, the level
  * before and after and the ground (a deal, a payment, a request). The requests
- * made before it are copied in (a request and its decision as two events).
+ * made before it are copied in (a request and its decision as two events);
+ * a repeated run copies only the requests the journal does not have yet.
  * crm\CrmAccessLog, the tab «Доступы» of «Компании».
  */
 class m261029_130000__create_table__cms_crm_access_log extends Migration
 {
+    use RepeatableMigrationTrait;
+
     public function safeUp()
     {
-        $this->createTable('{{%cms_crm_access_log}}', [
+        $this->createTableIfMissing('{{%cms_crm_access_log}}', [
             'id' => $this->primaryKey(),
             'created_at' => $this->integer()->notNull(),
             'cms_site_id' => $this->integer()->null(),
@@ -31,55 +35,34 @@ class m261029_130000__create_table__cms_crm_access_log extends Migration
             'request_id' => $this->integer()->null(),
             'comment' => $this->string(500)->null(),
         ]);
-        $this->createIndex('cms_crm_access_log__record', '{{%cms_crm_access_log}}', ['record_code', 'record_id', 'created_at']);
-        $this->createIndex('cms_crm_access_log__created_at', '{{%cms_crm_access_log}}', 'created_at');
-        $this->createIndex('cms_crm_access_log__actor', '{{%cms_crm_access_log}}', 'actor_id');
-        $this->createIndex('cms_crm_access_log__user', '{{%cms_crm_access_log}}', 'user_id');
-        $this->createIndex('cms_crm_access_log__event', '{{%cms_crm_access_log}}', 'event');
-        $this->createIndex('cms_crm_access_log__request', '{{%cms_crm_access_log}}', 'request_id');
+        $this->createIndexIfMissing('cms_crm_access_log__record', '{{%cms_crm_access_log}}', ['record_code', 'record_id', 'created_at']);
+        $this->createIndexIfMissing('cms_crm_access_log__created_at', '{{%cms_crm_access_log}}', 'created_at');
+        $this->createIndexIfMissing('cms_crm_access_log__actor', '{{%cms_crm_access_log}}', 'actor_id');
+        $this->createIndexIfMissing('cms_crm_access_log__user', '{{%cms_crm_access_log}}', 'user_id');
+        $this->createIndexIfMissing('cms_crm_access_log__event', '{{%cms_crm_access_log}}', 'event');
+        $this->createIndexIfMissing('cms_crm_access_log__request', '{{%cms_crm_access_log}}', 'request_id');
 
         // The requests made before the journal: the request and, when decided, its decision.
         $this->execute("INSERT INTO {{%cms_crm_access_log}} (created_at, cms_site_id, event, record_code, record_id, actor_id, user_id, level_to, cms_lead_id, request_id, comment)
             SELECT created_at, cms_site_id, 'request', record_code, record_id, requester_id, requester_id, level, cms_lead_id, id, LEFT(comment, 500)
-            FROM {{%cms_crm_access_request}}");
+            FROM {{%cms_crm_access_request}} r
+            WHERE NOT EXISTS (SELECT 1 FROM {{%cms_crm_access_log}} l WHERE l.request_id = r.id AND l.event = 'request')");
         $this->execute("INSERT INTO {{%cms_crm_access_log}} (created_at, cms_site_id, event, record_code, record_id, actor_id, user_id, level_to, cms_lead_id, request_id, comment)
             SELECT COALESCE(decided_at, updated_at, created_at), cms_site_id,
                 CASE status WHEN 'approved' THEN 'request_approved' WHEN 'declined' THEN 'request_declined'
                     WHEN 'cancelled' THEN 'request_cancelled' ELSE 'request_obsolete' END,
                 record_code, record_id, COALESCE(decided_by, requester_id), requester_id,
                 CASE status WHEN 'approved' THEN level ELSE NULL END, cms_lead_id, id, LEFT(decision_comment, 500)
-            FROM {{%cms_crm_access_request}} WHERE status <> 'pending'");
+            FROM {{%cms_crm_access_request}} r WHERE status <> 'pending'
+                AND NOT EXISTS (SELECT 1 FROM {{%cms_crm_access_log}} l WHERE l.request_id = r.id AND l.event LIKE 'request\_%')");
     }
 
     public function safeDown()
     {
         // The journal of the access is kept for good (ARCHITECTURE.md п. 13).
         $this->refuseRollbackWithData([
-            'события журнала доступа' => (new \yii\db\Query())->from('{{%cms_crm_access_log}}'),
+            'события журнала доступа' => $this->hasTable('{{%cms_crm_access_log}}') ? (new \yii\db\Query())->from('{{%cms_crm_access_log}}') : null,
         ]);
-        $this->dropTable('{{%cms_crm_access_log}}');
-    }
-
-    /**
-     * MySQL does not roll DDL back, so the data this rollback would destroy is
-     * checked before the first DDL (release audit F06, 29.10.2026): with any of
-     * it the rollback is refused and the schema stays as it is.
-     *
-     * @param array $checks label => a query counting the rows that would be lost
-     */
-    private function refuseRollbackWithData(array $checks): void
-    {
-        $found = [];
-        foreach ($checks as $label => $query) {
-            $count = (int)$query->count('*', $this->db);
-            if ($count > 0) {
-                $found[] = $label.': '.$count;
-            }
-        }
-        if ($found) {
-            throw new \yii\base\Exception('Откат невозможен: он безвозвратно удалит данные CRM ('.implode('; ', $found).'). Схема не изменена. '
-                .'Чтобы откатить: снимите дамп базы (mysqldump) и сохраните эти данные; если они действительно не нужны, удалите их вручную '
-                .'и повторите откат. Вернуть их можно только из резервной копии базы.');
-        }
+        $this->dropTableIfExists('{{%cms_crm_access_log}}');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use skeeks\cms\crm\OutboundSales;
+use skeeks\cms\db\RepeatableMigrationTrait;
 use skeeks\cms\models\CmsLeadPipeline;
 use yii\db\Migration;
 
@@ -14,11 +15,13 @@ use yii\db\Migration;
  */
 class m261029_100000__alter_table__cms_lead_outbound extends Migration
 {
+    use RepeatableMigrationTrait;
+
     public function safeUp()
     {
-        $this->addColumn('{{%cms_lead}}', 'cms_deal_type_id', $this->integer()->null()->comment('Услуга'));
-        $this->createIndex('cms_lead__cms_deal_type_id', '{{%cms_lead}}', ['cms_deal_type_id']);
-        $this->addForeignKey('cms_lead__cms_deal_type_id', '{{%cms_lead}}', 'cms_deal_type_id', '{{%cms_deal_type}}', 'id', 'SET NULL', 'SET NULL');
+        $this->addColumnIfMissing('{{%cms_lead}}', 'cms_deal_type_id', $this->integer()->null()->comment('Услуга'));
+        $this->createIndexIfMissing('cms_lead__cms_deal_type_id', '{{%cms_lead}}', ['cms_deal_type_id']);
+        $this->addForeignKeyIfMissing('cms_lead__cms_deal_type_id', '{{%cms_lead}}', 'cms_deal_type_id', '{{%cms_deal_type}}', 'id', 'SET NULL', 'SET NULL');
 
         if ($this->db->getTableSchema('{{%cms_lead_pipeline}}', true)) {
             foreach (CmsLeadPipeline::find()->andWhere(['code' => CmsLeadPipeline::CODE_OUTBOUND])->all() as $pipeline) {
@@ -30,13 +33,14 @@ class m261029_100000__alter_table__cms_lead_outbound extends Migration
     public function safeDown()
     {
         // MySQL does not roll DDL back: refuse before the first change rather than lose the services of deals.
-        $used = (int)(new \yii\db\Query())->from('{{%cms_lead}}')->andWhere(['not', ['cms_deal_type_id' => null]])->count('*', $this->db);
+        $used = $this->hasColumn('{{%cms_lead}}', 'cms_deal_type_id')
+            ? (int)(new \yii\db\Query())->from('{{%cms_lead}}')->andWhere(['not', ['cms_deal_type_id' => null]])->count('*', $this->db) : 0;
         if ($used) {
             throw new \yii\base\Exception('Откат невозможен: у '.$used.' сделок указана «Услуга», она пропала бы. Очистите поле у этих сделок, если откат действительно нужен. Схема не изменена.');
         }
         // The stages stay: deals and the history may already stand on them.
-        $this->dropForeignKey('cms_lead__cms_deal_type_id', '{{%cms_lead}}');
-        $this->dropIndex('cms_lead__cms_deal_type_id', '{{%cms_lead}}');
-        $this->dropColumn('{{%cms_lead}}', 'cms_deal_type_id');
+        $this->dropForeignKeyIfExists('cms_lead__cms_deal_type_id', '{{%cms_lead}}');
+        $this->dropIndexIfExists('cms_lead__cms_deal_type_id', '{{%cms_lead}}');
+        $this->dropColumnIfExists('{{%cms_lead}}', 'cms_deal_type_id');
     }
 }

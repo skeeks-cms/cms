@@ -1,6 +1,7 @@
 <?php
 
 use skeeks\cms\crm\CrmProtection;
+use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
@@ -14,14 +15,22 @@ use yii\db\Migration;
  */
 class m261028_170000__alter_table__crm_protection extends Migration
 {
+    use RepeatableMigrationTrait;
+
     public function safeUp()
     {
+        // The index is created last: with it the table is finished, and a repeated run does not
+        // turn «always» on again for a record whose protection was changed since.
         foreach (['{{%cms_company}}', '{{%cms_user}}'] as $table) {
-            $this->addColumn($table, 'crm_protection', $this->string(16)->notNull()->defaultValue('free')->comment('Защита клиента: free, protected, always'));
-            $this->addColumn($table, 'crm_protected_until', $this->integer()->null()->comment('Под защитой до'));
-            $this->addColumn($table, 'crm_protection_reason', $this->string(255)->null()->comment('Основание защиты'));
-            $this->createIndex(str_replace(['{{%', '}}'], '', $table).'__crm_protection', $table, 'crm_protection');
+            $index = str_replace(['{{%', '}}'], '', $table).'__crm_protection';
+            if ($this->hasIndex($table, $index)) {
+                continue;
+            }
+            $this->addColumnIfMissing($table, 'crm_protection', $this->string(16)->notNull()->defaultValue('free')->comment('Защита клиента: free, protected, always'));
+            $this->addColumnIfMissing($table, 'crm_protected_until', $this->integer()->null()->comment('Под защитой до'));
+            $this->addColumnIfMissing($table, 'crm_protection_reason', $this->string(255)->null()->comment('Основание защиты'));
             $this->update($table, ['crm_protection' => 'always', 'crm_protection_reason' => 'Включено вручную'], ['crm_access_by_approval' => 1]);
+            $this->createIndexIfMissing($index, $table, 'crm_protection');
         }
         $this->db->getSchema()->refresh();
         $count = (new CrmProtection())->recalcMany(true);
@@ -33,11 +42,13 @@ class m261028_170000__alter_table__crm_protection extends Migration
         // No data is lost: the computed protection comes back from payments and services
         // (php yii cms/crm/protection --all), the manual "always" is kept in crm_access_by_approval below.
         foreach (['{{%cms_company}}', '{{%cms_user}}'] as $table) {
-            $this->update($table, ['crm_access_by_approval' => 1], ['crm_protection' => 'always']);
-            $this->dropIndex(str_replace(['{{%', '}}'], '', $table).'__crm_protection', $table);
-            $this->dropColumn($table, 'crm_protection_reason');
-            $this->dropColumn($table, 'crm_protected_until');
-            $this->dropColumn($table, 'crm_protection');
+            if ($this->hasColumn($table, 'crm_protection')) {
+                $this->update($table, ['crm_access_by_approval' => 1], ['crm_protection' => 'always']);
+            }
+            $this->dropIndexIfExists(str_replace(['{{%', '}}'], '', $table).'__crm_protection', $table);
+            $this->dropColumnIfExists($table, 'crm_protection_reason');
+            $this->dropColumnIfExists($table, 'crm_protected_until');
+            $this->dropColumnIfExists($table, 'crm_protection');
         }
     }
 }
