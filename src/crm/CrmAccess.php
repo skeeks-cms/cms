@@ -489,8 +489,12 @@ class CrmAccess extends Component
     /**
      * The access page of a client (canManageAccess()): the level of an employee
      * who is not the main responsible, set as chosen (raised or lowered).
+     * No link — an error; the same level again — a success without a change
+     * (false: the caller writes no journal event).
+     *
+     * @return bool the level was changed
      */
-    public function setLevel(string $recordCode, int $recordId, int $userId, string $level): void
+    public function setLevel(string $recordCode, int $recordId, int $userId, string $level): bool
     {
         if (!isset(self::levels()[$level])) {
             throw new \DomainException('Неизвестный уровень доступа.');
@@ -498,10 +502,17 @@ class CrmAccess extends Component
         if ($this->mainResponsibleId($recordCode, $recordId) === $userId) {
             throw new \DomainException('У основного ответственного всегда полный доступ. Сменить основного — «Передать клиента».');
         }
-        [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
-        if (!$class::updateAll(['access_level' => $level], [$recordColumn => $recordId, $userColumn => $userId])) {
+        $before = $this->linkLevel($userId, $recordCode, $recordId);
+        if ($before === null) {
             throw new \DomainException('Сотрудник не работает с этим клиентом.');
         }
+        if ($before === $level) {
+            return false;
+        }
+        [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
+        $class::updateAll(['access_level' => $level], [$recordColumn => $recordId, $userColumn => $userId]);
+
+        return true;
     }
 
     /** The access page: an employee stops working with the client (never the main responsible). */
@@ -1299,28 +1310,32 @@ class CrmAccess extends Component
      * to the person) when he has no link yet; an existing level, the main
      * responsible and the links of others stay. Written to the access journal.
      * Administrators see every client and get no link.
+     *
+     * @return bool the level was granted (false: he already works with the client, no journal event)
      */
-    public function grantLeadExecutorLevel(CmsLead $lead, ?int $actorId = null): void
+    public function grantLeadExecutorLevel(CmsLead $lead, ?int $actorId = null): bool
     {
         $executorId = (int)$lead->executor_id;
         if (!$executorId || !self::levelsReady() || $this->isAdmin($executorId)) {
-            return;
+            return false;
         }
         if ($lead->cms_company_id) {
             $record = [CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id];
         } elseif ($lead->cms_user_id && ($person = CmsUser::findOne((int)$lead->cms_user_id)) && !$person->is_worker) {
             $record = [CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id];
         } else {
-            return;
+            return false;
         }
         if ($this->linkLevel($executorId, $record[0], $record[1]) !== null) {
-            return;
+            return false;
         }
         $this->grantLink($record[0], $record[1], $executorId, self::LEVEL_DEAL);
         CrmAccessLog::write(CrmAccessLog::GRANT, $record[0], $record[1], [
             'actor_id' => $actorId ?: null, 'user_id' => $executorId, 'level_to' => self::LEVEL_DEAL,
-            'cms_lead_id' => (int)$lead->id, 'comment' => 'ответственный сделки №'.(int)$lead->id,
+            'cms_lead_id' => (int)$lead->id, 'comment' => 'Смена ответственного сделки №'.(int)$lead->id,
         ]);
+
+        return true;
     }
 
     /** @var bool[] table => it has cms_lead_id */

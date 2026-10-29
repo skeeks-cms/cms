@@ -168,11 +168,38 @@ try {
     $check($access->mainResponsibleId('company', (int)$A->id) === (int)$admin->id, 'основной ответственный не изменился');
     $check($access->linkLevel($worker, 'company', (int)$A->id) === CrmAccess::LEVEL_DEAL, 'уровни других сотрудников не изменились');
     $check((int)(new \yii\db\Query())->from('{{%cms_log}}')->andWhere(['log_type' => CrmAccessLog::LOG_TYPE])->count() === $journalBefore + 1,
-        'в журнал доступа записано одно событие');
-    $db->createCommand()->update('{{%cms_company2manager}}', ['access_level' => CrmAccess::LEVEL_EDIT], ['cms_company_id' => $A->id, 'cms_user_id' => $newcomer->id])->execute();
+        'в ленту клиента записано одно событие доступа');
+    // The journal «Доступы»: who changed the responsible, to whom and which level («было → стало»), the reason and the deal.
+    $event = \skeeks\cms\models\CmsCrmAccessLog::find()->andWhere(['record_code' => 'company', 'record_id' => (int)$A->id, 'user_id' => (int)$newcomer->id])
+        ->orderBy(['id' => SORT_DESC])->one();
+    $check($event && $event->event === CrmAccessLog::GRANT && (int)$event->actor_id === (int)$admin->id && (int)$event->cms_lead_id === (int)$other->id
+        && $event->level_to === CrmAccess::LEVEL_DEAL && $event->comment === 'Смена ответственного сделки №'.(int)$other->id,
+        'журнал «Доступы»: кто сменил, кому, уровень, причина и сделка');
+    $check(CrmAccessLog::levelChange($event) === 'нет доступа → Свои сделки', 'журнал «Доступы»: уровень «нет доступа → Свои сделки»');
+    $feedEntry = \skeeks\cms\models\CmsLog::find()->andWhere(['log_type' => CrmAccessLog::LOG_TYPE, 'model_id' => (int)$A->id])->orderBy(['id' => SORT_DESC])->one();
+    $feedData = $feedEntry && is_array($feedEntry->data) ? $feedEntry->data : [];
+    $check($feedEntry && (int)($feedData['cms_lead_id'] ?? 0) === (int)$other->id
+        && mb_strpos((string)$feedEntry->comment, 'Смена ответственного сделки №'.(int)$other->id) !== false,
+        'лента клиента: та же запись со ссылкой на сделку');
+    $journalCount = static fn() => (int)\skeeks\cms\models\CmsCrmAccessLog::find()->andWhere(['record_code' => 'company', 'record_id' => (int)$A->id])->count();
+    $journal = $journalCount();
     (new LeadTriage())->assign($other, (int)$worker->id, (int)$admin->id);
+    $check($journalCount() === $journal, 'ответственный, у которого уже есть уровень: событие только у сделки, журнал без записи');
+    // N6: the same level again — a success without a change and without a journal event; no link — an error.
+    $check($access->setLevel('company', (int)$A->id, (int)$worker->id, CrmAccess::LEVEL_DEAL) === false && $journalCount() === $journal,
+        'тот же уровень повторно: успех без изменений и без записи в журнал');
+    $refused = null;
+    try {
+        $access->setLevel('company', (int)$A->id, (int)$leader->id, CrmAccess::LEVEL_DEAL);
+    } catch (\DomainException $e) {
+        $refused = $e->getMessage();
+    }
+    $check($refused === 'Сотрудник не работает с этим клиентом.', 'уровень сотруднику без связи: ошибка');
+    $db->createCommand()->update('{{%cms_company2manager}}', ['access_level' => CrmAccess::LEVEL_EDIT], ['cms_company_id' => $A->id, 'cms_user_id' => $newcomer->id])->execute();
+    $journal = $journalCount();
     (new LeadTriage())->assign($other, (int)$newcomer->id, (int)$admin->id);
-    $check($access->linkLevel($newcomer, 'company', (int)$A->id) === CrmAccess::LEVEL_EDIT, 'уровень выше «Свои сделки» не понижается');
+    $check($access->linkLevel($newcomer, 'company', (int)$A->id) === CrmAccess::LEVEL_EDIT && $journalCount() === $journal,
+        'уровень выше «Свои сделки» не понижается, журнал без записи');
     (new LeadTriage())->assign($other, (int)$admin->id, (int)$admin->id);
     $check(CmsCompany2manager::find()->andWhere(['cms_company_id' => $A->id, 'cms_user_id' => $admin->id])->count() === 1
         && $access->linkLevel($admin, 'company', (int)$A->id) === CrmAccess::LEVEL_FULL, 'администратору связь не добавляется');

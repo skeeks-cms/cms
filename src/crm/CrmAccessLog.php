@@ -110,6 +110,22 @@ class CrmAccessLog
         }
     }
 
+    /**
+     * The level of an event «было → стало»: «Свои сделки → Полный»; a new link
+     * (GRANT, WORK) without a previous level is «нет доступа → Свои сделки».
+     */
+    public static function levelChange(CmsCrmAccessLog $log): string
+    {
+        $levels = CrmAccess::levels();
+        $name = static fn($code) => $code ? ($levels[$code] ?? $code) : '';
+        $from = $name($log->level_from);
+        if ($from === '' && $log->level_to && in_array($log->event, [self::GRANT, self::WORK], true)) {
+            $from = 'нет доступа';
+        }
+
+        return trim($from.($from !== '' || $log->level_to ? ' → ' : '').$name($log->level_to), ' →');
+    }
+
     /** «Фирстова Елизавета: клиент взят в работу из общего пула» — the event in words, without a grammatical gender. */
     public static function text(CmsCrmAccessLog $log): string
     {
@@ -141,7 +157,7 @@ class CrmAccessLog
                 $text = 'клиент взят в работу из общего пула';
                 break;
             case self::GRANT:
-                $text = 'доступ выдан — '.$user.', уровень '.$level($log->level_to);
+                $text = 'доступ выдан — '.$user.': '.self::levelChange($log);
                 break;
             case self::LEVEL:
                 $text = 'уровень изменён — '.$user.': '.$level($log->level_from).' → '.$level($log->level_to);
@@ -216,7 +232,8 @@ class CrmAccessLog
             'model_id' => (int)$record->id,
             'log_type' => self::LOG_TYPE,
             'comment' => self::text($log),
-            'data' => ['access_log_id' => (int)$log->id, 'event' => $log->event],
+            // The deal of the event (a change of its responsible): the feed links it.
+            'data' => array_filter(['access_log_id' => (int)$log->id, 'event' => $log->event, 'cms_lead_id' => (int)$log->cms_lead_id ?: null]),
         ]);
         if ($record instanceof CmsCompany && $entry->hasAttribute('cms_company_id')) {
             $entry->cms_company_id = (int)$record->id;

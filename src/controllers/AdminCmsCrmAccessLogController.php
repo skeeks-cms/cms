@@ -179,12 +179,7 @@ class AdminCmsCrmAccessLogController extends BackendModelStandartController
                         ],
                         'level' => [
                             'label' => 'Уровень',
-                            'value' => static function (CmsCrmAccessLog $model) {
-                                $levels = CrmAccess::levels();
-                                $name = static fn($code) => $code ? ($levels[$code] ?? $code) : '';
-
-                                return trim($name($model->level_from).($model->level_from || $model->level_to ? ' → ' : '').$name($model->level_to), ' →') ?: '—';
-                            },
+                            'value' => static fn(CmsCrmAccessLog $model) => \skeeks\cms\crm\CrmAccessLog::levelChange($model) ?: '—',
                         ],
                         'ground' => [
                             'label' => 'Основание',

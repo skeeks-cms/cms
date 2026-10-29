@@ -16,8 +16,6 @@ use skeeks\cms\crm\CrmAccess;
 use skeeks\cms\models\CmsCompany;
 use yii\helpers\Html;
 
-$levels = CrmAccess::levels();
-$level = static fn($code) => $code ? ($levels[$code] ?? $code) : '';
 ?>
 <?php if (!$events) : ?>
     <p class="sx-lead-identity__note">Событий нет.</p>
@@ -61,7 +59,7 @@ $level = static fn($code) => $code ? ($levels[$code] ?? $code) : '';
                         <?php endif; ?>
                         <td><?= $event->actor ? Requests::employeeLink($event->actor) : 'CRM'; ?></td>
                         <td><?= $event->user ? Requests::employeeLink($event->user) : '—'; ?></td>
-                        <td><?= Html::encode(trim($level($event->level_from).($event->level_from || $event->level_to ? ' → ' : '').$level($event->level_to), ' →')) ?: '—'; ?></td>
+                        <td><?= Html::encode(\skeeks\cms\crm\CrmAccessLog::levelChange($event)) ?: '—'; ?></td>
                         <td><?= $grounds ? implode('<br>', $grounds) : '—'; ?></td>
                     </tr>
                 <?php endforeach; ?>

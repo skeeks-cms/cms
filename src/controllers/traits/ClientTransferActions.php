@@ -216,7 +216,11 @@ trait ClientTransferActions
                         break;
                     case 'level':
                         $levelBefore = $access->linkLevel((int)$request->post('user_id'), $code, $id);
-                        $access->setLevel($code, $id, (int)$request->post('user_id'), (string)$request->post('level'));
+                        if (!$access->setLevel($code, $id, (int)$request->post('user_id'), (string)$request->post('level'))) {
+                            // The same level again: a success, no journal event.
+                            $response->message = 'Уровень доступа не изменился.';
+                            break;
+                        }
                         CrmAccessLog::write(CrmAccessLog::LEVEL, $code, $id, ['actor_id' => $actorId, 'user_id' => (int)$request->post('user_id'),
                             'level_from' => $levelBefore, 'level_to' => (string)$request->post('level')]);
                         $response->message = 'Уровень доступа изменён.';
