@@ -66,6 +66,71 @@ class CrmAccess extends Component
         return $default ?? ($default = new self());
     }
 
+    /** @var array answers of one web request (memo()) */
+    private array $memo = [];
+
+    /** @var int|null the identity the answers were given under */
+    private ?int $memoIdentity = null;
+
+    /** @var bool the reset handlers are registered */
+    private static bool $memoWatched = false;
+
+    /** @var bool keep answers in the console too: only a test of the memo itself sets it */
+    public static bool $keepAnswersInConsole = false;
+
+    /**
+     * Answers of rights (memo()) and the department tree (CmsDepartment::tree())
+     * are kept for one web request; the console and workers ask every time.
+     */
+    public static function keepsAnswers(): bool
+    {
+        return PHP_SAPI !== 'cli' || self::$keepAnswersInConsole;
+    }
+
+    /**
+     * An answer of one web request (audit F10: a feed asked the same visibility
+     * and link questions hundreds of times). Keyed by the employee asked about;
+     * dropped when the signed-in identity changes and when a link, a department,
+     * an employee of a department or a person of a company is saved or deleted
+     * (resetMemo()). The console and workers never keep answers: their data and
+     * rights may change under them. Rights are never cached across requests.
+     *
+     * @return mixed
+     */
+    private function memo(string $key, callable $compute)
+    {
+        if (!self::keepsAnswers()) {
+            return $compute();
+        }
+        if (!self::$memoWatched) {
+            self::$memoWatched = true;
+            $reset = static fn() => self::instance()->resetMemo();
+            foreach ([CmsCompany2manager::class, CmsUser2manager::class, CmsCompany2user::class, CmsDepartment::class,
+                         \skeeks\cms\models\CmsDepartment2worker::class] as $class) {
+                foreach ([\yii\db\BaseActiveRecord::EVENT_AFTER_INSERT, \yii\db\BaseActiveRecord::EVENT_AFTER_UPDATE, \yii\db\BaseActiveRecord::EVENT_AFTER_DELETE] as $event) {
+                    \yii\base\Event::on($class, $event, $reset);
+                }
+            }
+        }
+        $identity = \Yii::$app->has('user') && \Yii::$app->user instanceof \yii\web\User ? (int)\Yii::$app->user->id : 0;
+        if ($identity !== $this->memoIdentity) {
+            $this->memo = [];
+            $this->memoIdentity = $identity;
+        }
+        if (!array_key_exists($key, $this->memo)) {
+            $this->memo[$key] = $compute();
+        }
+
+        return $this->memo[$key];
+    }
+
+    /** Rights of this request changed (a link, a level, a department): every kept answer goes. */
+    public function resetMemo(): void
+    {
+        $this->memo = [];
+        CmsDepartment::resetTree();
+    }
+
     public function isAdmin($user): bool
     {
         $userId = $this->userId($user);
@@ -171,16 +236,16 @@ class CrmAccess extends Component
     {
         $identity = $this->identity($user);
 
-        return $identity !== null && $companyId > 0 && CmsCompany::find()->forManager($identity)
-            ->andWhere([CmsCompany::tableName().'.id' => $companyId])->exists();
+        return $identity !== null && $companyId > 0 && $this->memo('seeCompany:'.(int)$identity->id.':'.$companyId,
+            static fn() => CmsCompany::find()->forManager($identity)->andWhere([CmsCompany::tableName().'.id' => $companyId])->exists());
     }
 
     public function canSeeClient($user, int $clientId): bool
     {
         $identity = $this->identity($user);
 
-        return $identity !== null && $clientId > 0 && CmsUser::find()->forManager($identity)
-            ->andWhere([CmsUser::tableName().'.id' => $clientId])->exists();
+        return $identity !== null && $clientId > 0 && $this->memo('seeClient:'.(int)$identity->id.':'.$clientId,
+            static fn() => CmsUser::find()->forManager($identity)->andWhere([CmsUser::tableName().'.id' => $clientId])->exists());
     }
 
     /**
@@ -269,6 +334,7 @@ class CrmAccess extends Component
             $class::updateAll(['is_main' => 0], $condition);
         }
         $class::updateAll(['is_main' => 1, 'access_level' => self::LEVEL_FULL], [$recordColumn => $recordId, $userColumn => $userId]);
+        $this->resetMemo();
     }
 
     /** @var bool setMain() is moving the mark: ensureMain() does not choose meanwhile */
@@ -480,6 +546,7 @@ class CrmAccess extends Component
                 $class::updateAll($values, [$recordColumn => (int)$record->id, $userColumn => $userId]);
             }
             $snapshot = [];
+            self::instance()->resetMemo();
             self::instance()->ensureMain($recordCode, (int)$record->id);
         };
         $record->on(\yii\db\BaseActiveRecord::EVENT_AFTER_UPDATE, $restore);
@@ -511,6 +578,7 @@ class CrmAccess extends Component
         }
         [$class, $recordColumn, $userColumn] = self::linkTable($recordCode);
         $class::updateAll(['access_level' => $level], [$recordColumn => $recordId, $userColumn => $userId]);
+        $this->resetMemo();
 
         return true;
     }
@@ -540,6 +608,7 @@ class CrmAccess extends Component
         if (CrmProtection::ready()) {
             (new CrmProtection())->setAlways($recordCode, $recordId, $required);
         }
+        $this->resetMemo();
     }
 
     /**
@@ -841,15 +910,18 @@ class CrmAccess extends Component
     public function linkLevel($user, string $recordCode, int $recordId): ?string
     {
         $userId = $this->userId($user);
-        $query = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY
-            ? CmsCompany2manager::find()->andWhere(['cms_company_id' => $recordId, 'cms_user_id' => $userId])
-            : CmsUser2manager::find()->andWhere(['client_id' => $recordId, 'worker_id' => $userId]);
-        $link = $query->one();
-        if (!$link) {
-            return null;
-        }
 
-        return $link->hasAttribute('access_level') ? (string)$link->access_level : self::LEVEL_FULL;
+        return $this->memo('link:'.$userId.':'.$recordCode.':'.$recordId, static function () use ($userId, $recordCode, $recordId) {
+            $query = $recordCode === CmsCrmAccessRequest::RECORD_COMPANY
+                ? CmsCompany2manager::find()->andWhere(['cms_company_id' => $recordId, 'cms_user_id' => $userId])
+                : CmsUser2manager::find()->andWhere(['client_id' => $recordId, 'worker_id' => $userId]);
+            $link = $query->one();
+            if (!$link) {
+                return null;
+            }
+
+            return $link->hasAttribute('access_level') ? (string)$link->access_level : self::LEVEL_FULL;
+        });
     }
 
     /**
@@ -2029,6 +2101,6 @@ class CrmAccess extends Component
         }
         $id = $this->userId($user);
 
-        return $id ? CmsUser::findOne($id) : null;
+        return $id ? $this->memo('user:'.$id, static fn() => CmsUser::findOne($id)) : null;
     }
 }

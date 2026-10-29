@@ -40,18 +40,10 @@ class CmsCompanyRule extends Rule
              * @var CmsUser $model
              */
             $model = $params['model'];
-            $currentUser = CmsUser::findOne($user);
 
-            //Если пользователь является подчиненным для текущего, то его можно редактировать
-            /*if ($currentUser->getSubordinates()->andWhere(['id' => $model->id])->exists()) {
-                return true;
-            }*/
-
-            //Если пользователь доступен для текущего
-            if (CmsCompany::find()
-                ->forManager($currentUser) //Поиск пользователей доступных текущему пользователю
-                ->andWhere([CmsCompany::tableName().'.id' => $model->id]) //Пользователь которого проверяем
-                ->exists()) {
+            //Компания доступна текущему пользователю: то же условие CmsCompany::find()->forManager(),
+            //один ответ на веб-запрос (CrmAccess::canSeeCompany(), аудит F10 — лента спрашивала сотни раз)
+            if (\skeeks\cms\crm\CrmAccess::instance()->canSeeCompany((int)$user, (int)$model->id)) {
                 return true;
             }
         }

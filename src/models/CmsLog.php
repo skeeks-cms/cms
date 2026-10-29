@@ -278,31 +278,68 @@ class CmsLog extends ActiveRecord
         return $this;
     }
 
+    /** @var array loaded models of this entry: 'model' / 'subModel' => the record or null (getModel(), preloadModels()) */
+    private array $_loadedModels = [];
+
+    /** The class of a model code (modelsConfig), null when unknown. */
+    private static function modelClassOf(?string $code): ?string
+    {
+        $classData = (array)ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, (string)$code);
+        $class = $classData ? (string)ArrayHelper::getValue($classData, 'class', $code) : '';
+
+        return $class !== '' && class_exists($class) ? $class : null;
+    }
+
+    /** The record the entry is about; read once per entry (a feed asks it several times). */
     public function getModel()
     {
-        $classData = (array)ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, $this->model_code);
-
-        if ($classData) {
-            $class = (string)ArrayHelper::getValue($classData, 'class', $this->model_code);
-            if (class_exists($class)) {
-                return $class::find()->andWhere(['id' => $this->model_id])->one();
-            }
+        if (!array_key_exists('model', $this->_loadedModels)) {
+            $class = self::modelClassOf($this->model_code);
+            $this->_loadedModels['model'] = $class ? $class::find()->andWhere(['id' => $this->model_id])->one() : null;
         }
 
-        return;
+        return $this->_loadedModels['model'];
     }
+
     public function getSubModel()
     {
-        $classData = (array)ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, $this->sub_model_code);
-
-        if ($classData) {
-            $class = (string)ArrayHelper::getValue($classData, 'class', $this->sub_model_code);
-            if (class_exists($class)) {
-                return $class::find()->andWhere(['id' => $this->sub_model_id])->one();
-            }
+        if (!array_key_exists('subModel', $this->_loadedModels)) {
+            $class = self::modelClassOf($this->sub_model_code);
+            $this->_loadedModels['subModel'] = $class ? $class::find()->andWhere(['id' => $this->sub_model_id])->one() : null;
         }
 
-        return;
+        return $this->_loadedModels['subModel'];
+    }
+
+    /**
+     * The records of a page of a feed in one query per model class (audit F10:
+     * the feed read the same task or deal again for every entry). Read-only
+     * batching for rendering: nothing is kept beyond these entries.
+     *
+     * @param self[] $logs
+     */
+    public static function preloadModels(array $logs): void
+    {
+        $wanted = [];
+        foreach ($logs as $log) {
+            foreach ([['model', 'model_code', 'model_id'], ['subModel', 'sub_model_code', 'sub_model_id']] as [$slot, $codeAttribute, $idAttribute]) {
+                if ($log->$idAttribute && ($class = self::modelClassOf($log->$codeAttribute))) {
+                    $wanted[$class][(int)$log->$idAttribute] = true;
+                }
+            }
+        }
+        $loaded = [];
+        foreach ($wanted as $class => $ids) {
+            $loaded[$class] = $class::find()->andWhere([$class::tableName().'.id' => array_keys($ids)])->indexBy('id')->all();
+        }
+        foreach ($logs as $log) {
+            foreach ([['model', 'model_code', 'model_id'], ['subModel', 'sub_model_code', 'sub_model_id']] as [$slot, $codeAttribute, $idAttribute]) {
+                $class = self::modelClassOf($log->$codeAttribute);
+                if ($class && $log->$idAttribute) {
+                    $log->_loadedModels[$slot] = $loaded[$class][(int)$log->$idAttribute] ?? null;
+                }
+            }
+        }
     }
 
     protected function formatLogValue($key, $name, $value)

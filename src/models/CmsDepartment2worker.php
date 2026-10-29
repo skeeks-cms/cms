@@ -62,6 +62,19 @@ class CmsDepartment2worker extends \skeeks\cms\base\ActiveRecord
         ]);
     }
 
+    /** The employees of a department changed: CmsDepartment::tree() is read again. */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        CmsDepartment::resetTree();
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        CmsDepartment::resetTree();
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

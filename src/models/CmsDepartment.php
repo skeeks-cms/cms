@@ -143,6 +143,55 @@ class CmsDepartment extends ActiveRecord
             ->via('cmsDepartment2workers');;
     }
 
+    /** @var array|null the tree of one web request (tree()) */
+    private static ?array $tree = null;
+
+    /**
+     * The departments and their employees, read once per web request (audit F10:
+     * every rights check of a feed read them again): rows (id, pid, worker_id),
+     * workers by department, departments by worker. Saving or deleting a
+     * department or its employee drops it (resetTree()); the console and workers
+     * read it every time, as their data may change under them.
+     *
+     * @return array{rows: array[], workers: int[][], departments: int[][]}
+     */
+    public static function tree(): array
+    {
+        if (self::$tree !== null && \skeeks\cms\crm\CrmAccess::keepsAnswers()) {
+            return self::$tree;
+        }
+        $rows = (new \yii\db\Query())
+            ->select(['id', 'pid', 'worker_id'])
+            ->from(static::tableName())
+            ->all(static::getDb());
+        $workers = [];
+        $departments = [];
+        foreach ((new \yii\db\Query())->select(['cms_department_id', 'worker_id'])->from(CmsDepartment2worker::tableName())->all(static::getDb()) as $link) {
+            $workers[(int)$link['cms_department_id']][] = (int)$link['worker_id'];
+            $departments[(int)$link['worker_id']][] = (int)$link['cms_department_id'];
+        }
+
+        return self::$tree = ['rows' => $rows, 'workers' => $workers, 'departments' => $departments];
+    }
+
+    /** The tree changed (a department, its head or its employees): the next check reads it again. */
+    public static function resetTree(): void
+    {
+        self::$tree = null;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        static::resetTree();
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        static::resetTree();
+    }
+
     /**
      * Подчиненные руководителя: сотрудники отделов, которыми он руководит, и всех их подотделов,
      * а также руководители этих подотделов. Сам руководитель в список не входит.
@@ -158,10 +207,8 @@ class CmsDepartment extends ActiveRecord
             return [];
         }
 
-        $rows = (new \yii\db\Query())
-            ->select(['id', 'pid', 'worker_id'])
-            ->from(static::tableName())
-            ->all(static::getDb());
+        $tree = static::tree();
+        $rows = $tree['rows'];
 
         $children = [];
         $queue = [];
@@ -189,14 +236,9 @@ class CmsDepartment extends ActiveRecord
             }
         }
 
-        if ($departmentIds) {
-            $workerIds = (new \yii\db\Query())
-                ->select(['worker_id'])
-                ->from(CmsDepartment2worker::tableName())
-                ->andWhere(['cms_department_id' => array_values($departmentIds)])
-                ->column(static::getDb());
-            foreach ($workerIds as $workerId) {
-                $result[(int)$workerId] = (int)$workerId;
+        foreach ($departmentIds as $departmentId) {
+            foreach ($tree['workers'][$departmentId] ?? [] as $workerId) {
+                $result[$workerId] = $workerId;
             }
         }
 
@@ -221,20 +263,14 @@ class CmsDepartment extends ActiveRecord
             return [];
         }
 
-        $rows = (new \yii\db\Query())
-            ->select(['id', 'pid', 'worker_id'])
-            ->from(static::tableName())
-            ->all(static::getDb());
+        $tree = static::tree();
+        $rows = $tree['rows'];
         $byId = [];
         foreach ($rows as $row) {
             $byId[(int)$row['id']] = $row;
         }
 
-        $start = array_map('intval', (new \yii\db\Query())
-            ->select(['cms_department_id'])
-            ->from(CmsDepartment2worker::tableName())
-            ->andWhere(['worker_id' => $workerId])
-            ->column(static::getDb()));
+        $start = $tree['departments'][$workerId] ?? [];
         foreach ($rows as $row) {
             // A head is a subordinate of the heads above his department, not of himself.
             if ((int)$row['worker_id'] === $workerId && $row['pid']) {

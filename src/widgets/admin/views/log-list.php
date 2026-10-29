@@ -54,6 +54,9 @@ $dataProvider = new \yii\data\ActiveDataProvider([
     'pagination' => $pagination,
 ]);
 
+// The records of the page's entries in one query per model class (audit F10).
+\skeeks\cms\models\CmsLog::preloadModels($dataProvider->getModels());
+
 $logListClass = $widget->is_show_model
     ? 'sx-log-list'
     : 'sx-log-list sx-log-list--hide-model';
