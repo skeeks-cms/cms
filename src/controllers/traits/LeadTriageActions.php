@@ -62,9 +62,10 @@ trait LeadTriageActions
                     $this->finishCreate($event->sender);
                 },
             ],
+            // «Взять в работу» and «Не продажа» of an unsorted deal (п. 13б): one window by its mode.
             'triage' => [
                 'class' => BackendModelAction::class,
-                'name' => 'Разобрать',
+                'name' => 'Взять в работу',
                 'isVisible' => false,
                 'callback' => [$this, 'triage'],
                 'accessCallback' => fn() => $this->model && CrmAccess::instance()->canTriage((int)\Yii::$app->user->id, $this->model),
@@ -413,6 +414,10 @@ JS
         $actorId = (int)\Yii::$app->user->id;
 
         if (\Yii::$app->request->isPost) {
+            if (!\Yii::$app->request->isAjax) {
+                // «Это он» of the card's «Найдены совпадения» posts a plain form: the same decision, then back to a page.
+                return $this->triagePlain($lead, $actorId);
+            }
             $response = new RequestResponse();
             try {
                 $triage = new LeadTriage();
@@ -463,20 +468,67 @@ JS
             ->with(['executor', 'stage'])->orderBy([CmsLead::tableName().'.id' => SORT_DESC])->all() : [];
         $hiddenRepeats = count($repeatIds) - count($repeats);
 
-        $form = new LeadIdentityForm();
-        if ($lead->cms_company_id) {
-            $form->company_mode = LeadIdentityForm::MODE_NONE;
-        }
+        $candidates = $matcher->present($raw, $viewer, (int)$lead->cms_site_id);
+        // «Взять в работу»: the responsible is me, the found client is already chosen (п. 13б).
+        $form = new LeadIdentityForm(['executor_id' => $actorId]);
+        $this->preselectCandidate($form, $lead, $candidates);
+        $mode = (string)\Yii::$app->request->get('mode');
 
         return $this->render('@skeeks/cms/views/admin-cms-lead/triage', [
             'model' => $lead,
             'form' => $form,
-            'candidates' => $matcher->present($raw, $viewer, (int)$lead->cms_site_id),
+            'mode' => in_array($mode, ['merge', 'support'], true) ? $mode : 'take',
+            'candidates' => $candidates,
             'repeats' => $repeats,
             'hiddenRepeats' => $hiddenRepeats,
             'deals' => $this->clientDeals($lead),
             'stageId' => (int)\Yii::$app->request->get('stage_id') ?: null,
         ]);
+    }
+
+    /**
+     * The client the request names is chosen in «Взять в работу» when the base has one strong match of a
+     * kind the employee sees (a company, a contact); several or only weak ones — the employee chooses.
+     */
+    private function preselectCandidate(LeadIdentityForm $form, CmsLead $lead, array $candidates): void
+    {
+        foreach (['company' => CrmMatcher::TYPE_COMPANY, 'client' => CrmMatcher::TYPE_CLIENT] as $part => $type) {
+            if (($part === 'company' && $lead->cms_company_id) || ($part === 'client' && $lead->cms_user_id)) {
+                continue;
+            }
+            $strong = array_values(array_filter($candidates, static fn($c) => $c['type'] === $type && $c['strong']));
+            if (count($strong) === 1 && $strong[0]['visible']) {
+                $form->{$part.'_mode'} = LeadIdentityForm::MODE_EXISTING;
+                $form->{$part.'_id'} = (int)$strong[0]['id'];
+            }
+        }
+    }
+
+    /**
+     * «Это он» of «Найдены совпадения» in the card: «Взять в работу» with this record, the responsible is me;
+     * a page follows the result (a flash tells it).
+     */
+    private function triagePlain(CmsLead $lead, int $actorId)
+    {
+        $form = new LeadIdentityForm(['executor_id' => $actorId]);
+        $companyId = (int)\Yii::$app->request->post('company_id');
+        $clientId = (int)\Yii::$app->request->post('client_id');
+        if ($companyId) {
+            $form->company_mode = LeadIdentityForm::MODE_EXISTING;
+            $form->company_id = $companyId;
+        }
+        if ($clientId) {
+            $form->client_mode = LeadIdentityForm::MODE_EXISTING;
+            $form->client_id = $clientId;
+        }
+        try {
+            $result = (new LeadTriage())->accept($lead, $form, $actorId);
+            \Yii::$app->session->setFlash('success', (string)($result['message'] ?? 'Сделка принята в работу.'));
+        } catch (\DomainException $e) {
+            \Yii::$app->session->setFlash('error', $e->getMessage());
+        }
+
+        return $this->redirect(CrmAccess::instance()->canSeeLead($actorId, $lead) ? ['view', 'pk' => $lead->id] : ['kanban']);
     }
 
     /** «Клиент сделки» for a deal in work: find or create its company and contact person. */

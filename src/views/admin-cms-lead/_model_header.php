@@ -20,7 +20,10 @@ if ($model->executor) {
         ['class' => 'sx-lead-header__responsible']
     );
 }
-$statusContent .= CmsLeadStatusWidget::widget(['lead' => $model, 'showStage' => true, 'stageInline' => true]);
+// «Неразобранное» is shown by the stage bar under the header; a status badge there read as a button (п. 13б).
+if ($model->status !== CmsLead::STATUS_NEW) {
+    $statusContent .= CmsLeadStatusWidget::widget(['lead' => $model, 'showStage' => true, 'stageInline' => true]);
+}
 // One amount at a time: «Сумма» for an open or rejected deal; a successful one shows «Сумма сделки» in its status.
 if ($model->status !== CmsLead::STATUS_SUCCESS && $model->amountAsText !== '') {
     $statusContent .= Html::tag('span', 'Сумма '.Html::encode($model->amountAsText), ['class' => 'sx-status', 'title' => 'Ожидаемая сумма сделки']);
@@ -51,11 +54,57 @@ $this->registerCss(<<<CSS
         justify-content: flex-start;
     }
 }
+.sx-lead-header__menu {
+    position: relative;
+}
+.sx-lead-header__menu > summary {
+    list-style: none;
+    cursor: pointer;
+}
+.sx-lead-header__menu > summary::-webkit-details-marker {
+    display: none;
+}
+.sx-lead-header__menu-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    min-width: 220px;
+    padding: 4px;
+    border: 1px solid var(--sx-menu-border-color, var(--sx-color-border));
+    border-radius: var(--sx-radius-control);
+    background: var(--sx-menu-background, var(--sx-color-surface-raised));
+    box-shadow: var(--sx-menu-shadow, 0 8px 24px rgba(29, 35, 48, 0.16));
+}
+.sx-lead-header__menu-list form {
+    margin: 0;
+}
+.sx-lead-header__menu-item {
+    display: block;
+    width: 100%;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: var(--sx-radius-control);
+    background: transparent;
+    color: var(--sx-menu-color, var(--sx-color-text));
+    font: inherit;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.sx-lead-header__menu-item:hover,
+.sx-lead-header__menu-item:focus {
+    background: var(--sx-menu-hover-background, var(--sx-color-surface-hover));
+    color: var(--sx-menu-active-color, var(--sx-color-accent));
+    text-decoration: none;
+}
 CSS
 );
 
 // An action of this deal in the backend window: enableNoModelActions() keeps its header and tabs out of the window.
-$windowLink = static function (string $label, array $route, string $variant = 'secondary', ?string $size = null): string {
+$windowLink = static function (string $label, array $route, string $variant = 'secondary', ?string $size = null, ?string $class = null): string {
     $url = (string)BackendUrlHelper::createByParams($route)->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
     $action = ['isOpenNewWindow' => true, 'url' => $url];
     if ($size) {
@@ -63,7 +112,7 @@ $windowLink = static function (string $label, array $route, string $variant = 's
     }
 
     return Html::a($label, $url, [
-        'class' => 'sx-button sx-button--'.$variant.' sx-button--sm',
+        'class' => $class ?? 'sx-button sx-button--'.$variant.' sx-button--sm',
         'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode($action).').go(); return false;',
     ]);
 };
@@ -71,19 +120,22 @@ $access = \skeeks\cms\crm\CrmAccess::instance();
 $userId = (int)Yii::$app->user->id;
 
 if ($model->status === CmsLead::STATUS_NEW && $access->canTriage($userId, $model)) {
-    // As before П2а, one click takes the deal (a simple site needs nothing more);
-    // «Разобрать»: who it is, add to an open deal, support or spam.
-    if ($model->canBeClaimed) {
-        $toolbar[] = Html::beginForm(['/cms/admin-cms-lead/claim', 'pk' => $model->id], 'post', [
-            'class' => 'sx-model-header__toolbar-form',
-        ])
-            .Html::submitButton('<i class="fas fa-anchor" aria-hidden="true"></i> Взять в работу', [
-                'class' => 'sx-button sx-button--primary sx-button--sm',
-                'data-confirm' => 'Закрепить сделку за вами?',
-            ])
-            .Html::endForm();
-    }
-    $toolbar[] = $windowLink('<i class="fas fa-inbox" aria-hidden="true"></i> Разобрать', ['/cms/admin-cms-lead/triage', 'pk' => $model->id], $model->canBeClaimed ? 'secondary' : 'primary');
+    // Two buttons, as «Принять / Отклонить» in amoCRM (п. 13б): «Взять в работу» — one window with the client
+    // (the found one already chosen), the responsible is me; «Не продажа» — spam, an open deal, support.
+    \skeeks\cms\assets\admin\LeadIdentityAsset::register($this);
+    $toolbar[] = $windowLink('<i class="fas fa-anchor" aria-hidden="true"></i> Взять в работу',
+        ['/cms/admin-cms-lead/triage', 'pk' => $model->id, 'from' => 'card'], 'primary');
+    $toolbar[] = Html::tag('details',
+        Html::tag('summary', 'Не продажа <i class="fas fa-chevron-down" aria-hidden="true"></i>', ['class' => 'sx-button sx-button--secondary sx-button--sm'])
+        .Html::tag('div',
+            Html::beginForm(['/cms/admin-cms-lead/triage', 'pk' => $model->id], 'post', ['data-sx-lead-ajax-form' => true])
+            .Html::submitButton('Спам', ['name' => 'op', 'value' => 'spam', 'class' => 'sx-lead-header__menu-item', 'role' => 'menuitem',
+                'data-confirm' => 'Отметить заявку как спам и закрыть её?'])
+            .Html::endForm()
+            .$windowLink('Уже есть сделка', ['/cms/admin-cms-lead/triage', 'pk' => $model->id, 'mode' => 'merge'], 'secondary', null, 'sx-lead-header__menu-item')
+            .$windowLink('Поддержка', ['/cms/admin-cms-lead/triage', 'pk' => $model->id, 'mode' => 'support'], 'secondary', null, 'sx-lead-header__menu-item'),
+            ['class' => 'sx-lead-header__menu-list', 'role' => 'menu']),
+        ['class' => 'sx-lead-header__menu']);
 } elseif ($model->canBeReopenedBy((int)Yii::$app->user->id)) {
     $toolbar[] = Html::beginForm(['/cms/admin-cms-lead/reopen', 'pk' => $model->id], 'post', [
         'class' => 'sx-model-header__toolbar-form',

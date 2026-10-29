@@ -11,6 +11,29 @@ use yii\helpers\Html;
 /** @var CmsLead $model */
 /** @var array $matches */
 /** @var bool $canLink */
+/** @var bool $canTake an unsorted deal the employee sorts: «Это он» takes it into work with the record (п. 13б) */
+
+$canTake = $canTake ?? false;
+// «Это он»: «Взять в работу» with this record, the responsible is me (LeadTriageActions::triagePlain()).
+$takeButton = static function (?int $companyId, ?int $clientId, string $title) use ($model): string {
+    return Html::beginForm(['/cms/admin-cms-lead/triage', 'pk' => $model->id], 'post', [
+        'class' => 'sx-lead-match__form',
+    ])
+        .Html::hiddenInput('company_id', $companyId)
+        .Html::hiddenInput('client_id', $clientId)
+        .Html::submitButton('Это он', [
+            'class' => 'sx-button sx-button--primary sx-button--sm',
+            'data-confirm' => 'Взять сделку в работу с клиентом «'.$title.'»? Ответственный — вы.',
+        ])
+        .Html::endForm();
+};
+// Two records with one name (duplicates of the base) differ by the number and the main responsible.
+$companyMeta = static function (CmsCompany $company): string {
+    $mainId = \skeeks\cms\crm\CrmAccess::instance()->mainResponsibleId('company', (int)$company->id);
+    $main = $mainId ? CmsUser::findOne($mainId) : null;
+
+    return '№'.(int)$company->id.($main ? ' · ответственный '.$main->shortDisplayName : '');
+};
 
 $linkButton = static function (?int $companyId, ?int $clientId, string $label, string $confirm) use ($model): string {
     return Html::beginForm(['/cms/admin-cms-lead/link-identity', 'pk' => $model->id], 'post', [
@@ -44,7 +67,9 @@ BackendSurfaceWidget::begin([
                     <?= CmsUserViewWidget::widget(['cmsUser' => $client, 'isSmall' => true]); ?>
                     <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
                 </div>
-                <?php if ($canLink && !$model->cms_user_id) : ?>
+                <?php if ($canTake) : ?>
+                    <?= $takeButton(null, (int)$client->id, (string)$client->shortDisplayName); ?>
+                <?php elseif ($canLink && !$model->cms_user_id) : ?>
                     <?= $linkButton(null, (int)$client->id, 'Привязать клиента', 'Привязать этого клиента к сделке?'); ?>
                 <?php endif; ?>
 
@@ -59,8 +84,11 @@ BackendSurfaceWidget::begin([
                                     'modelId' => $company->id,
                                     'label' => $company->asText,
                                 ]); ?>
+                                <span class="sx-lead-match__reason"><?= Html::encode($companyMeta($company)); ?></span>
                                 <?php if ((int)$model->cms_company_id === (int)$company->id) : ?>
                                     <span class="sx-lead-match__reason">Уже привязана к сделке</span>
+                                <?php elseif ($canTake) : ?>
+                                    <?= $takeButton((int)$company->id, (int)$client->id, (string)$company->asText); ?>
                                 <?php elseif ($canLink && !$model->cms_company_id) : ?>
                                     <?= $linkButton(
                                         (int)$company->id,
@@ -86,16 +114,19 @@ BackendSurfaceWidget::begin([
                         'modelId' => $company->id,
                         'label' => $company->asText,
                     ]); ?>
+                    <span class="sx-lead-match__reason"><?= Html::encode($companyMeta($company)); ?></span>
                     <span class="sx-lead-match__reason"><?= Html::encode(implode(' · ', $match['reasons'])); ?></span>
                 </div>
-                <?php if ($canLink && !$model->cms_company_id) : ?>
+                <?php if ($canTake) : ?>
+                    <?= $takeButton((int)$company->id, null, (string)$company->asText); ?>
+                <?php elseif ($canLink && !$model->cms_company_id) : ?>
                     <?= $linkButton((int)$company->id, null, 'Привязать компанию', 'Привязать эту компанию к сделке?'); ?>
                 <?php endif; ?>
             </article>
         <?php endforeach; ?>
 
-        <?php if (!$canLink) : ?>
-            <p class="sx-lead-matches__notice">Возьмите сделку в работу, чтобы привязать найденную запись.</p>
+        <?php if ($canTake) : ?>
+            <p class="sx-lead-matches__notice">«Это он» — взять сделку в работу с этим клиентом, ответственный — вы.</p>
         <?php endif; ?>
     </div>
 <?php BackendSurfaceWidget::end(); ?>

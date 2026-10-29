@@ -1,8 +1,12 @@
 <?php
 /**
- * Sorting an unsorted deal («Неразобранное», П2а): who it is, take into work,
- * add to an open deal, support or spam. Actions: LeadTriageActions::triage().
+ * An unsorted deal («Неразобранное», п. 13б): «Взять в работу» — the client
+ * (the found match is already chosen; another company; a new client), the
+ * responsible is me, one save; «Не продажа» — «Уже есть сделка» (add to an
+ * open deal) or «Поддержка». Spam is posted from the header. Actions:
+ * LeadTriageActions::triage().
  *
+ * @var string $mode LeadTriageActions::TRIAGE_TAKE | TRIAGE_MERGE | TRIAGE_SUPPORT
  * @var yii\web\View $this
  * @var skeeks\cms\models\CmsLead $model
  * @var skeeks\cms\crm\LeadIdentityForm $form
@@ -14,18 +18,20 @@
  */
 
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+use skeeks\cms\crm\LeadIdentityForm;
 use skeeks\cms\models\CmsLead;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->title = 'Разбор сделки №'.(int)$model->id;
+$titles = ['merge' => 'Уже есть сделка', 'support' => 'Поддержка'];
+$this->title = ($titles[$mode] ?? 'Взять в работу').': сделка №'.(int)$model->id;
 $description = trim((string)$model->description);
 $contacts = array_merge(
     array_map(static fn($phone) => (string)$phone->value, $model->phones),
     array_map(static fn($email) => (string)$email->value, $model->emails)
 );
 ?>
-<?= Html::beginForm(Url::to(['/cms/admin-cms-lead/triage', 'pk' => $model->id]), 'post', ['data-sx-lead-ajax-form' => true]); ?>
+<?= Html::beginForm(Url::to(['/cms/admin-cms-lead/triage', 'pk' => $model->id]), 'post', ['data-sx-lead-ajax-form' => true, 'data-sx-lead-open-card' => $mode === 'take' && Yii::$app->request->get('from') !== 'card']); ?>
 <?php if ($stageId) : ?>
     <?= Html::hiddenInput('stage_id', $stageId); ?>
 <?php endif; ?>
@@ -33,7 +39,6 @@ $contacts = array_merge(
     <?php BackendSurfaceWidget::begin([
         'title' => 'Что пришло',
         'titleTag' => 'h2',
-        'hint' => 'Неразобранная сделка: определите клиента и решите, что с ней делать.',
         'raised' => true,
         'responsive' => true,
     ]); ?>
@@ -61,7 +66,12 @@ $contacts = array_merge(
         </div>
     <?php BackendSurfaceWidget::end(); ?>
 
-    <?php if ($repeats || $hiddenRepeats) : ?>
+    <?php if ($mode === 'merge') : ?>
+        <?php if (!$repeats && !$hiddenRepeats) : ?>
+            <p class="sx-lead-identity__note">Открытых сделок этого клиента не найдено. Возьмите заявку в работу или отметьте её как поддержку.</p>
+        <?php endif; ?>
+    <?php endif; ?>
+    <?php if ($mode === 'merge' && ($repeats || $hiddenRepeats)) : ?>
         <?php BackendSurfaceWidget::begin([
             'title' => 'Открытые сделки этого клиента',
             'titleTag' => 'h2',
@@ -94,9 +104,13 @@ $contacts = array_merge(
         <?php BackendSurfaceWidget::end(); ?>
     <?php endif; ?>
 
+    <?php if ($mode === 'take') : ?>
     <?php BackendSurfaceWidget::begin([
         'title' => 'Клиент',
         'titleTag' => 'h2',
+        'hint' => $form->company_mode === LeadIdentityForm::MODE_EXISTING || $form->client_mode === LeadIdentityForm::MODE_EXISTING
+            ? 'Подходящая запись из базы уже выбрана. Если это другой клиент — выберите другую компанию или создайте нового.'
+            : ($candidates ? 'В базе есть похожие записи: выберите подходящую, другую компанию или создайте нового клиента.' : null),
         'raised' => true,
         'responsive' => true,
     ]); ?>
@@ -109,16 +123,18 @@ $contacts = array_merge(
             'withContacts' => true,
         ]); ?>
         <div class="sx-lead-triage__actions">
-            <?= Html::submitButton('Принять в работу', [
+            <?= Html::submitButton('Взять в работу', [
                 'name' => 'op',
                 'value' => 'accept',
                 'class' => 'sx-button sx-button--primary',
             ]); ?>
         </div>
     <?php BackendSurfaceWidget::end(); ?>
+    <?php endif; ?>
 
+    <?php if ($mode === 'support') : ?>
     <?php BackendSurfaceWidget::begin([
-        'title' => 'Это не продажа',
+        'title' => 'Поддержка',
         'titleTag' => 'h2',
         'hint' => 'Вопрос по действующей услуге — задача в поддержку. Сделка закроется и не попадёт в отказы.',
         'raised' => true,
@@ -128,19 +144,13 @@ $contacts = array_merge(
             <?= Html::dropDownList('deal_id', null, ['' => $deals ? 'Без услуги' : 'У клиента нет доступных услуг']
                 + \yii\helpers\ArrayHelper::map($deals, 'id', static fn($deal) => $deal->asText.($deal->is_active ? '' : ' (неактивна)')),
                 ['class' => 'form-control', 'style' => 'max-width: 420px', 'aria-label' => 'Услуга клиента']); ?>
-            <?= Html::submitButton('Это поддержка', [
+            <?= Html::submitButton('Передать в поддержку', [
                 'name' => 'op',
                 'value' => 'support',
-                'class' => 'sx-button sx-button--secondary',
-                'data-confirm' => 'Поставить задачу поддержки и закрыть сделку?',
-            ]); ?>
-            <?= Html::submitButton('Спам', [
-                'name' => 'op',
-                'value' => 'spam',
-                'class' => 'sx-button sx-button--danger',
-                'data-confirm' => 'Отметить сделку как спам и закрыть её?',
+                'class' => 'sx-button sx-button--primary',
             ]); ?>
         </div>
     <?php BackendSurfaceWidget::end(); ?>
+    <?php endif; ?>
 </div>
 <?= Html::endForm(); ?>

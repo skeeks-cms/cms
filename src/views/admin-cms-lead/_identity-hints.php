@@ -52,7 +52,8 @@ $live = $live ?? false;
                         <?php if ($candidate['visible'] && $type === CrmMatcher::TYPE_LEAD) : ?>
                             <?= Html::a(Html::encode($title).' №'.(int)$candidate['id'], Url::to(['/cms/admin-cms-lead/view', 'pk' => $candidate['id']]), ['target' => '_blank', 'data-pjax' => 0]); ?>
                         <?php elseif ($candidate['visible'] && $type === CrmMatcher::TYPE_COMPANY) : ?>
-                            <?= Html::a(Html::encode($title), Url::to(['/cms/admin-cms-company/view', 'pk' => $candidate['id']]), ['target' => '_blank', 'data-pjax' => 0]); ?>
+                            <?php // The number tells apart two records of one name (duplicates of the base). ?>
+                            <?= Html::a(Html::encode($title).' №'.(int)$candidate['id'], Url::to(['/cms/admin-cms-company/view', 'pk' => $candidate['id']]), ['target' => '_blank', 'data-pjax' => 0]); ?>
                         <?php elseif ($candidate['visible'] && $type === CrmMatcher::TYPE_CLIENT) : ?>
                             <?= Html::a(Html::encode($title), Url::to(['/cms/admin-user/view', 'pk' => $candidate['id']]), ['target' => '_blank', 'data-pjax' => 0]); ?>
                         <?php else : ?>

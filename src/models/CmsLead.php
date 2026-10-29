@@ -347,12 +347,14 @@ class CmsLead extends Core
                     ? (int)\Yii::$app->user->id
                     : 0;
                 if ((int)$this->executor_id !== $currentUserId) {
+                    // An unsorted request given by turns (crm\InboundQueue) is «Неразобранное» to sort.
+                    $unsorted = $this->status === self::STATUS_NEW;
                     $this->sendWebNotify(
                         (int)$this->executor_id,
-                        'Вам назначена новая сделка',
+                        $unsorted ? 'Новая сделка в Неразобранном' : 'Вам назначена новая сделка',
                         $this->sourceNameAsText,
                         null,
-                        'lead.assigned'
+                        $unsorted ? 'lead.new' : 'lead.assigned'
                     );
                 }
             } elseif (!$this->deferManagerNotifications) {
@@ -706,9 +708,17 @@ class CmsLead extends Core
         }
     }
 
-    /** Active employees with lead permission and the same scope as the lead grid. */
+    /**
+     * Who is told about a new unsorted deal: with «Входящие заявки» set — the
+     * queue (or the employee it was given to) and the administrators by their
+     * notification settings (crm\InboundQueue::notifyIds()); otherwise every
+     * active employee with the deals right who sees it, as the lead grid.
+     */
     public function availableManagerIds(): array
     {
+        if (($queue = \skeeks\cms\crm\InboundQueue::notifyIds($this)) !== null) {
+            return $queue;
+        }
         $query = CmsUser::find()->isWorker()
             ->andWhere([CmsUser::tableName().'.is_active' => 1]);
         if ($this->cms_site_id) {

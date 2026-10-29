@@ -27,7 +27,8 @@ class CmsLeadQuery extends CmsActiveQuery
      * Restricts leads to the CRM scope available to an employee.
      *
      * Unassigned leads require evidence of an available company. Unmatched
-     * leads are administrator triage; assignment retains the executor hierarchy.
+     * leads are administrator triage and the queue of «Входящие заявки»
+     * (crm\InboundQueue); assignment retains the executor hierarchy.
      */
     public function forManager(User $user = null)
     {
@@ -66,6 +67,11 @@ class CmsLeadQuery extends CmsActiveQuery
         $condition = array_merge(['or',
             [$table.'.executor_id' => $managerIds],
         ], $this->companyEvidenceCondition($table, (int)$user->id, $availableCompanyIds));
+        // «Входящие заявки» «видят все из списка» (п. 13б, crm\InboundQueue): the queue sees every unsorted deal
+        // nobody was given; by turns each one sees only his own (the executor branch).
+        if (\skeeks\cms\crm\InboundQueue::seesAllUnsorted((int)$user->id)) {
+            $condition[] = ['and', [$table.'.status' => \skeeks\cms\models\CmsLead::STATUS_NEW], [$table.'.executor_id' => null]];
+        }
         // A personal deal of a person (no company, owner's decision 29.10.2026): the access to the person
         // himself — a "full" link of the employee or a subordinate; his companies do not open it.
         if (\skeeks\cms\crm\CrmAccess::levelsReady()) {

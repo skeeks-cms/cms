@@ -447,7 +447,17 @@
                 return;
             }
             sx.notify.success(response.message || 'Готово');
+            var redirect = response.data && response.data.redirect;
             if (sx.Window && sx.Window._openerWindowWidget) {
+                if (form.data('sxLeadOpenCard') && redirect && redirect.indexOf('/view') !== -1) {
+                    // «Взять в работу» (п. 13б): the window goes on to the card of the deal, keeping its layout.
+                    sx.Window.openerWidgetTriggerEvent('model-update', {submitBtn: 'apply'});
+                    var layout = window.location.search.replace(/^\?/, '').split('&').filter(function (pair) {
+                        return pair.indexOf('_sxb') === 0 && redirect.indexOf(pair) === -1;
+                    });
+                    window.location.href = redirect + (layout.length ? (redirect.indexOf('?') === -1 ? '?' : '&') + layout.join('&') : '');
+                    return;
+                }
                 sx.Window.openerWidgetTriggerEvent('model-update', {submitBtn: 'save'});
                 return;
             }

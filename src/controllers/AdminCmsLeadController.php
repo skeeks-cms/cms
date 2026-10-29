@@ -968,6 +968,7 @@ JS
             'model' => $this->model,
             'matches' => $matches,
             'canLink' => $this->canLinkIdentity(),
+            'canTake' => \skeeks\cms\crm\CrmAccess::instance()->canTriage((int)\Yii::$app->user->id, $this->model),
         ]);
     }
 

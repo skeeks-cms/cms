@@ -45,12 +45,16 @@ class CmsLeadService
 
         $transaction = $this->beginTransactionIfNeeded();
         try {
+            // «Входящие заявки» (п. 13б): the main responsible of a found client, or the next one of the queue;
+            // inside the transaction, so the turn of the queue stays locked until the deal is saved.
+            $route = \skeeks\cms\crm\InboundQueue::route($lead, $phones, $emails);
             if (!$lead->save()) {
                 throw new InvalidArgumentException('Не удалось создать сделку: '.implode('; ', $lead->getFirstErrors()));
             }
             $this->saveContacts($lead, CmsLeadPhone::class, $phones);
             $this->saveContacts($lead, CmsLeadEmail::class, $emails);
-            if (!$lead->executor_id) {
+            \skeeks\cms\crm\InboundQueue::afterRoute($lead, $route);
+            if ($lead->status === CmsLead::STATUS_NEW && (!$lead->executor_id || $route === 'round')) {
                 $lead->notifyAvailableManagers();
             }
             $lead->deferManagerNotifications = false;

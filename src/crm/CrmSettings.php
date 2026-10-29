@@ -21,6 +21,10 @@ use yii\helpers\ArrayHelper;
  * In both modes the pair is marked as a possible duplicate, the hints and the
  * requests stay, a hidden client stays hidden. Read by CrmDuplicateGuard only.
  *
+ * «Входящие заявки» (п. 13б, InboundQueue): who sorts «Неразобранное» —
+ * employees and departments — all of them or by turns, and whether a request
+ * of a found client goes straight to its main responsible.
+ *
  * «Исходящие продажи» (П2д): also the pipeline of outbound sales and the
  * stages a personal offer sent from its deal moves the deal to
  * (OutboundSales). Empty — the pipeline with the code `outbound` and the
@@ -67,6 +71,15 @@ class CrmSettings extends Component
     public $outgoingLeadWorkerId;
     public $outgoingTaskOnView = 1;
 
+    /** @var int[] «Входящие заявки»: employees who sort «Неразобранное» (InboundQueue) */
+    public $inboundWorkerIds = [];
+    /** @var int[] «Входящие заявки»: departments whose employees sort it */
+    public $inboundDepartmentIds = [];
+    /** @var string InboundQueue::MODE_ALL | MODE_ROUND */
+    public $inboundMode = InboundQueue::MODE_ALL;
+    /** @var int a request of a found client goes straight to its main responsible */
+    public $inboundToMain = 0;
+
     /** @var int|null personal offers: the pipeline; null — the one with the code `outbound` */
     public $outboundPipelineId;
     /** @var int|null the stage after a presentation or a КП is sent from the deal; null — «КП отправлено» */
@@ -110,6 +123,10 @@ class CrmSettings extends Component
             [['protectionMonths'], 'integer', 'min' => 1, 'max' => 120],
             [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value],
             [['outboundPipelineId', 'proposalSentStageId', 'proposalViewedStageId'], 'integer'],
+            [['inboundWorkerIds', 'inboundDepartmentIds'], 'filter', 'filter' => static fn($value) => array_values(array_filter(array_map('intval', (array)$value)))],
+            [['inboundWorkerIds', 'inboundDepartmentIds'], 'each', 'rule' => ['integer']],
+            [['inboundMode'], 'in', 'range' => array_keys(InboundQueue::modes())],
+            [['inboundToMain'], 'boolean'],
         ]);
     }
 
@@ -128,6 +145,10 @@ class CrmSettings extends Component
             'outboundPipelineId' => 'Воронка личных предложений',
             'proposalSentStageId' => 'Этап при отправке',
             'proposalViewedStageId' => 'Этап при просмотре',
+            'inboundWorkerIds' => 'Кто разбирает: сотрудники',
+            'inboundDepartmentIds' => 'Кто разбирает: отделы',
+            'inboundMode' => 'Как распределять',
+            'inboundToMain' => 'Если клиент найден — сразу его основному ответственному',
         ]);
     }
 
@@ -141,6 +162,10 @@ class CrmSettings extends Component
             'outboundPipelineId' => 'Воронка, в которой ведутся продажи по найденным компаниям. Отправка и просмотр Презентации или КП двигают этапы только у сделок этой воронки.',
             'proposalSentStageId' => 'Куда переходит сделка, когда из неё отправили Презентацию или КП. Сделка, которая уже дальше, остаётся на месте.',
             'proposalViewedStageId' => 'Куда переходит сделка, когда клиент впервые открыл Презентацию или КП.',
+            'inboundWorkerIds' => 'Новые заявки из форм сайта, писем и других источников попадают в «Неразобранное». Их видят администраторы и эти сотрудники. Если никого не выбрать, заявку видят администраторы и сотрудники, которые ведут найденного клиента.',
+            'inboundDepartmentIds' => 'Все сотрудники выбранных отделов тоже разбирают заявки.',
+            'inboundMode' => '«Видят все из списка» — каждый видит все новые заявки и получает уведомление, первый берёт в работу. «По кругу» — заявка сразу назначается следующему сотруднику по очереди, разбирает её он.',
+            'inboundToMain' => 'Если по телефону или e-mail заявки нашёлся клиент и у всех найденных записей один основной ответственный, сделка сразу уходит ему в работу, минуя «Неразобранное». Если ответственных несколько, заявка остаётся в «Неразобранном».',
             'duplicateMode' => 'В обоих режимах при вводе показываются совпадения в базе, а новая запись отмечается как возможный повтор, чтобы её потом можно было объединить. Чужой клиент остаётся скрытым по уровню доступа.',
             'protectionMonths' => 'Клиент, который платил за это время или у которого есть действующая услуга, — «Под защитой»: другой менеджер работает с ним только по согласованию с основным ответственным. Остальные — «Свободные».',
         ]);
@@ -158,6 +183,17 @@ class CrmSettings extends Component
                         'items' => self::duplicateModes(),
                         'allowNull' => false,
                     ],
+                ],
+            ],
+            // «Входящие заявки» (п. 13б): who sorts «Неразобранное» and how (InboundQueue).
+            'inbound' => [
+                'class' => FieldSet::class,
+                'name' => 'Входящие заявки',
+                'fields' => [
+                    'inboundWorkerIds' => ['class' => SelectField::class, 'items' => self::workerItems(), 'multiple' => true],
+                    'inboundDepartmentIds' => ['class' => SelectField::class, 'items' => self::departmentItems(), 'multiple' => true],
+                    'inboundMode' => ['class' => SelectField::class, 'items' => InboundQueue::modes(), 'allowNull' => false],
+                    'inboundToMain' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
                 ],
             ],
             // «Исходящие продажи» (П2д): the mailing defaults here; the pipeline and the stage of personal offers join this set.
@@ -221,6 +257,12 @@ class CrmSettings extends Component
         asort($result);
 
         return $result;
+    }
+
+    /** Departments, id => name. */
+    public static function departmentItems(): array
+    {
+        return ArrayHelper::map(\skeeks\cms\models\CmsDepartment::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
     }
 
     /** Pipelines of the site, id => name. */

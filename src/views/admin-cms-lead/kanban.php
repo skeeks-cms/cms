@@ -171,6 +171,11 @@ foreach ($columns as $column) {
                         'class' => 'sx-lead-kanban__menu-item', 'role' => 'menuitem', 'data-pjax' => '0',
                         'onclick' => $openWindow($crmSettingsUrl),
                     ]); ?>
+                    <?php // «Входящие заявки» (п. 13б): who sorts «Неразобранное» — the same settings of the site CRM. ?>
+                    <?= Html::a('Входящие заявки', $crmSettingsUrl, [
+                        'class' => 'sx-lead-kanban__menu-item', 'role' => 'menuitem', 'data-pjax' => '0',
+                        'onclick' => $openWindow($crmSettingsUrl),
+                    ]); ?>
                 <?php endif; ?>
                 <?= Html::a('Отчёт по воронке', ['report', 'pipeline' => $pipelineId], ['class' => 'sx-lead-kanban__menu-item', 'role' => 'menuitem', 'data-pjax' => '0']); ?>
             </div>
