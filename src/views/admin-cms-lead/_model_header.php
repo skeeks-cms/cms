@@ -54,8 +54,9 @@ $this->registerCss(<<<CSS
 CSS
 );
 
+// An action of this deal in the backend window: enableNoModelActions() keeps its header and tabs out of the window.
 $windowLink = static function (string $label, array $route, string $variant = 'secondary', ?string $size = null): string {
-    $url = (string)BackendUrlHelper::createByParams($route)->enableEmptyLayout()->enableNoActions()->url;
+    $url = (string)BackendUrlHelper::createByParams($route)->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
     $action = ['isOpenNewWindow' => true, 'url' => $url];
     if ($size) {
         $action['size'] = $size;
@@ -97,7 +98,7 @@ if ($model->status === CmsLead::STATUS_NEW && $access->canTriage($userId, $model
         $amountUrl = (string)BackendUrlHelper::createByParams([
             '/cms/admin-cms-lead/deal-amount',
             'pk' => $model->id,
-        ])->enableEmptyLayout()->enableNoActions()->url;
+        ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
         $toolbar[] = Html::a('<i class="fas fa-ruble-sign" aria-hidden="true"></i> Сумма сделки', $amountUrl, [
             'class' => 'sx-button sx-button--secondary sx-button--sm',
             'onclick' => 'new sx.classes.backend.widgets.Action('.Json::encode(['isOpenNewWindow' => true, 'url' => $amountUrl, 'size' => 'small']).').go(); return false;',

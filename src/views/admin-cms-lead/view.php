@@ -269,7 +269,7 @@ CSS
     <?php if ($successSignals) : ?>
         <?php $successUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
             '/cms/admin-cms-lead/process', 'pk' => $model->id, 'status' => CmsLead::STATUS_SUCCESS,
-        ])->enableEmptyLayout()->enableNoActions()->url; ?>
+        ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url; ?>
         <div class="sx-surface sx-surface--raised sx-surface--padded sx-lead-success-hint" role="status">
             <div>
                 <strong>Похоже, сделка состоялась.</strong>
@@ -662,7 +662,7 @@ JS
                     'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
                         '/cms/admin-cms-lead/no-answer',
                         'pk' => $model->id,
-                    ])->enableEmptyLayout()->enableNoActions()->url,
+                    ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url,
                     'window' => ['size' => 'small'],
                 ];
             }

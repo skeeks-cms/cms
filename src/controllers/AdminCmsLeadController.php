@@ -697,7 +697,7 @@ JS
                     '/cms/admin-cms-lead/triage',
                     'pk' => $lead->id,
                     'stage_id' => (int)substr($column, strlen(CmsLeadBoardService::STAGE_PREFIX)) ?: null,
-                ])->enableEmptyLayout()->enableNoActions()->url];
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url];
                 $response->success = true;
 
                 return $response;
@@ -711,7 +711,7 @@ JS
                     '/cms/admin-cms-lead/process',
                     'pk' => $lead->id,
                     'status' => $status,
-                ])->enableEmptyLayout()->enableNoActions()->url];
+                ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url];
             }
             $response->success = true;
         } catch (\RuntimeException $e) {

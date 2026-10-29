@@ -19,7 +19,7 @@ $this->title = 'Сменить ответственного: сделка №'.(
 ?>
 <?= Html::beginForm(Url::to(['/cms/admin-cms-lead/assign', 'pk' => $model->id]), 'post', ['data-sx-lead-ajax-form' => true]); ?>
 <?php BackendSurfaceWidget::begin([
-    'title' => 'Новый ответственный',
+    'title' => 'Сменить ответственного',
     'titleTag' => 'h2',
     'hint' => 'Сделку получит выбранный сотрудник. Компания останется у своего ответственного: новому сотруднику она видна только названием и ответственным.',
     'raised' => true,

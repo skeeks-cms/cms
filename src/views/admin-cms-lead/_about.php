@@ -24,7 +24,7 @@ if ($pipeline && count(CmsLeadPipeline::forSite((int)$model->cms_site_id)) > 1) 
     $value = Html::encode($pipeline->name);
     if (!$model->isTerminal && ($canWork || $model->status === CmsLead::STATUS_NEW)) {
         $moveUrl = (string)BackendUrlHelper::createByParams(['/cms/admin-cms-lead/move-pipeline', 'pk' => $model->id])
-            ->enableEmptyLayout()->enableNoActions()->url;
+            ->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
         $value .= ' '.Html::a('перенести', $moveUrl, [
             'class' => 'sx-lead-about__action',
             'data-pjax' => '0',
