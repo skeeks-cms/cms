@@ -43,8 +43,15 @@ if ($targetPage !== null) {
     $pagination['page'] = $targetPage;
 }
 
+// The files, the authors and their avatars of a page in a few queries, not per entry (audit F10).
+// Eager loading reads only for the entries of the page and skips empty sets; the visibility is the query's own.
+$query = $widget->query;
+if ($query instanceof \yii\db\ActiveQuery) {
+    $query = (clone $query)->with(['files', 'createdBy.image']);
+}
+
 $dataProvider = new \yii\data\ActiveDataProvider([
-    'query' => $widget->query,
+    'query' => $query,
     'sort'       => [
         'defaultOrder' => [
             'created_at' => SORT_DESC,

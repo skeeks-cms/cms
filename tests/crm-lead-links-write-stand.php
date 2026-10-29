@@ -67,6 +67,24 @@ $clean = static function () use ($db, &$ids) {
     $payments = (new \yii\db\Query())->select('id')->from('shop_payment')->where(['or', ['cms_company_id' => $companies], ['cms_user_id' => $people]])->column();
     $documents = (new \yii\db\Query())->select('id')->from('shop_document')->where($client)->column();
     $deals = (new \yii\db\Query())->select('id')->from('cms_deal')->where($client)->column();
+    // The journal, its files and the notifications of the run: exact pairs model_code + model_id of the
+    // fixture's records (ids of different tables coincide — never by the number alone), and the entries
+    // written on its companies.
+    $pairs = ['or'];
+    foreach ([[\skeeks\cms\models\CmsCompany::class, $ids['companies']], [CmsUser::class, $ids['people']], [CmsLead::class, $ids['leads']],
+                 [\skeeks\cms\models\CmsDeal::class, $deals], [\skeeks\cms\shop\models\ShopBill::class, $bills],
+                 [\skeeks\cms\shop\models\ShopPayment::class, $payments], [\skeeks\cms\shop\models\ShopDocument::class, $documents]] as [$class, $modelIds]) {
+        if ($modelIds) {
+            $pairs[] = ['and', ['model_code' => (new $class())->skeeksModelCode], ['model_id' => $modelIds]];
+        }
+    }
+    $logs = (new \yii\db\Query())->select('id')->from('cms_log')->where(['or', ['cms_company_id' => $companies], $pairs])->column();
+    if ($db->getTableSchema('{{%cms_log_file}}') !== null) {
+        $db->createCommand()->delete('{{%cms_log_file}}', ['cms_log_id' => $logs ?: [0]])->execute();
+    }
+    if ($db->getTableSchema('{{%cms_web_notify}}') !== null && count($pairs) > 1) {
+        $db->createCommand()->delete('{{%cms_web_notify}}', $pairs)->execute();
+    }
     foreach (['shop_bill2payment' => ['or', ['shop_bill_id' => $bills ?: [0]], ['shop_payment_id' => $payments ?: [0]]],
                  'cms_deal2bill' => ['shop_bill_id' => $bills ?: [0]], 'cms_deal2payment' => ['shop_payment_id' => $payments ?: [0]],
                  'shop_document2bill' => ['shop_document_id' => $documents ?: [0]], 'shop_document2deal' => ['shop_document_id' => $documents ?: [0]],
@@ -74,7 +92,7 @@ $clean = static function () use ($db, &$ids) {
                  'shop_bill' => ['id' => $bills ?: [0]], 'shop_payment' => ['id' => $payments ?: [0]], 'shop_document' => ['id' => $documents ?: [0]],
                  'cms_deal' => ['id' => $deals ?: [0]],
                  'cms_crm_access_log' => ['or', ['and', ['record_code' => 'company'], ['record_id' => $companies]], ['and', ['record_code' => 'client'], ['record_id' => $people]]],
-                 'cms_log' => ['or', ['cms_company_id' => $companies], ['model_id' => array_merge($companies, $people, $leads)]],
+                 'cms_log' => ['id' => $logs ?: [0]],
                  'cms_lead_stage_history' => ['cms_lead_id' => $leads], 'cms_lead' => ['id' => $leads],
                  'cms_company2manager' => ['cms_company_id' => $companies], 'cms_user2manager' => ['client_id' => $people],
                  'cms_company' => ['id' => $companies], 'cms_user' => ['id' => $people]] as $table => $where) {
@@ -119,6 +137,11 @@ try {
     $closedA = $lead('закрытая своя сделка А', ['cms_company_id' => $A], (int)$worker->id, CmsLead::STATUS_SUCCESS);
     $ownE = $lead('своя сделка E', ['cms_company_id' => $E], (int)$worker->id);
     $ownP = $lead('своя сделка клиента-человека', ['cms_user_id' => $P], (int)$worker->id);
+    // A control entry of another record with the same number (another model_code): the cleanup must keep it.
+    $db->createCommand()->insert('{{%cms_log}}', ['model_code' => (new \skeeks\cms\models\CmsTask())->skeeksModelCode, 'model_id' => $A,
+        'log_type' => \skeeks\cms\models\CmsLog::LOG_TYPE_COMMENT, 'comment' => $mark.'чужая запись с тем же номером '.$uniq,
+        'created_at' => time(), 'updated_at' => time()])->execute();
+    $controlLogId = (int)$db->getLastInsertID();
     $paySystem = (int)(new \yii\db\Query())->select('id')->from('shop_pay_system')->orderBy(['id' => SORT_ASC])->scalar();
 
     $scopes = array_values(Yii::$app->oauth2Server->resources['cms-rest-api']['scopes']);
@@ -278,6 +301,11 @@ try {
     [$code, $body] = $postService(['cms_company_id' => $A, 'cms_lead_id' => $foreignA]);
     $expect($rows('cms_deal', ['cms_lead_id' => $foreignA]) === $before && mb_strpos($body, CrmAccess::LEAD_NOT_AVAILABLE) !== false
         && mb_strpos($body, $mark.'чужая сделка А '.$uniq) === false, 'HTTP (CSRF): услуга по чужой сделке — отказ, нет имени чужой сделки ('.$code.')');
+    // A hidden company with his own deal of another client: no record, the hidden name is not in the answer.
+    $before = $rows('cms_deal', ['cms_company_id' => $B]);
+    [$code, $body] = $postService(['cms_company_id' => $B, 'cms_lead_id' => $ownA]);
+    $expect($rows('cms_deal', ['cms_company_id' => $B]) === $before && mb_strpos($body, $hiddenName) === false,
+        'HTTP (CSRF): скрытая компания и своя сделка другого клиента — отказ, нет записи, нет скрытого имени ('.$code.')');
     @unlink($jar);
 } catch (\Throwable $e) {
     $expect(false, get_class($e).': '.$e->getMessage().' ('.$e->getFile().':'.$e->getLine().')');
@@ -285,6 +313,11 @@ try {
     $clean();
     $left = (int)(new \yii\db\Query())->from('cms_company')->where(['like', 'name', $mark.'%'.$uniq, false])->count();
     $expect($left === 0, 'данные «Проверка:» удалены');
+    if (!empty($controlLogId)) {
+        $expect((new \yii\db\Query())->from('cms_log')->where(['id' => $controlLogId])->exists(),
+            'очистка не тронула чужую запись журнала с тем же номером и другим model_code');
+        $db->createCommand()->delete('{{%cms_log}}', ['id' => $controlLogId])->execute();
+    }
 }
 echo $fail ? "FAIL crm-lead-links-write-stand: $fail of $checks\n" : "OK crm-lead-links-write-stand: $checks checks\n";
 exit($fail ? 1 : 0);

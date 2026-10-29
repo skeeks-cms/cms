@@ -529,6 +529,8 @@ try {
             'Компании' => '/~sxx/cms/admin-cms-company/index',
             'Клиенты' => '/~sxx/cms/admin-user/index',
             'Счета' => '/~sxx/cms/admin-cms-bill/index',
+            // «Счета по заказам» of cms-shop: not in the menu, opened by a direct address (release rehearsal 30.10.2026, п. 4б).
+            'Счета по заказам' => '/~sxx/shop/admin-bill/index',
             'Платежи' => '/~sxx/shop/admin-payment/index',
             'Документы' => '/~sxx/cms/admin-cms-document/index',
             'Реквизиты' => '/~sxx/cms/admin-cms-contractor/index',
@@ -555,6 +557,8 @@ try {
         // --- cards of the foreign records by a direct address ---
         $cards = [
             'Карточка чужой сделки' => ['/~sxx/cms/admin-cms-lead/view?pk='.$foreign->id, $foreign->name],
+            'Счёт по заказам: карточка чужого счёта' => ['/~sxx/shop/admin-bill/view?pk='.$billA->id, ''],
+            'Счёт по заказам: удалить чужой счёт' => ['/~sxx/shop/admin-bill/delete?pk='.$billA->id, ''],
             'Чужая сделка: задачи' => ['/~sxx/cms/admin-cms-lead/tasks?pk='.$foreign->id, $foreign->name],
             'Чужая сделка: журнал' => ['/~sxx/cms/admin-cms-lead/log?pk='.$foreign->id, ''],
             'Карточка услуги' => ['/~sxx/cms/admin-cms-deal/view?pk='.$service->id, $service->name],

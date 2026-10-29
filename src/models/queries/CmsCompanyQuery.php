@@ -50,11 +50,19 @@ class CmsCompanyQuery extends CmsActiveQuery
                 $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
             }
 
-            $this->joinWith("managers as managers");
-            $this->andWhere(["managers.id" => $managers]);
+            // IN over the links, not a join: a company linked to him and to a subordinate is one row
+            // (the grid count and the pages equal the distinct companies, model-access-queries).
+            $this->andWhere([$this->getPrimaryTableName().'.id' => self::linkedCompanyIds($managers)]);
         }
 
         return $this;
+    }
+
+    /** The companies linked to these employees (cms_company2manager), as a subquery. */
+    private static function linkedCompanyIds(array $managerIds): \yii\db\Query
+    {
+        return (new \yii\db\Query())->select('cms_company_id')->from('{{%cms_company2manager}}')
+            ->andWhere(['cms_user_id' => array_values(array_unique(array_map('intval', $managerIds)))]);
     }
 
     /**
@@ -80,8 +88,13 @@ class CmsCompanyQuery extends CmsActiveQuery
         if ($subordinates = $user->subordinates) {
             $managers = ArrayHelper::merge($managers, ArrayHelper::map($subordinates, "id", "id"));
         }
-        $this->joinWith("managers as managers");
-        $this->andWhere(['or', ["managers.id" => $managers], ['managers.id' => null]]);
+        // Linked to him or his subordinates, or with nobody linked at all — subqueries, not a join (one row per company).
+        $table = $this->getPrimaryTableName();
+        $this->andWhere(['or',
+            [$table.'.id' => self::linkedCompanyIds($managers)],
+            ['not exists', (new \yii\db\Query())->select(new \yii\db\Expression('1'))->from(['anyLink' => '{{%cms_company2manager}}'])
+                ->where('anyLink.cms_company_id = '.$table.'.id')],
+        ]);
 
         return $this;
     }
