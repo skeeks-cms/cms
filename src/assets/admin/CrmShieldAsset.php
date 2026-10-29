@@ -5,8 +5,9 @@ namespace skeeks\cms\assets\admin;
 use yii\web\AssetBundle;
 
 /**
- * The shield of a protected client at its name (crm\CrmProtection::shield()):
- * registered by the helper itself, only on pages that show one.
+ * The shield of a protected client at its name (crm\CrmProtection::shield())
+ * and the column «Ответственный и сотрудники» (crm\CrmClientGrid): registered
+ * by the helpers themselves, only on pages that show them.
  */
 class CrmShieldAsset extends AssetBundle
 {

@@ -1157,6 +1157,32 @@ try {
         $check(CrmAccess::instance()->mainResponsibleId('company', (int)$bulkPool->id) === (int)$leader->id
             && CrmAccess::instance()->linkLevel($subordinate->id, 'company', (int)$bulkPool->id) === CrmAccess::LEVEL_DEAL,
             'a bulk participant of a pool company by a head: the head is the main one, the employee gets the level chosen');
+        // The same bulk actions of the client list (crm\CrmClientGrid): a person of the subordinate, an employee refused.
+        $bulkPerson = new CmsUser(['first_name' => 'Массово человек'.$uniq, 'is_worker' => 0]);
+        $bulkPerson->save();
+        \skeeks\cms\models\CmsUser2manager::deleteAll(['client_id' => $bulkPerson->id]);
+        CrmAccess::instance()->setMain('client', (int)$bulkPerson->id, (int)$subordinate->id);
+        $clientController = Yii::$app->createController('/cms/admin-user')[0];
+        $applySelection->invoke($clientController->createAction('crm-bulk-grant'), [(int)$bulkPerson->id],
+            new \skeeks\cms\crm\CrmBulkAccessForm(['operation' => \skeeks\cms\crm\CrmBulkAccessForm::GRANT, 'recordCode' => 'client', 'user_id' => (int)$leader->id, 'level' => CrmAccess::LEVEL_EDIT]));
+        $applySelection->invoke($clientController->createAction('crm-bulk-protection'), [(int)$bulkPerson->id],
+            new \skeeks\cms\crm\CrmBulkAccessForm(['operation' => \skeeks\cms\crm\CrmBulkAccessForm::PROTECTION, 'recordCode' => 'client', 'protection' => 'always']));
+        $applySelection->invoke($clientController->createAction('crm-bulk-main'), [(int)$bulkPerson->id],
+            new \skeeks\cms\crm\CrmBulkAccessForm(['operation' => \skeeks\cms\crm\CrmBulkAccessForm::MAIN, 'recordCode' => 'client', 'user_id' => (int)$leader->id]));
+        $cell = \skeeks\cms\crm\CrmClientGrid::managersCell('client', $bulkPerson);
+        $check(CrmAccess::instance()->mainResponsibleId('client', (int)$bulkPerson->id) === (int)$leader->id
+            && CrmAccess::instance()->linkLevel($subordinate->id, 'client', (int)$bulkPerson->id) === CrmAccess::LEVEL_EDIT
+            && \skeeks\cms\crm\CrmProtection::state('client', (int)$bulkPerson->id) === 'always'
+            && mb_strpos($cell, 'Ответственный') !== false && mb_strpos($cell, (string)$leader->shortDisplayName) < mb_strpos($cell, (string)$subordinate->shortDisplayName),
+            'the bulk actions of the client list: the main one, the level, the protection; the column shows the main one first');
+        try {
+            $applySelection->invoke($clientController->createAction('crm-bulk-protection'), [(int)$subordinate->id],
+                new \skeeks\cms\crm\CrmBulkAccessForm(['operation' => \skeeks\cms\crm\CrmBulkAccessForm::PROTECTION, 'recordCode' => 'client', 'protection' => 'always']));
+            $workerRefused = false;
+        } catch (\Throwable $e) {
+            $workerRefused = true;
+        }
+        $check($workerRefused && \skeeks\cms\crm\CrmClientGrid::managersCell('client', $subordinate) === '', 'an employee in the client list: no bulk access, an empty column');
         // The dismissal (п. 13а): an employee with clients is not deactivated until they are given away.
         $leaving = CmsCompany::findOne($foreign->id);
         $mainOf = CrmAccess::instance()->mainResponsibleId('company', (int)$leaving->id);

@@ -18,3 +18,17 @@
     align-items: baseline;
     min-width: 0;
 }
+
+/* The column «Ответственный и сотрудники» of the client lists (crm\CrmClientGrid::managersCell()). */
+.sx-crm-managers {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sx-crm-managers__item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+}

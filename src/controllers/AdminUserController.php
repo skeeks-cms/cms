@@ -123,7 +123,11 @@ class AdminUserController extends BackendModelStandartController
                 "filters" => [
                     "visibleFilters" => [
                         'q',
-                        'crmResponsible',
+                        'crm_responsible',
+                        'crm_protection',
+                        'crm_main_user',
+                        'crm_employee',
+                        'crm_created',
                         'is_active',
                         'role',
                         'isOnline',
@@ -140,16 +144,21 @@ class AdminUserController extends BackendModelStandartController
                             ['q', 'safe'],
                             ['isOnline', 'safe'],
                             ['role', 'safe'],
-                            ['crmResponsible', 'safe'],
+                            [['crm_responsible', 'crm_protection', 'crm_main_user', 'crm_employee', 'crm_created'], 'safe'],
                         ],
                         'attributeDefines' => [
                             'q',
                             'role',
                             'isOnline',
-                            'crmResponsible',
+                            'crm_responsible',
+                            'crm_protection',
+                            'crm_main_user',
+                            'crm_employee',
+                            'crm_created',
                         ],
 
-                        'fields' => [
+                        // The access to clients (crm\CrmClientGrid): the responsible, the employee, the protection, the creation date.
+                        'fields' => \skeeks\cms\crm\CrmClientGrid::filterFields(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT, CmsUser::tableName()) + [
 
                             'is_active' => [
                                 'field'             => [
@@ -176,19 +185,6 @@ class AdminUserController extends BackendModelStandartController
                                         ]);
                                     }
 
-                                },
-                            ],
-                            
-                            // П2а: «Мои клиенты (основной)», «Без ответственного».
-                            'crmResponsible' => [
-                                'class'    => SelectField::class,
-                                'label'    => 'Ответственный',
-                                'items'    => \skeeks\cms\crm\CrmAccess::responsibleFilterItems(),
-                                'on apply' => function (QueryFiltersEvent $e) {
-                                    if ($e->field->value) {
-                                        \skeeks\cms\crm\CrmAccess::instance()->applyResponsibleFilter($e->dataProvider->query, 'client',
-                                            (string)$e->field->value, CmsUser::tableName().'.id', (int)\Yii::$app->user->id);
-                                    }
                                 },
                             ],
 
@@ -288,6 +284,7 @@ class AdminUserController extends BackendModelStandartController
                         'actions',
                         //'id',
                         'custom',
+                        'managers',
                         'phone',
                         'email',
                         //'image_id',
@@ -363,6 +360,8 @@ class AdminUserController extends BackendModelStandartController
                                 );
                             },
                         ],
+                        // The main responsible first and marked, then the employees with their levels; empty for an employee.
+                        'managers'               => \skeeks\cms\crm\CrmClientGrid::managersColumn(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT),
                         'created_at'             => [
                             'class' => DateTimeColumnData::class,
                         ],
@@ -885,7 +884,9 @@ class AdminUserController extends BackendModelStandartController
             'crm-access-add' => $this->clientAccessAddAction(),
             'duplicate-check' => $this->duplicateCheckAction(),
             'duplicate-request' => $this->duplicateRequestAction(),
-        ]);
+        ],
+            // Bulk actions of the access over the marked rows or «для всех» (crm\CrmBulkAccessAction).
+            \skeeks\cms\crm\CrmClientGrid::bulkActions(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT));
 
 
         return $actions;

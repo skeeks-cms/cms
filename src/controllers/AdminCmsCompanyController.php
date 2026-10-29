@@ -162,62 +162,8 @@ HTML
                             'crm_created',
                         ],
 
-                        'fields' => [
-                            // The access to clients (crm\CrmAccess, crm\CrmProtection): who works with the company, its protection.
-                            'crm_responsible' => [
-                                'class' => SelectField::class,
-                                'label' => 'Ответственные',
-                                'items' => array_intersect_key(\skeeks\cms\crm\CrmAccess::responsibleFilterItems(), array_flip(['my_main', 'no_main', 'no_responsible', 'pool'])),
-                                'on apply' => function (QueryFiltersEvent $e) {
-                                    \skeeks\cms\crm\CrmAccess::instance()->applyResponsibleFilter($e->dataProvider->query, 'company', (string)$e->field->value,
-                                        CmsCompany::tableName().'.id', (int)\Yii::$app->user->id);
-                                },
-                            ],
-                            'crm_protection' => [
-                                'class' => SelectField::class,
-                                'label' => 'Защита',
-                                'items' => \skeeks\cms\crm\CrmProtection::ready() ? \skeeks\cms\crm\CrmProtection::states() : [],
-                                'on apply' => function (QueryFiltersEvent $e) {
-                                    if ($e->field->value && \skeeks\cms\crm\CrmProtection::ready()) {
-                                        $e->dataProvider->query->andWhere([CmsCompany::tableName().'.crm_protection' => (string)$e->field->value]);
-                                    }
-                                },
-                            ],
-                            'crm_main_user' => [
-                                'class' => WidgetField::class,
-                                'label' => 'Основной ответственный',
-                                'widgetClass' => AjaxSelectModel::class,
-                                'widgetConfig' => [
-                                    'modelClass' => CmsUser::class,
-                                    'searchQuery' => static fn($word = '') => $word ? CmsUser::find()->isWorker()->search($word) : CmsUser::find()->isWorker(),
-                                ],
-                                'on apply' => function (QueryFiltersEvent $e) {
-                                    \skeeks\cms\crm\CrmAccess::instance()->applyEmployeeFilter($e->dataProvider->query, 'company', (int)$e->field->value, true, CmsCompany::tableName().'.id');
-                                },
-                            ],
-                            'crm_employee' => [
-                                'class' => WidgetField::class,
-                                'label' => 'Сотрудник работает',
-                                'widgetClass' => AjaxSelectModel::class,
-                                'widgetConfig' => [
-                                    'modelClass' => CmsUser::class,
-                                    'searchQuery' => static fn($word = '') => $word ? CmsUser::find()->isWorker()->search($word) : CmsUser::find()->isWorker(),
-                                ],
-                                'on apply' => function (QueryFiltersEvent $e) {
-                                    \skeeks\cms\crm\CrmAccess::instance()->applyEmployeeFilter($e->dataProvider->query, 'company', (int)$e->field->value, false, CmsCompany::tableName().'.id');
-                                },
-                            ],
-                            'crm_created' => [
-                                'class' => WidgetField::class,
-                                'label' => 'Дата создания',
-                                'widgetClass' => \skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget::class,
-                                'widgetConfig' => ['options' => ['placeholder' => 'Диапазон дат']],
-                                'on apply' => function (QueryFiltersEvent $e) {
-                                    if ($e->field->value && ($range = \skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget::parseRange($e->field->value))) {
-                                        $e->dataProvider->query->andWhere(['between', CmsCompany::tableName().'.created_at', (int)$range[0], (int)$range[1]]);
-                                    }
-                                },
-                            ],
+                        // The access to clients (crm\CrmClientGrid): the responsible, the employee, the protection, the creation date.
+                        'fields' => \skeeks\cms\crm\CrmClientGrid::filterFields(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY, CmsCompany::tableName()) + [
 
                             'q' => [
                                 'label'          => 'Поиск',
@@ -514,31 +460,8 @@ HTML
                                 );
                             },
                         ],
-                        'managers' => [
-                            'format' => 'raw',
-                            'label'  => 'Сотрудники',
-                            'value'  => function (CmsCompany $model) {
-
-                                $data = [];
-                                if ($model->managers) {
-                                    // The main responsible first (П2а).
-                                    $mainId = \skeeks\cms\crm\CrmAccess::instance()->mainResponsibleId('company', (int)$model->id);
-                                    $managers = $model->managers;
-                                    usort($managers, static fn($a, $b) => ((int)$b->id === $mainId) <=> ((int)$a->id === $mainId));
-                                    foreach ($managers as $manager) {
-                                        $data[] = \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
-                                            'user'    => $manager,
-                                            'isSmall' => true,
-                                        ]);
-                                    }
-                                }
-
-
-                                $info = implode("", $data);
-
-                                return $info;
-                            },
-                        ],
+                        // The main responsible first and marked, then the employees with their levels.
+                        'managers' => \skeeks\cms\crm\CrmClientGrid::managersColumn(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY),
                         'users'    => [
                             'format' => 'raw',
                             'label'  => 'Контакты',
@@ -1050,15 +973,10 @@ HTML
             'crm-access' => $this->clientAccessAction(),
             // The journal of the access to clients: a tab of the section («Список», «Импорт», «Добавить», «Доступы»).
             'crm-access-log' => $this->clientAccessLogAction(),
-            // Bulk actions of the access over the marked rows or «для всех» (crm\CrmBulkAccessAction).
-            'crm-bulk-main' => ['class' => \skeeks\cms\crm\CrmBulkAccessAction::class, 'operation' => \skeeks\cms\crm\CrmBulkAccessForm::MAIN,
-                'name' => 'Назначить основного ответственного', 'icon' => 'fas fa-user-check', 'priority' => 310, 'successMessage' => 'Основной ответственный назначен.'],
-            'crm-bulk-grant' => ['class' => \skeeks\cms\crm\CrmBulkAccessAction::class, 'operation' => \skeeks\cms\crm\CrmBulkAccessForm::GRANT,
-                'name' => 'Добавить сотрудника с уровнем', 'icon' => 'fas fa-user-plus', 'priority' => 320, 'successMessage' => 'Доступ выдан.'],
-            'crm-bulk-protection' => ['class' => \skeeks\cms\crm\CrmBulkAccessAction::class, 'operation' => \skeeks\cms\crm\CrmBulkAccessForm::PROTECTION,
-                'name' => 'Сменить защиту', 'icon' => 'fas fa-shield-alt', 'priority' => 330, 'successMessage' => 'Защита изменена.'],
             'crm-access-add' => $this->clientAccessAddAction(),
-        ]);
+        ],
+            // Bulk actions of the access over the marked rows or «для всех» (crm\CrmBulkAccessAction).
+            \skeeks\cms\crm\CrmClientGrid::bulkActions(\skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY));
     }
 
 
