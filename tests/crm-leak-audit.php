@@ -60,33 +60,74 @@ define('AUDIT_PREFIX', getenv('AUDIT_PREFIX') ?: 'Аудит: ');
 define('AUDIT_KEY', getenv('AUDIT_KEY') ?: 'audit-');
 $db = Yii::$app->db;
 
-/** Removes every record of the audit: by the prefix and by the ids hanging on the audit companies and people. */
-$clean = static function () use ($db) {
-    $like = ['like', 'name', AUDIT_PREFIX.'%', false];
+/**
+ * Removes the records of the audit and everything they left: the models found by the marks, then their feed
+ * (cms_log), the journal of the access (cms_crm_access_log), the notifications and their deliveries, by exact
+ * pairs of the own records only. $uniq — one run (names end with it, codes carry it); null — every kept run
+ * (AUDIT_CLEAN). Returns the number of removed models and what is left of them (empty — clean).
+ *
+ * @return array{removed: int, residue: array<string, int>}
+ */
+$clean = static function (?string $uniq = null) use ($db) {
+    $named = $uniq === null ? AUDIT_PREFIX.'%' : AUDIT_PREFIX.'%'.$uniq;
+    $keyed = $uniq === null ? AUDIT_KEY.'%' : AUDIT_KEY.'%'.$uniq;
+    $like = ['like', 'name', $named, false];
     $companies = CmsCompany::find()->select('id')->andWhere($like)->column();
-    $people = CmsUser::find()->select('id')->andWhere(['like', 'first_name', AUDIT_PREFIX.'%', false])->column();
+    $people = CmsUser::find()->select('id')->andWhere(['like', 'first_name', $named, false])->column();
     $leads = CmsLead::find()->select('id')->andWhere(['or', $like, ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
     $deals = CmsDeal::find()->select('id')->andWhere(['or', $like, ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
-    $bills = ShopBill::find()->select('id')->andWhere(['or', ['like', 'description', AUDIT_PREFIX.'%', false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
-    $payments = ShopPayment::find()->select('id')->andWhere(['or', ['like', 'comment', AUDIT_PREFIX.'%', false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
-    $documents = ShopDocument::find()->select('id')->andWhere(['or', ['like', 'description', AUDIT_PREFIX.'%', false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
+    $bills = ShopBill::find()->select('id')->andWhere(['or', ['like', 'description', $named, false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
+    $payments = ShopPayment::find()->select('id')->andWhere(['or', ['like', 'comment', $named, false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
+    $documents = ShopDocument::find()->select('id')->andWhere(['or', ['like', 'description', $named, false], ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]])->column();
     $tasks = CmsTask::find()->select('id')->andWhere(['or', $like, ['cms_company_id' => $companies ?: [0]], ['cms_lead_id' => $leads ?: [0]], ['cms_deal_id' => $deals ?: [0]]])->column();
-    $proposals = $db->createCommand('SELECT id FROM cms_proposal WHERE name LIKE :p OR cms_company_id IN ('.implode(',', array_map('intval', $companies ?: [0])).')', [':p' => AUDIT_PREFIX.'%'])->queryColumn();
-    $calls = $db->createCommand('SELECT id FROM cms_telephony_call WHERE provider_call_id LIKE :p', [':p' => AUDIT_KEY.'%'])->queryColumn();
-    $messages = $db->createCommand('SELECT id FROM cms_comm_message WHERE subject LIKE :p', [':p' => AUDIT_PREFIX.'%'])->queryColumn();
-    $conversations = $db->createCommand('SELECT id FROM cms_comm_conversation WHERE thread_key LIKE :p', [':p' => AUDIT_KEY.'%'])->queryColumn();
-    $codes = [
+    $proposals = $db->createCommand('SELECT id FROM cms_proposal WHERE name LIKE :p OR cms_company_id IN ('.implode(',', array_map('intval', $companies ?: [0])).')', [':p' => $named])->queryColumn();
+    $calls = $db->createCommand('SELECT id FROM cms_telephony_call WHERE provider_call_id LIKE :p', [':p' => $keyed])->queryColumn();
+    $messages = $db->createCommand('SELECT id FROM cms_comm_message WHERE subject LIKE :p', [':p' => $named])->queryColumn();
+    $conversations = $db->createCommand('SELECT id FROM cms_comm_conversation WHERE thread_key LIKE :p', [':p' => $keyed])->queryColumn();
+
+    // Exact pairs of the own records: the feed and the notifications use the model code; a person is also
+    // written under the identity class.
+    $pairs = [
         (new CmsCompany())->skeeksModelCode => $companies, (new CmsUser())->skeeksModelCode => $people,
         (new CmsLead())->skeeksModelCode => $leads, (new CmsDeal())->skeeksModelCode => $deals,
         (new ShopBill())->skeeksModelCode => $bills, (new ShopPayment())->skeeksModelCode => $payments,
         (new ShopDocument())->skeeksModelCode => $documents, (new CmsTask())->skeeksModelCode => $tasks,
+        'skeeks\cms\proposal\models\CmsProposal' => $proposals,
+        'skeeks\cms\communication\models\CmsCommMessage' => $messages,
+        'skeeks\cms\communication\models\CmsCommConversation' => $conversations,
     ];
-    foreach ($codes as $code => $ids) {
-        if ($ids) {
-            CmsLog::deleteAll(['model_code' => $code, 'model_id' => $ids]);
-            $db->createCommand()->delete('cms_web_notify', ['model_code' => $code, 'model_id' => $ids])->execute();
-        }
+    $identityClass = Yii::$app->user->identityClass;
+    if ($people && $identityClass !== CmsUser::class && method_exists($identityClass, 'getSkeeksModelCode')) {
+        $pairs[(new $identityClass())->skeeksModelCode] = $people;
     }
+    $pairsCondition = static function (string $codeColumn, string $idColumn) use ($pairs): array {
+        $or = ['or'];
+        foreach ($pairs as $code => $ids) {
+            if ($ids) {
+                $or[] = ['and', [$codeColumn => $code], [$idColumn => $ids]];
+            }
+        }
+        return count($or) > 1 ? $or : ['0=1'];
+    };
+    $accessCondition = ['or',
+        ['and', ['record_code' => \skeeks\cms\models\CmsCrmAccessRequest::RECORD_COMPANY], ['record_id' => $companies ?: [0]]],
+        ['and', ['record_code' => \skeeks\cms\models\CmsCrmAccessRequest::RECORD_CLIENT], ['record_id' => $people ?: [0]]],
+        ['cms_lead_id' => $leads ?: [0]],
+        ['shop_payment_id' => $payments ?: [0]],
+    ];
+    $hasTable = static fn(string $table) => $db->getTableSchema($table, true) !== null;
+    // The notifications and their deliveries are collected before the models go (a delivery outlives its
+    // notification: the key is ON DELETE SET NULL).
+    $notifyIds = (new \yii\db\Query())->select('id')->from('cms_web_notify')->andWhere($pairsCondition('model_code', 'model_id'))->column($db);
+    $deliveries = static function () use ($db, $hasTable, &$notifyIds, $messages): array {
+        if (!$hasTable('cms_comm_notify_delivery')) {
+            return [];
+        }
+        $where = ['or', ['cms_web_notify_id' => $notifyIds ?: [0]], ['cms_comm_message_id' => $messages ?: [0]]];
+        return (new \yii\db\Query())->select('id')->from('cms_comm_notify_delivery')->andWhere($where)->column($db);
+    };
+    $deliveryIds = $deliveries();
+
     $del = static function (string $table, array $where) use ($db) {
         $db->createCommand()->delete($table, $where)->execute();
     };
@@ -143,11 +184,49 @@ $clean = static function () use ($db) {
         CmsUser::deleteAll(['id' => $people]);
     }
 
-    return count($companies) + count($people) + count($leads) + count($deals) + count($bills) + count($payments) + count($documents) + count($tasks) + count($proposals);
+    // After the models: removing them may write their own entries; then the notifications written meanwhile.
+    CmsLog::deleteAll($pairsCondition('model_code', 'model_id'));
+    if ($hasTable('cms_crm_access_log')) {
+        $del('cms_crm_access_log', $accessCondition);
+    }
+    $notifyIds = array_values(array_unique(array_merge($notifyIds,
+        (new \yii\db\Query())->select('id')->from('cms_web_notify')->andWhere($pairsCondition('model_code', 'model_id'))->column($db))));
+    $deliveryIds = array_values(array_unique(array_merge($deliveryIds, $deliveries())));
+    if ($deliveryIds) {
+        $del('cms_comm_notify_delivery', ['id' => $deliveryIds]);
+    }
+    if ($notifyIds) {
+        $del('cms_web_notify', ['id' => $notifyIds]);
+    }
+
+    // What is left of them (empty — clean).
+    $count = static fn(string $table, array $where) => (int)(new \yii\db\Query())->from($table)->andWhere($where)->count('*', $db);
+    $residue = array_filter([
+        'models' => $count('cms_company', ['id' => $companies ?: [0]]) + $count('cms_user', ['id' => $people ?: [0]]) + $count('cms_lead', ['id' => $leads ?: [0]])
+            + $count('cms_deal', ['id' => $deals ?: [0]]) + $count('shop_bill', ['id' => $bills ?: [0]]) + $count('shop_payment', ['id' => $payments ?: [0]])
+            + $count('shop_document', ['id' => $documents ?: [0]]) + $count('cms_task', ['id' => $tasks ?: [0]]) + $count('cms_proposal', ['id' => $proposals ?: [0]])
+            + $count('cms_telephony_call', ['id' => $calls ?: [0]]) + $count('cms_comm_message', ['id' => $messages ?: [0]]) + $count('cms_comm_conversation', ['id' => $conversations ?: [0]]),
+        'links' => $count('cms_comm_link', ['cms_comm_message_id' => $messages ?: [0]]) + $count('cms_company2manager', ['cms_company_id' => $companies ?: [0]])
+            + $count('cms_user2manager', ['client_id' => $people ?: [0]]) + $count('cms_company2user', ['or', ['cms_company_id' => $companies ?: [0]], ['cms_user_id' => $people ?: [0]]]),
+        'cms_log' => $count('cms_log', $pairsCondition('model_code', 'model_id')),
+        'cms_crm_access_log' => $hasTable('cms_crm_access_log') ? $count('cms_crm_access_log', $accessCondition) : 0,
+        'cms_web_notify' => $count('cms_web_notify', ['or', ['id' => $notifyIds ?: [0]], $pairsCondition('model_code', 'model_id')]),
+        'cms_comm_notify_delivery' => $deliveryIds ? $count('cms_comm_notify_delivery', ['id' => $deliveryIds]) : 0,
+    ]);
+
+    return [
+        'removed' => count($companies) + count($people) + count($leads) + count($deals) + count($bills) + count($payments) + count($documents) + count($tasks) + count($proposals),
+        'residue' => $residue,
+    ];
 };
 
 if (getenv('AUDIT_CLEAN')) {
-    echo 'removed: '.$clean()." records\n";
+    $cleaned = $clean();
+    echo 'removed: '.$cleaned['removed']." records\n";
+    if ($cleaned['residue']) {
+        fwrite(STDERR, 'FAIL: left after the cleaning: '.json_encode($cleaned['residue'])."\n");
+        exit(1);
+    }
     exit(0);
 }
 
@@ -996,7 +1075,11 @@ try {
     if (getenv('AUDIT_KEEP')) {
         echo "AUDIT_KEEP: the fixture is kept; remove it with AUDIT_CLEAN=1\n";
     } else {
-        $clean();
+        // The own records of this run only, also after an error; anything left fails the audit.
+        $cleaned = $clean($uniq);
+        if ($cleaned['residue']) {
+            $results[] = ['Очистка', 'после прогона', 'FAIL', 'осталось: '.json_encode($cleaned['residue'], JSON_UNESCAPED_UNICODE)];
+        }
     }
 }
 

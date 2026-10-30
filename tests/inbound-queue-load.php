@@ -11,8 +11,9 @@
  * handlers are detached in every process: a fake transport).
  *
  * The site's own turn row (queue «default») is saved before and restored after;
- * the test deals («Проверка: нагрузка очереди …») and their notifications are
- * removed.
+ * the deals of this run («Проверка: нагрузка очереди <run>-…», QUEUE_RUN) with
+ * their feed, access journal, notifications and deliveries are removed by exact
+ * pairs and checked to be gone (a neighbour run is not touched).
  *
  * Usage: INBOUND_QUEUE_TEST=local php tests/inbound-queue-load.php
  *        (QUEUE_MEMBERS=1663,110, QUEUE_PROCESSES=14 by default)
@@ -88,11 +89,52 @@ if ($role !== 'main') {
     }
 }
 
-$cleanup = static function () use ($siteId) {
-    foreach (CmsLead::find()->andWhere(['cms_site_id' => $siteId])->andWhere(['like', 'name', LOAD_PREFIX.'%', false])->all() as $lead) {
-        CmsWebNotify::deleteAll(['model_code' => $lead->skeeksModelCode, 'model_id' => (int)$lead->id]);
+/**
+ * Removes the deals of THIS run only (source_ref of $run; a neighbour run keeps its own) and everything they
+ * left: their feed (cms_log), the journal of the access, the notifications and their deliveries, by exact pairs.
+ * The notifications and deliveries are collected before the deals go, the journals cleaned after delete() (it
+ * writes its own entries). Returns what is left of them (empty — clean).
+ */
+$cleanup = static function () use ($siteId, $run, $db): array {
+    $leads = CmsLead::find()->andWhere(['cms_site_id' => $siteId])->andWhere(['like', 'source_ref', 'inbound-queue-load:'.$run.'-%', false])->all();
+    $ids = array_map(static fn(CmsLead $lead) => (int)$lead->id, $leads);
+    if (!$ids) {
+        return [];
+    }
+    $codes = array_values(array_unique([CmsLead::class, (new CmsLead())->skeeksModelCode]));
+    $pairs = ['and', ['model_code' => $codes], ['model_id' => $ids]];
+    $deliveriesReady = $db->getTableSchema('{{%cms_comm_notify_delivery}}', true) !== null;
+    $accessReady = $db->getTableSchema('{{%cms_crm_access_log}}', true) !== null;
+    $notifyIds = static fn() => array_map('intval', (new \yii\db\Query())->select('id')->from('{{%cms_web_notify}}')->andWhere($pairs)->column($db));
+    $deliveryIds = static fn(array $notify) => $deliveriesReady && $notify
+        ? array_map('intval', (new \yii\db\Query())->select('id')->from('{{%cms_comm_notify_delivery}}')->andWhere(['cms_web_notify_id' => $notify])->column($db)) : [];
+    $notifies = $notifyIds();
+    $sends = $deliveryIds($notifies);
+    foreach ($leads as $lead) {
         $lead->delete();
     }
+    $db->createCommand()->delete('{{%cms_log}}', $pairs)->execute();
+    if ($accessReady) {
+        $db->createCommand()->delete('{{%cms_crm_access_log}}', ['cms_lead_id' => $ids])->execute();
+    }
+    $notifies = array_values(array_unique(array_merge($notifies, $notifyIds())));
+    $sends = array_values(array_unique(array_merge($sends, $deliveryIds($notifies))));
+    if ($sends) {
+        $db->createCommand()->delete('{{%cms_comm_notify_delivery}}', ['id' => $sends])->execute();
+    }
+    if ($notifies) {
+        $db->createCommand()->delete('{{%cms_web_notify}}', ['id' => $notifies])->execute();
+    }
+    $count = static fn(string $table, array $where) => (int)(new \yii\db\Query())->from($table)->andWhere($where)->count('*', $db);
+
+    return array_filter([
+        'deals' => $count('{{%cms_lead}}', ['id' => $ids]),
+        'contacts' => $count('{{%cms_lead_phone}}', ['cms_lead_id' => $ids]),
+        'cms_log' => $count('{{%cms_log}}', $pairs),
+        'cms_crm_access_log' => $accessReady ? $count('{{%cms_crm_access_log}}', ['cms_lead_id' => $ids]) : 0,
+        'cms_web_notify' => $count('{{%cms_web_notify}}', $pairs),
+        'cms_comm_notify_delivery' => $sends ? $count('{{%cms_comm_notify_delivery}}', ['id' => $sends]) : 0,
+    ]);
 };
 $saved = (new \yii\db\Query())->from($rotation)->andWhere(['cms_site_id' => $siteId, 'queue' => InboundQueue::QUEUE_DEFAULT])->one();
 $restore = static function () use ($db, $rotation, $siteId, $saved) {
@@ -180,6 +222,11 @@ try {
     }
     echo 'OK inbound-queue-load: '.$processes.' processes x 2 series ('.implode('; ', $summary).")\n";
 } finally {
-    $cleanup();
+    $left = $cleanup();
     $restore();
+    if ($left) {
+        fwrite(STDERR, 'FAIL inbound-queue-load: left after cleaning up '.json_encode($left)."\n");
+        exit(1);
+    }
+    echo "Cleaned up: no deals, contacts, feed, access journal, notifications or deliveries of run {$run} are left\n";
 }
