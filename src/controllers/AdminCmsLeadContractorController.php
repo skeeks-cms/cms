@@ -8,8 +8,10 @@ use skeeks\cms\models\CmsLead2contractor;
 use yii\db\ActiveRecord;
 
 /**
- * Requisites of a lead: `create?lead_id=<id>` adds, `detach?lead_id=<id>&contractor_id=<id>`
- * removes the link (the contractor itself stays, it may serve other records).
+ * Requisites of a lead: `detach?lead_id=<id>&contractor_id=<id>` removes the link (the contractor
+ * itself stays, it may serve other records). П2г (owner's decision 30.10.2026): requisites of a lead
+ * are «данные обращения» — `create` is refused to everybody, they are added to the company or the
+ * person of the deal.
  */
 class AdminCmsLeadContractorController extends AdminCmsContractorAttachController
 {
@@ -24,7 +26,11 @@ class AdminCmsLeadContractorController extends AdminCmsContractorAttachControlle
 
     public function actions()
     {
-        return array_merge(parent::actions(), [
+        $actions = parent::actions();
+        $actions['create']['accessCallback'] = static fn() => false;
+        $actions['create']['isVisible'] = false;
+
+        return array_merge($actions, [
             'detach' => [
                 'class' => \skeeks\cms\backend\ViewBackendAction::class,
                 'isVisible' => false,

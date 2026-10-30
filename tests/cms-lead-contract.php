@@ -286,16 +286,20 @@ foreach (['sx-send-sms-trigger', 'sx-telephony-btn', '/cms/admin-cms-lead-phone'
     }
 }
 // П2г: the request data are read only — no «Добавить …» of the deal's own phones, emails, addresses.
-foreach (['/cms/admin-cms-lead-phone/create', '/cms/admin-cms-lead-email/create', '/cms/admin-cms-lead-address/create'] as $fragment) {
+foreach (['/cms/admin-cms-lead-phone/create', '/cms/admin-cms-lead-email/create', '/cms/admin-cms-lead-address/create',
+    '/cms/admin-cms-lead-contractor/create', '/cms/admin-cms-lead-link/create'] as $fragment) {
     if (strpos($view, $fragment) !== false) {
         throw new RuntimeException('The deal card must not add contacts to the deal: '.$fragment);
     }
 }
 $contactActions = file_get_contents($root.'/controllers/traits/LeadContactActions.php');
-foreach (['Phone' => 'BackendAction::SIZE_SMALL, true', 'Email' => 'BackendAction::SIZE_SMALL, true', 'Address' => 'null, true'] as $kind => $call) {
+foreach (['Phone' => 'BackendAction::SIZE_SMALL, true', 'Email' => 'BackendAction::SIZE_SMALL, true', 'Address' => 'null, true', 'Link' => 'BackendAction::SIZE_SMALL, true'] as $kind => $call) {
     if (strpos(file_get_contents($root.'/controllers/AdminCmsLead'.$kind.'Controller.php'), 'leadContactActions('.$call.')') === false) {
         throw new RuntimeException('Lead '.$kind.' rows must be request data (create/update refused).');
     }
+}
+if (strpos(file_get_contents($root.'/controllers/AdminCmsLeadContractorController.php'), "\$actions['create']['accessCallback'] = static fn() => false;") === false) {
+    throw new RuntimeException('Requisites of a lead are request data: create is refused.');
 }
 if (strpos($contactActions, '$write = $requestData ? static fn() => false : $access;') === false) {
     throw new RuntimeException('Request data must refuse create and update for everybody.');
@@ -327,9 +331,8 @@ if (strpos($controller, 'CrmAccess::instance()->canWorkLead((int)\Yii::$app->use
 ) {
     throw new RuntimeException('Completed leads must remain read-only in controller actions through CrmAccess::canWorkLead().');
 }
-// Contact blocks pass add routes (requisites and links of the request; П2г: no phones, emails, addresses),
-// row menus and call/SMS actions only when $canWork.
-if (substr_count($view, "'addRoute' => \$canWork ?") < 2
+// П2г: the request data have no add routes at all; row menus and call/SMS actions only when $canWork.
+if (strpos($view, "'addRoute' => \$canWork ?") !== false
     || strpos($view, 'string $title): string => $canWork') === false
     || strpos($view, '(string)$phone->value, $model, $canWork ? [') === false
     || strpos($view, '$canWork = $model->canBeWorkedBy') === false

@@ -6,7 +6,10 @@ use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsDepartment;
 use skeeks\cms\models\CmsCompany2manager;
 use skeeks\cms\models\CmsCompany2user;
+use skeeks\cms\models\CmsCompany2contractor;
+use skeeks\cms\models\CmsCompanyAddress;
 use skeeks\cms\models\CmsCompanyEmail;
+use skeeks\cms\models\CmsCompanyLink;
 use skeeks\cms\models\CmsCompanyPhone;
 use skeeks\cms\models\CmsCrmAccessRequest;
 use skeeks\cms\models\CmsCrmDuplicateMark;
@@ -742,6 +745,9 @@ class LeadTriage
                 $this->copyToCard($lead, $kind, (string)$model->value, $model->name, $target);
             }
         }
+        if (!$identity['foreign']) {
+            $this->copyRequestDataToCompany($lead, $identity, $actorId);
+        }
 
         if ($identity['foreign']) {
             [$recordCode, $recordId] = [$identity['foreign'][0], (int)$identity['foreign'][1]];
@@ -908,6 +914,49 @@ class LeadTriage
         $model->cms_site_id = (int)$client->cms_site_id;
         if (!$model->save()) {
             throw new \DomainException(($kind === 'phone' ? 'Телефон: ' : 'Email: ').implode('; ', $model->getFirstErrors()));
+        }
+    }
+
+    /**
+     * П2г: addresses, links and requisites of the request go to the company of the deal when it gets one
+     * (created now, or one the actor may change: "Свои сделки и данные компании" and above); values the
+     * company already has are skipped, a row the company refuses stays with the deal only.
+     */
+    private function copyRequestDataToCompany(CmsLead $lead, array $identity, int $actorId): void
+    {
+        $companyId = (int)$lead->cms_company_id;
+        if (!$companyId || (!$lead->addresses && !$lead->links && !$lead->lead2contractors)) {
+            return;
+        }
+        $created = $identity['newCompany'] && (int)$identity['newCompany']->id === $companyId;
+        if (!$created && !$this->access->canEditClientData($actorId, CmsCrmAccessRequest::RECORD_COMPANY, $companyId)) {
+            return;
+        }
+        $rows = [];
+        foreach ($lead->addresses as $address) {
+            if (!CmsCompanyAddress::find()->andWhere(['cms_company_id' => $companyId, 'value' => $address->value])->exists()) {
+                $row = new CmsCompanyAddress(['cms_company_id' => $companyId]);
+                foreach (['name', 'value', 'latitude', 'longitude', 'entrance', 'floor', 'apartment_number', 'comment', 'postcode', 'sort'] as $attribute) {
+                    $row->{$attribute} = $address->{$attribute};
+                }
+                $rows[] = $row;
+            }
+        }
+        foreach ($lead->links as $link) {
+            if (!CmsCompanyLink::find()->andWhere(['cms_company_id' => $companyId, 'url' => $link->url])->exists()) {
+                $rows[] = new CmsCompanyLink(['cms_company_id' => $companyId, 'url' => $link->url, 'link_type' => $link->link_type, 'name' => $link->name, 'sort' => $link->sort]);
+            }
+        }
+        // Requisites are shared contractor records: the company gets a link to them.
+        foreach ($lead->lead2contractors as $map) {
+            if (!CmsCompany2contractor::find()->andWhere(['cms_company_id' => $companyId, 'cms_contractor_id' => (int)$map->cms_contractor_id])->exists()) {
+                $rows[] = new CmsCompany2contractor(['cms_company_id' => $companyId, 'cms_contractor_id' => (int)$map->cms_contractor_id]);
+            }
+        }
+        foreach ($rows as $row) {
+            if (!$row->save()) {
+                \Yii::warning('Request data of deal #'.(int)$lead->id.' not copied to company #'.$companyId.': '.implode('; ', $row->getFirstErrors()), self::class);
+            }
         }
     }
 

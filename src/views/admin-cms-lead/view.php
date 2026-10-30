@@ -419,8 +419,8 @@ CSS
                 ]);
             }
             echo Html::tag('div',
-                Html::tag('div', 'Контакты из обращения только для чтения. Чтобы добавить телефон или email, укажите клиента — компанию или контакт: '
-                    .'контакты обращения перенесутся в его карточку.')
+                Html::tag('div', 'Данные из обращения только для чтения. Чтобы добавить телефон, email, адрес, реквизиты или ссылку, укажите клиента — компанию или контакт: '
+                    .'телефоны и email обращения перенесутся в его карточку, адреса, реквизиты и ссылки — в карточку компании.')
                 .$identityLink,
                 ['class' => 'sx-surface sx-surface--raised sx-surface--padded sx-lead-request-hint']
             );
@@ -457,7 +457,7 @@ CSS
 
             echo CrmContactBlockWidget::widget([
                 'title' => 'Адреса из обращения',
-                'hint' => 'Адреса офиса, склада или магазина клиента из обращения. Первый из них основной. Когда у сделки появится компания или клиент, здесь будут их адреса.',
+                'hint' => 'Адреса офиса, склада или магазина клиента из обращения. Первый из них основной. Когда у сделки появится компания, адреса перенесутся в неё.',
                 'icon' => 'map-pin',
                 'items' => array_map(static fn($address) => [
                     'label' => $address->name ?: 'Адрес',
@@ -491,7 +491,8 @@ CSS
             ], $links);
 
             if ($requestData) {
-                // П2г: requisites and links of a request without a client; they go to the company created or found on sorting.
+                // П2г: requisites and links of a request without a client, read only; they go to the company the deal gets
+                // (LeadTriage::copyRequestDataToCompany()).
                 if ($canWork) {
                     $detachUrl = \yii\helpers\Json::encode(Url::to(['/cms/admin-cms-lead-contractor/detach', 'lead_id' => $leadId]));
                     $this->registerJs(<<<JS
@@ -511,25 +512,20 @@ JS
                 // Full contractor form with "fill by INN"; an INN already in the base is only linked.
                 echo CrmContactBlockWidget::widget([
                     'title' => 'Реквизиты из обращения',
-                    'hint' => 'Реквизиты организации или ИП, с которыми пришла сделка. Если такой ИНН уже есть в базе, реквизиты просто привязываются. При разборе они переносятся в компанию; когда у сделки появится компания или клиент, здесь будут их реквизиты.',
+                    'hint' => 'Реквизиты организации или ИП, с которыми пришла сделка. Когда у сделки появится компания, они перенесутся в неё, а здесь будут реквизиты клиента.',
                     'icon' => 'id-card',
                     'items' => $contractorItems($model->contractors, static fn($contractor) => $canWork
                         ? CrmContactBlockWidget::iconButton('close', 'Убрать из сделки', ['data-sx-lead-contractor-detach' => (int)$contractor->id])
                         : ''),
-                    'emptyText' => 'Реквизитов пока нет',
-                    'addLabel' => 'Добавить реквизиты',
-                    'addRoute' => $canWork ? ['/cms/admin-cms-lead-contractor/create', 'lead_id' => $leadId] : null,
+                    'emptyText' => 'Реквизитов в обращении нет',
                 ]);
 
                 echo CrmContactBlockWidget::widget([
                     'title' => 'Ссылки из обращения',
-                    'hint' => 'Сайт и соцсети клиента из обращения. При разборе ссылки переносятся в компанию; когда у сделки появится компания, здесь будут её ссылки.',
+                    'hint' => 'Сайт и соцсети клиента из обращения. Когда у сделки появится компания, ссылки перенесутся в неё, а здесь будут её ссылки.',
                     'icon' => 'link',
                     'items' => $linkItems($model->links, static fn($link) => $menu('/cms/admin-cms-lead-link', (int)$link->id, 'Изменить ссылку')),
-                    'emptyText' => 'Ссылок пока нет',
-                    'addLabel' => 'Добавить ссылку',
-                    'addRoute' => $canWork ? ['/cms/admin-cms-lead-link/create', 'CmsLeadLink' => ['cms_lead_id' => $leadId]] : null,
-                    'addSize' => 'small',
+                    'emptyText' => 'Ссылок в обращении нет',
                 ]);
             } else {
                 // П2г: a deal of a client has no requisites or links of its own — those of the company (or the person)

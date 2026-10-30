@@ -156,12 +156,24 @@ try {
         'executor_id' => $other->id]);
     $phoneId = (int)$incoming->phones[0]->id;
     $form->contacts = ['phone:'.$phoneId => 'company'];
+    // П2г: addresses, links and requisites of the request go to the company the deal gets.
+    (new \skeeks\cms\models\CmsLeadAddress(['cms_lead_id' => $incoming->id, 'value' => 'Проверка: адрес '.$uniq, 'latitude' => 55.75, 'longitude' => 37.61]))->save(false);
+    (new \skeeks\cms\models\CmsLeadLink(['cms_lead_id' => $incoming->id, 'url' => 'https://p2g-'.$uniq.'.test', 'link_type' => \skeeks\cms\models\CmsCompanyLink::TYPE_OTHER]))->save(false);
+    $requisite = new \skeeks\cms\models\CmsContractor(['cms_site_id' => $siteId, 'contractor_type' => 'legal', 'name' => 'Проверка '.$uniq, 'inn' => '77'.substr(str_pad($uniq, 8, '0'), 0, 8)]);
+    $requisiteSaved = $requisite->save(false);
+    if ($requisiteSaved) {
+        (new \skeeks\cms\models\CmsLead2contractor(['cms_lead_id' => $incoming->id, 'cms_contractor_id' => $requisite->id]))->save(false);
+    }
+    $incoming = CmsLead::findOne($incoming->id);
     $result = (new LeadTriage())->accept($incoming, $form, (int)$admin->id);
     $incoming->refresh();
     $check($incoming->status === CmsLead::STATUS_IN_WORK && (int)$incoming->executor_id === (int)$other->id && (int)$incoming->triaged_by === (int)$admin->id, 'accepted: in work, the chosen responsible, who sorted');
     $check(CmsCompany2user::find()->andWhere(['cms_company_id' => $incoming->cms_company_id, 'cms_user_id' => $incoming->cms_user_id])->exists(), 'the new person is linked to the new company');
     $check(CmsCompanyPhone::find()->andWhere(['cms_company_id' => $incoming->cms_company_id])->count() == 1, 'the chosen contact went to the company card');
     $check(count($incoming->phones) === 1, 'the contact stays with the deal («Из обращения»)');
+    $check(\skeeks\cms\models\CmsCompanyAddress::find()->andWhere(['cms_company_id' => $incoming->cms_company_id, 'value' => 'Проверка: адрес '.$uniq])->exists()
+        && \skeeks\cms\models\CmsCompanyLink::find()->andWhere(['cms_company_id' => $incoming->cms_company_id, 'url' => 'https://p2g-'.$uniq.'.test'])->exists(), 'the address and the link of the request went to the new company');
+    $check(!$requisiteSaved || \skeeks\cms\models\CmsCompany2contractor::find()->andWhere(['cms_company_id' => $incoming->cms_company_id, 'cms_contractor_id' => $requisite->id])->exists(), 'the requisites of the request are linked to the new company');
     $newClient = CmsUser::findOne($incoming->cms_user_id);
     $check($newClient && !$newClient->is_worker && !$newClient->password_hash, 'the person gets no password');
     $check($triaged === ['accepted'], 'EVENT_TRIAGED after commit');

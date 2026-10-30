@@ -19,9 +19,9 @@ use yii\helpers\ArrayHelper;
  * of an existing one from its saved value, so a posted form cannot move the
  * record to another lead.
  *
- * П2г (owner's decision 30.10.2026): phones, emails and addresses of a lead
- * are «данные обращения» — written only by incoming sources, never added or
- * changed by hand (`$requestData`); contacts are added to the company or the
+ * П2г (owner's decision 30.10.2026): phones, emails, addresses and links of a
+ * lead are «данные обращения» — written only by incoming sources, never added
+ * or changed by hand (`$requestData`); they are added to the company or the
  * person of the lead. A wrong row may still be removed by the responsible.
  */
 trait LeadContactActions
