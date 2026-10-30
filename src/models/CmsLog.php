@@ -12,6 +12,7 @@ use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\queries\CmsLogQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use skeeks\cms\helpers\CommentHtml;
 use yii\helpers\HtmlPurifier;
 use yii\helpers\Inflector;
 /**
@@ -525,7 +526,7 @@ class CmsLog extends ActiveRecord
 
         switch ($this->log_type) {
             case self::LOG_TYPE_COMMENT:
-                return new CmsLogEntry(['icon' => 'comment', 'title' => 'Комментарий', 'body' => (string)$this->comment]);
+                return new CmsLogEntry(['icon' => 'comment', 'title' => 'Комментарий', 'body' => CommentHtml::render((string)$this->comment)]);
             case self::LOG_TYPE_PHONE_CALL:
                 return $this->phoneCallEntry();
             case self::LOG_TYPE_INSERT:
@@ -590,7 +591,7 @@ class CmsLog extends ActiveRecord
         $name = ArrayHelper::getValue(\Yii::$app->skeeks->modelsConfig, [$this->model_code, 'name_one'], $this->model_code);
 
         if ($this->log_type == CmsLog::LOG_TYPE_COMMENT) {
-            return $this->comment;
+            return CommentHtml::render((string)$this->comment);
         } elseif ($this->log_type == CmsLog::LOG_TYPE_INSERT) {
 
             $res = [];

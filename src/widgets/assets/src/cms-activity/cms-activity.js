@@ -124,6 +124,22 @@
             return false;
         });
 
+    // Images of other sites in old comments load only on request (CommentHtml).
+    $("body")
+        .off("click.sxLogImagesShow")
+        .on("click.sxLogImagesShow", ".sx-log-images__show", function (event) {
+            event.preventDefault();
+
+            var notice = $(this).closest(".sx-log-images");
+            notice.parent().find("img[data-sx-src]").each(function () {
+                this.src = this.getAttribute("data-sx-src");
+                this.removeAttribute("data-sx-src");
+            });
+            notice.remove();
+
+            return false;
+        });
+
     $("body")
         .off("click.sxLogPinToggle")
         .on("click.sxLogPinToggle", ".sx-log-pin-toggle", function (event) {

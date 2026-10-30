@@ -423,6 +423,36 @@
     margin-bottom: 0;
 }
 
+.sx-log-entry__body img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Images of other sites wait for «Показать картинки» (CommentHtml). */
+.sx-log-entry__body img[data-sx-src] {
+    display: none;
+}
+
+.sx-log-images {
+    margin-bottom: 6px;
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-log-images__show {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--sx-color-accent);
+    font: inherit;
+    cursor: pointer;
+}
+
+.sx-log-images__show:hover,
+.sx-log-images__show:focus-visible {
+    text-decoration: underline;
+}
+
 .sx-log-entry__summary .sx-gray,
 .sx-log-entry__body .sx-gray {
     color: var(--sx-color-text-muted);
