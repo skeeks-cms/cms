@@ -133,6 +133,9 @@ class CrmController extends Controller
         }
         if ($this->apply) {
             $this->stdout('Назначено: '.$service->applyHistoryMainPlan($plan)."\n");
+            if (($byCode['company'] ?? 0) > 0) {
+                $this->stdout("Контакты этих компаний получают основного повторным cms/crm/assign-owners (до protect-owners).\n");
+            }
         } else {
             $this->stdout("Ничего не записано. Записать: --apply\n");
         }
@@ -301,9 +304,11 @@ class CrmController extends Controller
 
     /**
      * Every client (company or person) whose main responsible is one of --owners becomes «Всегда по
-     * согласованию» (owner's decision 30.10.2026), after assign-owners and assign-pool-main. The plan
-     * by default; --apply writes, each change to the journal of the access; a repeated run changes
-     * nothing. The daily protection agent keeps «always» (CrmProtection::compute()).
+     * согласованию» (owner's decision 30.10.2026), after assign-owners, assign-pool-main and the
+     * repeated assign-owners (the contacts of the companies from the pool). The plan by default;
+     * --apply writes, each change to the journal of the access, and refuses while contacts of owner
+     * companies still wait for their main (OwnerAssignment::pendingOwnerContacts()); a repeated run
+     * changes nothing. The daily protection agent keeps «always» (CrmProtection::compute()).
      */
     public function actionProtectOwners()
     {
@@ -319,6 +324,19 @@ class CrmController extends Controller
             return ExitCode::UNSPECIFIED_ERROR;
         }
         $service = new \skeeks\cms\crm\OwnerAssignment($owners);
+        // Contacts of owner companies without their own main (a company from the former pool after the
+        // first assign-owners) are not seen here and would stay free: assign-owners has to run again first.
+        $pending = $service->pendingOwnerContacts();
+        if ($pending) {
+            $this->stderr('Контакты компаний владельцев ещё без основного: '.count($pending).' (ID '
+                .implode(', ', array_map(static fn($row) => (int)$row['id'], array_slice($pending, 0, 50))).(count($pending) > 50 ? ', …' : '')
+                ."). Сначала повторите cms/crm/assign-owners с теми же --owners/--keep/--review и --apply.\n");
+            if ($this->apply) {
+                $this->stderr("Ничего не записано.\n");
+
+                return ExitCode::UNSPECIFIED_ERROR;
+            }
+        }
         $plan = $service->protectionPlan();
         $groups = [];
         foreach ($plan as $row) {

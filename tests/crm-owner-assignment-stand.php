@@ -219,6 +219,78 @@ try {
     $check((int)(new yii\db\Query())->from('cms_crm_access_log')->count() === $before + 15, 'the plan of the command writes nothing');
     $usage = $command()->runAction('assign-owners', []);
     $check($usage !== 0, 'the command without owners refuses');
+
+    // The whole release sequence (audit F4-01, 30.10.2026) with the real roles of the site: a company of the
+    // former pool (no links) and its historical contact (no author, no history of his own). The first
+    // assign-owners cannot give the contact a main — the company has none yet; assign-pool-main gives the
+    // company to an owner and skips the contact (a person in a company is not in the pool). protect-owners
+    // must not run then: the contact would stay free, and «Работать» would make a deal without a request.
+    // The repeated assign-owners gives the contact the main of his company and «always».
+    $ids = static fn(string $name, string $default) => array_values(array_filter(array_map('intval', explode(',', getenv($name) ?: $default))));
+    $realOwners = $ids('TEST_OWNERS', '1,23');
+    $realKeep = $ids('TEST_KEEP', '110');
+    $realReview = $ids('TEST_REVIEW', '1663');
+    foreach (array_merge($realOwners, $realKeep, $realReview) as $id) {
+        $check(\skeeks\cms\models\CmsUser::find()->andWhere(['id' => $id, 'is_worker' => 1])->exists(), "the worker $id is on the stand");
+    }
+    $owner = $realOwners[0];
+    $poolCompany = $company('из пула с контактом', null, []);
+    $poolContact = $contact('исторический', [$poolCompany]);
+    $check((new yii\db\Query())->select('created_by')->from('cms_user')->where(['id' => $poolContact])->scalar() === null
+        && !(new yii\db\Query())->from(['u' => 'cms_user'])->where(['u.id' => $poolContact])->andWhere(CrmAccess::historyCondition('client', 'u.id'))->exists(),
+        'the historical contact: no author, no history of his own');
+    $sequence = new OwnerAssignment($realOwners, $realKeep, $realReview);
+    $ours = static fn(array $rows) => array_values(array_filter($rows, static fn($row) => ($row['code'] === 'company' && (int)$row['id'] === $poolCompany)
+        || ($row['code'] === 'client' && (int)$row['id'] === $poolContact)));
+    $changes = static fn(array $rows) => array_values(array_filter($rows, static fn($row) => $row['change']));
+    $first = $ours($sequence->plan());
+    $check($first === [], 'sequence 1, assign-owners: neither the pool company nor its contact '.json_encode($first));
+    $poolPlan = $ours((new CrmProtection())->poolMainPlan($owner));
+    $check(count($poolPlan) === 1 && $poolPlan[0]['code'] === 'company' && $poolPlan[0]['user_id'] === $owner,
+        'sequence 2, assign-pool-main: the company to the owner, the contact is not in the pool '.json_encode($poolPlan));
+    $check((new CrmProtection())->applyHistoryMainPlan($poolPlan) === 1, 'sequence 2: applied');
+    $access->resetMemo();
+    // The miss: the contact waits for the main of his company, protect-owners does not see him.
+    $pending = $ours($sequence->pendingOwnerContacts());
+    $check(count($pending) === 1 && (int)$pending[0]['id'] === $poolContact && $pending[0]['user_id'] === $owner && $pending[0]['always'],
+        'F4-01: after the pool the contact of the owner company is pending '.json_encode($pending));
+    $check(!array_filter($sequence->protectionPlan(), static fn($row) => $row['code'] === 'client' && (int)$row['id'] === $poolContact)
+        && $access->mainResponsibleId('client', $poolContact) === null && !$access->approvalRequired('client', $poolContact),
+        'F4-01: protect-owners does not see the contact, he is free without a main');
+    $protectBefore = (int)(new yii\db\Query())->from('cms_crm_access_log')->count();
+    $controller = $command();
+    $code = $controller->runAction('protect-owners', ['owners' => implode(',', $realOwners), 'apply' => 1]);
+    $check($code !== 0 && strpos($controller->out, 'повторите cms/crm/assign-owners') !== false
+        && (int)(new yii\db\Query())->from('cms_crm_access_log')->count() === $protectBefore
+        && $protection('cms_company', $poolCompany) === CrmProtection::FREE,
+        'protect-owners --apply refuses while contacts are pending and writes nothing');
+    // The fix: assign-owners again with the same options, then protect-owners.
+    // The repeated assign-owners also makes the pool company of the owner «always» (it is an owner row now).
+    $second = $changes($ours($sequence->plan()));
+    $secondContact = array_values(array_filter($second, static fn($row) => $row['code'] === 'client'));
+    $check(count($second) === 2 && count($secondContact) === 1 && $secondContact[0]['group'] === OwnerAssignment::CONTACT
+        && $secondContact[0]['user_id'] === $owner && $secondContact[0]['always'],
+        'sequence 3, repeated assign-owners: the contact gets the main of his company '.json_encode($second));
+    $check($sequence->apply($second) === [1, 2], 'sequence 3: one main, two «always»');
+    $access->resetMemo();
+    $check($ours($sequence->pendingOwnerContacts()) === [], 'sequence 3: nothing pending');
+    $controller = $command();
+    $code = $controller->runAction('protect-owners', ['owners' => implode(',', $realOwners)]);
+    $check($code === 0 && strpos($controller->out, 'Ничего не записано') !== false && $ours($sequence->protectionPlan()) === [],
+        'sequence 4, protect-owners: nothing of the sequence left to protect');
+    $check($access->mainResponsibleId('client', $poolContact) === $access->mainResponsibleId('company', $poolCompany)
+        && $access->mainResponsibleId('company', $poolCompany) === $owner, 'the main of the contact is the main of his company');
+    $check($protection('cms_user', $poolContact) === CrmProtection::ALWAYS && $protection('cms_company', $poolCompany) === CrmProtection::ALWAYS,
+        'the contact and the company «always»');
+    $check($changes($ours($sequence->plan())) === [] && $ours((new CrmProtection())->poolMainPlan($owner)) === []
+        && $ours($sequence->protectionPlan()) === [] && $ours($sequence->pendingOwnerContacts()) === [], 'every repeated plan of the sequence is empty');
+    $check($access->approvalRequired('client', $poolContact) && $access->approvalRequired('company', $poolCompany), 'the approval is required');
+    foreach (array_merge($realKeep, $realReview) as $actor) {
+        Yii::$app->user->setIdentity(\skeeks\cms\models\CmsUser::findOne($actor));
+        $access->resetMemo();
+        $result = (new \skeeks\cms\crm\LeadTriage())->workWithClient($access->candidateRef('client', $poolContact), $actor, 'Проверка: владельцы — порядок');
+        $check($result['lead'] === null && $result['request'] !== null, "«Работать» under $actor: a request to the owner, no deal");
+    }
 } finally {
     $transaction->rollBack();
 }

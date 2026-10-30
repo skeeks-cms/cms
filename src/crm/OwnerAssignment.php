@@ -257,6 +257,21 @@ class OwnerAssignment
         return $plan;
     }
 
+    /**
+     * Contacts of owner companies still waiting for the main responsible of their company (plan()
+     * rows of the group contact that make an owner the main one). A company given to an owner from
+     * the former pool after the first assign-owners leaves its contacts here until assign-owners
+     * runs again (release audit F4-01, 30.10.2026); protectionPlan() does not see them, as they
+     * have no main yet.
+     *
+     * @return array[] the plan() rows
+     */
+    public function pendingOwnerContacts(): array
+    {
+        return array_values(array_filter($this->plan(), fn(array $row) => $row['group'] === self::CONTACT && $row['change']
+            && in_array((int)$row['user_id'], $this->owners, true)));
+    }
+
     /** Applies protectionPlan(): «Всегда по согласованию», each change in the journal; returns the count. */
     public function applyProtection(array $plan): int
     {
