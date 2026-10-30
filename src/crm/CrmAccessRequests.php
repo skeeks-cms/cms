@@ -11,7 +11,7 @@ use yii\helpers\Html;
 
 /**
  * Requests about a client of another main responsible (П2а, owner's decision
- * 28.10.2026, ARCHITECTURE.md П1/П2 пп. 10–11):
+ * 28.10.2026, platform-plan crm/links-contract.md, пп. 10–11):
  * - «Работать с этим клиентом» (work): the deal is already the employee's and
  *   he has the level "Свои сделки"; the main responsible (or his leader, an
  *   administrator) raises the level ("Свои сделки и данные компании",

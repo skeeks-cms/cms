@@ -59,7 +59,7 @@ class m261029_130000__create_table__cms_crm_access_log extends Migration
 
     public function safeDown()
     {
-        // The journal of the access is kept for good (ARCHITECTURE.md п. 13).
+        // The journal of the access is kept for good (platform-plan crm/links-contract.md п. 13).
         $this->refuseRollbackWithData([
             'события журнала доступа' => $this->hasTable('{{%cms_crm_access_log}}') ? (new \yii\db\Query())->from('{{%cms_crm_access_log}}') : null,
         ]);

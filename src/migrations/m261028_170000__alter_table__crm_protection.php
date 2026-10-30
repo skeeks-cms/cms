@@ -5,7 +5,7 @@ use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
- * П2д (owner's decision 28.10.2026, cms-communication ARCHITECTURE.md п. 13):
+ * П2д (owner's decision 28.10.2026, platform-plan crm/links-contract.md п. 13):
  * the protection of a company and a client person instead of the hand flag
  * «Доступ только по согласованию» — free | protected (a payment for the last N
  * months or an active service) | always (by hand). The records with the old

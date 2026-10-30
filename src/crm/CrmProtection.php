@@ -10,7 +10,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\CmsUser2manager;
 
 /**
- * П2д, owner's decision 28.10.2026 (cms-communication ARCHITECTURE.md п. 13):
+ * П2д, owner's decision 28.10.2026 (platform-plan crm/links-contract.md п. 13):
  * the protection of a company or a client person instead of the hand flag
  * «Доступ только по согласованию».
  *

@@ -10,7 +10,7 @@ use yii\base\Event;
 use yii\db\BaseActiveRecord;
 
 /**
- * «Исходящие продажи» (П2д, ARCHITECTURE.md п. 13): the default stages of
+ * «Исходящие продажи» (П2д, platform-plan crm/links-contract.md п. 13): the default stages of
  * the outbound pipeline and the personal offer moving a deal through them.
  *
  * A presentation or a КП a manager sent from a deal moves it to «КП

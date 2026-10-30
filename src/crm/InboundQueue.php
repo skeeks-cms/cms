@@ -12,8 +12,8 @@ use yii\db\Query;
 use yii\helpers\Html;
 
 /**
- * «Входящие заявки» (owner's decision 29.10.2026, cms-communication
- * ARCHITECTURE.md п. 13б): who sorts the requests of «Неразобранное» and how.
+ * «Входящие заявки» (owner's decision 29.10.2026,
+ * platform-plan crm/links-contract.md п. 13б): who sorts the requests of «Неразобранное» and how.
  * The queue belongs to the pipeline the deal is in (CmsLeadPipeline: its
  * employees, departments and mode; a request lands in a pipeline by its source,
  * CmsLeadPipeline::forSource()); a pipeline without its own queue takes the

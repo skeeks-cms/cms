@@ -4,7 +4,7 @@ use skeeks\cms\db\RepeatableMigrationTrait;
 use yii\db\Migration;
 
 /**
- * П2а, owner's decision 28.10.2026 (ARCHITECTURE.md, П1/П2 пп. 10–11):
+ * П2а, owner's decision 28.10.2026 (platform-plan crm/links-contract.md, пп. 10–11):
  * - the main responsible: exactly one link of a company or a client is
  *   `is_main` (always "full"); existing records — the link of the author of the
  *   record, else the earliest link; no links — no main;

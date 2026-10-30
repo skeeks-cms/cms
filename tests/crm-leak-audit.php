@@ -427,7 +427,7 @@ try {
     $comment($protected, 'комментарий защищённой компании', ['cms_company_id' => $protected->id]);
     $comment($own, 'комментарий своей сделки', ['cms_company_id' => $A->id]);
 
-    // ============ people (owner's decision 29.10.2026, ARCHITECTURE.md п. 11): the data of a person are seen
+    // ============ people (owner's decision 29.10.2026, platform-plan crm/links-contract.md п. 11): the data of a person are seen
     // through his companies, his personal orders — only through his own access ============
     $human = static function (string $what, array $companies, ?int $mainId, string $protection = null) use ($name, $siteId, $link, $db) {
         $model = new CmsUser(['first_name' => $name($what), 'last_name' => 'Аудитов', 'cms_site_id' => $siteId,
