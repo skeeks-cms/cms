@@ -136,6 +136,14 @@ $this->registerCss(<<<CSS
 .sx-task-layout > * {
     min-width: 0;
 }
+/* The description and the properties are always one height: the row of the layout. */
+html[data-sx-theme] .sx-task-layout.sx-detail-layout {
+    align-items: stretch;
+}
+.sx-task-main-surface,
+.sx-task-side {
+    height: 100%;
+}
 .sx-task-description {
     display: flex;
     width: 100%;
