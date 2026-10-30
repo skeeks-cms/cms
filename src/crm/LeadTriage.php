@@ -76,6 +76,8 @@ class LeadTriage
             throw new \DomainException('Этап не найден. Обновите страницу.');
         }
 
+        $this->defaultContacts($lead, $form);
+
         return $this->transaction(function () use ($lead, $form, $actorId, $stageId) {
             // The request of a client does not wait for an approval (a client «по согласованию» goes to its main responsible).
             $identity = $this->applyIdentity($lead, $form, $actorId, true);
@@ -234,6 +236,25 @@ class LeadTriage
     }
 
     /**
+     * П2г: without an explicit choice (the API, «Это он») every phone and email of the request goes to the
+     * client card (CONTACT_TO_CARD); a choice of the window, «Не переносить» included, is kept.
+     */
+    private function defaultContacts(CmsLead $lead, LeadIdentityForm $form): void
+    {
+        if ((array)$form->contacts !== []) {
+            return;
+        }
+        $contacts = [];
+        foreach ($lead->phones as $phone) {
+            $contacts['phone:'.(int)$phone->id] = LeadIdentityForm::CONTACT_TO_CARD;
+        }
+        foreach ($lead->emails as $email) {
+            $contacts['email:'.(int)$email->id] = LeadIdentityForm::CONTACT_TO_CARD;
+        }
+        $form->contacts = $contacts;
+    }
+
+    /**
      * П2г (owner's decision 30.10.2026): a deal made by an employee — the
      * deal form, the API — is saved only with its client, a company or a
      * person, found or created; phones and emails are typed into the new
@@ -340,6 +361,7 @@ class LeadTriage
             throw new \DomainException('Этот клиент закреплён за другим сотрудником. Запросите доступ из окна совпадения.');
         }
         $this->validate($form);
+        $this->defaultContacts($lead, $form);
         $executorId = (int)$lead->executor_id;
 
         return $this->transaction(function () use ($lead, $form, $actorId, $executorId) {
@@ -730,7 +752,8 @@ class LeadTriage
     private function afterIdentity(CmsLead $lead, array &$identity, LeadIdentityForm $form, int $actorId): void
     {
         foreach ((array)$form->contacts as $key => $target) {
-            if ($target === LeadIdentityForm::CONTACT_TO_CARD) {
+            $auto = $target === LeadIdentityForm::CONTACT_TO_CARD;
+            if ($auto) {
                 // «В карточку клиента»: the person of the deal, else its company.
                 $target = $lead->cms_user_id ? 'client' : ($lead->cms_company_id ? 'company' : '');
             }
@@ -742,7 +765,9 @@ class LeadTriage
                 ? CmsLeadPhone::findOne(['id' => (int)$id, 'cms_lead_id' => (int)$lead->id])
                 : ($kind === 'email' ? CmsLeadEmail::findOne(['id' => (int)$id, 'cms_lead_id' => (int)$lead->id]) : null);
             if ($model && $this->mayCopyTo($lead, $target, $identity, $actorId)) {
-                $this->copyToCard($lead, $kind, (string)$model->value, $model->name, $target);
+                // The default choice never fails the decision: a row the card refuses stays request data.
+                $auto ? $this->tryCopyToCard($lead, $kind, (string)$model->value, $model->name, $target)
+                    : $this->copyToCard($lead, $kind, (string)$model->value, $model->name, $target);
             }
         }
         if (!$identity['foreign']) {
