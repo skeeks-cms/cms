@@ -478,15 +478,11 @@ class CmsTask extends ActiveRecord
                                 return false;
                             }
 
-                            if (\Yii::$app->user->id == $this->executor_id) {
+                            if ($this->canCancel()) {
                                 return true;
                             }
 
-                            if (\Yii::$app->user->id == $this->created_by) {
-                                return true;
-                            }
-
-                            $this->addError('status', "Отменить задачу может только исполнитель или автор.");
+                            $this->addError('status', "Отменить задачу может только исполнитель, автор или администратор.");
                             return false;
 
                         } elseif ($this->status == self::STATUS_IN_WORK) {
@@ -1071,6 +1067,22 @@ class CmsTask extends ActiveRecord
         }
 
         return (int)$this->updated_at;
+    }
+
+    /**
+     * Who may cancel a new or accepted task and resume a cancelled one: its
+     * author, its executor or an administrator (cleaning up tasks of closed deals).
+     */
+    public function canCancel($userId = null): bool
+    {
+        $userId = (int)($userId ?? \Yii::$app->user->id);
+        if (!$userId) {
+            return false;
+        }
+
+        return $userId === (int)$this->executor_id
+            || $userId === (int)$this->created_by
+            || \Yii::$app->authManager->checkAccess($userId, CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
     }
 
     public function canResumeReady()

@@ -28,10 +28,10 @@ class TaskWorkflow
             $isAuthor = (int)$actor->id === (int)$task->created_by;
             $allowed = $isExecutor;
             if ($status === CmsTask::STATUS_READY) { $allowed = $isAuthor; }
-            if ($status === CmsTask::STATUS_CANCELED) { $allowed = $isAuthor || $isExecutor; }
+            if ($status === CmsTask::STATUS_CANCELED) { $allowed = $task->canCancel((int)$actor->id); }
             if ($status === CmsTask::STATUS_ON_PAUSE && in_array($old, [CmsTask::STATUS_ON_CHECK, CmsTask::STATUS_READY], true)) { $allowed = $isAuthor; }
             if ($status === CmsTask::STATUS_ON_PAUSE && $old === CmsTask::STATUS_ON_PAUSE) { $allowed = $isAuthor || $isExecutor; }
-            if ($status === CmsTask::STATUS_ON_PAUSE && $old === CmsTask::STATUS_CANCELED) { $allowed = $isAuthor || $isExecutor; }
+            if ($status === CmsTask::STATUS_ON_PAUSE && $old === CmsTask::STATUS_CANCELED) { $allowed = $task->canCancel((int)$actor->id); }
             if (!$allowed) { throw new Exception('Only the responsible task participant may perform this action.'); }
             $open = CmsTaskSchedule::find()->task($task)->notEnd()->all();
             if ($open && (int)$open[0]->cms_user_id !== $executorId) { throw new Exception('Task interval belongs to another user.'); }

@@ -229,7 +229,7 @@ $title = '';
 
 <? endif; ?>
 
-<? if ($widget->task->created_by == \Yii::$app->user->id || $widget->task->executor_id == \Yii::$app->user->id) : ?>
+<? if ($widget->task->canCancel()) : ?>
     <? if ($widget->task->status == \skeeks\cms\models\CmsTask::STATUS_NEW || $widget->task->status == \skeeks\cms\models\CmsTask::STATUS_ACCEPTED) : ?>
 
         <? $status = \skeeks\cms\models\CmsTask::STATUS_CANCELED; ?>
