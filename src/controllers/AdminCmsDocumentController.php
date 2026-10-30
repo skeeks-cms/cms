@@ -132,9 +132,13 @@ class AdminCmsDocumentController extends BackendModelStandartController
                                     /** @var ShopDocumentQuery $query */
                                     $query = $e->dataProvider->query;
                                     if ($e->field->value) {
-                                        $query->search($e->field->value);
-                                        $query->joinWith('company as company');
-                                        $query->orWhere(['LIKE', 'company.name', $e->field->value]);
+                                        // One OR group under the access scope of the list (orWhere() would OR forManager()).
+                                        $table = ShopDocument::tableName();
+                                        $query->andWhere([
+                                            'or',
+                                            [$table.'.id' => ShopDocument::find()->search($e->field->value)->select($table.'.id')],
+                                            [$table.'.cms_company_id' => CmsCompany::find()->select('id')->andWhere(['like', 'name', $e->field->value])],
+                                        ]);
                                     }
                                 },
                             ],
@@ -730,36 +734,37 @@ JS
         $dealData = [];
 
         if ($model->cms_company_id || $model->cms_user_id || $selectedBillIds) {
-            $billQuery = ShopBill::find()->forManager();
+            // The owner's bills or the selected ones, always under forManager(): orWhere() would OR the scope away.
+            $billOwner = ['and'];
             if ($model->cms_company_id) {
-                $billQuery->andWhere(['cms_company_id' => $model->cms_company_id]);
+                $billOwner[] = ['cms_company_id' => $model->cms_company_id];
             }
             if ($model->cms_user_id) {
-                $billQuery->andWhere(['cms_user_id' => $model->cms_user_id]);
+                $billOwner[] = ['cms_user_id' => $model->cms_user_id];
             }
-            if ($selectedBillIds) {
-                $billQuery->orWhere([ShopBill::tableName().'.id' => $selectedBillIds]);
-            }
+            $billSelected = [ShopBill::tableName().'.id' => $selectedBillIds];
+            $billQuery = ShopBill::find()->forManager()->andWhere(count($billOwner) === 1 ? $billSelected
+                : ($selectedBillIds ? ['or', $billOwner, $billSelected] : $billOwner));
             $billData = ArrayHelper::map($billQuery->limit(100)->all(), 'id', 'asFullText');
             if ($model->bills && !$model->isNewRecord) {
                 $billData = ArrayHelper::merge(ArrayHelper::map($model->bills, 'id', 'asFullText'), (array)$billData);
             }
             if ($selectedBillIds) {
-                $billData = ArrayHelper::merge(ArrayHelper::map(ShopBill::find()->where(['id' => $selectedBillIds])->all(), 'id', 'asFullText'), (array)$billData);
+                $billData = ArrayHelper::merge(ArrayHelper::map(ShopBill::find()->forManager()->andWhere([ShopBill::tableName().'.id' => $selectedBillIds])->all(), 'id', 'asFullText'), (array)$billData);
             }
         }
 
         if ($model->cms_company_id || $model->cms_user_id || $selectedDealIds) {
-            $dealQuery = CmsDeal::find()->forManager();
+            $dealOwner = ['and'];
             if ($model->cms_company_id) {
-                $dealQuery->andWhere(['cms_company_id' => $model->cms_company_id]);
+                $dealOwner[] = ['cms_company_id' => $model->cms_company_id];
             }
             if ($model->cms_user_id) {
-                $dealQuery->andWhere(['cms_user_id' => $model->cms_user_id]);
+                $dealOwner[] = ['cms_user_id' => $model->cms_user_id];
             }
-            if ($selectedDealIds) {
-                $dealQuery->orWhere([CmsDeal::tableName().'.id' => $selectedDealIds]);
-            }
+            $dealSelected = [CmsDeal::tableName().'.id' => $selectedDealIds];
+            $dealQuery = CmsDeal::find()->forManager()->andWhere(count($dealOwner) === 1 ? $dealSelected
+                : ($selectedDealIds ? ['or', $dealOwner, $dealSelected] : $dealOwner));
             $dealData = ArrayHelper::map($dealQuery->limit(100)->all(), 'id', 'asText');
             if ($model->deals && !$model->isNewRecord) {
                 $dealData = ArrayHelper::merge(ArrayHelper::map($model->deals, 'id', 'asText'), (array)$dealData);

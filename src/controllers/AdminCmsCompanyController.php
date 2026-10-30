@@ -182,10 +182,12 @@ HTML
 
                                         $logsQuery = CmsLog::find()->andWhere(['like', 'comment', $e->field->value])->andWhere(['model_code' => CmsCompany::class])->select(["model_id"]);
 
-                                        $query->search($e->field->value);
-
-                                        $query->orWhere([
-                                            CmsCompany::tableName().'.id' => $logsQuery,
+                                        // One OR group under the access scope of the list: orWhere() here would OR the
+                                        // whole forManager() condition and show other employees' companies.
+                                        $query->andWhere([
+                                            'or',
+                                            [CmsCompany::tableName().'.id' => CmsCompany::find()->search($e->field->value)->select(CmsCompany::tableName().'.id')],
+                                            [CmsCompany::tableName().'.id' => $logsQuery],
                                         ]);
                                     }
                                 },

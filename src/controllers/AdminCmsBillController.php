@@ -331,14 +331,14 @@ class AdminCmsBillController extends BackendModelStandartController
                                     $query = $e->dataProvider->query;
 
                                     if ($e->field->value) {
-                                        $query->search($e->field->value);
-                                        $query->joinWith('company as company');
-                                        $query->joinWith('senderContractor as senderContractor');
-                                        $query->orWhere([
-                                            'LIKE', 'company.name', $e->field->value
-                                        ]);
-                                        $query->orWhere([
-                                            'LIKE', 'senderContractor.name', $e->field->value
+                                        // One OR group under the access scope of the list: orWhere() would OR the whole
+                                        // forManager() condition and show bills of other employees' clients.
+                                        $table = ShopBill::tableName();
+                                        $query->andWhere([
+                                            'or',
+                                            [$table.'.id' => ShopBill::find()->search($e->field->value)->select($table.'.id')],
+                                            [$table.'.cms_company_id' => CmsCompany::find()->select('id')->andWhere(['like', 'name', $e->field->value])],
+                                            [$table.'.sender_contractor_id' => CmsContractor::find()->select('id')->andWhere(['like', 'name', $e->field->value])],
                                         ]);
                                     }
                                 },

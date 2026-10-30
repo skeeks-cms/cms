@@ -423,6 +423,8 @@ try {
     $comment($billP, 'комментарий счёта клиента Б', ['cms_user_id' => $person->id]);
     $comment($poolLead, 'комментарий сделки пула', ['cms_company_id' => $pool->id]);
     $comment($A, 'комментарий компании', ['cms_company_id' => $A->id]);
+    // the company search also looks in the comments of its feed (findex[q] of «Компании»)
+    $comment($protected, 'комментарий защищённой компании', ['cms_company_id' => $protected->id]);
     $comment($own, 'комментарий своей сделки', ['cms_company_id' => $A->id]);
 
     // ============ people (owner's decision 29.10.2026, ARCHITECTURE.md п. 11): the data of a person are seen
@@ -526,7 +528,7 @@ try {
             'коммент. платежа' => AUDIT_PREFIX.'комментарий платежа '.$uniq, 'коммент. документа' => AUDIT_PREFIX.'комментарий документа '.$uniq,
             'коммент. услуги' => AUDIT_PREFIX.'комментарий услуги '.$uniq, 'коммент. задачи' => AUDIT_PREFIX.'комментарий задачи компании '.$uniq,
             'коммент. чужой сделки Б' => AUDIT_PREFIX.'комментарий чужой сделки клиента Б '.$uniq, 'коммент. счёта Б' => AUDIT_PREFIX.'комментарий счёта клиента Б '.$uniq,
-            'коммент. сделки пула' => AUDIT_PREFIX.'комментарий сделки пула '.$uniq,
+            'коммент. сделки пула' => AUDIT_PREFIX.'комментарий сделки пула '.$uniq, 'коммент. защищённой компании' => AUDIT_PREFIX.'комментарий защищённой компании '.$uniq,
             'письмо по чужой сделке' => AUDIT_PREFIX.'письмо по чужой сделке '.$uniq, 'письмо по услуге' => AUDIT_PREFIX.'письмо по услуге '.$uniq,
             'письмо защищённой' => AUDIT_PREFIX.'письмо защищённой '.$uniq,
             // A letter linked only to the company: the old correspondence of the client is "full" only (п. 11, 29.10.2026).
@@ -635,12 +637,25 @@ try {
             'Чаты' => '/~sxx/cmsCommunication/admin-cms-comm-chat',
             'Рабочий стол' => '/~sxx/admin/admin-index/dashboard?pk=1',
         ];
+        // The search of a grid (findex[q], QueryFiltersWidget) must narrow the visible rows, never add others: a
+        // filter handler with orWhere() once joined the visibility (forManager()) by OR (patch 30.10.2026). The
+        // parameter is applied even where the search field is not shown, so every grid section is searched.
+        // (a query is echoed in the search field: it must not equal a mark, so the name goes without the run mark)
+        $searches = [$uniq, AUDIT_PREFIX.'Защищённая компания', AUDIT_PREFIX];
         foreach ($sections as $place => $path) {
-            $page('Раздел «'.$place.'»', $path);
+            [$code, $body] = $page('Раздел «'.$place.'»', $path);
+            if ($code !== 200 || !preg_match('~_sx-export=~', $body)) {
+                continue;
+            }
+            foreach ($searches as $q) {
+                $page('Раздел «'.$place.'»: поиск «'.$q.'»', $path.(strpos($path, '?') === false ? '?' : '&').http_build_query(['findex' => ['q' => $q]]));
+            }
         }
         // the searches above look for the marks of this run ($uniq): they must find the own records (the mail search
         // has no own control: the letters of the fixture belong to no mailbox, the section lists mailbox letters)
         $mustSee('Сделки: канбан, поиск своей', '/~sxx/cms/admin-cms-lead/kanban?q='.urlencode($uniq), $own->name);
+        $mustSee('Сделки: таблица, поиск своей', '/~sxx/cms/admin-cms-lead/index?'.http_build_query(['findex' => ['q' => $uniq]]), $own->name);
+        $mustSee('Компании: поиск своей', '/~sxx/cms/admin-cms-company/index?'.http_build_query(['findex' => ['q' => $uniq]]), $A->name);
 
         // --- cards of the foreign records by a direct address ---
         $cards = [
@@ -968,7 +983,13 @@ try {
                      'Услуги' => '/~sxx/cms/admin-cms-deal/index', 'Счета' => '/~sxx/cms/admin-cms-bill/index', 'Платежи' => '/~sxx/shop/admin-payment/index',
                      'Документы' => '/~sxx/cms/admin-cms-document/index', 'Предложения' => '/~sxx/cmsProposal/admin-cms-proposal/index',
                      'Клиенты' => '/~sxx/cms/admin-user/index'] as $place => $path) {
-            $page('Раздел «'.$place.'»', $path);
+            [$code, $body] = $page('Раздел «'.$place.'»', $path);
+            // the grid search (findex[q]) must not open his personal records either
+            if ($code === 200 && preg_match('~_sx-export=~', $body)) {
+                foreach ([$uniq, $V->first_name] as $q) {
+                    $page('Раздел «'.$place.'»: поиск «'.$q.'»', $path.(strpos($path, '?') === false ? '?' : '&').http_build_query(['findex' => ['q' => $q]]));
+                }
+            }
         }
         foreach ([
                      'Личная сделка В' => '/~sxx/cms/admin-cms-lead/view?pk='.$leadV->id,
