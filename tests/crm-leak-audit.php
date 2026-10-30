@@ -159,6 +159,8 @@ $worker = CmsUser::findOne((int)(getenv('TEST_DEAL_USER_ID') ?: 1663));
 if (!$admin || !$worker || Yii::$app->authManager->checkAccess((int)$worker->id, \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
     throw new RuntimeException('The stand needs the main responsible TEST_ADMIN_ID and a non-administrator TEST_DEAL_USER_ID.');
 }
+// A head of a department (he has subordinates) sees the clients without a main responsible (п. 13а), an employee does not.
+$isHead = (bool)\skeeks\cms\models\CmsDepartment::subordinateIds((int)$worker->id);
 $uniq = (string)mt_rand(100000, 999999);
 $name = static fn(string $what) => AUDIT_PREFIX.$what.' '.$uniq;
 
@@ -514,9 +516,16 @@ try {
             return [$code, $body];
         };
         // the own must stay visible: otherwise a hidden page or an empty search would pass the audit for nothing
+        // A big list shows only its first page: the own record may be further, so the full CSV export of the same
+        // list (the same query, every page) is read when the page does not have it.
         $mustSee = static function (string $place, string $path, string $marker) use ($http, &$results, &$levelTag) {
             [$code, $body] = $http($path);
             $seen = $code === 200 && mb_strpos($body, $marker) !== false;
+            if (!$seen && $code === 200 && preg_match('~_sx-export=([\w-]+)~', $body, $m)) {
+                [$c2, $csv] = $http($path.(strpos($path, '?') === false ? '?' : '&').'_sx-export='.$m[1]);
+                $csv = str_replace("\xC2\xA0", ' ', (string)@iconv('windows-1251', 'UTF-8//IGNORE', $csv));
+                $seen = $c2 === 200 && (mb_strpos($csv, $marker) !== false || mb_strpos($csv, str_replace(' ', '', $marker)) !== false);
+            }
             $results[] = [$levelTag.$place.' (должно быть видно)', 'GET '.$path.' → '.$code, $seen ? 'ok' : 'FAIL', $seen ? '' : 'НЕ ВИДНО своего'];
         };
 
@@ -934,7 +943,17 @@ try {
         (bool)preg_match('~admin-user/view[^"\']*pk(?:=|%3D)'.$G->id.'(?!\d)~', $dup) || (bool)$found($dup, ['платёж Г']), '');
     // Д: no main responsible (old data; there is no general pool, owner's decision 29.10.2026, п. 13а) — closed to an
     // employee who is not a head of a department, no «Взять в работу».
-    [$code, $card] = $closed('Клиент Д (без основного): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
+    // The card of a client without a main one: a head sees it (п. 13а), an employee does not.
+    $noMainCard = static function (string $place, string $path, string $marker) use ($isHead, $http, $closed, &$results, &$levelTag) {
+        if (!$isHead) {
+            return $closed($place, $path, $marker);
+        }
+        [$code, $body] = $http($path);
+        $seen = $code === 200 && ($marker === '' || mb_strpos($body, $marker) !== false);
+        $results[] = [$levelTag.$place.' (руководителю видно, п. 13а)', 'GET '.$path.' → '.$code, $seen ? 'ok' : 'FAIL', $seen ? '' : 'руководитель не видит карточку'];
+        return [$code, $body];
+    };
+    [$code, $card] = $noMainCard('Клиент Д (без основного): карточка', '/~sxx/cms/admin-user/view?pk='.$D->id, $D->first_name);
     $takeable = $code === 200 && mb_strpos($card, 'Взять в работу') !== false;
     $report('Клиент Д: нет «Взять в работу»', 'GET view → '.$code, $takeable, $takeable ? 'кнопка есть' : '');
     $hits = $code === 200 ? $found($card, ['сделка Д']) : [];
@@ -945,7 +964,7 @@ try {
     $closed('Клиент Д (пул): сделка по ссылке', '/~sxx/cms/admin-cms-lead/view?pk='.$leadD->id, '');
     // Ж: a history without a main responsible (old data) — no «Взять в работу», closed without a link
     foreach (['view', 'leads', 'bills', 'payments', 'log', 'crm-access', 'update'] as $tab) {
-        [$code, $card] = $closed('Клиент Ж (давний платёж, без основного): '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$Zh->id, '');
+        [$code, $card] = ($tab === 'view' ? $noMainCard : $closed)('Клиент Ж (давний платёж, без основного): '.$tab, '/~sxx/cms/admin-user/'.$tab.'?pk='.$Zh->id, '');
         if ($tab === 'view') {
             $takeable = $code === 200 && mb_strpos($card, 'Взять в работу') !== false;
             $report('Клиент Ж: нет «Взять в работу»', 'GET view → '.$code, $takeable, $takeable ? 'кнопка есть: клиент с историей в пуле' : '');
