@@ -249,19 +249,14 @@ class CrmCardActionsWidget extends Widget
     /**
      * The widget config of a task card (owner's decision 31.10.2026, «как в
      * компании»): the comment in one line opening the editor, its pinned
-     * comment is «Результат по задаче»; «Позвонить» and «Письмо» of the deal
-     * of the task, else of its company or client — the actions of that card
-     * ({@see cardConfig()}: its rights, the choice of an own deal); «Связанная
-     * задача», «Привязать задачу» (the dialog `#sx-task-link-modal` of the
-     * card) and «Перенести срок» (the edit window, when $canUpdate).
+     * comment is «Результат по задаче»; «Связанная задача», «Привязать
+     * задачу» (the dialog `#sx-task-link-modal` of the card) and «Перенести
+     * срок» (the edit window, when $canUpdate). No call or letter: those are
+     * actions of the card of the client or deal (owner's decision 31.10.2026).
      */
     public static function taskConfig(\skeeks\cms\models\CmsTask $task, bool $canUpdate = false): array
     {
         $actions = [];
-        $owner = $task->cmsLead ?: ($task->cmsCompany ?: ($task->cmsUser && !$task->cmsUser->is_worker ? $task->cmsUser : null));
-        if ($owner && ($config = self::cardConfig($owner))) {
-            $actions += array_intersect_key((new self($config))->items(), ['call' => 1, 'mail' => 1]);
-        }
         $actions['related-create'] = ['label' => 'Связанная задача', 'icon' => 'plus', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
             '/cms/admin-cms-task/create',
             'parent_cms_task_id' => (int)$task->id,

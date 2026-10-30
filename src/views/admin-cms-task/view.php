@@ -144,6 +144,16 @@ html[data-sx-theme] .sx-task-layout.sx-detail-layout {
 .sx-task-side {
     height: 100%;
 }
+/* The status buttons and the deadline always at the bottom of the description block. */
+.sx-task-main-surface {
+    display: flex;
+    flex-direction: column;
+}
+.sx-task-main-surface > .sx-surface__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
 .sx-task-description {
     display: flex;
     width: 100%;
@@ -172,7 +182,8 @@ html[data-sx-theme] .sx-task-layout.sx-detail-layout {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
-    margin-top: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }
 /* The deadline over the status buttons: overdue in the danger colour. */
 .sx-task-deadline {
