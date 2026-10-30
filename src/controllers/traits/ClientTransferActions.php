@@ -29,9 +29,6 @@ use yii\helpers\Url;
  */
 trait ClientTransferActions
 {
-    /** @var bool[] "employee:record code:id" => whether «Доступ» is shown, within one request */
-    private array $clientAccessTabAnswers = [];
-
     public function clientTransferAction(): array
     {
         return [
@@ -180,18 +177,16 @@ trait ClientTransferActions
             'accessCallback' => function () {
                 [$code, $id] = $this->transferRecord();
                 $userId = (int)\Yii::$app->user->id;
-                // A card asks it for every tab menu of the page (audit final4: six times per feed):
-                // one answer per employee and record within this controller, that is one request.
-                $key = $userId.':'.$code.':'.(int)$id;
-                if (array_key_exists($key, $this->clientAccessTabAnswers)) {
-                    return $this->clientAccessTabAnswers[$key];
-                }
                 $access = CrmAccess::instance();
-                // Only who sees the client: a hidden one shows neither its name nor its employees.
-                $sees = $code === CmsCrmAccessRequest::RECORD_COMPANY ? $access->canSeeCompany($userId, (int)$id) : $access->canSeeClient($userId, (int)$id);
+                // A card asks it for every tab menu of the page (audit final4: six times per feed): one answer per
+                // employee and record in the request memo of CrmAccess, dropped with resetMemo() (audit F5-01).
+                return $access->remember('accessTab:'.$userId.':'.$code.':'.(int)$id, static function () use ($access, $userId, $code, $id) {
+                    // Only who sees the client: a hidden one shows neither its name nor its employees.
+                    $sees = $code === CmsCrmAccessRequest::RECORD_COMPANY ? $access->canSeeCompany($userId, (int)$id) : $access->canSeeClient($userId, (int)$id);
 
-                return $this->clientAccessTabAnswers[$key] = $id && CrmAccess::mainReady() && $sees
-                    && ($access->accessList($code, $id) || $access->canTransferClient($userId, $code, $id));
+                    return $id && CrmAccess::mainReady() && $sees
+                        && ($access->accessList($code, $id) || $access->canTransferClient($userId, $code, $id));
+                });
             },
         ];
     }

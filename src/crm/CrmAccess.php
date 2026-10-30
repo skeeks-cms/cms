@@ -124,6 +124,20 @@ class CrmAccess extends Component
         return $this->memo[$key];
     }
 
+    /**
+     * The same request memo for the answers about rights of other code (a feed
+     * renderer, a tab check): one store, dropped with every resetMemo() and on a
+     * change of the signed-in identity; nothing is kept in the console and
+     * workers. Put the employee and the record into the key. Do not keep rights
+     * answers in a separate cache: it would outlive a revoked access (audit F5-01).
+     *
+     * @return mixed
+     */
+    public function remember(string $key, callable $compute)
+    {
+        return $this->memo('ext:'.$key, $compute);
+    }
+
     /** Rights of this request changed (a link, a level, a department): every kept answer goes. */
     public function resetMemo(): void
     {
