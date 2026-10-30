@@ -6,6 +6,8 @@
 /* @var $model \skeeks\cms\models\CmsTask */
 
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
+use skeeks\cms\models\CmsTask;
+use yii\helpers\Html;
 
 $controller = $this->context;
 $action = $controller->action;
@@ -23,6 +25,10 @@ $projectClients = $model->cmsProject ? $model->cmsProject->users : [];
 if (!$planStartAt && $planStartEndAt && $model->plan_duration) {
     $planStartAt = max(0, (int)$planStartEndAt - (int)$model->plan_duration);
 }
+// The deadline: the planned end; an open task past it is overdue.
+$deadline = $model->plan_end_at ? (int)$model->plan_end_at : null;
+$isClosed = in_array($model->status, [CmsTask::STATUS_READY, CmsTask::STATUS_CANCELED], true);
+$isOverdue = $deadline && !$isClosed && $deadline < time();
 
 $quickAccessItems = [];
 $makeQuickAccessActionUrl = function ($route, $id) {
@@ -42,14 +48,6 @@ $makeQuickAccessImageUrl = function ($model) {
 
     return null;
 };
-$createRelatedTaskUrl = (string) \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
-    '/cms/admin-cms-task/create',
-    'parent_cms_task_id' => $model->id,
-])->enableEmptyLayout()->enableNoActions()->url;
-$createRelatedTaskActionData = \yii\helpers\Json::encode([
-    "isOpenNewWindow" => true,
-    "url"             => $createRelatedTaskUrl,
-]);
 $linkRelatedTaskUrl = \yii\helpers\Url::to([
     '/cms/admin-cms-task/link-related-task',
     'pk' => $model->id,
@@ -138,40 +136,21 @@ $this->registerCss(<<<CSS
 .sx-task-layout > * {
     min-width: 0;
 }
-.sx-task-main-surface,
-.sx-task-side {
-    height: 100%;
-}
 .sx-task-description {
-    min-height: 220px;
     display: flex;
     width: 100%;
     overflow: auto;
     flex-direction: column;
-    padding: 1rem;
+    gap: 1rem;
 }
 .sx-task-description-empty {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     color: var(--sx-color-text-muted);
 }
-
-.sx-task-main-surface .sx-task-description > div {
-    margin-bottom: 1rem;
-}
-.sx-task-main-surface .sx-task-description > div:last-child {
-    margin-bottom: 0;
-}
-
 .sx-task-main-surface .sx-files img {
     border-radius: var(--sx-radius-sm);
     max-width: 10rem;
     border: 1px solid var(--sx-color-border);
 }
-
 .sx-task-main-surface .sx-files .sx-file-item {
     margin-bottom: 0.25rem;
 }
@@ -179,62 +158,67 @@ $this->registerCss(<<<CSS
     color: var(--sx-color-text-muted);
     font-size: 0.85rem;
     margin-bottom: 0.5rem;
-    margin-top: 1rem;
-}
-.sx-task-main-surface .sx-files .sx-files-block {
-    padding: 1rem;
 }
 .sx-task-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-top: 1rem;
 }
-.sx-task-related-create {
-    white-space: nowrap;
-}
-.sx-task-related-table {
-    margin-bottom: 0;
-}
-.sx-task-related-table th {
-    font-weight: normal;
+/* The deadline over the status buttons: overdue in the danger colour. */
+.sx-task-deadline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--sx-color-text-muted);
-    border-top: 0;
 }
-.sx-task-related-table td {
-    vertical-align: middle;
-}
-.sx-task-related-actions {
-    width: 1%;
-    white-space: nowrap;
-    text-align: right;
-}
-.sx-task-related-link {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-.sx-task-related-link .select2-container {
-    flex: 1 1 auto;
-}
-.sx-task-related-link .btn {
-    white-space: nowrap;
+.sx-task-deadline--overdue {
+    color: var(--sx-color-danger, #d64545);
+    font-weight: 600;
 }
 .sx-task-side .sx-properties {
     padding: 0;
 }
-@media (max-width: 900px) {
-    .sx-task-related-link {
-        flex-direction: column;
-    }
-    .sx-task-related-link .select2-container,
-    .sx-task-related-link .btn {
-        width: 100% !important;
+.sx-task-related-list {
+    display: flex;
+    flex-direction: column;
+}
+.sx-task-related-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 6px 0;
+    border-top: 1px solid var(--sx-color-border);
+}
+.sx-task-related-row:first-child {
+    border-top: 0;
+}
+.sx-task-related-row__task {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.sx-task-related-row__meta {
+    flex: 0 0 auto;
+    color: var(--sx-color-text-muted);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+}
+.sx-task-link-scope {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-bottom: 10px;
+}
+.sx-task-link-scope label {
+    margin: 0;
+    font-weight: normal;
+}
+@media (max-width: 575px) {
+    .sx-task-related-row {
+        flex-wrap: wrap;
     }
 }
-
 CSS
 );
 \skeeks\cms\assets\LinkActvationAsset::register($this);
@@ -301,8 +285,15 @@ $("body").on("click", ".sx-task-related-link-btn", function(e) {
 
     return false;
 });
+// Another scope of the search: the chosen task of the old one is dropped.
+$("body").on("change", "[name=sx-task-link-scope]", function() {
+    $("#sx-task-related-link-select").val(null).trigger("change");
+});
 JS
 );
+// «Перенести срок» — the edit window, for who may edit the task.
+$canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($update = $controller->createAction('update'))
+    && (!$update instanceof \skeeks\cms\IHasPermissions || $update->isAllow);
 ?>
 
 <div class="sx-task-content sx-surface-stack">
@@ -314,19 +305,17 @@ JS
             'responsive' => true,
             'options'    => ['class' => 'sx-task-main-surface'],
         ]); ?>
-            <div class="sx-surface sx-task-description">
-                <? if ($model->description) : ?>
-                    <?php echo \skeeks\cms\helpers\TaskContentHelper::render($model->description); ?>
-                <? else : ?>
-                    <div class="sx-task-description-empty">Нет описания задачи...</div>
-                <? endif; ?>
+            <div class="sx-task-description">
+                <?php if ($model->description) : ?>
+                    <div><?php echo \skeeks\cms\helpers\TaskContentHelper::render($model->description); ?></div>
+                <?php else : ?>
+                    <div class="sx-task-description-empty">Описания нет</div>
+                <?php endif; ?>
 
                 <?php if ($model->files) : ?>
-
-                    <?
+                    <?php
                     $files = $model->files;
                     $images = [];
-
                     foreach ($files as $key => $file) {
                         if ($file->isImage()) {
                             $images[] = $file;
@@ -336,44 +325,38 @@ JS
                     ?>
                     <div class="sx-files">
                         <?php if ($images) : ?>
-                            <div class="sx-title">Приложенные изображения:</div>
-                            <div class="sx-surface sx-files-block">
-                                <? foreach ($images as $key => $file) : ?>
-                                    <?
-                                    /**
-                                     * @var $file \skeeks\cms\models\CmsStorageFile
-                                     */
-                                    ?>
+                            <div class="sx-title">Приложенные изображения</div>
+                            <div>
+                                <?php foreach ($images as $file) : ?>
                                     <a href="<?php echo $file->src; ?>" target="_blank" data-pjax="0">
                                         <img src="<?php echo $file->src; ?>"/>
                                     </a>
-                                <? endforeach; ?>
+                                <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
-
-
                         <?php if ($files) : ?>
-                            <div class="sx-title">Приложенные файлы:</div>
-                            <div class="sx-surface sx-files-block">
-                                <? foreach ($files as $key => $file) : ?>
+                            <div class="sx-title">Приложенные файлы</div>
+                            <div>
+                                <?php foreach ($files as $file) : ?>
                                 <div class="sx-file-item">
-                                    <a href="<?php echo $file->src; ?>" download="<?php echo $file->original_name; ?>" target="_blank" data-pjax="0"><?php echo $file->original_name; ?></a>
+                                    <a href="<?php echo $file->src; ?>" download="<?php echo Html::encode($file->original_name); ?>" target="_blank" data-pjax="0"><?php echo Html::encode($file->original_name); ?></a>
                                     <a href="<?php echo \yii\helpers\Url::to(['/cms/admin-storage-files/download', 'pk' => $file->id]); ?>" target="_blank" data-pjax="0" class="btn btn-xs btn-default">скачать (<?php echo \Yii::$app->formatter->asShortSize($file->size); ?>)</a>
                                 </div>
-                                <? endforeach; ?>
+                                <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
-
-
                     </div>
                 <?php endif; ?>
-
             </div>
             <div class="sx-task-actions">
                 <?php echo $status; ?>
-                <a href="<?php echo $createRelatedTaskUrl; ?>" class="btn btn-default sx-task-related-create" data-pjax="0" onclick='new sx.classes.backend.widgets.Action(<?php echo $createRelatedTaskActionData; ?>).go(); return false;'>
-                    <i class="fas fa-plus"></i> Связанная задача
-                </a>
+                <?php if ($deadline) : ?>
+                    <span class="sx-task-deadline<?php echo $isOverdue ? ' sx-task-deadline--overdue' : ''; ?>"
+                          title="Планируемое завершение">
+                        <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('clock', ['size' => 14]); ?>
+                        <?php echo $isOverdue ? 'Просрочена: ' : 'Срок: '; ?><?php echo \Yii::$app->formatter->asDatetime($deadline, 'php:d.m.Y H:i'); ?>
+                    </span>
+                <?php endif; ?>
             </div>
         <?php BackendSurfaceWidget::end(); ?>
     </div>
@@ -383,119 +366,33 @@ JS
             'options'     => ['class' => 'sx-task-side'],
             'bodyOptions' => ['class' => 'sx-properties-wrapper sx-columns-1'],
         ]); ?>
+            <?php // Only filled properties: an empty «—» row is not shown. ?>
             <ul class="sx-properties">
                 <li>
-            <span class="sx-properties--name">
-                Статус 
-            </span>
+                    <span class="sx-properties--name">Статус</span>
                     <span class="sx-properties--value">
-                <?php
-                if ($model->createdBy) {
-                    echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget([
-                        'task'    => $model,
-                    ]);
-                } else {
-                    echo "—";
-                }
-                ?>
-            </span>
-                </li>
-                <li>
-            <span class="sx-properties--name">
-                Поставил 
-            </span>
-                    <span class="sx-properties--value">
-                <?php
-                if ($model->createdBy) {
-                    echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
-                        'user'    => $model->createdBy,
-                        'isSmall' => true,
-                    ]);
-                } else {
-                    echo "—";
-                }
-                ?>
-            </span>
-                </li>
-                <li>
-            <span class="sx-properties--name">
-                Исполнитель
-            </span>
-                    <span class="sx-properties--value">
-                <?php
-                if ($model->executor) {
-                    echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget([
-                        'user'    => $model->executor,
-                        'isSmall' => true,
-                    ]);
-                } else {
-                    echo "—";
-                }
-                ?>
-            </span>
-                </li>
-                <li>
-            <span class="sx-properties--name">
-                Длительност по плану
-            </span>
-                    <span class="sx-properties--value">
-                <?php echo \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($model->plan_duration); ?>
-            </span>
-                </li>
-                <li>
-                    <span class="sx-properties--name">
-                        Отработано
-                    </span>
-                    <span class="sx-properties--value">
-                <?php echo $model->schedules ? \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($model->schedules) : "—"; ?>
-            </span>
-                </li>
-
-                <li>
-                    <span class="sx-properties--name">
-                        Начало по плану
-                    </span>
-                    <span class="sx-properties--value">
-                        <?php echo $planStartAt ? \Yii::$app->formatter->asDatetime($planStartAt) : "—"; ?>
+                        <?php echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $model]); ?>
                     </span>
                 </li>
-
-                <?php if($model->executor_end_at) : ?>
-                    <li>
-                    <span class="sx-properties--name">
-                        Время завершения <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip" title="" data-original-title="Примерное время завершения задачи. Учитывается рабочий график исполнителя и загруженность по другим задачам."></i>
+                <?php if ($model->executor) : ?>
+                <li>
+                    <span class="sx-properties--name">Исполнитель</span>
+                    <span class="sx-properties--value">
+                        <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $model->executor, 'isSmall' => true]); ?>
                     </span>
-                            <span class="sx-properties--value" >
-                        <?php echo \Yii::$app->formatter->asDatetime($model->executor_end_at); ?>
-                    </span>
-                        </li>
+                </li>
                 <?php endif; ?>
-
+                <?php if ($model->createdBy && (int)$model->created_by !== (int)$model->executor_id) : ?>
                 <li>
-                    <span class="sx-properties--name">
-                        Компания
-                    </span>
+                    <span class="sx-properties--name">Поставил</span>
                     <span class="sx-properties--value">
-                        <?php if ($model->cms_company_id) : ?>
-                            <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
-                                'controllerId' => '/cms/admin-cms-company',
-                                'modelId'      => $model->cmsCompany->id,
-                                'label'        => $model->cmsCompany->name,
-                                'options'      => [
-                                    'class'      => 'sx-preview-card__related',
-                                    'aria-label' => (string)$model->cmsCompany->name,
-                                ],
-                            ]); ?>
-                        <?php else : ?>
-                            —
-                        <?php endif; ?>
+                        <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $model->createdBy, 'isSmall' => true]); ?>
                     </span>
                 </li>
+                <?php endif; ?>
                 <?php if ($model->cmsLead) : ?>
                 <li>
-                    <span class="sx-properties--name">
-                        Сделка
-                    </span>
+                    <span class="sx-properties--name">Сделка</span>
                     <span class="sx-properties--value">
                         <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
                             'controllerId' => '/cms/admin-cms-lead',
@@ -510,11 +407,38 @@ JS
                     </span>
                 </li>
                 <?php endif; ?>
+                <?php if ($model->cms_company_id && $model->cmsCompany) : ?>
+                <li>
+                    <span class="sx-properties--name">Компания</span>
+                    <span class="sx-properties--value">
+                        <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-company',
+                            'modelId'      => $model->cmsCompany->id,
+                            'label'        => $model->cmsCompany->name,
+                            'options'      => [
+                                'class'      => 'sx-preview-card__related',
+                                'aria-label' => (string)$model->cmsCompany->name,
+                            ],
+                        ]); ?>
+                    </span>
+                </li>
+                <?php endif; ?>
+                <?php if ($model->cms_user_id && $model->cmsUser && !$model->cmsUser->is_worker) : ?>
+                <li>
+                    <span class="sx-properties--name">Клиент</span>
+                    <span class="sx-properties--value">
+                        <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-user',
+                            'modelId'      => $model->cmsUser->id,
+                            'label'        => $model->cmsUser->shortDisplayNameWithAlias,
+                            'options'      => ['class' => 'sx-preview-card__related'],
+                        ]); ?>
+                    </span>
+                </li>
+                <?php endif; ?>
                 <?php if ($model->hasAttribute('cms_deal_id') && $model->cms_deal_id && $model->cmsDeal) : ?>
                 <li>
-                    <span class="sx-properties--name">
-                        Услуга
-                    </span>
+                    <span class="sx-properties--name">Услуга</span>
                     <span class="sx-properties--value">
                         <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
                             'controllerId' => '/cms/admin-cms-deal',
@@ -526,7 +450,7 @@ JS
                             ],
                         ]); ?>
                         <?php if ($resource = $model->dealResource) : ?>
-                            <div class="sx-text-muted"><?= \yii\helpers\Html::encode($resource->title); ?></div>
+                            <div class="sx-text-muted"><?= Html::encode($resource->title); ?></div>
                         <?php endif; ?>
                         <?php if ($model->is_internal) : ?>
                             <div class="sx-text-muted">Внутренняя: клиент не видит</div>
@@ -560,26 +484,22 @@ JS
                 </li>
                 <?php endif; ?>
                 <?php endif; ?>
+                <?php if ($model->cms_project_id && $model->cmsProject) : ?>
                 <li>
-                    <span class="sx-properties--name">
-                        Проект
-                    </span>
+                    <span class="sx-properties--name">Проект</span>
                     <span class="sx-properties--value">
-                        <?php if ($model->cms_project_id) : ?>
-                            <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
-                                'controllerId' => '/cms/admin-cms-project',
-                                'modelId'      => $model->cmsProject->id,
-                                'label'        => $model->cmsProject->name,
-                                'options'      => [
-                                    'class'      => 'sx-preview-card__related',
-                                    'aria-label' => (string)$model->cmsProject->name,
-                                ],
-                            ]); ?>
-                        <?php else : ?>
-                            —
-                        <?php endif; ?>
+                        <?php echo \skeeks\cms\backend\widgets\BackendEntityLink::widget([
+                            'controllerId' => '/cms/admin-cms-project',
+                            'modelId'      => $model->cmsProject->id,
+                            'label'        => $model->cmsProject->name,
+                            'options'      => [
+                                'class'      => 'sx-preview-card__related',
+                                'aria-label' => (string)$model->cmsProject->name,
+                            ],
+                        ]); ?>
                     </span>
                 </li>
+                <?php endif; ?>
                 <?php if ($projectClients) : ?>
                     <?php
                     $clientVisibilityHint = 'Эта задача доступна перечисленным клиентам, потому что они добавлены в проект «'.
@@ -588,12 +508,9 @@ JS
                     <li>
                         <span class="sx-properties--name">
                             Клиенты
-                            <i
-                                class="far fa-question-circle sx-hint-icon"
-                                data-toggle="tooltip"
-                                title="<?php echo \yii\helpers\Html::encode($clientVisibilityHint); ?>"
-                                aria-label="<?php echo \yii\helpers\Html::encode($clientVisibilityHint); ?>"
-                            ></i>
+                            <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
+                               title="<?php echo Html::encode($clientVisibilityHint); ?>"
+                               aria-label="<?php echo Html::encode($clientVisibilityHint); ?>"></i>
                         </span>
                         <span class="sx-properties--value">
                             <?php foreach ($projectClients as $index => $client) : ?>
@@ -611,134 +528,150 @@ JS
                         </span>
                     </li>
                 <?php endif; ?>
+                <?php if ($planStartAt) : ?>
+                <li>
+                    <span class="sx-properties--name">Начало по плану</span>
+                    <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($planStartAt); ?></span>
+                </li>
+                <?php endif; ?>
+                <?php if ($model->plan_duration) : ?>
+                <li>
+                    <span class="sx-properties--name">Длительность по плану</span>
+                    <span class="sx-properties--value"><?php echo \skeeks\cms\helpers\CmsScheduleHelper::durationAsText($model->plan_duration); ?></span>
+                </li>
+                <?php endif; ?>
+                <?php if ($model->schedules) : ?>
+                <li>
+                    <span class="sx-properties--name">Отработано</span>
+                    <span class="sx-properties--value"><?php echo \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($model->schedules); ?></span>
+                </li>
+                <?php endif; ?>
+                <?php if ($model->executor_end_at) : ?>
+                <li>
+                    <span class="sx-properties--name">
+                        Время завершения <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip" title="Примерное время завершения задачи. Учитывается рабочий график исполнителя и загруженность по другим задачам."></i>
+                    </span>
+                    <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($model->executor_end_at); ?></span>
+                </li>
+                <?php endif; ?>
             </ul>
         <?php BackendSurfaceWidget::end(); ?>
     </div>
 </div>
 
+<?php if ($relatedTasks) : ?>
+    <?php // Only when there are: the parent and the child tasks, compact; «Привязать задачу» is in the block of actions. ?>
+    <?php BackendSurfaceWidget::begin([
+        'title'      => 'Связанные задачи',
+        'titleTag'   => 'h3',
+        'raised'     => true,
+        'responsive' => true,
+        'options'    => ['class' => 'sx-task-related'],
+    ]); ?>
+        <div class="sx-task-related-list">
+            <?php foreach ($relatedTasks as $relatedTask) : ?>
+                <?php
+                $unlinkTaskId = ((int)$model->parent_cms_task_id === (int)$relatedTask->id) ? $model->id : $relatedTask->id;
+                $unlinkRelatedTaskUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/unlink-related-task', 'pk' => $unlinkTaskId]);
+                ?>
+                <div class="sx-task-related-row">
+                    <div class="sx-task-related-row__task">
+                        <?php echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $relatedTask]); ?>
+                    </div>
+                    <?php if ($relatedTask->plan_end_at) : ?>
+                        <span class="sx-task-related-row__meta"><?php echo \Yii::$app->formatter->asDatetime((int)$relatedTask->plan_end_at, 'php:d.m.Y H:i'); ?></span>
+                    <?php endif; ?>
+                    <?php echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $relatedTask, 'isShort' => true]); ?>
+                    <?php if ($relatedTask->executor) : ?>
+                        <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $relatedTask->executor, 'isSmall' => true]); ?>
+                    <?php endif; ?>
+                    <a href="#" class="btn btn-xs btn-default sx-task-related-unlink" data-url="<?php echo $unlinkRelatedTaskUrl; ?>" title="Отвязать задачу" aria-label="Отвязать задачу" data-toggle="tooltip">
+                        <i class="fas fa-unlink"></i>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php BackendSurfaceWidget::end(); ?>
+<?php endif; ?>
+
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin([
     'id'      => 'sx-comments',
     'options' => ['class' => 'sx-surface-stack sx-activity-thread'],
 ]); ?>
-
-<?php $taskResultQuery = $model->getLogs()->comments()->results(); ?>
-<?php if ($taskResultQuery->count()) : ?>
-            <?php BackendSurfaceWidget::begin([
-                'title'      => 'Результат по задаче',
-                'titleTag'   => 'h3',
-                'raised'     => true,
-                'responsive' => true,
-            ]); ?>
-                <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-                    'query'                => $taskResultQuery,
-                    'is_show_model'        => false,
-                    'is_show_pin_controls' => true,
-                    'is_raised'             => false,
-                ]); ?>
-            <?php BackendSurfaceWidget::end(); ?>
-<?php endif; ?>
-
-        <?php BackendSurfaceWidget::begin([
-            'title'      => 'Связанные задачи',
-            'titleTag'   => 'h3',
-            'raised'     => true,
-            'responsive' => true,
-            'options'    => ['class' => 'sx-task-related'],
-        ]); ?>
-            <div class="sx-task-related-link">
-                <?php echo \skeeks\cms\widgets\AjaxSelectModel::widget([
-                    'name' => 'related_task_id',
-                    'modelClass' => \skeeks\cms\models\CmsTask::class,
-                    'modelShowAttribute' => 'name',
-                    'options' => [
-                        'id' => 'sx-task-related-link-select',
-                    ],
-                    'placeholder' => 'Выбрать существующую задачу',
-                    'searchQuery' => function ($word = '') use ($model) {
-                        $query = \skeeks\cms\models\CmsTask::find()
-                            ->forManager()
-                            ->andWhere(['!=', \skeeks\cms\models\CmsTask::tableName().'.id', $model->id]);
-
-                        if ($word) {
-                            $query->search($word);
-                        }
-
-                        return $query->orderBy([\skeeks\cms\models\CmsTask::tableName().'.created_at' => SORT_DESC]);
-                    },
-                ]); ?>
-                <button type="button" class="btn btn-default sx-task-related-link-btn" data-url="<?php echo $linkRelatedTaskUrl; ?>">
-                    <i class="fas fa-link"></i> Привязать
-                </button>
-            </div>
-
-            <?php if ($relatedTasks) : ?>
-                <div class="table-responsive">
-                    <table class="table table-hover sx-task-related-table">
-                        <thead>
-                        <tr>
-                            <th>Задача</th>
-                            <th>Планируемое завершение</th>
-                            <th>Отработанное время</th>
-                            <th>Статус</th>
-                            <th>Исполнитель</th>
-                            <th class="sx-task-related-actions"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($relatedTasks as $relatedTask) : ?>
-                            <?php
-                                $unlinkTaskId = ((int)$model->parent_cms_task_id === (int)$relatedTask->id) ? $model->id : $relatedTask->id;
-                                $unlinkRelatedTaskUrl = \yii\helpers\Url::to([
-                                    '/cms/admin-cms-task/unlink-related-task',
-                                    'pk' => $unlinkTaskId,
-                                ]);
-                            ?>
-                            <tr>
-                                <td>
-                                    <?php echo \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $relatedTask]); ?>
-                                </td>
-                                <td>
-                                    <?php echo $relatedTask->plan_end_at ? \Yii::$app->formatter->asDatetime((int) $relatedTask->plan_end_at, "php:d.m.Y H:i") : " - "; ?>
-                                </td>
-                                <td>
-                                    <?php echo $relatedTask->schedules ? \skeeks\cms\helpers\CmsScheduleHelper::durationAsTextBySchedules($relatedTask->schedules) : " - "; ?>
-                                </td>
-                                <td>
-                                    <?php echo \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $relatedTask, 'isShort' => true]); ?>
-                                </td>
-                                <td>
-                                    <?php echo \skeeks\cms\widgets\admin\CmsWorkerViewWidget::widget(['user' => $relatedTask->executor, 'isSmall' => true]); ?>
-                                </td>
-                                <td class="sx-task-related-actions">
-                                    <a href="#" class="btn btn-xs btn-default sx-task-related-unlink" data-url="<?php echo $unlinkRelatedTaskUrl; ?>" title="Отвязать задачу" data-toggle="tooltip">
-                                        <i class="fas fa-unlink"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif; ?>
-        <?php BackendSurfaceWidget::end(); ?>
-
-            <?php BackendSurfaceWidget::begin([
-                'title'      => 'Добавить комментарий',
-                'titleTag'   => 'h3',
-                'raised'     => true,
-                'responsive' => true,
-            ]); ?>
-                <?php echo \skeeks\cms\widgets\admin\CmsCommentWidget::widget([
-                    'model' => $model,
-                    'pinnedLabel' => 'Результат по задаче',
-                ]); ?>
-            <?php BackendSurfaceWidget::end(); ?>
-
+    <?php // The block of the card as in a company: the comment in one line, the result pinned (CrmCardActionsWidget::taskConfig()). ?>
+    <?= \skeeks\cms\widgets\admin\CrmCardActionsWidget::widget(\skeeks\cms\widgets\admin\CrmCardActionsWidget::taskConfig($model, $canUpdate)); ?>
+    <?php // The result (pinned comments) once, right under the block; the feed below skips it. ?>
+    <?php $taskResultQuery = $model->getLogs()->activity()->pinned(); ?>
+    <?php if ($taskResultQuery->count()) : ?>
         <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
-            'query'                => $model->getLogs()->activity(),
+            'query'                => $taskResultQuery,
             'is_show_model'        => false,
             'is_show_pin_controls' => true,
         ]); ?>
-
+    <?php endif; ?>
+    <?php echo \skeeks\cms\widgets\admin\CmsLogListWidget::widget([
+        'query'                => $model->getLogs()->activity()->notPinned(),
+        'is_show_model'        => false,
+        'is_show_pin_controls' => true,
+    ]); ?>
 <?php $pjax::end(); ?>
 </div>
+
+<?php // «Привязать задачу»: search by the deal, the company of the task or everywhere (the tasks the employee sees). ?>
+<?php
+$scopes = array_filter([
+    'lead'    => $model->cms_lead_id ? 'По сделке' : null,
+    'company' => $model->cms_company_id ? 'По компании' : null,
+    'all'     => 'Все задачи',
+]);
+$scopeDefault = (string)array_key_first($scopes);
+$linkModal = \yii\bootstrap\Modal::begin([
+    'header'       => 'Привязать задачу',
+    'id'           => 'sx-task-link-modal',
+    'size'         => \yii\bootstrap\Modal::SIZE_DEFAULT,
+    'toggleButton' => false,
+]);
+?>
+    <?php if (count($scopes) > 1) : ?>
+        <div class="sx-task-link-scope" role="radiogroup" aria-label="Где искать">
+            <?php foreach ($scopes as $scope => $label) : ?>
+                <label><?= Html::radio('sx-task-link-scope', $scope === $scopeDefault, ['value' => $scope]); ?> <?= Html::encode($label); ?></label>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <div class="form-group">
+        <?php echo \skeeks\cms\widgets\AjaxSelectModel::widget([
+            'name' => 'related_task_id',
+            'modelClass' => CmsTask::class,
+            'modelShowAttribute' => 'name',
+            'options' => ['id' => 'sx-task-related-link-select'],
+            'placeholder' => 'Найдите задачу по названию или номеру',
+            'searchQuery' => function ($word = '') use ($model) {
+                $table = CmsTask::tableName();
+                $query = CmsTask::find()->forManager()->andWhere(['!=', $table.'.id', $model->id]);
+                $scope = (string)\Yii::$app->request->get('scope');
+                if ($scope === 'lead' && $model->cms_lead_id) {
+                    $query->andWhere([$table.'.cms_lead_id' => (int)$model->cms_lead_id]);
+                } elseif ($scope === 'company' && $model->cms_company_id) {
+                    $query->andWhere([$table.'.cms_company_id' => (int)$model->cms_company_id]);
+                }
+                if ($word) {
+                    $query->search($word);
+                }
+
+                return $query->orderBy([$table.'.created_at' => SORT_DESC]);
+            },
+            'pluginOptions' => [
+                'dropdownParent' => new \yii\web\JsExpression('$("#sx-task-link-modal")'),
+                'ajax' => [
+                    'data' => new \yii\web\JsExpression('function(params) {
+                        return {q: params.term, scope: $("[name=sx-task-link-scope]:checked").val() || '.\yii\helpers\Json::encode($scopeDefault).'};
+                    }'),
+                ],
+            ],
+        ]); ?>
+    </div>
+    <button type="button" class="sx-button sx-button--primary sx-task-related-link-btn" data-url="<?php echo $linkRelatedTaskUrl; ?>">
+        <i class="fas fa-link"></i> Привязать
+    </button>
+<?php \yii\bootstrap\Modal::end(); ?>

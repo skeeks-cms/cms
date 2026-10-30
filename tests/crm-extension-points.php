@@ -302,7 +302,9 @@ foreach (['admin-cms-task', 'admin-cms-lead', 'admin-cms-deal'] as $viewDir) {
 
 // The task card shows the registered feed types (letters linked to the task), not only comments.
 $taskView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-task/view.php');
-crmExtensionExpect(strpos($taskView, "'query'                => \$model->getLogs()->activity(),") !== false, 'The task feed must use CmsLogQuery::activity().');
+// The feed is the activity, the result (pinned) once under the block of actions and not again in the feed.
+crmExtensionExpect(strpos($taskView, "'query'                => \$model->getLogs()->activity()->notPinned(),") !== false
+    && strpos($taskView, "\$model->getLogs()->activity()->pinned()") !== false, 'The task feed must use CmsLogQuery::activity(), its result pinned once.');
 
 // Blocks of other packages in lead, company and deal cards (proposals first).
 $cardOwner = new CrmExtensionTestRecord();

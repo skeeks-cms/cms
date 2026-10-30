@@ -40,6 +40,9 @@ class CrmCardActionsWidget extends Widget
     /** @var bool "Закрепить" in the note form */
     public bool $isShowPin = true;
 
+    /** @var string|null the name of a pinned note of the card ("Результат по задаче"), CmsCommentWidget::$pinnedLabel */
+    public ?string $pinLabel = null;
+
     /**
      * Tabs of the card before the tabs of packages, in their order:
      * id => `label` (plain text), `icon` (BackendIcon name), and either
@@ -236,8 +239,52 @@ class CrmCardActionsWidget extends Widget
         if ($record instanceof \skeeks\cms\models\User && !$record->is_worker) {
             return self::clientConfig($record, $record->cmsUserPhones, $record->cmsUserEmails);
         }
+        if ($record instanceof \skeeks\cms\models\CmsTask) {
+            return self::taskConfig($record);
+        }
 
         return null;
+    }
+
+    /**
+     * The widget config of a task card (owner's decision 31.10.2026, «как в
+     * компании»): the comment in one line opening the editor, its pinned
+     * comment is «Результат по задаче»; «Позвонить» and «Письмо» of the deal
+     * of the task, else of its company or client — the actions of that card
+     * ({@see cardConfig()}: its rights, the choice of an own deal); «Связанная
+     * задача», «Привязать задачу» (the dialog `#sx-task-link-modal` of the
+     * card) and «Перенести срок» (the edit window, when $canUpdate).
+     */
+    public static function taskConfig(\skeeks\cms\models\CmsTask $task, bool $canUpdate = false): array
+    {
+        $actions = [];
+        $owner = $task->cmsLead ?: ($task->cmsCompany ?: ($task->cmsUser && !$task->cmsUser->is_worker ? $task->cmsUser : null));
+        if ($owner && ($config = self::cardConfig($owner))) {
+            $actions += array_intersect_key((new self($config))->items(), ['call' => 1, 'mail' => 1]);
+        }
+        $actions['related-create'] = ['label' => 'Связанная задача', 'icon' => 'plus', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+            '/cms/admin-cms-task/create',
+            'parent_cms_task_id' => (int)$task->id,
+        ])->enableEmptyLayout()->enableNoActions()->url];
+        $actions['related-link'] = ['label' => 'Привязать задачу', 'icon' => 'link', 'options' => [
+            'data-toggle' => 'modal',
+            'data-target' => '#sx-task-link-modal',
+        ]];
+        if ($canUpdate) {
+            $actions['reschedule'] = ['label' => 'Перенести срок', 'icon' => 'clock', 'url' => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams([
+                '/cms/admin-cms-task/update',
+                'pk' => (int)$task->id,
+            ])->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url];
+        }
+
+        return [
+            'model' => $task,
+            'commentUrl' => ['/cms/admin-cms-log/add-comment'],
+            'noteLabel' => 'Комментарий',
+            'notePlaceholder' => 'Напишите комментарий…',
+            'pinLabel' => 'Результат по задаче',
+            'actions' => $actions,
+        ];
     }
 
     /**
@@ -737,10 +784,12 @@ class CrmCardActionsWidget extends Widget
      */
     protected function renderNoteForm(): string
     {
+        $pinLabel = $this->pinLabel;
         $form = static fn($model, $url, $placeholder, $pin) => CmsCommentWidget::widget([
             'model' => $model,
             'backend_url' => $url,
             'isShowPin' => $pin,
+            'pinnedLabel' => $pinLabel,
             'placeholder' => $placeholder,
             'isShowCancel' => true,
         ]);
