@@ -120,27 +120,27 @@ class CmsCompany extends ActiveRecord
             ->orWhere([
                 'and',
                 ['model_code' => (new CmsDeal())->skeeksModelCode],
-                ['model_id' => $this->getDeals()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getDeals()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new ShopBill())->skeeksModelCode],
-                ['model_id' => $this->getBills()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getBills()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new ShopPayment())->skeeksModelCode],
-                ['model_id' => $this->getPayments()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getPayments()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new CmsTask())->skeeksModelCode],
-                ['model_id' => $this->getTasks()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getTasks()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new CmsProject())->skeeksModelCode],
-                ['model_id' => $this->getProjects()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getProjects()->select(['id']))],
             ])
             // The records of its deals, as in the card feed.
             ->orWhere(queries\CmsLogQuery::clientDealsCondition($this))

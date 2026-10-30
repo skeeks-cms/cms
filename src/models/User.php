@@ -255,27 +255,27 @@ class User
             ->orWhere([
                 'and',
                 ['model_code' => (new CmsDeal())->skeeksModelCode],
-                ['model_id' => $this->getDeals()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getDeals()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new ShopBill())->skeeksModelCode],
-                ['model_id' => $this->getBills()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getBills()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new ShopPayment())->skeeksModelCode],
-                ['model_id' => $this->getPayments()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getPayments()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new CmsTask())->skeeksModelCode],
-                ['model_id' => $this->getTasks()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getTasks()->select(['id']))],
             ])
             ->orWhere([
                 'and',
                 ['model_code' => (new ShopBonusTransaction())->skeeksModelCode],
-                ['model_id' => $this->getBonusTransactions()->select(['id'])],
+                ['model_id' => queries\CmsLogQuery::feedIds($this->getBonusTransactions()->select(['id']))],
             ])
             // The records of his deals, as in the card feed.
             ->orWhere(queries\CmsLogQuery::clientDealsCondition($this))

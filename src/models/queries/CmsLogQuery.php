@@ -19,6 +19,31 @@ use skeeks\cms\rbac\CmsManager;
  */
 class CmsLogQuery extends CmsActiveQuery
 {
+    /** Above this many records of one kind a feed keeps the subquery instead of a list. */
+    public const FEED_IDS_LIMIT = 2000;
+
+    /**
+     * The ids of a client's records of one kind (its deals, bills, tasks…) for
+     * a feed condition `model_id IN (…)`: an explicit list, not a subquery.
+     * With subqueries in a chain of OR MariaDB merged the single-column
+     * indexes over ~70 000 entries and sorted them (audit final4: a company
+     * feed 150–740 ms); with lists it reads the (model_code, model_id) index,
+     * a few ms. A kind with more than FEED_IDS_LIMIT records stays a subquery.
+     *
+     * @param \yii\db\ActiveQuery $records a relation query of the client
+     * @return int[]|\yii\db\ActiveQuery
+     */
+    public static function feedIds(\yii\db\ActiveQuery $records)
+    {
+        $ids = (clone $records)->limit(self::FEED_IDS_LIMIT + 1)->column();
+        if (count($ids) > self::FEED_IDS_LIMIT) {
+            return $records;
+        }
+
+        // An empty list is "0=1" in the condition.
+        return array_map('intval', $ids);
+    }
+
     /**
      * The records of the deals (CmsLead) of a company or a client person for
      * its card feed, as in Bitrix24. A letter, a call, a proposal event or a
