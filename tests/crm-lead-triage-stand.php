@@ -174,7 +174,9 @@ try {
     (new LeadTriage())->merge($repeat, $incoming, (int)$admin->id);
     $repeat->refresh();
     $check($repeat->status === CmsLead::STATUS_REJECTED && $repeat->triage_result === CmsLead::TRIAGE_MERGED && (int)$repeat->merged_into_id === (int)$incoming->id, 'merged: closed, points to the target');
-    $check($incoming->getPhones()->count() == 2, 'the new phone of the request is added to the target');
+    // П2г: the target has a client — the contacts of the request go to its person card, not to the deal.
+    $check($incoming->getPhones()->count() == 1, 'the target deal gets no new phone of its own');
+    $check(\skeeks\cms\models\CmsUserPhone::find()->andWhere(['cms_user_id' => (int)$incoming->cms_user_id])->count() == 2, 'the phones of the request go to the person of the target');
     $again = $service->createFromSource(['cms_site_id' => $siteId, 'source_type' => CmsLead::SOURCE_FORM, 'source_ref' => 'p2a-'.$uniq.'-2', 'name' => 'Повтор '.$uniq]);
     $check((int)$again->id === (int)$incoming->id, 'the repeated source event goes to the target deal');
     $partnerLead = $service->createFromSource(['cms_site_id' => $siteId, 'source_type' => CmsLead::SOURCE_FORM, 'source_ref' => 'p2a-'.$uniq.'-p',
@@ -636,11 +638,17 @@ try {
     $check($lineLead->name === 'Строка '.$uniq, 'an empty name is the company name (made by hand — no source)');
     $check(CmsCompanyPhone::find()->andWhere(['cms_company_id' => $lineLead->cms_company_id])->count() == 1
         && \skeeks\cms\models\CmsCompanyEmail::find()->andWhere(['cms_company_id' => $lineLead->cms_company_id])->count() == 2, 'phones and emails of the line go to the new company');
+    // П2г: a deal by an employee is saved only with its client.
     $noName = new CmsLead(['cms_site_id' => $siteId]);
-    (new LeadTriage())->createLead($noName, new LeadIdentityForm(), (int)$other->id);
-    $check($noName->name === 'Сделка №'.$noName->id, 'without a client the deal is named by its number');
+    try {
+        (new LeadTriage())->createLead($noName, new LeadIdentityForm(['client_phone' => '+7 916 '.$uniq.'1']), (int)$other->id);
+        $check(false, 'a deal without a client is refused');
+    } catch (DomainException $e) {
+        $check($e->getMessage() === LeadTriage::CLIENT_REQUIRED && $noName->isNewRecord, 'a deal without a client is refused, nothing saved');
+    }
+    $check(!\skeeks\cms\models\CmsLeadPhone::find()->andWhere(['like', 'value', $uniq.'1'])->andWhere(['like', 'value', '916'])->exists(), 'the typed phone is not kept anywhere');
     if (CmsLead::amountReady()) {
-        $withAmount = CmsLead::findOne($noName->id);
+        $withAmount = CmsLead::findOne($lineLead->id);
         $withAmount->amount = '150 000';
         $check($withAmount->save() && (float)$withAmount->amount === 150000.0, '«Сумма» of an open deal is kept');
         $withAmount->status = CmsLead::STATUS_SUCCESS;

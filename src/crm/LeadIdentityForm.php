@@ -6,8 +6,9 @@ use yii\base\Model;
 
 /**
  * "Кто это": the client of a deal chosen in the deal form or while sorting
- * an unsorted deal. Find or create a company and a contact person, or take
- * a deal without a client; a hidden match is sent back as a signed
+ * an unsorted deal. Find or create a company and a contact person; only an
+ * incoming deal may be taken without a client (a new deal by an employee
+ * needs one, LeadTriage::requireClient()); a hidden match is sent back as a signed
  * reference (CrmAccess::candidateRef()), never as an id the employee chose.
  *
  * Applied by LeadTriage::applyIdentity() in one transaction with the deal.
@@ -54,9 +55,12 @@ class LeadIdentityForm extends Model
     /** Responsible of the deal; empty — by the default rule. */
     public $executor_id;
 
+    /** A contact of the request goes to the person of the deal, else to its company (the default choice). */
+    public const CONTACT_TO_CARD = 'card';
+
     /**
      * Contacts of the request moved to the client card by choice:
-     * "phone:<id>" | "email:<id>" => company | client | '' (stay with the deal only).
+     * "phone:<id>" | "email:<id>" => card | company | client | '' (stay with the deal only).
      */
     public $contacts = [];
 

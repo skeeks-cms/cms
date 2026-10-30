@@ -34,7 +34,9 @@ use yii\helpers\Html;
  *   go to the target (CmsLead::resolveMerged());
  * - support(): a task on the client's service, the deal closes as support;
  * - spam(): the deal closes as spam;
- * - createLead(): a new deal from the deal form ("найти или создать");
+ * - createLead(): a new deal from the deal form ("найти или создать"), always
+ *   with a client (requireClient(), П2г: contacts live in the company or the
+ *   person, a deal made by an employee never keeps its own);
  * - assign(): give a deal to another employee without the whole company.
  *
  * Every operation checks CrmAccess, runs in one transaction, writes the deal
@@ -43,6 +45,9 @@ use yii\helpers\Html;
  */
 class LeadTriage
 {
+    public const CLIENT_REQUIRED = 'Укажите клиента сделки: компанию или контакт — выберите из базы или создайте нового. '
+        .'Телефоны и email запишите в новую компанию или контакт, у сделки своих контактов нет.';
+
     /** Application event after a deal is sorted (TriageEvent); configure 'on crm.leadTriaged'. */
     public const EVENT_LEAD_TRIAGED = 'crm.leadTriaged';
 
@@ -110,6 +115,7 @@ class LeadTriage
             throw new \DomainException('Сделка уже создана.');
         }
         $this->validate($form);
+        $this->requireClient($lead, $form);
 
         $numbered = false;
         if (trim((string)$lead->name) === '') {
@@ -220,12 +226,23 @@ class LeadTriage
                 if (!$model->validate(['value'])) {
                     throw new \DomainException(($kind === 'phone' ? 'Телефон: ' : 'Email: ').implode(' ', $model->getErrors('value')));
                 }
-            } elseif ($form->client_mode === LeadIdentityForm::MODE_NONE) {
-                $model = $kind === 'phone' ? new CmsLeadPhone(['value' => $value]) : new CmsLeadEmail(['value' => $value]);
-                if (!$model->validate(['value'])) {
-                    throw new \DomainException(($kind === 'phone' ? 'Телефон: ' : 'Email: ').implode(' ', $model->getErrors('value')));
-                }
             }
+        }
+    }
+
+    /**
+     * П2г (owner's decision 30.10.2026): a deal made by an employee — the
+     * deal form, the API — is saved only with its client, a company or a
+     * person, found or created; phones and emails are typed into the new
+     * company or person (checked by CrmDuplicateGuard). A deal without a
+     * client comes only from incoming sources (CmsLeadService::createFromSource(),
+     * a record source of a letter or a chat), its contacts are «данные
+     * обращения», read only.
+     */
+    public function requireClient(CmsLead $lead, LeadIdentityForm $form): void
+    {
+        if ($form->isEmpty() && !$lead->cms_company_id && !$lead->cms_user_id) {
+            throw new \DomainException(self::CLIENT_REQUIRED);
         }
     }
 
@@ -291,15 +308,12 @@ class LeadTriage
         return $identity;
     }
 
-    /** Second half of a new deal, after it is saved: its contacts, the request, the duplicate mark. */
+    /**
+     * Second half of a new deal, after it is saved: the request, the duplicate mark. П2г: typed phones and
+     * emails belong to the new company or person only, the deal gets none of its own.
+     */
     public function finishNewLead(CmsLead $lead, array $identity, LeadIdentityForm $form, int $actorId): array
     {
-        if (!$identity['clientId'] && $form->client_mode === LeadIdentityForm::MODE_NONE) {
-            // Without a contact person the typed contacts stay with the deal («Из обращения»).
-            foreach (array_filter(['phone' => trim((string)$form->client_phone), 'email' => trim((string)$form->client_email)]) as $kind => $value) {
-                $this->addLeadContact($lead, $kind, $value);
-            }
-        }
         $this->afterIdentity($lead, $identity, $form, $actorId);
 
         return [
@@ -357,11 +371,17 @@ class LeadTriage
         }
 
         return $this->transaction(function () use ($lead, $target, $actorId) {
-            foreach ($lead->phones as $phone) {
-                $this->addLeadContact($target, 'phone', (string)$phone->value, $phone->name);
-            }
-            foreach ($lead->emails as $email) {
-                $this->addLeadContact($target, 'email', (string)$email->value, $email->name);
+            // П2г: a deal of a client keeps no contacts of its own — they go to its person (else company) card;
+            // a deal without a client keeps them as «данные обращения».
+            $card = $target->cms_user_id ? 'client' : ($target->cms_company_id ? 'company' : null);
+            $card = $card && $this->mayCopyTo($target, $card, null, $actorId) ? $card : null;
+            foreach (array_merge(
+                array_map(static fn($row) => ['phone', $row], $lead->phones),
+                array_map(static fn($row) => ['email', $row], $lead->emails)
+            ) as [$kind, $row]) {
+                if (!$card || !$this->tryCopyToCard($target, $kind, (string)$row->value, $row->name, $card)) {
+                    $this->addLeadContact($target, $kind, (string)$row->value, $row->name);
+                }
             }
             CmsTask::updateAll(['cms_lead_id' => (int)$target->id], [
                 'cms_lead_id' => (int)$lead->id,
@@ -707,6 +727,10 @@ class LeadTriage
     private function afterIdentity(CmsLead $lead, array &$identity, LeadIdentityForm $form, int $actorId): void
     {
         foreach ((array)$form->contacts as $key => $target) {
+            if ($target === LeadIdentityForm::CONTACT_TO_CARD) {
+                // «В карточку клиента»: the person of the deal, else its company.
+                $target = $lead->cms_user_id ? 'client' : ($lead->cms_company_id ? 'company' : '');
+            }
             if (!in_array($target, ['company', 'client'], true) || $identity['foreign']) {
                 continue;
             }
@@ -884,6 +908,21 @@ class LeadTriage
         $model->cms_site_id = (int)$client->cms_site_id;
         if (!$model->save()) {
             throw new \DomainException(($kind === 'phone' ? 'Телефон: ' : 'Email: ').implode('; ', $model->getFirstErrors()));
+        }
+    }
+
+    /**
+     * copyToCard() that never fails the operation: a contact the card refuses (a strong match of another
+     * company in the strict mode) stays where it was. @return bool whether the card has it now
+     */
+    private function tryCopyToCard(CmsLead $lead, string $kind, string $value, ?string $name, string $target): bool
+    {
+        try {
+            $this->copyToCard($lead, $kind, $value, $name, $target);
+
+            return true;
+        } catch (\DomainException $e) {
+            return false;
         }
     }
 

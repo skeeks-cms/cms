@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\controllers\traits\LeadContactActions;
 use skeeks\cms\models\CmsLeadPhone;
@@ -26,7 +27,7 @@ class AdminCmsLeadPhoneController extends BackendModelStandartController
 
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(), $this->leadContactActions());
+        return ArrayHelper::merge(parent::actions(), $this->leadContactActions(BackendAction::SIZE_SMALL, true));
     }
 
     public function updateFields($action): array

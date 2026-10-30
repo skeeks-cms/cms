@@ -205,13 +205,17 @@ JS
                 'fields' => [
                     'identity' => [
                         'class' => HtmlBlock::class,
-                        'content' => '<div class="sx-lead-identity-field">'.$this->renderPartial('@skeeks/cms/views/admin-cms-lead/_identity', [
-                            'form' => $identity,
-                            'lead' => $action->model,
-                            'candidates' => [],
-                            'allowForeign' => true,
-                            'withExecutor' => false,
-                        ]).'</div>',
+                        'content' => '<div class="sx-lead-identity-field">'
+                            // П2г: a deal by hand is saved only with its client (LeadTriage::requireClient()).
+                            .(\skeeks\cms\source\RecordSources::has($action) ? '' : '<p class="sx-lead-identity__note">Обязательно: компания или контакт — '
+                                .'выберите из базы или создайте нового. Телефоны и email пишутся в карточку клиента.</p>')
+                            .$this->renderPartial('@skeeks/cms/views/admin-cms-lead/_identity', [
+                                'form' => $identity,
+                                'lead' => $action->model,
+                                'candidates' => [],
+                                'allowForeign' => true,
+                                'withExecutor' => false,
+                            ]).'</div>',
                     ],
                 ],
             ],
@@ -343,6 +347,11 @@ JS
         try {
             $triage = new LeadTriage();
             $triage->checkIdentity($action->formModels['identity'], (int)\Yii::$app->user->id);
+            // П2г: a deal made by hand has a client; only a deal from a letter or a chat (a record source,
+            // an incoming channel) may come without one, its contacts are «данные обращения».
+            if (!\skeeks\cms\source\RecordSources::has($action)) {
+                $triage->requireClient($lead, $action->formModels['identity']);
+            }
             if (trim((string)$lead->name) === '') {
                 $lead->name = $triage->suggestName($lead, $action->formModels['identity']);
                 // Nothing to name it by: "Сделка №<id>" once it is saved.

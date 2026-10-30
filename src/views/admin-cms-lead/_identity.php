@@ -171,17 +171,18 @@ $searchPart = static function (string $part, string $title, string $placeholder)
     <?php if ($withContacts && ($lead->phones || $lead->emails)) : ?>
         <div class="sx-lead-identity__contacts">
             <h3 class="sx-lead-identity__title">Контакты из обращения</h3>
-            <p class="sx-lead-identity__note">Они останутся в сделке. Отметьте, какие добавить в карточку клиента.</p>
+            <p class="sx-lead-identity__note">Контакты живут в карточке клиента: по умолчанию они перенесутся в карточку контакта, а без контакта — компании. В сделке они останутся только для истории.</p>
             <?php foreach (array_merge(
                 array_map(static fn($phone) => ['phone', $phone], $lead->phones),
                 array_map(static fn($email) => ['email', $email], $lead->emails)
             ) as [$kind, $contact]) : ?>
                 <label class="sx-lead-identity__contact">
                     <span><?= Html::encode((string)$contact->value); ?></span>
-                    <?= Html::dropDownList($formName.'[contacts]['.$kind.':'.(int)$contact->id.']', '', [
-                        '' => 'Только в сделке',
+                    <?= Html::dropDownList($formName.'[contacts]['.$kind.':'.(int)$contact->id.']', LeadIdentityForm::CONTACT_TO_CARD, [
+                        LeadIdentityForm::CONTACT_TO_CARD => 'В карточку клиента',
                         'client' => 'В карточку контакта',
                         'company' => 'В карточку компании',
+                        '' => 'Не переносить',
                     ], ['class' => 'form-control']); ?>
                 </label>
             <?php endforeach; ?>

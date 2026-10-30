@@ -18,15 +18,22 @@ use yii\helpers\ArrayHelper;
  * lead id of a new record comes from the request (`<FormName>[cms_lead_id]`),
  * of an existing one from its saved value, so a posted form cannot move the
  * record to another lead.
+ *
+ * П2г (owner's decision 30.10.2026): phones, emails and addresses of a lead
+ * are «данные обращения» — written only by incoming sources, never added or
+ * changed by hand (`$requestData`); contacts are added to the company or the
+ * person of the lead. A wrong row may still be removed by the responsible.
  */
 trait LeadContactActions
 {
     /**
      * @param string|null $size form window size, BackendAction::SIZE_*; null for the regular window
+     * @param bool $requestData rows of the request: create and update are refused to everybody
      */
-    protected function leadContactActions(?string $size = BackendAction::SIZE_SMALL): array
+    protected function leadContactActions(?string $size = BackendAction::SIZE_SMALL, bool $requestData = false): array
     {
         $access = fn() => $this->canManageLeadContact();
+        $write = $requestData ? static fn() => false : $access;
         $lockLead = function (Event $event): void {
             $event->sender->model->cms_lead_id = $this->trustedLeadId($event->sender->model);
         };
@@ -40,14 +47,16 @@ trait LeadContactActions
                 'fields' => [$this, 'updateFields'],
                 'size' => $size,
                 'buttons' => ['save'],
-                'accessCallback' => $access,
+                'accessCallback' => $write,
+                'isVisible' => !$requestData,
                 'on '.BackendModelCreateAction::EVENT_BEFORE_VALIDATE => $lockLead,
             ],
             'update' => [
                 'fields' => [$this, 'updateFields'],
                 'size' => $size,
                 'buttons' => ['save'],
-                'accessCallback' => $access,
+                'accessCallback' => $write,
+                'isVisible' => !$requestData,
                 'on '.BackendModelUpdateAction::EVENT_BEFORE_VALIDATE => $lockLead,
             ],
             'delete' => ['accessCallback' => $access],

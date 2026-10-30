@@ -132,6 +132,12 @@ class RecordSources
         return true;
     }
 
+    /** Whether a create action is making its record from a source (a letter, a chat message, a call). */
+    public static function has($action): bool
+    {
+        return self::entry($action) !== null;
+    }
+
     public static function onBeforeValidate(Event $event): void
     {
         if ($entry = self::entry($event->sender)) {

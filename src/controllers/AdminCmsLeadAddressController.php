@@ -31,7 +31,7 @@ class AdminCmsLeadAddressController extends BackendModelStandartController
     public function actions()
     {
         // The map suggestion widget needs the regular window width.
-        return ArrayHelper::merge(parent::actions(), $this->leadContactActions(null));
+        return ArrayHelper::merge(parent::actions(), $this->leadContactActions(null, true));
     }
 
     public function updateFields($action): array

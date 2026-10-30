@@ -280,10 +280,25 @@ foreach (["createContactTable('cms_lead_phone'", "createContactTable('cms_lead_e
         throw new RuntimeException('Initial lead contact schema is incomplete: '.$fragment);
     }
 }
-foreach (['Добавить телефон', 'Добавить email', 'sx-send-sms-trigger', 'sx-telephony-btn', '/cms/admin-cms-lead-phone', '/cms/admin-cms-lead-email'] as $fragment) {
+foreach (['sx-send-sms-trigger', 'sx-telephony-btn', '/cms/admin-cms-lead-phone', '/cms/admin-cms-lead-email', 'Указать клиента'] as $fragment) {
     if (strpos($view, $fragment) === false) {
         throw new RuntimeException('Lead contact surface is incomplete: '.$fragment);
     }
+}
+// П2г: the request data are read only — no «Добавить …» of the deal's own phones, emails, addresses.
+foreach (['/cms/admin-cms-lead-phone/create', '/cms/admin-cms-lead-email/create', '/cms/admin-cms-lead-address/create'] as $fragment) {
+    if (strpos($view, $fragment) !== false) {
+        throw new RuntimeException('The deal card must not add contacts to the deal: '.$fragment);
+    }
+}
+$contactActions = file_get_contents($root.'/controllers/traits/LeadContactActions.php');
+foreach (['Phone' => 'BackendAction::SIZE_SMALL, true', 'Email' => 'BackendAction::SIZE_SMALL, true', 'Address' => 'null, true'] as $kind => $call) {
+    if (strpos(file_get_contents($root.'/controllers/AdminCmsLead'.$kind.'Controller.php'), 'leadContactActions('.$call.')') === false) {
+        throw new RuntimeException('Lead '.$kind.' rows must be request data (create/update refused).');
+    }
+}
+if (strpos($contactActions, '$write = $requestData ? static fn() => false : $access;') === false) {
+    throw new RuntimeException('Request data must refuse create and update for everybody.');
 }
 if (strpos($controller, "@skeeks/cms/views/admin-cms-lead/_model_header") === false) {
     throw new RuntimeException('Lead workflow actions must be available from the shared model header on every lead action.');
@@ -312,8 +327,9 @@ if (strpos($controller, 'CrmAccess::instance()->canWorkLead((int)\Yii::$app->use
 ) {
     throw new RuntimeException('Completed leads must remain read-only in controller actions through CrmAccess::canWorkLead().');
 }
-// Contact blocks pass add routes, row menus and call/SMS actions only when $canWork.
-if (substr_count($view, "'addRoute' => \$canWork ?") < 5
+// Contact blocks pass add routes (requisites and links of the request; П2г: no phones, emails, addresses),
+// row menus and call/SMS actions only when $canWork.
+if (substr_count($view, "'addRoute' => \$canWork ?") < 2
     || strpos($view, 'string $title): string => $canWork') === false
     || strpos($view, '(string)$phone->value, $model, $canWork ? [') === false
     || strpos($view, '$canWork = $model->canBeWorkedBy') === false

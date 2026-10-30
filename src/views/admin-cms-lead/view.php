@@ -243,6 +243,14 @@ $this->registerCss(<<<CSS
     border: 1px solid var(--sx-color-success);
     background: var(--sx-color-success-soft);
 }
+.sx-lead-request-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 13px;
+    color: var(--sx-color-text-muted);
+}
 .sx-lead-identity-card__arrow {
     align-self: center;
     flex: 0 0 auto;
@@ -391,6 +399,31 @@ CSS
             // once a client is linked, the «Клиент» blocks show the client's own contacts.
             $requestData = !$model->company && !$model->client;
             if ($requestData) {
+            // П2г (owner's decision 30.10.2026): the request data are read only — no «Добавить …» here; a contact is
+            // added to the client, so the way is «Указать клиента» (the sorting window of an unsorted deal), which moves
+            // the contacts of the request into the chosen or created card.
+            $identityRoute = null;
+            if ($model->status === CmsLead::STATUS_NEW && \skeeks\cms\crm\CrmAccess::instance()->canTriage((int)\Yii::$app->user->id, $model)) {
+                $identityRoute = ['/cms/admin-cms-lead/triage', 'pk' => $model->id, 'from' => 'card'];
+            } elseif ($model->status === CmsLead::STATUS_IN_WORK && $canWork) {
+                $identityRoute = ['/cms/admin-cms-lead/identity', 'pk' => $model->id];
+            }
+            $identityLink = '';
+            if ($identityRoute) {
+                $identityUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams($identityRoute)
+                    ->enableEmptyLayout()->enableNoActions()->enableNoModelActions()->url;
+                $identityLink = Html::a('<i class="fas fa-user-plus" aria-hidden="true"></i> Указать клиента', $identityUrl, [
+                    'class' => 'sx-button sx-button--primary sx-button--sm',
+                    'data-pjax' => '0',
+                    'onclick' => 'new sx.classes.backend.widgets.Action('.\yii\helpers\Json::encode(['isOpenNewWindow' => true, 'url' => $identityUrl]).').go(); return false;',
+                ]);
+            }
+            echo Html::tag('div',
+                Html::tag('div', 'Контакты из обращения только для чтения. Чтобы добавить телефон или email, укажите клиента — компанию или контакт: '
+                    .'контакты обращения перенесутся в его карточку.')
+                .$identityLink,
+                ['class' => 'sx-surface sx-surface--raised sx-surface--padded sx-lead-request-hint']
+            );
             echo CrmContactBlockWidget::widget([
                 'title' => 'Телефоны из обращения',
                 'hint' => 'Телефоны, с которыми пришла сделка. Первый из них основной, по нему звонят и пишут SMS. Когда у сделки появится компания или клиент, здесь будут их контакты.',
@@ -404,10 +437,7 @@ CSS
                             'call' => CrmContactBlockWidget::iconButton('phone', 'Позвонить', ['class' => 'sx-telephony-btn', 'data-value' => $phone->value, 'data-lead-id' => $leadId]),
                         ] : []),
                 ], $model->phones),
-                'emptyText' => 'Телефонов пока нет',
-                'addLabel' => 'Добавить телефон',
-                'addRoute' => $canWork ? ['/cms/admin-cms-lead-phone/create', 'CmsLeadPhone' => ['cms_lead_id' => $leadId]] : null,
-                'addSize' => 'small',
+                'emptyText' => 'Телефонов в обращении нет',
             ]);
 
             echo CrmContactBlockWidget::widget([
@@ -422,15 +452,12 @@ CSS
                             'mailto' => CrmContactBlockWidget::iconButton('mail', 'Написать письмо', ['href' => 'mailto:'.$email->value]),
                         ]),
                 ], $model->emails),
-                'emptyText' => 'Email пока нет',
-                'addLabel' => 'Добавить email',
-                'addRoute' => $canWork ? ['/cms/admin-cms-lead-email/create', 'CmsLeadEmail' => ['cms_lead_id' => $leadId]] : null,
-                'addSize' => 'small',
+                'emptyText' => 'Email в обращении нет',
             ]);
 
             echo CrmContactBlockWidget::widget([
                 'title' => 'Адреса из обращения',
-                'hint' => 'Адреса офиса, склада или магазина клиента. Первый из них основной. При создании компании адреса переносятся в неё.',
+                'hint' => 'Адреса офиса, склада или магазина клиента из обращения. Первый из них основной. Когда у сделки появится компания или клиент, здесь будут их адреса.',
                 'icon' => 'map-pin',
                 'items' => array_map(static fn($address) => [
                     'label' => $address->name ?: 'Адрес',
@@ -443,9 +470,7 @@ CSS
                     ])),
                     'actions' => $menu('/cms/admin-cms-lead-address', (int)$address->id, 'Изменить адрес'),
                 ], $model->addresses),
-                'emptyText' => 'Адресов пока нет',
-                'addLabel' => 'Добавить адрес',
-                'addRoute' => $canWork ? ['/cms/admin-cms-lead-address/create', 'CmsLeadAddress' => ['cms_lead_id' => $leadId]] : null,
+                'emptyText' => 'Адресов в обращении нет',
             ]);
             }
 
