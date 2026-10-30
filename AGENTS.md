@@ -148,6 +148,13 @@ Every CRM change in the core must keep a simple site (no cms-communication, no
 CRM data) working as before — the "base site" rule of the skill reference.
 Test: tests/crm-lead-triage-stand.php (CRM_TRIAGE_STAND_TEST=local, stand DB,
 rolled back).
+П2г: a deal made by an employee always has a client (`LeadTriage::requireClient()`
+in `createLead()` and the create window, except a record source); phones,
+emails, addresses, requisites and links of a deal are read-only request data
+(`AdminCmsLead{Phone,Email,Address,Link,Contractor}Controller`: create/update
+answer 403), moved to the client by «Указать клиента» (`defaultContacts()`,
+`copyRequestDataToCompany()`). Contract: skill
+`references/crm-duplicates-and-triage.md`, «A deal by an employee always has a client».
 
 ## Verification
 
