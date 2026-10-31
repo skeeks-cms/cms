@@ -17,52 +17,10 @@ $model = $user;
     <div class="col-sm-12">
         <!--<h5 class="g-mt-14">Календарь задач</h5>-->
 
-        <div class="sx-task-calendar__toolbar">
-            <div class="sx-task-calendar__toolbar-start">
-                <button class="btn btn-primary sx-save-priority-btn"><i class="fa fa-save"></i> Сохранить порядок задач</button>
-            </div>
-            <div class="sx-task-calendar__toolbar-end">
-
-                    <?
-                    $btnCreateTask = '';
-                    if ($controller = \Yii::$app->createController('/cms/admin-cms-task')) {
-                        $controller = $controller[0];
-
-                        if ($createAction = \yii\helpers\ArrayHelper::getValue($controller->actions, 'create')) {
-
-                            /**
-                             * @var $createAction BackendModelCreateAction
-                             */
-                            $r = new \ReflectionClass(\skeeks\cms\models\CmsTask::class);
-
-                            $createAction->url = \yii\helpers\ArrayHelper::merge($createAction->urlData, [
-                                $r->getShortName() => [
-                                    'executor_id' => $user->id,
-                                ],
-                            ]);
-
-                            $createAction->name = "Добавить задачу";
-
-                            $btnCreateTask = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-                                'actions'         => [$createAction],
-                                'isOpenNewWindow' => true,
-                                'minViewCount'    => 1,
-                                'itemTag'         => 'button',
-                                'itemOptions'     => ['class' => 'btn btn-primary'],
-                                /*'button'          => [
-                                    'class' => 'btn btn-primary',
-                                    //'style' => 'font-size: 11px; cursor: pointer;',
-                                    'tag'   => 'a',
-                                    'label' => 'Зарегистрировать номер',
-                                ],*/
-                            ]);
-
-                        }
-                    }
-                    ?>
-                <?= $btnCreateTask; ?>
-            </div>
-        </div>
+        <?= \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget([
+            'context' => $widget->context,
+            'start'   => '<button type="button" class="btn btn-primary btn-sm sx-save-priority-btn"><i class="fa fa-save"></i> Сохранить порядок задач</button>',
+        ]); ?>
 
         <div class="row">
             <div class="col-sm-12">
@@ -253,16 +211,22 @@ JS
                     ->where([\skeeks\cms\models\CmsTask::tableName() . '.executor_id' => $model->id])
                     ->andWhere([\skeeks\cms\models\CmsTask::tableName() . '.status' => \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE])
                     ->innerJoin(['unfinished_schedules' => $unfinishedSchedules], ['unfinished_schedules.cms_task_id' => new \yii\db\Expression(\skeeks\cms\models\CmsTask::tableName() . '.id')])
+                    ->with(\skeeks\cms\widgets\admin\TaskViewContext::ROW_RELATIONS)
                     ->orderBy(['last_start_at' => SORT_DESC])
                     ->all();
 
                 // Every active task has a start (TaskPlanner). The page does not replan: tasks move only on events.
 
-                $tasks = \skeeks\cms\models\CmsTask::find()
+                $tasksQuery = \skeeks\cms\models\CmsTask::find()
                     ->where(['executor_id' => $model->id])
                     ->andWhere(['status' => \skeeks\cms\models\CmsTask::activeStatuses()])
-                    ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC, 'id' => SORT_ASC])
-                    ->all();
+                    ->with(\skeeks\cms\widgets\admin\TaskViewContext::ROW_RELATIONS)
+                    ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC, 'id' => SORT_ASC]);
+                $tasks = $widget->context->applySearch($tasksQuery)->all();
+
+                // Two weeks of days; later tasks are counted and open in the calendar (a search shows every day found).
+                $isSearch = $widget->context->q !== '';
+                $lastShownDate = date('Y-m-d', strtotime('+13 day'));
 
                 $now = time();
                 $expiredTasks = [];
@@ -402,6 +366,19 @@ JS
                     if ($i > 6 && (!$lastDate || $date > $lastDate)) {
                         break;
                     }
+                    if (!$isSearch && $date > $lastShownDate) {
+                        $laterCount = 0;
+                        foreach ($tasksByDate as $taskDate => $dateTasks) {
+                            if ($taskDate >= $date) {
+                                $laterCount += count($dateTasks);
+                            }
+                        }
+                        if ($laterCount) {
+                            echo '<div class="sx-task-calendar__later text-center text-muted">Дальше ещё задач: '.$laterCount
+                                .' — <a href="'.\yii\helpers\Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/tasks-calendar', 'executor_id' => $model->id, 'date' => $date])).'" data-pjax="0">открыть в календаре</a></div>';
+                        }
+                        break;
+                    }
                     $times = \skeeks\cms\helpers\CmsScheduleHelper::getSchedulesByWorktimeForDate($workShedule, $date);
 
                     $timesForCalculate = $times;
@@ -473,7 +450,7 @@ JS
                             ->andHaving(["date_formated_end" => $date])
                         ;
 
-                        $qt = \skeeks\cms\models\CmsTask::find()
+                        $qt = \skeeks\cms\models\CmsTask::find()->with(\skeeks\cms\widgets\admin\TaskViewContext::ROW_RELATIONS)
                             ->select([
                                 \skeeks\cms\models\CmsTask::tableName() . ".*",
                                 "schedules_end_at" => "schedules.end_at",

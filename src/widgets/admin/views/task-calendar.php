@@ -91,42 +91,29 @@ $lanes = static function (array $dayTasks) {
     return $result;
 };
 
-$btnCreateTask = '';
-if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
-    $taskController = $taskController[0];
-    if ($createAction = \yii\helpers\ArrayHelper::getValue($taskController->actions, 'create')) {
-        $createAction->url = \yii\helpers\ArrayHelper::merge($createAction->urlData, [
-            'CmsTask' => ['executor_id' => $widget->user->id],
-        ]);
-        $createAction->name = 'Добавить задачу';
-        $btnCreateTask = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
-            'actions'         => [$createAction],
-            'isOpenNewWindow' => true,
-            'minViewCount'    => 1,
-            'itemTag'         => 'button',
-            'itemOptions'     => ['class' => 'btn btn-primary'],
-        ]);
-    }
-}
 ?>
 <?= Html::beginTag('div', $widget->options + ['data-sx-task-calendar' => '1', 'data-now' => $now]); ?>
 
-<div class="sx-task-calendar__bar">
-    <div class="sx-task-calendar__nav">
-        <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(-1)])); ?>" title="Назад"><i class="fas fa-chevron-left"></i></a>
-        <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $today])); ?>">Сегодня</a>
-        <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(1)])); ?>" title="Вперёд"><i class="fas fa-chevron-right"></i></a>
-        <h2 class="sx-task-calendar__title"><?= Html::encode($widget->title()); ?></h2>
+<?
+ob_start();
+?>
+    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(-1)])); ?>" title="Назад"><i class="fas fa-chevron-left"></i></a>
+    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $today])); ?>">Сегодня</a>
+    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(1)])); ?>" title="Вперёд"><i class="fas fa-chevron-right"></i></a>
+    <h2 class="sx-task-calendar__title"><?= Html::encode($widget->title()); ?></h2>
+<?
+$start = ob_get_clean();
+ob_start();
+?>
+    <div class="btn-group sx-task-calendar__modes" role="group">
+        <? foreach ([CmsTaskCalendarWidget::MODE_DAY => 'День', CmsTaskCalendarWidget::MODE_WEEK => 'Неделя', CmsTaskCalendarWidget::MODE_MONTH => 'Месяц'] as $mode => $label) : ?>
+            <a class="btn btn-sm <?= $widget->mode === $mode ? 'btn-primary' : 'btn-default'; ?>" href="<?= Html::encode($widget->url(['mode' => $mode])); ?>"><?= $label; ?></a>
+        <? endforeach; ?>
     </div>
-    <div class="sx-task-calendar__tools">
-        <div class="btn-group sx-task-calendar__modes" role="group">
-            <? foreach ([CmsTaskCalendarWidget::MODE_DAY => 'День', CmsTaskCalendarWidget::MODE_WEEK => 'Неделя', CmsTaskCalendarWidget::MODE_MONTH => 'Месяц'] as $mode => $label) : ?>
-                <a class="btn btn-sm <?= $widget->mode === $mode ? 'btn-primary' : 'btn-default'; ?>" href="<?= Html::encode($widget->url(['mode' => $mode])); ?>"><?= $label; ?></a>
-            <? endforeach; ?>
-        </div>
-        <?= $btnCreateTask; ?>
-    </div>
-</div>
+<?
+$tools = ob_get_clean();
+echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $widget->context, 'start' => $start, 'tools' => $tools]);
+?>
 
 <? if ($widget->mode === CmsTaskCalendarWidget::MODE_MONTH) : ?>
     <div class="sx-surface sx-surface--raised sx-task-calendar__month">

@@ -28,6 +28,9 @@ class CmsTaskCalendarWidget extends Widget
     /** @var CmsUser */
     public $user;
 
+    /** @var TaskViewContext|null whose tasks and the search; null — the employee $user, fixed */
+    public $context;
+
     /** @var string month|week|day */
     public $mode;
 
@@ -45,6 +48,10 @@ class CmsTaskCalendarWidget extends Widget
     public function init()
     {
         parent::init();
+        if (!$this->context) {
+            $this->context = TaskViewContext::forUser($this->user);
+        }
+        $this->user = $this->context->user;
         $request = \Yii::$app->request;
         $this->mode = $this->mode ?: (string)$request->get('mode', self::MODE_MONTH);
         if (!in_array($this->mode, [self::MODE_MONTH, self::MODE_WEEK, self::MODE_DAY], true)) {
@@ -155,14 +162,14 @@ class CmsTaskCalendarWidget extends Widget
      */
     protected function tasksByDay(int $from, int $to): array
     {
-        $tasks = CmsTask::find()
+        $query = CmsTask::find()
             ->andWhere(['executor_id' => (int)$this->user->id])
             ->andWhere(['>=', 'plan_start_at', $from])
             ->andWhere(['<', 'plan_start_at', $to])
             ->andWhere(['not', ['status' => CmsTask::STATUS_CANCELED]])
             ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC])
-            ->limit(2000)
-            ->all();
+            ->limit(2000);
+        $tasks = $this->context->applySearch($query)->all();
 
         $result = [];
         foreach ($tasks as $task) {

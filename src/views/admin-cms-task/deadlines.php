@@ -6,4 +6,4 @@
  */
 /* @var $this yii\web\View */
 
-echo \skeeks\cms\widgets\admin\CmsTaskDeadlinesWidget::widget(['user' => \Yii::$app->user->identity]);
+echo \skeeks\cms\widgets\admin\CmsTaskDeadlinesWidget::widget(['context' => \skeeks\cms\widgets\admin\TaskViewContext::fromRequest()]);

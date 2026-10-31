@@ -14,6 +14,7 @@ $f = \Yii::$app->formatter;
 $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
 ?>
 <?= Html::beginTag('div', $widget->options); ?>
+<?= \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $widget->context]); ?>
 <p class="sx-task-deadlines__hint text-muted">
     Перетащите задачу в другую колонку — она встанет в первое свободное время этого дня по графику и закрепится.
 </p>

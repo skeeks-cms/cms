@@ -23,6 +23,9 @@ class CmsTaskDeadlinesWidget extends Widget
     /** @var CmsUser */
     public $user;
 
+    /** @var TaskViewContext|null whose tasks and the search; null — the employee $user, fixed */
+    public $context;
+
     /** @var int cards drawn in a column */
     public $columnLimit = 60;
 
@@ -31,6 +34,10 @@ class CmsTaskDeadlinesWidget extends Widget
     public function run()
     {
         TaskCalendarAsset::register($this->view);
+        if (!$this->context) {
+            $this->context = TaskViewContext::forUser($this->user);
+        }
+        $this->user = $this->context->user;
 
         $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
         $today = new \DateTime('today', $tz);
@@ -51,10 +58,11 @@ class CmsTaskDeadlinesWidget extends Widget
         $columns['later'] = ['title' => 'Позже', 'day' => max($nextWeek, $afterTomorrow)->format('Y-m-d'),
             'sub' => 'с '.$f->asDate(max($nextWeek, $afterTomorrow)->getTimestamp(), 'php:j M'), 'tasks' => []];
 
-        $tasks = CmsTask::find()
+        $query = CmsTask::find()
             ->andWhere(['executor_id' => (int)$this->user->id, 'status' => CmsTask::activeStatuses()])
-            ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC])
-            ->all();
+            ->with(['cmsProject', 'cmsCompany', 'cmsUser'])
+            ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC]);
+        $tasks = $this->context->applySearch($query)->all();
         $now = time();
         foreach ($tasks as $task) {
             $start = (int)$task->plan_start_at;

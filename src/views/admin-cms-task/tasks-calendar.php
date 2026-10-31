@@ -3,9 +3,9 @@
  * @link https://cms.skeeks.com/
  * @copyright Copyright (c) 2010 SkeekS
  * @license https://cms.skeeks.com/license/
- * @author Semenov Alexander <semenov@skeeks.com>
  */
+/* @var $this yii\web\View */
 
-$model = \Yii::$app->user->identity;
-?>
-<?php echo $this->render('@skeeks/cms/views/admin-worker/tasks-calendar', ['model' => $model]); ?>
+$context = \skeeks\cms\widgets\admin\TaskViewContext::fromRequest();
+echo \skeeks\cms\widgets\admin\CmsUnassignedClientTasksWidget::widget(['user' => $context->user]);
+echo \skeeks\cms\widgets\admin\CmsTaskCalendarWidget::widget(['context' => $context]);

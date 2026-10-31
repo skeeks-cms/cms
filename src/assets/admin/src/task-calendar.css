@@ -552,3 +552,83 @@
     font-weight: 600;
     color: var(--sx-tc-accent);
 }
+
+/* One toolbar of every task view (CmsTaskViewToolbarWidget): same order, size and controls. */
+.sx-task-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 12px;
+    margin-bottom: 14px;
+}
+
+.sx-task-toolbar__start,
+.sx-task-toolbar__end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.sx-task-toolbar .btn,
+.sx-task-toolbar .form-control {
+    height: 32px;
+    line-height: 1.2;
+    font-size: 13px;
+}
+
+.sx-task-toolbar .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+}
+
+.sx-task-toolbar .btn-group .btn {
+    padding: 0 10px;
+}
+
+.sx-task-toolbar__user {
+    width: auto;
+    max-width: 220px;
+}
+
+.sx-task-toolbar__search {
+    position: relative;
+    width: 240px;
+}
+
+.sx-task-toolbar__search .fa-search {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--sx-color-text-muted);
+    pointer-events: none;
+}
+
+.sx-task-toolbar__search .form-control {
+    padding-left: 30px;
+}
+
+.sx-task-toolbar__add .fa,
+.sx-task-toolbar__add .fas {
+    margin: 0;
+}
+
+@media (max-width: 767px) {
+    .sx-task-toolbar__search,
+    .sx-task-toolbar__user {
+        width: 100%;
+        max-width: none;
+        flex: 1 1 100%;
+    }
+}
+
+/* «Сохранить порядок задач» of the day view stays hidden until a reorder (it floats in the middle then). */
+.sx-worker-tasks-calendar-widget .sx-task-toolbar .sx-save-priority-btn {
+    display: none;
+}

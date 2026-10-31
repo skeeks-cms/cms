@@ -28,14 +28,15 @@ class CmsTaskGanttWidget extends Widget
     /** @var CmsUser whose tasks */
     public $user;
 
-    /** @var CmsUser[] employees the viewer may choose (self, subordinates; all for an administrator) */
-    public $users = [];
+    /** @var TaskViewContext|null whose tasks and the search; null — the employee $user, fixed */
+    public $context;
 
     public $options = [];
 
     public function run()
     {
         TaskGanttAsset::register($this->view);
+        $this->resolveContext();
 
         $this->options['id'] = $this->id;
         Html::addCssClass($this->options, 'sx-task-gantt');
@@ -56,18 +57,27 @@ class CmsTaskGanttWidget extends Widget
      */
     public function data(): array
     {
+        $this->resolveContext();
 
         return ['tasks' => $this->tasksData(), 'work' => $this->workData(), 'now' => time()];
     }
 
+    protected function resolveContext(): void
+    {
+        if (!$this->context) {
+            $this->context = TaskViewContext::forUser($this->user);
+        }
+        $this->user = $this->context->user;
+    }
+
     protected function tasksData(): array
     {
-        $tasks = CmsTask::find()
+        $query = CmsTask::find()
             ->andWhere(['executor_id' => (int)$this->user->id, 'status' => CmsTask::activeStatuses()])
             ->with(['cmsProject', 'cmsCompany', 'cmsUser'])
             ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC])
-            ->limit(1000)
-            ->all();
+            ->limit(1000);
+        $tasks = $this->context->applySearch($query)->all();
 
         $isSelf = (int)\Yii::$app->user->id === (int)$this->user->id;
         $result = [];

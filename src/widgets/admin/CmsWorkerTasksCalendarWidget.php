@@ -28,13 +28,25 @@ class CmsWorkerTasksCalendarWidget extends Widget
     public $user = null;
 
     /**
+     * @var TaskViewContext|null whose tasks and the search; null — the employee $user, fixed (an employee's card)
+     */
+    public $context;
+
+    /**
      * @var array
      */
     public $options = [];
 
     public function run()
     {
+        if (!$this->context) {
+            $this->context = TaskViewContext::forUser($this->user);
+        }
+        $this->user = $this->context->user;
+
         WorkerTasksCalendarAsset::register($this->view);
+        // The common toolbar of task views lives in the task calendar asset.
+        \skeeks\cms\assets\admin\TaskCalendarAsset::register($this->view);
 
         $this->options['id'] = $this->id;
         Html::addCssClass($this->options, "sx-worker-tasks-calendar-widget");

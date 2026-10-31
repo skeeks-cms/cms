@@ -442,6 +442,29 @@ class AdminWorkerController extends BackendModelStandartController
                 },
             ],
 
+            // The same task views as in the task section, for this employee only (no choice of an employee).
+            'deadlines' => [
+                'class'          => BackendModelAction::class,
+                'name'           => 'Сроки',
+                'generateAccess' => false,
+                'icon'           => 'fas fa-columns',
+                "callback"       => [$this, 'view'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-worker", ['model' => $this->model]);
+                },
+            ],
+
+            'gantt' => [
+                'class'          => BackendModelAction::class,
+                'name'           => 'Гант',
+                'generateAccess' => false,
+                'icon'           => 'fas fa-stream',
+                "callback"       => [$this, 'view'],
+                "accessCallback" => function () {
+                    return \Yii::$app->user->can("cms/admin-worker", ['model' => $this->model]);
+                },
+            ],
+
             'report' => [
                 'class'          => BackendModelAction::class,
                 'name'           => 'Отчет',
