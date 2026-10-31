@@ -129,8 +129,14 @@ JS
                     
 
                     <? if ($task->plan_start_at) : ?>
-                        <span title="Запланирована на это время" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at, "d MMMM y 'г'., HH:mm"); ?></span>
-                        <? if ($task->plan_start_at < time()) : ?>
+                        <?
+                        $isFixedStart = !$task->hasAttribute('is_fixed_start') || $task->is_fixed_start;
+                        $isLateStart = $task->plan_start_at < time() - 60 && $task->status !== \skeeks\cms\models\CmsTask::STATUS_IN_WORK
+                            && in_array($task->status, \skeeks\cms\models\CmsTask::activeStatuses(), true);
+                        ?>
+                        <span title="<?= $isFixedStart ? 'Закреплена на это время' : 'Время рассчитано по графику и очереди'; ?>" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at, "d MMMM y 'г'., HH:mm"); ?></span>
+                        <?= $task->reminderIconHtml; ?>
+                        <? if ($isLateStart) : ?>
                             / <span class="sx-preview-card__meta--danger">Просрочена!</span>
                         <? endif; ?>
                     <? else: ?>

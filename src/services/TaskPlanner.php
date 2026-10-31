@@ -124,10 +124,12 @@ class TaskPlanner
      * (a call or a reply a package asks for: proposals, mailings, link visits). Without such a window
      * within the horizon — the nearest free minute.
      */
-    public function nearestStart(?CmsUser $user, int $duration, ?int $notBefore = null): int
+    public function nearestStart(?CmsUser $user, int $duration, ?int $notBefore = null, ?int $excludeTaskId = null): int
     {
         $from = $this->alignUp(max($this->now(), (int)$notBefore));
-        $busy = $user ? $this->busyIntervals($this->loadTasks((int)$user->id), $from) : [];
+        $tasks = $user ? $this->loadTasks((int)$user->id) : [];
+        unset($tasks[(int)$excludeTaskId]);
+        $busy = $this->busyIntervals($tasks, $from);
         $first = null;
         foreach ($this->freeIntervals($this->schedule($user), $from, $busy) as [$a, $b]) {
             $a = $this->alignUp($a);
@@ -143,6 +145,55 @@ class TaskPlanner
         }
 
         return $first ?? $from;
+    }
+
+    /**
+     * What a person should know about a fixed time: it is outside the working schedule or overlaps other
+     * fixed tasks and tasks in work. Such a time is allowed (owner's decision), only warned about.
+     *
+     * @return string[]
+     */
+    public function warnings(CmsTask $task): array
+    {
+        if (!$task->plan_start_at || !$task->executor_id) {
+            return [];
+        }
+        $start = (int)$task->plan_start_at;
+        $end = $start + max((int)$task->plan_duration, static::STEP);
+        $user = CmsUser::findOne((int)$task->executor_id);
+        $warnings = [];
+
+        $inSchedule = false;
+        foreach ($this->freeIntervals($this->schedule($user), $start, []) as [$a, $b]) {
+            if ($a > $start) {
+                break;
+            }
+            $inSchedule = $b >= $end;
+            break;
+        }
+        if (!$inSchedule) {
+            $warnings[] = 'Время вне рабочего графика исполнителя.';
+        }
+
+        $tasks = $this->loadTasks((int)$task->executor_id);
+        unset($tasks[(int)$task->id]);
+        $names = [];
+        foreach ($tasks as $id => $other) {
+            if (!$this->isFixed($other) && $other['status'] !== CmsTask::STATUS_IN_WORK) {
+                continue;
+            }
+            $a = (int)$other['plan_start_at'];
+            $b = $a + max((int)$other['plan_duration'], static::STEP);
+            if ($a < $end && $b > $start) {
+                $names[] = $id;
+            }
+        }
+        if ($names) {
+            $titles = CmsTask::find()->select('name')->andWhere(['id' => array_slice($names, 0, 3)])->column();
+            $warnings[] = 'В это время уже есть: «'.implode('», «', $titles).'»'.(count($names) > 3 ? ' и ещё '.(count($names) - 3) : '').'.';
+        }
+
+        return $warnings;
     }
 
     /**
@@ -168,6 +219,10 @@ class TaskPlanner
         ];
         if (static::hasStartMode()) {
             $select[] = $taskTable.'.is_fixed_start';
+        }
+        if (static::hasReminder()) {
+            $select[] = $taskTable.'.remind_offset';
+            $select[] = $taskTable.'.remind_at';
         }
 
         $rows = (new \yii\db\Query())->select($select)->from($taskTable)
@@ -290,6 +345,14 @@ class TaskPlanner
 
     protected function put(array &$result, array $task, array $values, bool $all): void
     {
+        // A reminder «N minutes before the start» moves with the start; a moved one is sent again.
+        if (isset($values['plan_start_at']) && isset($task['remind_offset']) && $task['remind_offset'] !== null) {
+            $remindAt = (int)$values['plan_start_at'] - (int)$task['remind_offset'];
+            if ((int)$task['remind_at'] !== $remindAt) {
+                $values['remind_at'] = $remindAt;
+                $values['reminded_at'] = null;
+            }
+        }
         if (!$all) {
             foreach ($values as $name => $value) {
                 if (array_key_exists($name, $task) && $task[$name] !== null && (int)$task[$name] === (int)$value) {
@@ -397,6 +460,20 @@ class TaskPlanner
     protected function now(): int
     {
         return $this->now ?? time();
+    }
+
+    /**
+     * Whether the table has the reminder columns yet (code may run before its migration).
+     */
+    public static function hasReminder(): bool
+    {
+        static $has = null;
+        if ($has === null) {
+            $schema = CmsTask::getTableSchema();
+            $has = $schema && $schema->getColumn('remind_at') !== null;
+        }
+
+        return $has;
     }
 
     /**

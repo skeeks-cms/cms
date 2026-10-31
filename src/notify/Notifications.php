@@ -146,6 +146,8 @@ class Notifications extends Component
             'task.resumed' => ['name' => 'Задача возобновлена'] + $task,
             'task.comment' => ['name' => 'Комментарий к задаче'] + $task,
             'task.order' => ['name' => 'Изменён порядок ваших задач', 'audience' => self::AUDIENCE_WORKER] + $task,
+            // A reminder a person set on a task (services\TaskReminders): important, never muted.
+            'task.reminder' => ['name' => 'Напоминание о задаче', 'importance' => self::IMPORTANCE_IMPORTANT, 'mutable' => false] + $task,
             'task.client_unassigned' => ['name' => 'Неразобранная задача от клиента', 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER] + $task,
             'lead.new' => ['name' => 'Новая сделка в Неразобранном', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
             'lead.delegated' => ['name' => 'Сделку по вашему клиенту ведёт другой сотрудник', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],

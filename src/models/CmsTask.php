@@ -36,6 +36,11 @@ use yii\helpers\ArrayHelper;
  *
  * @property int|null            $plan_start_at Планируемое начало (есть у каждой активной задачи, см. TaskPlanner)
  * @property int                 $is_fixed_start Начало выбрано человеком и не сдвигается; 0 — его ставит TaskPlanner
+ * @property int|null            $remind_at Когда напомнить
+ * @property int|null            $remind_offset Напомнить за столько секунд до начала (null — своё время remind_at)
+ * @property int                 $remind_author Напомнить и автору
+ * @property int|null            $reminded_at Когда напоминание отправлено
+ * @property string              $reminder Выбор напоминания в форме: '' нет, число — секунд до начала, 'custom' — своё время
  * @property int|null            $plan_end_at Планируемое завершение
  *
  * @property int|null            $plan_duration Длительность по плану в секундах
@@ -157,6 +162,7 @@ class CmsTask extends ActiveRecord
                 'no_log_fields' => [
                     'executor_sort',
                     'executor_end_at',
+                    'reminded_at',
                 ],
                 'relation_map' => [
                     'cms_project_id' => 'cmsProject',
@@ -177,10 +183,32 @@ class CmsTask extends ActiveRecord
             return false;
         }
 
+        // A reminder «before the start» follows the start; a reminder moved to the future is sent again.
+        if ($this->hasAttribute('remind_at')) {
+            if ($this->_reminder !== null) {
+                $this->applyReminderChoice($this->_reminder);
+            }
+            if ($this->remind_offset !== null && $this->remind_offset !== '' && $this->plan_start_at) {
+                $this->remind_at = (int)$this->plan_start_at - (int)$this->remind_offset;
+            }
+            if (!$this->remind_at) {
+                // An auto task gets its start (and the reminder) from the planner after saving.
+                $this->remind_at = null;
+                if ($this->remind_offset === '') {
+                    $this->remind_offset = null;
+                }
+            }
+            if ($this->isAttributeChanged('remind_at', false) && $this->remind_at && (int)$this->remind_at > time()) {
+                $this->reminded_at = null;
+            }
+        }
+
         // A start set by a person is fixed; an emptied start is given back to the planner.
         if ($this->hasAttribute('is_fixed_start')) {
             if (!$this->plan_start_at) {
                 $this->is_fixed_start = 0;
+            } elseif ($insert) {
+                $this->is_fixed_start = 1;
             } elseif (!$this->isAttributeChanged('is_fixed_start', false) && $this->isAttributeChanged('plan_start_at', false)) {
                 $this->is_fixed_start = 1;
             }
@@ -385,6 +413,26 @@ class CmsTask extends ActiveRecord
             [['plan_duration', 'fact_duration'], 'integer'],
             // Before its migration the column is absent: the validator would read it anyway.
             [\skeeks\cms\services\TaskPlanner::hasStartMode() ? ['is_fixed_start'] : [], 'boolean'],
+            [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_at', 'remind_offset'] : [], 'integer'],
+            [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_offset'] : [], 'integer', 'min' => 0, 'max' => 30 * 86400],
+            [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_author'] : [], 'boolean'],
+            [
+                'remind_at',
+                function ($attribute) {
+                    if ($this->getReminder() !== 'custom' || !$this->isAttributeChanged($attribute, false)) {
+                        return;
+                    }
+                    if (!$this->{$attribute}) {
+                        $this->addError($attribute, 'Укажите, когда напомнить.');
+                    } elseif ((int)$this->{$attribute} < time() - 60) {
+                        $this->addError($attribute, 'Время напоминания уже прошло.');
+                    }
+                },
+                'skipOnEmpty' => false,
+                'when'        => function () { return $this->hasAttribute('remind_at'); },
+            ],
+            [['reminder'], 'string'],
+            [['reminder'], 'in', 'range' => array_merge(['', 'none'], array_map('strval', array_keys(static::reminderOffsets())), ['custom'])],
 
             [['name'], 'string', 'max' => 255],
 
@@ -623,6 +671,11 @@ class CmsTask extends ActiveRecord
 
             'plan_start_at' => 'Планируемое начало',
             'is_fixed_start' => 'Закреплено на время',
+            'remind_at'      => 'Когда напомнить',
+            'remind_offset'  => 'Напомнить до начала',
+            'remind_author'  => 'Напомнить и мне',
+            'reminded_at'    => 'Напоминание отправлено',
+            'reminder'       => 'Напомнить',
             'plan_end_at'   => 'Планируемое завершение',
             'plan_duration' => 'Длительность по плану',
             'fact_duration' => 'Фактическая длительность',
@@ -1057,6 +1110,92 @@ class CmsTask extends ActiveRecord
     /**
      * @return float|int
      */
+    /** @var string|null the reminder chosen in a form, applied on save */
+    protected $_reminder;
+
+    /**
+     * Ready reminders «before the start»: seconds => label.
+     */
+    public static function reminderOffsets(): array
+    {
+        return [
+            0     => 'В начале задачи',
+            300   => 'За 5 минут',
+            900   => 'За 15 минут',
+            1800  => 'За 30 минут',
+            3600  => 'За час',
+            86400 => 'За день',
+        ];
+    }
+
+    /** The reminder as the form shows it: '' none, seconds before the start, 'custom' — a time of its own. */
+    public function getReminder(): string
+    {
+        if ($this->_reminder !== null) {
+            return $this->_reminder;
+        }
+        if (!$this->hasAttribute('remind_at') || !$this->remind_at) {
+            return '';
+        }
+
+        return $this->remind_offset !== null ? (string)(int)$this->remind_offset : 'custom';
+    }
+
+    public function setReminder($value): void
+    {
+        $this->_reminder = (string)$value;
+    }
+
+    protected function applyReminderChoice(string $choice): void
+    {
+        if ($choice === '' || $choice === 'none') {
+            $this->remind_at = null;
+            $this->remind_offset = null;
+        } elseif ($choice === 'custom') {
+            $this->remind_offset = null;
+        } else {
+            $this->remind_offset = (int)$choice;
+        }
+    }
+
+    /** Whether the task will remind (a reminder that was not sent yet). */
+    public function hasPendingReminder(): bool
+    {
+        return $this->hasAttribute('remind_at') && $this->remind_at && !$this->reminded_at
+            && in_array($this->status, static::activeStatuses(), true);
+    }
+
+    /** «Напомнит 2 ноября в 09:45» / «Напомнило …». */
+    public function getReminderText(): string
+    {
+        if (!$this->hasAttribute('remind_at') || !$this->remind_at) {
+            return '';
+        }
+        $f = \Yii::$app->formatter;
+        $when = $f->asDate((int)$this->remind_at, 'php:j F').' в '.$f->asTime((int)$this->remind_at, 'php:H:i');
+
+        return ($this->reminded_at ? 'Напоминание отправлено: ' : 'Напомнит ').$when
+            .($this->remind_author ? ' (исполнителю и автору)' : '');
+    }
+
+    /** The bell of a task with a reminder: shown in lists, calendars, «Сроки», Gantt and the card. */
+    public function getReminderIconHtml(): string
+    {
+        if (!$this->hasAttribute('remind_at') || !$this->remind_at) {
+            return '';
+        }
+
+        $isSent = $this->reminded_at || !in_array($this->status, static::activeStatuses(), true);
+
+        // Inline colors: the bell is drawn by many widgets and pages, none of them owns a shared stylesheet.
+        return \yii\helpers\Html::tag('i', '', [
+            'class'       => 'fas fa-bell sx-task-bell'.($isSent ? ' is-sent' : ''),
+            'style'       => $isSent ? 'color: var(--sx-color-text-muted); opacity: .55;' : 'color: var(--sx-color-warning);',
+            'title'       => $this->reminderText,
+            'data-toggle' => 'tooltip',
+        ]);
+    }
+
     public function getPlanDurationSeconds()
     {
         return $this->plan_duration;

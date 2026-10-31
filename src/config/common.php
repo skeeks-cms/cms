@@ -61,6 +61,21 @@ return [
                     'resourceKey' => static function () { return 'cms:notify-cleanup'; },
                     'dedupKey' => static function () { return 'cms:notify-cleanup'; },
                 ],
+                // Tasks: reminders whose time came go as notifications (the agent cms/task/remind, TaskReminders).
+                'cms.task-remind' => [
+                    'type' => 'cms.task-remind',
+                    'title' => 'Задачи: отправить напоминания',
+                    'handler' => \skeeks\cms\jobs\TaskRemindJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 120,
+                    'leaseSeconds' => 60,
+                    'maxAttempts' => 1,
+                    'idempotent' => true,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'cms:task-remind'; },
+                    'dedupKey' => static function () { return 'cms:task-remind'; },
+                ],
                 // Tasks: auto tasks whose time passed move on to free time (the agent cms/task/plan, TaskPlanner).
                 'cms.task-plan' => [
                     'type' => 'cms.task-plan',
@@ -236,6 +251,13 @@ return [
                     'class' => \skeeks\cms\agent\CmsAgent::class,
                     'name' => 'Защита клиентов: снять истёкшую',
                     'interval' => 3600 * 24,
+                ],
+
+                'cms/task/remind' => [
+                    'jobType' => 'cms.task-remind',
+                    'class' => \skeeks\cms\agent\CmsAgent::class,
+                    'name' => 'Задачи: отправить напоминания',
+                    'interval' => 60,
                 ],
 
                 'cms/task/plan' => [

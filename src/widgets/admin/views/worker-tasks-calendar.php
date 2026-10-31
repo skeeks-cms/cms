@@ -256,67 +256,86 @@ JS
                     ->orderBy(['last_start_at' => SORT_DESC])
                     ->all();
 
-                $scheduleTotalTime = \skeeks\cms\models\CmsTaskSchedule::find()->select([
-                    'SUM((end_at - start_at)) as total_timestamp',
-                ])->where([
-                    'cms_task_id' => new \yii\db\Expression(\skeeks\cms\models\CmsTask::tableName() . ".id"),
-                ]);
+                // Every active task has a start (TaskPlanner): auto tasks whose time passed move on first.
+                if (\skeeks\cms\services\TaskPlanner::hasStartMode()) {
+                    (new \skeeks\cms\services\TaskPlanner())->plan($model);
+                }
 
-
-                $tasks = \skeeks\cms\models\CmsTask::find()->select([
-                    \skeeks\cms\models\CmsTask::tableName().'.*',
-                    'executorPriority'  => new \yii\db\Expression("IF(executor_sort is not null, executor_sort, 9999999)"),
-                    'scheduleTotalTime' => $scheduleTotalTime,
-                    'planTotalTime'     => new \yii\db\Expression(\skeeks\cms\models\CmsTask::tableName().".plan_duration"),
-                ])->where([
-                    'executor_id' => $model->id,
-                ])->andWhere([
-                    'status' => [
-                        \skeeks\cms\models\CmsTask::STATUS_NEW,
-                        \skeeks\cms\models\CmsTask::STATUS_IN_WORK,
-                        \skeeks\cms\models\CmsTask::STATUS_ON_PAUSE,
-                        \skeeks\cms\models\CmsTask::STATUS_ACCEPTED,
-                    ],
-                ])->orderBy([
-                    'executorPriority' => SORT_ASC,
-                    'id'               => SORT_DESC,
-                ])
+                $tasks = \skeeks\cms\models\CmsTask::find()
+                    ->where(['executor_id' => $model->id])
+                    ->andWhere(['status' => \skeeks\cms\models\CmsTask::activeStatuses()])
+                    ->orderBy(['plan_start_at' => SORT_ASC, 'executor_sort' => SORT_ASC, 'id' => SORT_ASC])
                     ->all();
 
                 $now = time();
-                $currentDate = \Yii::$app->formatter->asDate($now, "php:Y-m-d");
-
                 $expiredTasks = [];
-                $plannedTasksByDate = [];
-                $tasksWithoutPlan = [];
-
-                if ($tasks) {
-                    foreach ($tasks as $task) {
-                        if (!empty($task->plan_start_at)) {
-                            if ($task->plan_start_at < $now) {
-                                $expiredTasks[] = $task;
-                            } else {
-                                $plannedDate = \Yii::$app->formatter->asDate($task->plan_start_at, "php:Y-m-d");
-                                if (!isset($plannedTasksByDate[$plannedDate])) {
-                                    $plannedTasksByDate[$plannedDate] = [];
-                                }
-                                $plannedTasksByDate[$plannedDate][] = $task;
-                            }
-                        } else {
-                            $tasksWithoutPlan[] = $task;
-                        }
+                $tasksByDate = [];
+                foreach ($tasks as $task) {
+                    $isLate = (int)$task->plan_start_at < $now - 60
+                        && $task->status !== \skeeks\cms\models\CmsTask::STATUS_IN_WORK
+                        && (!$task->hasAttribute('is_fixed_start') || $task->is_fixed_start);
+                    if ($isLate || !$task->plan_start_at) {
+                        $expiredTasks[] = $task;
+                        continue;
                     }
+                    $tasksByDate[\Yii::$app->formatter->asDate(max((int)$task->plan_start_at, $now), "php:Y-m-d")][] = $task;
                 }
+                $lastDate = $tasksByDate ? max(array_keys($tasksByDate)) : null;
 
-                $tasks = $tasksWithoutPlan;
-                $maxPlannedDate = $plannedTasksByDate ? max(array_keys($plannedTasksByDate)) : null;
+                /**
+                 * One row of a task: the move handle for auto tasks (their order is the queue), the start time,
+                 * a pin for a fixed time, the task and its status.
+                 */
+                $renderTaskRow = function (\skeeks\cms\models\CmsTask $task, bool $withDate = false) use ($user) {
+                    $isCan = \Yii::$app->user->id == $user->id || \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
+                    $isFixed = !$task->hasAttribute('is_fixed_start') || (bool)$task->is_fixed_start;
+                    $isInWork = $task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK;
+                    $class = [$isFixed || $isInWork ? 'sx-task-row-fixed' : 'sx-task-tr'];
+                    if (!$isCan) {
+                        $class[] = 'sx-task-hidden';
+                    }
+                    if ($isInWork) {
+                        $class[] = 'sx-row-in-work';
+                    }
+                    $start = (int)$task->plan_start_at;
+                    $time = $start ? \Yii::$app->formatter->asTime($start, 'php:H:i') : '—';
+                    $hint = $isFixed ? 'Закреплено на это время' : 'Рассчитано по графику: время сдвигается вместе с очередью';
+                    if ($isInWork) {
+                        $hint = 'В работе с этого времени';
+                    }
+                    ob_start();
+                    echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => ['id' => $task->id, 'executor_sort' => $task->executor_sort]]);
+                    ?>
+                    <td class="sx-task-calendar__handle-cell">
+                        <? if (!$isFixed && !$isInWork && $isCan) : ?>
+                            <span title="Перетащите, чтобы изменить очередь">
+                                <a href="#" class="btn sx-move-btn sx-task-calendar__move"><i class="fas fa-arrows-alt-v"></i></a>
+                            </span>
+                        <? endif; ?>
+                    </td>
+                    <td class="sx-task-calendar__time-cell">
+                        <span class="sx-task-calendar__time <?= $isFixed ? 'is-fixed' : 'is-auto'; ?>" title="<?= \yii\helpers\Html::encode($hint); ?>" data-toggle="tooltip">
+                            <? if ($withDate && $start) : ?>
+                                <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
+                            <? endif; ?>
+                            <?= $time; ?>
+                            <? if ($isFixed) : ?><i class="fas fa-thumbtack sx-task-calendar__pin"></i><? endif; ?>
+                        </span>
+                        <span class="sx-task-calendar__duration"><?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText((int)$task->plan_duration); ?></span>
+                    </td>
+                    <td class="sx-task-td">
+                        <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
+                    </td>
+                    <td class="sx-task-calendar__status-cell">
+                        <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task, 'isShort' => true]); ?>
+                    </td>
+                    <?
+                    echo \yii\helpers\Html::endTag('tr');
 
-                $elseDayTime = 0;
-
+                    return ob_get_clean();
+                };
 
                 $workShedule = $user->work_shedule;
-
-
                 ?>
 
                 <? if ($unfinishedTasks) : ?>
@@ -364,54 +383,12 @@ JS
                     <table class="table sx-table sx-calendar-day sx-expired-tasks">
                         <thead>
                         <tr>
-                            <th class="text-center" colspan="4">
-                                Просроченные задачи
-                            </th>
+                            <th class="text-center" colspan="4">Просроченные задачи</th>
                         </tr>
                         </thead>
                         <tbody>
                         <? foreach ($expiredTasks as $task) : ?>
-                            <?
-                            $isCan = true;
-
-                            if (\Yii::$app->user->id != $user->id) {
-                                $isCan = \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
-                            }
-
-                            $tr = [
-                                'class' => 'sx-task-tr ' . ($isCan ? "" : "sx-task-hidden") . ' sx-task-expired',
-
-                                'data' => [
-                                    'id'            => $task->id,
-                                    'executor_sort' => $task->executor_sort,
-                                ],
-                            ];
-
-                            if ($task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK) {
-                                $tr['class'] = "sx-task-tr sx-row-in-work sx-task-expired";
-                            }
-                            ?>
-                            <?= \yii\helpers\Html::beginTag('tr', $tr); ?>
-                            <td style="width: 45px;">
-                                <span title="Перетащите для изменеия порядка" style="line-height: 35px;">
-                                    <a href="#" class="btn sx-move-btn sx-task-calendar__move">
-                                        <i class="fas fa-arrows-alt-v"></i>
-                                    </a>
-                                </span>
-                            </td>
-                            <td style="width: 45px;">
-                                <!--<span title="Плановое время выполнения" data-toggle="tooltip" style="line-height: 35px;">
-                                    <?php /*= \Yii::$app->formatter->asDatetime($task->plan_start_at); */?>
-                                </span>-->
-                            </td>
-                            <td class="sx-task-td">
-                                <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
-                            </td>
-
-                            <td style="width: 50px;">
-                                <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task, 'isShort' => true]); ?>
-                            </td>
-                            <?= \yii\helpers\Html::endTag('tr'); ?>
+                            <?= $renderTaskRow($task, true); ?>
                         <? endforeach; ?>
                         </tbody>
                     </table>
@@ -424,6 +401,10 @@ JS
 
                     //День в цикле
                     $date = date("Y-m-d", strtotime("+{$i} day"));
+                    // Every day is shown, empty ones too: a week at least, then up to the last task.
+                    if ($i > 6 && (!$lastDate || $date > $lastDate)) {
+                        break;
+                    }
                     $times = \skeeks\cms\helpers\CmsScheduleHelper::getSchedulesByWorktimeForDate($workShedule, $date);
 
                     $timesForCalculate = $times;
@@ -549,148 +530,18 @@ JS
                     <? endif; ?>
                     </thead>
 
-                    <? if ($times) : ?>
-                        <tbody>
-
-                        <?
-                        $dayTime = \skeeks\cms\helpers\CmsScheduleHelper::durationBySchedules($timesForCalculate);
-                        /*echo $dayTime;*/
-                        $dayTime = $dayTime + $elseDayTime;
-                        /*echo "/" . $dayTime;*/
-
-                        ?>
-
-                        <? if (!empty($plannedTasksByDate[$date])) : ?>
-                            <? foreach ($plannedTasksByDate[$date] as $task) : ?>
-
-                                <?
-                                $isCan = true;
-
-                                if (\Yii::$app->user->id != $user->id) {
-                                    $isCan = \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
-                                }
-
-                                $tr = [
-                                    'class' => 'sx-task-tr ' . ($isCan ? "" : "sx-task-hidden") . ' sx-task-planned',
-
-                                    'data' => [
-                                        'id'            => $task->id,
-                                        'executor_sort' => $task->executor_sort,
-                                    ],
-                                ];
-
-                                if ($task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK) {
-                                    $tr['class'] = "sx-task-tr sx-row-in-work sx-task-planned";
-                                }
-                                ?>
-
-                                <?= \yii\helpers\Html::beginTag('tr', $tr); ?>
-                                <td style="width: 45px;">
-                                    <span title="Перетащите для изменеия порядка" style="line-height: 35px;">
-                                        <a href="#" class="btn sx-move-btn sx-task-calendar__move">
-                                            <i class="fas fa-arrows-alt-v"></i>
-                                        </a>
-                                    </span>
-                                </td>
-                                <td style="width: 45px;">
-                                    <span title="Плановое время выполнения" data-toggle="tooltip" style="line-height: 35px;">
-                                        <?= \Yii::$app->formatter->asTime($task->plan_start_at,'php:H:i'); ?>
-                                    </span>
-                                </td>
-                                <td class="sx-task-td">
-                                    <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
-                                </td>
-
-                                <td style="width: 50px;">
-                                    <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task, 'isShort' => true]); ?>
-                                </td>
-                                <?= \yii\helpers\Html::endTag('tr'); ?>
-                            <? endforeach; ?>
-                        <? endif; ?>
-
-                        <? if ($tasks) : ?>
-                            <? foreach ($tasks as $key => $task) : ?>
-
-                                <?
-                                $isCan = true;
-
-                                if (\Yii::$app->user->id != $user->id) {
-                                    $isCan = \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
-                                }
-
-                                $time = $task->raw_row['planTotalTime'] - $task->raw_row['scheduleTotalTime'];
-                                if ($time < 0) {
-                                    $time = 0;
-                                }
-                                $dayTime = $dayTime - $time;
-
-                                $tr = [
-                                    'class' => 'sx-task-tr ' . ($isCan ? "" : "sx-task-hidden"),
-
-                                    'data' => [
-                                        'id'                => $task->id,
-                                        'executor_sort' => $task->executor_sort,
-                                    ],
-                                ];
-
-                                if ($task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK) {
-                                    $tr['class'] = "sx-task-tr sx-row-in-work" . ($isCan ? "" : " sx-task-hidden");
-                                }
-                                ?>
-
-                                <?= \yii\helpers\Html::beginTag('tr', $tr); ?>
-                                <td style="width: 45px;">
-                                    <span title="Перетащите для изменеия порядка" style="line-height: 35px;">
-                                        <a href="#" class="btn sx-move-btn sx-task-calendar__move">
-                                            <i class="fas fa-arrows-alt-v"></i>
-                                        </a>
-                                    </span>
-                                </td>
-                                <td style="width: 45px;">
-                                    <span title="Сотировка задачи" data-toggle="tooltip" style="line-height: 35px;">
-                                    <?= $task->executor_sort; ?>
-                                    </span>
-                                </td>
-                                <td class="sx-task-td">
-                                    <?= \skeeks\cms\widgets\admin\CmsTaskViewWidget::widget(['task' => $task]); ?>
-                                    <?/*= \skeeks\crm\widgets\TaskViewWidget::widget(['task' => $task]); */?>
-                                </td>
-
-                                <td style="width: 50px;">
-                                    <?/*= \skeeks\crm\widgets\TaskStatusWidget::widget(['task' => $task, 'isShort' => true]); */?>
-                                    <?= \skeeks\cms\widgets\admin\CmsTaskStatusWidget::widget(['task' => $task, 'isShort' => true]); ?>
-                                </td>
-                                <?= \yii\helpers\Html::endTag('tr'); ?>
-                                <?
-                                unset($tasks[$key]);
-                                if ($dayTime <= 0) {
-                                    $elseDayTime = $dayTime;
-                                    break;
-                                }
-                                ?>
-
-                            <? endforeach; ?>
-                        <? else : ?>
-                            <? if (empty($plannedTasksByDate[$date]) && (!$maxPlannedDate || $date >= $maxPlannedDate)) : ?>
-                                </tbody>
-                                </table>
-                                <? break; ?>
-                            <? endif; ?>
-                        <? endif; ?>
-                        </tbody>
+                    <tbody>
+                    <? if (!empty($tasksByDate[$date])) : ?>
+                        <? foreach ($tasksByDate[$date] as $task) : ?>
+                            <?= $renderTaskRow($task); ?>
+                        <? endforeach; ?>
                     <? else : ?>
-                        <thead>
-                        <tr>
-                            <td class="text-center sx-task-calendar__empty" colspan="4">
-                                Не делает задачи в этот день
-                            </td>
+                        <tr class="sx-task-calendar__empty-row">
+                            <td class="text-center sx-task-calendar__empty" colspan="4"><?= $times ? 'Задач нет' : 'Не делает задачи в этот день'; ?></td>
                         </tr>
-                        </thead>
                     <? endif; ?>
-
-
+                    </tbody>
                     </table>
-
                 <? endfor; ?>
 
             </div>

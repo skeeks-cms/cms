@@ -11,6 +11,7 @@ use yii\console\ExitCode;
  *
  *   php yii cms/task/plan            # lay out the active tasks of every executor (the agent cms/task/plan)
  *   php yii cms/task/plan --user=110 # one executor
+ *   php yii cms/task/remind          # send the reminders whose time came (the agent cms/task/remind)
  */
 class TaskController extends Controller
 {
@@ -20,6 +21,14 @@ class TaskController extends Controller
     public function options($actionID)
     {
         return array_merge(parent::options($actionID), $actionID === 'plan' ? ['user'] : []);
+    }
+
+    /** Sends the reminders whose time came (the agent cms/task/remind). */
+    public function actionRemind()
+    {
+        $this->stdout('Sent: '.(new \skeeks\cms\services\TaskReminders())->sendDue()."\n");
+
+        return ExitCode::OK;
     }
 
     public function actionPlan()

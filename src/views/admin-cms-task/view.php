@@ -376,6 +376,9 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                         <?php echo $isOverdue ? 'Просрочена: ' : 'Срок: '; ?><?php echo \Yii::$app->formatter->asDatetime($deadline, 'php:d.m.Y H:i'); ?>
                     </span>
                 <?php endif; ?>
+                <?php if ($model->hasAttribute('remind_at') && $model->remind_at) : ?>
+                    <span class="sx-task-deadline"><?php echo $model->reminderIconHtml; ?></span>
+                <?php endif; ?>
             </div>
         <?php BackendSurfaceWidget::end(); ?>
     </div>
@@ -549,8 +552,20 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                 <?php endif; ?>
                 <?php if ($planStartAt) : ?>
                 <li>
-                    <span class="sx-properties--name">Начало по плану</span>
-                    <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($planStartAt); ?></span>
+                    <span class="sx-properties--name">Начало</span>
+                    <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($planStartAt); ?>
+                        <?php if ($model->hasAttribute('is_fixed_start')) : ?>
+                            <span class="text-muted" title="<?php echo $model->is_fixed_start ? 'Время выбрал человек, система его не сдвигает' : 'Время рассчитано по рабочему графику и очереди исполнителя и сдвигается вместе с ней'; ?>" data-toggle="tooltip">
+                                · <?php echo $model->is_fixed_start ? '<i class="fas fa-thumbtack"></i> закреплено' : 'по графику'; ?>
+                            </span>
+                        <?php endif; ?>
+                    </span>
+                </li>
+                <?php endif; ?>
+                <?php if ($model->hasAttribute('remind_at') && $model->remind_at) : ?>
+                <li>
+                    <span class="sx-properties--name">Напоминание</span>
+                    <span class="sx-properties--value"><?php echo $model->reminderIconHtml; ?> <?php echo \yii\helpers\Html::encode($model->reminderText); ?></span>
                 </li>
                 <?php endif; ?>
                 <?php if ($model->plan_duration) : ?>
