@@ -1,0 +1,334 @@
+/* Gantt of an employee's tasks. */
+.sx-task-gantt {
+    --sx-tg-border: var(--sx-color-border);
+    --sx-tg-surface: var(--sx-color-surface);
+    --sx-tg-muted: var(--sx-color-surface-muted);
+    --sx-tg-text: var(--sx-color-text);
+    --sx-tg-text-muted: var(--sx-color-text-muted);
+    --sx-tg-accent: var(--sx-color-accent);
+    --sx-tg-accent-soft: var(--sx-color-accent-soft);
+    --sx-tg-danger: var(--sx-color-danger);
+    --sx-tg-danger-soft: var(--sx-color-danger-soft);
+    --sx-tg-warning: var(--sx-color-warning);
+    --sx-tg-warning-soft: var(--sx-color-warning-soft);
+    --sx-tg-side: 280px;
+    --sx-tg-row: 34px;
+    color: var(--sx-tg-text);
+}
+
+.sx-task-gantt.is-busy .sx-task-gantt__body {
+    opacity: .6;
+    pointer-events: none;
+}
+
+.sx-task-gantt__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.sx-task-gantt__nav,
+.sx-task-gantt__tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sx-task-gantt__title {
+    margin-left: 6px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.sx-task-gantt__user,
+.sx-task-gantt__group {
+    width: auto;
+    min-width: 140px;
+}
+
+.sx-task-gantt__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--sx-tg-text-muted);
+}
+
+.sx-task-gantt__swatch {
+    display: inline-block;
+    width: 18px;
+    height: 10px;
+    margin-right: 4px;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+
+.sx-task-gantt__swatch.is-fixed,
+.sx-task-gantt__task.is-fixed {
+    background: var(--sx-tg-accent);
+}
+
+.sx-task-gantt__swatch.is-auto,
+.sx-task-gantt__task.is-auto {
+    background: var(--sx-tg-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--sx-tg-accent);
+}
+
+.sx-task-gantt__swatch.is-in-work,
+.sx-task-gantt__task.is-in-work {
+    background: var(--sx-tg-warning);
+}
+
+.sx-task-gantt__swatch.is-late,
+.sx-task-gantt__task.is-late {
+    background: var(--sx-tg-danger);
+}
+
+.sx-task-gantt__body {
+    display: flex;
+    border: 1px solid var(--sx-tg-border);
+    border-radius: var(--sx-radius-panel, 10px);
+    background: var(--sx-tg-surface);
+    overflow: hidden;
+}
+
+.sx-task-gantt__side {
+    flex: 0 0 var(--sx-tg-side);
+    width: var(--sx-tg-side);
+    border-right: 1px solid var(--sx-tg-border);
+    background: var(--sx-tg-surface);
+    z-index: 2;
+}
+
+.sx-task-gantt__side-head,
+.sx-task-gantt__scale {
+    height: 38px;
+    border-bottom: 1px solid var(--sx-tg-border);
+    background: var(--sx-tg-muted);
+}
+
+.sx-task-gantt__side-head {
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sx-tg-text-muted);
+}
+
+.sx-task-gantt__row,
+.sx-task-gantt__group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: var(--sx-tg-row);
+    padding: 0 12px;
+    border-bottom: 1px solid var(--sx-tg-border);
+    min-width: 0;
+}
+
+.sx-task-gantt__group {
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--sx-tg-muted);
+    color: var(--sx-tg-text-muted);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.sx-task-gantt__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--sx-tg-text);
+    font-size: 13px;
+}
+
+.sx-task-gantt__bell {
+    flex: none;
+    font-size: 11px;
+    color: var(--sx-tg-warning);
+}
+
+.sx-task-gantt__bell.is-sent {
+    color: var(--sx-tg-text-muted);
+    opacity: .55;
+}
+
+.sx-task-gantt__empty {
+    padding: 16px 12px;
+    font-size: 12px;
+    color: var(--sx-tg-text-muted);
+}
+
+.sx-task-gantt__main {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.sx-task-gantt__scale {
+    position: relative;
+}
+
+.sx-task-gantt__tick {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    padding: 10px 4px 0;
+    border-left: 1px solid var(--sx-tg-border);
+    font-size: 11px;
+    color: var(--sx-tg-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
+}
+
+.sx-task-gantt__tick.is-weekend {
+    color: var(--sx-tg-danger);
+}
+
+.sx-task-gantt__tick.is-today {
+    color: var(--sx-tg-accent);
+    font-weight: 700;
+}
+
+.sx-task-gantt__canvas {
+    position: relative;
+    background: var(--sx-tg-muted);
+}
+
+.sx-task-gantt__col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--sx-tg-border);
+}
+
+.sx-task-gantt__col.is-weekend {
+    background: rgba(127, 127, 127, .08);
+}
+
+.sx-task-gantt__col.is-today {
+    background: var(--sx-tg-accent-soft);
+    opacity: .5;
+}
+
+.sx-task-gantt__work {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--sx-tg-surface);
+}
+
+.sx-task-gantt__row-line,
+.sx-task-gantt__group-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--sx-tg-row);
+    border-bottom: 1px solid var(--sx-tg-border);
+    pointer-events: none;
+}
+
+.sx-task-gantt__group-line {
+    background: rgba(127, 127, 127, .06);
+}
+
+.sx-task-gantt__task {
+    position: absolute;
+    z-index: 2;
+    height: calc(var(--sx-tg-row) - 12px);
+    border-radius: 5px;
+    overflow: hidden;
+    color: #fff;
+    font-size: 11px;
+    line-height: calc(var(--sx-tg-row) - 12px);
+    cursor: pointer;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.sx-task-gantt__task.is-auto {
+    color: var(--sx-tg-text);
+}
+
+.sx-task-gantt__task.is-movable {
+    cursor: grab;
+}
+
+.sx-task-gantt__task.is-movable:active {
+    cursor: grabbing;
+}
+
+.sx-task-gantt__task-text {
+    display: block;
+    padding: 0 10px 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+}
+
+.sx-task-gantt__pin {
+    font-size: 9px;
+    transform: rotate(30deg);
+}
+
+.sx-task-gantt__handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+    background: rgba(0, 0, 0, .15);
+}
+
+.sx-task-gantt__now {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 3;
+    width: 0;
+    border-left: 2px solid var(--sx-tg-danger);
+    pointer-events: none;
+}
+
+.sx-task-gantt__tip {
+    position: absolute;
+    z-index: 5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--sx-tg-text);
+    color: var(--sx-tg-surface);
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+@media (max-width: 767px) {
+    .sx-task-gantt {
+        --sx-tg-side: 128px;
+    }
+
+    .sx-task-gantt__row,
+    .sx-task-gantt__group {
+        padding: 0 6px;
+    }
+
+    .sx-task-gantt__name {
+        font-size: 12px;
+    }
+
+    .sx-task-gantt__legend-hint {
+        display: none;
+    }
+}
