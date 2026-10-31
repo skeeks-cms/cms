@@ -365,3 +365,7 @@
         display: none;
     }
 }
+
+.sx-task-gantt__pin .sx-icon {
+    vertical-align: -1px;
+}

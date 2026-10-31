@@ -219,13 +219,13 @@
                 .on('click', function (e) { e.preventDefault(); self.open(task); });
             var item = $('<div class="sx-task-gantt__row"></div>').append(name);
             if (task.reminder) {
-                item.append($('<i class="fas fa-bell sx-task-gantt__bell"></i>').toggleClass('is-sent', task.reminded).attr('title', task.reminder));
+                item.append($('<span class="sx-task-gantt__bell"></span>').html(self.cfg.icons.bell).toggleClass('is-sent', task.reminded).attr('title', task.reminder));
             }
             if (task.behind) {
-                item.append($('<span class="sx-task-gantt__behind"><i class="fas fa-exclamation-circle"></i> не успевает</span>').attr('title', task.behind));
+                item.append($('<span class="sx-task-gantt__behind"></span>').html(self.cfg.icons.alert + ' не успевает').attr('title', task.behind));
             }
             if (task.replanned) {
-                item.append($('<i class="fas fa-history sx-task-gantt__bell is-sent"></i>').attr('title', task.replanned));
+                item.append($('<span class="sx-task-gantt__bell is-sent"></span>').html(self.cfg.icons.history).attr('title', task.replanned));
             }
             side.append(item);
             canvas.append($('<div class="sx-task-gantt__row-line"></div>').css({top: index * ROW}));
@@ -310,7 +310,7 @@
                 + (task.fixed ? ' · закреплено на время' : ' · по графику') + (task.reminder ? ' · ' + task.reminder : '') + (task.replanned ? ' · ' + task.replanned : '') + (task.behind ? ' · не успевает: ' + task.behind : ''));
         var text = $('<span class="sx-task-gantt__task-text"></span>').text(this.fmtTime.format(new Date(task.start * 1000)) + ' ' + task.name);
         if (task.fixed) {
-            text.prepend('<i class="fas fa-thumbtack sx-task-gantt__pin"></i> ');
+            text.prepend(' ').prepend($('<span class="sx-task-gantt__pin"></span>').html(this.cfg.icons.pin));
         }
         bar.append(text);
         if (task.movable) {

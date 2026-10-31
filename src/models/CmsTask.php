@@ -1183,7 +1183,7 @@ class CmsTask extends ActiveRecord
             return '';
         }
 
-        return \yii\helpers\Html::tag('span', '<i class="fas fa-exclamation-circle"></i> не успевает', [
+        return \yii\helpers\Html::tag('span', static::icon('alert-circle').' не успевает', [
             'class'       => 'sx-task-behind',
             'style'       => 'color: var(--sx-color-danger); font-weight: 600; white-space: nowrap;',
             'title'       => $this->deadlineText,
@@ -1279,12 +1279,18 @@ class CmsTask extends ActiveRecord
             return '';
         }
 
-        return \yii\helpers\Html::tag('i', '', [
-            'class'       => 'fas fa-history sx-task-replanned',
+        return \yii\helpers\Html::tag('span', static::icon('history'), [
+            'class'       => 'sx-task-replanned',
             'style'       => 'color: var(--sx-color-text-muted);',
             'title'       => $text,
             'data-toggle' => 'tooltip',
         ]);
+    }
+
+    /** An icon of the backend library (skeeks/cms-backend) for the marks of a task. */
+    public static function icon(string $name, int $size = 14): string
+    {
+        return \skeeks\cms\backend\helpers\BackendIcon::render($name, ['size' => $size, 'style' => 'vertical-align: -2px;']);
     }
 
     /** Whether the table has the deadline yet (code may run before its migration). */
@@ -1309,8 +1315,8 @@ class CmsTask extends ActiveRecord
         $isSent = $this->reminded_at || !in_array($this->status, static::activeStatuses(), true);
 
         // Inline colors: the bell is drawn by many widgets and pages, none of them owns a shared stylesheet.
-        return \yii\helpers\Html::tag('i', '', [
-            'class'       => 'fas fa-bell sx-task-bell'.($isSent ? ' is-sent' : ''),
+        return \yii\helpers\Html::tag('span', static::icon('bell'), [
+            'class'       => 'sx-task-bell'.($isSent ? ' is-sent' : ''),
             'style'       => $isSent ? 'color: var(--sx-color-text-muted); opacity: .55;' : 'color: var(--sx-color-warning);',
             'title'       => $this->reminderText,
             'data-toggle' => 'tooltip',

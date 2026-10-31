@@ -709,3 +709,20 @@
 .sx-worker-tasks-calendar-widget .sx-task-calendar__handle-cell .sx-task-calendar__move:active {
     cursor: grabbing;
 }
+
+/* Library icons of task marks (BackendIcon): the pin of a fixed time takes the accent colour. */
+.sx-task-calendar .sx-icon--pin,
+.sx-task-deadlines .sx-icon--pin,
+.sx-worker-tasks-calendar-widget .sx-icon--pin {
+    color: var(--sx-color-accent);
+}
+
+/* «Задачи»: overdue tasks folded to three, the rest open on a click. */
+.sx-worker-tasks-calendar-widget .sx-expired-tasks.is-folded .sx-task-expired-more {
+    display: none;
+}
+
+.sx-worker-tasks-calendar-widget .sx-expired-tasks__toggle td {
+    padding: 10px !important;
+    text-align: center;
+}

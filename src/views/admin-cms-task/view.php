@@ -559,7 +559,7 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                     <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($planStartAt); ?>
                         <?php if ($model->hasAttribute('is_fixed_start')) : ?>
                             <span class="text-muted" title="<?php echo $model->is_fixed_start ? 'Время выбрал человек, система его не сдвигает' : 'Время рассчитано по рабочему графику и очереди исполнителя и сдвигается вместе с ней'; ?>" data-toggle="tooltip">
-                                · <?php echo $model->is_fixed_start ? '<i class="fas fa-thumbtack"></i> закреплено' : 'по графику'; ?>
+                                · <?php echo $model->is_fixed_start ? \skeeks\cms\models\CmsTask::icon('pin', 12).' закреплено' : 'по графику'; ?>
                             </span>
                         <?php endif; ?>
                     </span>

@@ -97,9 +97,9 @@ $lanes = static function (array $dayTasks) {
 <?
 ob_start();
 ?>
-    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(-1)])); ?>" title="Назад"><i class="fas fa-chevron-left"></i></a>
+    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(-1)])); ?>" title="Назад"><?= \skeeks\cms\backend\helpers\BackendIcon::render('chevron-left', ['size' => 16]); ?></a>
     <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $today])); ?>">Сегодня</a>
-    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(1)])); ?>" title="Вперёд"><i class="fas fa-chevron-right"></i></a>
+    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(1)])); ?>" title="Вперёд"><?= \skeeks\cms\backend\helpers\BackendIcon::render('chevron-right', ['size' => 16]); ?></a>
     <h2 class="sx-task-calendar__title"><?= Html::encode($widget->title()); ?></h2>
 <?
 $start = ob_get_clean();
@@ -158,7 +158,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                 <div class="sx-task-calendar__cell-tasks">
                     <? foreach (array_slice($dayTasks, 0, $widget->monthCellLimit) as $task) : ?>
                         <?= Html::beginTag('a', $widget->taskLinkOptions($task)); ?>
-                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<i class="fas fa-exclamation-circle" style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'"></i>' : ''; ?></span>
+                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>
                             <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                         <?= Html::endTag('a'); ?>
                     <? endforeach; ?>
@@ -232,7 +232,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                     Html::addCssClass($options, 'sx-task-calendar__block');
                     ?>
                     <?= Html::beginTag('a', $options); ?>
-                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<i class="fas fa-exclamation-circle" style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'"></i>' : ''; ?></span>
+                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>
                         <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                     <?= Html::endTag('a'); ?>
                 <? endforeach; ?>

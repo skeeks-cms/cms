@@ -47,6 +47,12 @@ class CmsTaskGanttWidget extends Widget
             'tz'         => \Yii::$app->formatter->timeZone,
             'moveUrl'    => \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']),
             'dataUrl'    => \yii\helpers\Url::current(['sx-gantt-data' => 1]),
+            'icons'      => [
+                'pin'     => CmsTask::icon('pin', 10),
+                'bell'    => CmsTask::icon('bell', 12),
+                'history' => CmsTask::icon('history', 12),
+                'alert'   => CmsTask::icon('alert-circle', 12),
+            ],
         ]);
 
         return $this->render('task-gantt', ['widget' => $this]);

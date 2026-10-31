@@ -126,7 +126,7 @@ class AdminCmsTaskController extends BackendModelStandartController
             'calendar' => [
                 'class'    => ViewBackendAction::class,
                 'name' => 'Задачи',
-                'icon' => 'fa fa-calendar',
+                'icon' => 'svg:task-list',
                 'priority' => 10,
                 /*'isOpenNewWindow' => false,*/
             ],
@@ -134,7 +134,7 @@ class AdminCmsTaskController extends BackendModelStandartController
             'tasks-calendar' => [
                 'class'    => ViewBackendAction::class,
                 'name' => 'Календарь',
-                'icon' => 'fa fa-calendar',
+                'icon' => 'svg:calendar',
                 'priority' => 15,
                 /*'isOpenNewWindow' => false,*/
             ],
@@ -142,21 +142,21 @@ class AdminCmsTaskController extends BackendModelStandartController
             'deadlines' => [
                 'class'    => ViewBackendAction::class,
                 'name'     => 'Сроки',
-                'icon'     => 'fas fa-columns',
+                'icon'     => 'svg:kanban',
                 'priority' => 12,
             ],
 
             'gantt' => [
                 'class'    => ViewBackendAction::class,
                 'name'     => 'Гант',
-                'icon'     => 'fas fa-stream',
+                'icon'     => 'svg:gantt',
                 'priority' => 17,
             ],
 
             'report' => [
                 'class'    => ViewBackendAction::class,
                 'name'     => 'Отчет',
-                'icon'     => 'fa fa-chart-bar',
+                'icon'     => 'svg:chart-bar',
                 'priority' => 25,
             ],
             
@@ -164,6 +164,7 @@ class AdminCmsTaskController extends BackendModelStandartController
 
                 'priority' => 20,
                 
+                'icon' => 'svg:table',
                 'name' => 'Таблица',
 
                 'filters' => [
@@ -606,6 +607,7 @@ JS
             "create" => [
                 'fields' => [$this, 'updateFields'],
                 'priority' => 200,
+                'icon' => 'svg:plus',
                 'on beforeValidate' => function ($event) {
                     $this->keepAvailableLead($event->sender->model);
                 },

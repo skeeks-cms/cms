@@ -19,7 +19,7 @@ $model = $user;
 
         <?= \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget([
             'context' => $widget->context,
-            'start'   => '<button type="button" class="btn btn-primary btn-sm sx-save-priority-btn"><i class="fa fa-save"></i> Сохранить порядок задач</button>',
+            'start'   => '<button type="button" class="btn btn-primary btn-sm sx-save-priority-btn">'.\skeeks\cms\backend\helpers\BackendIcon::render('check-circle', ['size' => 16]).' Сохранить порядок задач</button>',
         ]); ?>
 
         <div class="row">
@@ -125,7 +125,7 @@ $model = $user;
 
         /**
          * При перезагрузке (закрытие окна задачи, сохранение порядка, F5) возвращаем прежнюю позицию,
-         * при обычном открытии страницы — показываем текущий день, а не начало списка просроченных задач.
+         * при обычном открытии страница показывается сверху (просроченные свёрнуты до трёх).
          * Штатное восстановление скролла браузером на длинном списке срабатывает ненадежно.
          */
         _initScrollPosition: function()
@@ -164,18 +164,8 @@ $model = $user;
                 return;
             }
 
-            var jToday = $(".sx-today-day", this.jWrapper).first();
-            if (!jToday.length) {
-                return;
-            }
-
-            var headerHeight = 0;
-            var jHeader = $(".sx-shell-header").first();
-            if (jHeader.length && jHeader.css("position") === "fixed") {
-                headerHeight = jHeader.outerHeight();
-            }
-
-            window.scrollTo(0, Math.max(0, jToday.offset().top - headerHeight - 10));
+            // A plain opening shows the page from the top: overdue tasks are folded to three, the day follows them
+            // (owner, 31.10.2026: no jump to the current day).
         }
     });
     
@@ -247,7 +237,7 @@ JS
                  * One row of a task: the move handle for auto tasks (their order is the queue), the start time,
                  * a pin for a fixed time, the task and its status.
                  */
-                $renderTaskRow = function (\skeeks\cms\models\CmsTask $task, bool $withDate = false) use ($user) {
+                $renderTaskRow = function (\skeeks\cms\models\CmsTask $task, bool $withDate = false, string $extraClass = '') use ($user) {
                     $isCan = \Yii::$app->user->id == $user->id || \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
                     $isFixed = !$task->hasAttribute('is_fixed_start') || (bool)$task->is_fixed_start;
                     $isInWork = $task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK;
@@ -257,6 +247,9 @@ JS
                     }
                     if ($isInWork) {
                         $class[] = 'sx-row-in-work';
+                    }
+                    if ($extraClass !== '') {
+                        $class[] = $extraClass;
                     }
                     $start = (int)$task->plan_start_at;
                     $time = $start ? \Yii::$app->formatter->asTime($start, 'php:H:i') : '—';
@@ -270,7 +263,7 @@ JS
                     <td class="sx-task-calendar__handle-cell">
                         <? if (!$isFixed && !$isInWork && $isCan) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
-                                <a href="#" class="btn sx-move-btn sx-task-calendar__move"><i class="fas fa-grip-vertical"></i></a>
+                                <a href="#" class="btn sx-move-btn sx-task-calendar__move"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></a>
                             </span>
                         <? endif; ?>
                     </td>
@@ -280,7 +273,7 @@ JS
                                 <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
                             <? endif; ?>
                             <?= $time; ?>
-                            <? if ($isFixed) : ?><i class="fas fa-thumbtack sx-task-calendar__pin"></i><? endif; ?>
+                            <? if ($isFixed) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
                         </span>
                         <span class="sx-task-calendar__duration"><?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText((int)$task->plan_duration); ?></span>
                     </td>
@@ -341,17 +334,33 @@ JS
                 <? endif; ?>
 
                 <? if ($expiredTasks) : ?>
-                    <table class="table sx-table sx-calendar-day sx-expired-tasks">
+                    <?
+                    // Overdue tasks are folded to three (a search shows them all): the day's work comes first.
+                    $expiredShown = $isSearch ? count($expiredTasks) : 3;
+                    $expiredMore = max(0, count($expiredTasks) - $expiredShown);
+                    ?>
+                    <table class="table sx-table sx-calendar-day sx-expired-tasks <?= $expiredMore ? 'is-folded' : ''; ?>">
                         <thead>
                         <tr>
-                            <th class="text-center" colspan="4">Просроченные задачи</th>
+                            <th class="text-center" colspan="4">Просроченные задачи · <?= count($expiredTasks); ?></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <? foreach ($expiredTasks as $task) : ?>
-                            <?= $renderTaskRow($task, true); ?>
+                        <? foreach (array_values($expiredTasks) as $index => $task) : ?>
+                            <?= $renderTaskRow($task, true, $index >= $expiredShown ? 'sx-task-expired-more' : ''); ?>
                         <? endforeach; ?>
                         </tbody>
+                        <? if ($expiredMore) : ?>
+                            <tfoot>
+                            <tr class="sx-expired-tasks__toggle">
+                                <td colspan="4">
+                                    <button type="button" class="btn btn-default btn-sm"
+                                            onclick="var t = $(this).closest('table').toggleClass('is-folded'); $(this).text(t.hasClass('is-folded') ? $(this).data('more') : 'Свернуть'); return false;"
+                                            data-more="Показать ещё <?= $expiredMore; ?>">Показать ещё <?= $expiredMore; ?></button>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        <? endif; ?>
                     </table>
                 <? endif; ?>
 

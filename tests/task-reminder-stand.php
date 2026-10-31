@@ -68,7 +68,7 @@ try {
     $task->refresh();
     $check((int)$task->remind_at === $start - 900 && (int)$task->remind_offset === 900, 'the reminder is 15 minutes before the start');
     $check($task->reminder === '900' && $task->hasPendingReminder(), 'the form shows the choice and the bell is pending');
-    $check(strpos($task->reminderIconHtml, 'fa-bell') !== false && strpos($task->reminderIconHtml, 'is-sent') === false, 'the bell is drawn');
+    $check(strpos($task->reminderIconHtml, 'sx-icon--bell') !== false && strpos($task->reminderIconHtml, 'is-sent') === false, 'the bell is drawn: '.$task->reminderIconHtml);
 
     $task->plan_start_at = $start + 3600;
     $check($task->save(), 'the start moves');

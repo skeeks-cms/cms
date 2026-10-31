@@ -37,11 +37,11 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
                     ?>
                     <div class="sx-task-deadlines__card <?= $key === 'late' ? 'is-late' : ''; ?>" <?= $canMove ? 'data-sx-deadlines-card' : ''; ?> data-pk="<?= (int)$task->id; ?>">
                         <? if ($canMove) : ?>
-                            <span class="sx-task-deadlines__handle" data-sx-deadlines-handle title="Перетащите в другую колонку"><i class="fas fa-grip-vertical"></i></span>
+                            <span class="sx-task-deadlines__handle" data-sx-deadlines-handle title="Перетащите в другую колонку"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></span>
                         <? endif; ?>
                         <div class="sx-task-deadlines__card-time">
                             <span><?= in_array($key, ['today', 'tomorrow'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
-                            <? if ($isFixed) : ?><i class="fas fa-thumbtack" title="Закреплено на это время"></i><? endif; ?>
+                            <? if ($isFixed) : ?><span title="Закреплено на это время"><?= \skeeks\cms\models\CmsTask::icon('pin', 12); ?></span><? endif; ?>
                             <?= $task->reminderIconHtml; ?>
                             <?= $task->replannedIconHtml; ?>
                             <?= $task->deadlineMarkHtml; ?>
