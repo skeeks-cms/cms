@@ -58,6 +58,32 @@ use yii\web\Response;
 class AdminCmsTaskController extends BackendModelStandartController
 {
     public $defaultAction = "calendar";
+
+    /** Views of the task section: the one a person opened last opens from the menu (owner's decision 31.10.2026). */
+    public const TASK_VIEWS = ['calendar', 'deadlines', 'tasks-calendar', 'gantt', 'index'];
+    public const TASK_VIEW_COOKIE = 'sx-task-view';
+
+    public function beforeAction($action)
+    {
+        $request = \Yii::$app->request;
+        if ($request instanceof \yii\web\Request && !$request->isAjax && $request->isGet && in_array($action->id, static::TASK_VIEWS, true)) {
+            $last = (string)$request->cookies->getValue(static::TASK_VIEW_COOKIE, '');
+            // The menu opens the section without an action: go to the last view.
+            if (trim((string)\Yii::$app->requestedRoute, '/') === $this->uniqueId && $last !== '' && $last !== $action->id
+                && in_array($last, static::TASK_VIEWS, true) && isset($this->actions[$last])) {
+                \Yii::$app->response->redirect(\yii\helpers\Url::current([0 => '/'.$this->uniqueId.'/'.$last]));
+                return false;
+            }
+            \Yii::$app->response->cookies->add(new \yii\web\Cookie([
+                'name'   => static::TASK_VIEW_COOKIE,
+                'value'  => $action->id,
+                'expire' => time() + 365 * 86400,
+            ]));
+        }
+
+        return parent::beforeAction($action);
+    }
+
     public function init()
     {
         $this->name = \Yii::t('skeeks/cms', "Задачи");
@@ -111,6 +137,20 @@ class AdminCmsTaskController extends BackendModelStandartController
                 'icon' => 'fa fa-calendar',
                 'priority' => 15,
                 /*'isOpenNewWindow' => false,*/
+            ],
+
+            'deadlines' => [
+                'class'    => ViewBackendAction::class,
+                'name'     => 'Сроки',
+                'icon'     => 'fas fa-columns',
+                'priority' => 12,
+            ],
+
+            'gantt' => [
+                'class'    => ViewBackendAction::class,
+                'name'     => 'Гант',
+                'icon'     => 'fas fa-stream',
+                'priority' => 17,
             ],
 
             'report' => [
@@ -1998,6 +2038,10 @@ JS
         }
         $isExecutorLocked = !$model->isNewRecord && CmsTaskSchedule::find()->task($model)->exists();
 
+        if ($model->hasAttribute('remind_at') && $model->reminder === '' && !\Yii::$app->request->isPost) {
+            $model->reminder = 'none';
+        }
+
         // A start given by the planner is not a person's choice: the form shows "automatically" for it.
         if (!$model->isNewRecord && $model->hasAttribute('is_fixed_start') && !$model->is_fixed_start && !\Yii::$app->request->isPost) {
             $model->plan_start_at = null;
@@ -2288,6 +2332,15 @@ $("body").on("change keyup", ".field-cmstask-plan_start_at input[type='text']", 
     updateTaskPlanStartMode();
 });
 
+function updateTaskReminderFields() {
+    var choice = $("#cmstask-reminder").val();
+    $(".field-cmstask-remind_at").toggle(choice === "custom");
+    $(".field-cmstask-remind_author").toggle(!!choice && choice !== "none");
+}
+$("body").on("change", "#cmstask-reminder", updateTaskReminderFields);
+$(document).on("pjax:complete", function () { setTimeout(updateTaskReminderFields, 200); });
+updateTaskReminderFields();
+
 $("body").on("click", ".sx-task-auto-start-btn", function() {
     clearTaskPlanStart();
     updateTaskEstimateEndAt();
@@ -2418,6 +2471,34 @@ JS
             'auto_start_at_trigger' => [
                 'class' => HtmlBlock::class,
                 'content' => '<div class="col-12 sx-task-auto-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-auto-start-btn"><i class="fas fa-magic"></i> Рассчитать время выполнения автоматически</button></div>',
+            ],
+
+            // A reminder: a notification in the CRM and in the channels each person chose (MAX, Telegram, mail).
+            // A plain select: the form's select widget drops the «none» item and its label.
+            'reminder' => [
+                'class'   => HtmlBlock::class,
+                'content' => '<div class="col-12 form-group field-cmstask-reminder">'
+                    .Html::activeLabel($model, 'reminder', ['class' => 'control-label'])
+                    .Html::activeDropDownList($model, 'reminder', ['none' => 'Не напоминать'] + CmsTask::reminderOffsets() + ['custom' => 'В своё время…'], ['class' => 'form-control'])
+                    .'<div class="hint-block">Придёт важным уведомлением: в CRM и туда, куда вы настроили уведомления (MAX, Telegram, почта).</div>'
+                    .'</div>',
+            ],
+
+            'remind_at' => [
+                'class'        => WidgetField::class,
+                'label'        => 'Когда напомнить',
+                'widgetClass'  => DateTimeInputWidget::class,
+                'widgetConfig' => [
+                    'type'       => DateTimeInputWidget::TYPE_DATETIME,
+                    'saveFormat' => 'php:U',
+                    'minuteStep' => 5,
+                ],
+            ],
+
+            'remind_author' => [
+                'class' => BoolField::class,
+                'label' => 'Напомнить и мне (автору задачи)',
+                'allowNull' => false,
             ],
 
             'task_relation' => [
@@ -2740,6 +2821,83 @@ JS
             $items[$resource->type.':'.$resource->id] = ($provider ? $provider->label().': ' : '').$resource->title;
         }
         return $items;
+    }
+
+    /**
+     * Moves a task in time from the task views («Сроки», calendar, Gantt): POST plan_start_at (unix time)
+     * and optionally plan_duration (seconds), or mode=auto to give the start back to the planner.
+     * A moved task becomes fixed; a closed task and a task in work do not move.
+     */
+    public function actionReschedule($pk)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $request = \Yii::$app->request;
+        if (!$request->isPost) {
+            throw new \yii\web\MethodNotAllowedHttpException('POST only.');
+        }
+
+        $query = CmsTask::find()->andWhere([CmsTask::tableName().'.id' => (int)$pk]);
+        self::initQuery($query);
+        $task = $query->one();
+        if (!$task) {
+            throw new \yii\web\NotFoundHttpException('Задача не найдена.');
+        }
+        if (!\Yii::$app->user->can('cms/admin-task/manage', ['model' => $task])) {
+            return ['success' => false, 'message' => 'Нет прав менять эту задачу.'];
+        }
+        if (!in_array($task->status, CmsTask::activeStatuses(), true) || $task->status === CmsTask::STATUS_IN_WORK) {
+            return ['success' => false, 'message' => $task->status === CmsTask::STATUS_IN_WORK
+                ? 'Задача в работе — её время не двигается.' : 'Закрытую задачу нельзя перенести.'];
+        }
+
+        if ($request->post('plan_duration') !== null && (int)$request->post('plan_duration') > 0) {
+            $task->plan_duration = (int)$request->post('plan_duration');
+        }
+
+        $day = (string)$request->post('day', '');
+        if ($request->post('plan_start_at') === null && $day === '' && $request->post('mode') === null) {
+            // Only the duration (the right edge of a Gantt bar): the start and its mode stay.
+            if ((int)$request->post('plan_duration') <= 0) {
+                return ['success' => false, 'message' => 'Не указано время начала.'];
+            }
+        } elseif ($request->post('mode') === 'auto') {
+            $task->plan_start_at = null;
+        } elseif ($day !== '') {
+            // A day (a column of «Сроки»): the first free time of the executor on that day or after it.
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $day)) {
+                return ['success' => false, 'message' => 'Неверный день.'];
+            }
+            $dayStart = (new \DateTime($day.' 00:00:00', new \DateTimeZone(\Yii::$app->formatter->timeZone)))->getTimestamp();
+            $task->plan_start_at = (new \skeeks\cms\services\TaskPlanner())->nearestStart(
+                $task->executor, max(900, (int)$task->plan_duration), max($dayStart, time()), (int)$task->id
+            );
+            $task->is_fixed_start = 1;
+        } else {
+            $startAt = (int)$request->post('plan_start_at');
+            if ($startAt <= 0) {
+                return ['success' => false, 'message' => 'Не указано время начала.'];
+            }
+            $task->plan_start_at = $startAt;
+            $task->is_fixed_start = 1;
+        }
+
+        if (!$task->save()) {
+            return ['success' => false, 'message' => implode(' ', $task->getFirstErrors())];
+        }
+        $task->refresh();
+
+        return [
+            'success'  => true,
+            'task'     => [
+                'id'             => (int)$task->id,
+                'plan_start_at'  => (int)$task->plan_start_at,
+                'plan_end_at'    => (int)$task->plan_end_at,
+                'plan_duration'  => (int)$task->plan_duration,
+                'is_fixed_start' => (int)$task->is_fixed_start,
+                'start_text'     => \Yii::$app->formatter->asDate((int)$task->plan_start_at, 'php:j F').' '.\Yii::$app->formatter->asTime((int)$task->plan_start_at, 'php:H:i'),
+            ],
+            'warnings' => (new \skeeks\cms\services\TaskPlanner())->warnings($task),
+        ];
     }
 
     public function actionUnlinkRelatedTask($pk)
