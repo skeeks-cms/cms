@@ -101,7 +101,7 @@ $model = $user;
 
             this.Sortable = sx.backend.sortable.create($(".sx-calendar-day tbody", this.jWrapper), {
                 group: "cms-worker-task-calendar-" + this.get('id'),
-                cursor: "n-resize",
+                cursor: "grabbing",
                 handle: ".sx-move-btn",
                 itemSelector: "> .sx-task-tr",
                 forceHelperSize: true,
@@ -270,7 +270,7 @@ JS
                     <td class="sx-task-calendar__handle-cell">
                         <? if (!$isFixed && !$isInWork && $isCan) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
-                                <a href="#" class="btn sx-move-btn sx-task-calendar__move"><i class="fas fa-arrows-alt-v"></i></a>
+                                <a href="#" class="btn sx-move-btn sx-task-calendar__move"><i class="fas fa-grip-vertical"></i></a>
                             </span>
                         <? endif; ?>
                     </td>

@@ -700,3 +700,12 @@
     gap: 8px;
     white-space: nowrap;
 }
+
+/* One drag handle in every task view: the grip of «Сроки». */
+.sx-worker-tasks-calendar-widget .sx-task-calendar__handle-cell .sx-task-calendar__move {
+    cursor: grab;
+}
+
+.sx-worker-tasks-calendar-widget .sx-task-calendar__handle-cell .sx-task-calendar__move:active {
+    cursor: grabbing;
+}
