@@ -8,7 +8,7 @@
 
 namespace skeeks\cms\controllers;
 
-use kartik\datecontrol\DateControl;
+use skeeks\cms\widgets\formInputs\datetime\DateTimeInputWidget;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
@@ -2407,24 +2407,11 @@ JS
             'plan_start_at' => [
                 'class'        => WidgetField::class,
                 'label'        => 'Когда начать делать задачу',
-                'widgetClass'  => DateControl::class,
+                'widgetClass'  => DateTimeInputWidget::class,
                 'widgetConfig' => [
-                    'type' => DateControl::FORMAT_DATETIME,
-                    'displayFormat' => 'php:d-m-Y H:i',
+                    'type'       => DateTimeInputWidget::TYPE_DATETIME,
                     'saveFormat' => 'php:U',
-                    'options' => [
-                        'autocomplete' => 'off',
-                        'data-lpignore' => 'true',
-                    ],
-                    'saveOptions' => [
-                        'autocomplete' => 'off',
-                        'data-lpignore' => 'true',
-                    ],
-                    'widgetOptions' => [
-                        'pluginOptions' => [
-                            'minuteStep' => 5,
-                        ],
-                    ],
+                    'minuteStep' => 5,
                 ],
             ],
 

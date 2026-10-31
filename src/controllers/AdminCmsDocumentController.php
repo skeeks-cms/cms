@@ -7,7 +7,7 @@
 
 namespace skeeks\cms\controllers;
 
-use kartik\datecontrol\DateControl;
+use skeeks\cms\widgets\formInputs\datetime\DateTimeInputWidget;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
@@ -788,9 +788,9 @@ JS
         ];
         $mainFields['issued_at'] = [
             'class' => WidgetField::class,
-            'widgetClass' => DateControl::class,
+            'widgetClass' => DateTimeInputWidget::class,
             'widgetConfig' => [
-                'type' => DateControl::FORMAT_DATE,
+                'type' => DateTimeInputWidget::TYPE_DATE,
             ],
         ];
 

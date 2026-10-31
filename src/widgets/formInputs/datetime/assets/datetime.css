@@ -1,0 +1,403 @@
+/* Date and time field (DateTimeInputWidget): the trigger and the window.
+   Colors come from the backend theme (--sx-form-control-*, --sx-calendar-*,
+   --sx-color-*); the fallbacks keep the field usable on sites without it. */
+
+.sx-dt {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+.sx-dt__trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--sx-form-control-height, 38px);
+    padding: 0 36px 0 var(--sx-form-control-padding-x, 12px);
+    border: 1px solid var(--sx-form-control-border-color, #ced4da);
+    border-radius: var(--sx-form-control-radius, 6px);
+    background: var(--sx-form-control-background, #fff);
+    color: var(--sx-form-control-color, #212529);
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.3;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color var(--sx-form-control-transition-duration, 160ms), box-shadow var(--sx-form-control-transition-duration, 160ms);
+}
+
+.sx-dt__trigger:hover {
+    border-color: var(--sx-form-control-hover-border-color, #9aa3ad);
+}
+
+.sx-dt__trigger:focus-visible,
+.sx-dt.is-open .sx-dt__trigger {
+    outline: 0;
+    border-color: var(--sx-form-control-focus-border-color, var(--sx-color-accent, #ee4d7d));
+    box-shadow: var(--sx-form-control-focus-shadow, 0 0 0 3px rgba(238, 77, 125, .2));
+}
+
+.sx-dt__trigger:disabled {
+    background: var(--sx-form-control-disabled-background, #f1f3f5);
+    color: var(--sx-form-control-disabled-color, #8a9099);
+    cursor: default;
+}
+
+.sx-dt__icon {
+    flex: 0 0 auto;
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+.sx-dt__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sx-dt.is-empty .sx-dt__label {
+    color: var(--sx-form-control-placeholder-color, #8a9099);
+}
+
+.sx-dt__clear {
+    position: absolute;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--sx-color-text-muted, #6f7484);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.sx-dt__clear:hover {
+    background: var(--sx-color-surface-hover, #f1f3f5);
+    color: var(--sx-color-text, #212529);
+}
+
+.sx-dt.is-empty .sx-dt__clear {
+    display: none;
+}
+
+.has-error .sx-dt__trigger,
+.is-invalid .sx-dt__trigger {
+    border-color: var(--sx-color-danger, #dc3545);
+}
+
+/* ---------- the window ---------- */
+
+.sx-dt-pop {
+    --sx-dt-cell: 36px;
+    position: fixed;
+    z-index: calc(var(--sx-z-modal, 1050) + 10);
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+    max-width: calc(100vw - 16px);
+    border: 1px solid var(--sx-calendar-border-color, var(--sx-color-border, #dee2e6));
+    border-radius: var(--sx-radius-panel, 12px);
+    background: var(--sx-calendar-background, var(--sx-color-surface-raised, #fff));
+    box-shadow: var(--sx-calendar-shadow, 0 8px 24px rgba(0, 0, 0, .16));
+    color: var(--sx-calendar-color, var(--sx-color-text, #212529));
+    font-size: 14px;
+    line-height: 1.3;
+    user-select: none;
+}
+
+.sx-dt-pop button {
+    font: inherit;
+    color: inherit;
+}
+
+.sx-dt-pop button:focus-visible {
+    outline: 2px solid var(--sx-color-accent, #ee4d7d);
+    outline-offset: 1px;
+}
+
+.sx-dt-pop__body {
+    display: flex;
+    gap: 4px;
+}
+
+.sx-dt-pop__main {
+    padding: 12px 12px 6px;
+}
+
+.sx-dt-pop__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.sx-dt-pop__title {
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+}
+
+.sx-dt-pop__nav,
+.sx-dt-pop__nav-space {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.sx-dt-pop__nav:hover {
+    background: var(--sx-calendar-hover-background, var(--sx-color-surface-hover, #f1f3f5));
+}
+
+.sx-dt-pop__days {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sx-dt-pop__row {
+    display: grid;
+    grid-template-columns: repeat(7, var(--sx-dt-cell));
+    gap: 2px;
+}
+
+.sx-dt-pop__wd {
+    padding: 4px 0;
+    color: var(--sx-calendar-muted-color, var(--sx-color-text-subtle, #8a9099));
+    font-size: 12px;
+    text-align: center;
+}
+
+.sx-dt-pop__day,
+.sx-dt-pop__cell {
+    position: relative;
+    height: var(--sx-dt-cell);
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.sx-dt-pop__day:hover,
+.sx-dt-pop__cell:hover,
+.sx-dt-pop__quick:hover {
+    background: var(--sx-calendar-hover-background, var(--sx-color-surface-hover, #f1f3f5));
+}
+
+.sx-dt-pop__day.is-weekend,
+.sx-dt-pop__wd.is-weekend {
+    color: var(--sx-color-text-muted, #6f7484);
+}
+
+.sx-dt-pop__day.is-weekend {
+    opacity: .75;
+}
+
+.sx-dt-pop__day.is-other {
+    opacity: .4;
+}
+
+.sx-dt-pop__day.is-today {
+    box-shadow: inset 0 0 0 1.5px var(--sx-color-accent, #ee4d7d);
+    font-weight: 600;
+    opacity: 1;
+}
+
+.sx-dt-pop .is-selected,
+.sx-dt-pop .is-selected:hover {
+    background: var(--sx-calendar-active-background, var(--sx-color-accent, #ee4d7d));
+    color: var(--sx-calendar-active-color, var(--sx-color-accent-contrast, #fff));
+    font-weight: 600;
+    opacity: 1;
+}
+
+.sx-dt-pop__quick.is-selected .sx-dt-pop__quick-day {
+    color: inherit;
+    opacity: .85;
+}
+
+.sx-dt-pop [aria-disabled="true"],
+.sx-dt-pop [aria-disabled="true"]:hover {
+    background: transparent;
+    opacity: .3;
+    cursor: not-allowed;
+}
+
+.sx-dt-pop__caption {
+    margin: 6px 2px 4px;
+    color: var(--sx-calendar-muted-color, var(--sx-color-text-subtle, #8a9099));
+    font-size: 12px;
+}
+
+.sx-dt-pop__grid {
+    display: grid;
+    grid-template-columns: repeat(6, calc((var(--sx-dt-cell) * 7 + 12px) / 6));
+    gap: 2px;
+}
+
+.sx-dt-pop__side {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 172px;
+    padding: 12px 8px 8px;
+    border-left: 1px solid var(--sx-calendar-border-color, var(--sx-color-border, #dee2e6));
+}
+
+.sx-dt-pop__quick {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sx-dt-pop__quick-day {
+    color: var(--sx-color-text-muted, #6f7484);
+    font-size: 12px;
+}
+
+.sx-dt-pop__foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--sx-calendar-border-color, var(--sx-color-border, #dee2e6));
+}
+
+.sx-dt-pop__spacer {
+    flex: 1 1 auto;
+}
+
+.sx-dt-pop__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--sx-form-control-border-color, #ced4da);
+    border-radius: 999px;
+    background: var(--sx-color-surface-muted, #f4f6f8);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.sx-dt-pop__time.is-active {
+    border-color: var(--sx-color-accent, #ee4d7d);
+    background: var(--sx-color-accent-soft, rgba(238, 77, 125, .12));
+}
+
+.sx-dt-pop__link {
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--sx-color-text-muted, #6f7484) !important;
+    cursor: pointer;
+}
+
+.sx-dt-pop__link:hover {
+    color: var(--sx-color-danger, #dc3545) !important;
+}
+
+.sx-dt-pop__done {
+    height: 34px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--sx-color-accent, #ee4d7d);
+    color: var(--sx-color-accent-contrast, #fff) !important;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sx-dt-pop__done:hover {
+    background: var(--sx-color-accent-hover, var(--sx-color-accent, #e03a6c));
+}
+
+.sx-dt-pop__done:disabled {
+    opacity: .4;
+    cursor: default;
+}
+
+/* ---------- phone: a sheet at the bottom of the screen ---------- */
+
+.sx-dt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--sx-z-modal, 1050) + 9);
+    background: rgba(0, 0, 0, .35);
+}
+
+.sx-dt-pop.is-sheet {
+    --sx-dt-cell: calc((100vw - 24px - 12px) / 7);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    max-height: 92vh;
+    overflow-y: auto;
+    border-width: 1px 0 0;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.sx-dt-pop.is-sheet .sx-dt-pop__body {
+    flex-direction: column-reverse;
+}
+
+.sx-dt-pop.is-sheet .sx-dt-pop__side {
+    flex-direction: row;
+    gap: 6px;
+    min-width: 0;
+    padding: 12px 12px 0;
+    overflow-x: auto;
+    border-left: 0;
+    scrollbar-width: none;
+}
+
+.sx-dt-pop.is-sheet .sx-dt-pop__quick {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    border: 1px solid var(--sx-calendar-border-color, var(--sx-color-border, #dee2e6));
+    border-radius: 999px;
+}
+
+.sx-dt-pop.is-sheet .sx-dt-pop__day,
+.sx-dt-pop.is-sheet .sx-dt-pop__cell {
+    height: min(var(--sx-dt-cell), 44px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .sx-dt-pop.is-sheet {
+        animation: sx-dt-sheet .18s ease-out;
+    }
+}
+
+@keyframes sx-dt-sheet {
+    from {
+        transform: translateY(24px);
+    }
+}
