@@ -88,6 +88,11 @@ $config = [
             'class' => '\skeeks\cms\components\Breadcrumbs',
         ],
 
+        // Link preview card (og:image 1200x630) for pages without their own picture; the site sets its style here.
+        'ogImage' => [
+            'class' => \skeeks\cms\components\OgImage::class,
+        ],
+
         'upaBackend' => [
             'id'    => 'upaBackend',
             'class' => \skeeks\cms\components\UpaBackendComponent::class,

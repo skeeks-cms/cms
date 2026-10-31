@@ -212,6 +212,11 @@ class SavedFilterController extends Controller
             ], 'og:image');
         }
 
+        //Без своей картинки — карточка превью с заголовком и разделом (подставит view в конце страницы)
+        if (\Yii::$app->has('ogImage')) {
+            \Yii::$app->get('ogImage')->setPage($model->seoName, $model->cmsTree ? $model->cmsTree->name : null);
+        }
+
 
         $this->view->registerMetaTag([
             'property' => 'og:url',

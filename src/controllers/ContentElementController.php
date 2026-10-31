@@ -381,6 +381,12 @@ class ContentElementController extends Controller
             ], 'og:image');
         }
 
+        //Без своей картинки — карточка превью с заголовком и разделом (подставит view в конце страницы)
+        if (\Yii::$app->has('ogImage')) {
+            $label = $model->cmsTree ? $model->cmsTree->name : ($model->cmsContent ? $model->cmsContent->name : null);
+            \Yii::$app->get('ogImage')->setPage($model->seoName, $label);
+        }
+
 
         $this->view->registerMetaTag([
             'property' => 'og:url',

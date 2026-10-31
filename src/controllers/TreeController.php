@@ -189,6 +189,14 @@ class TreeController extends Controller
             ], 'og:image');
         }
 
+        //Без своей картинки — карточка превью с заголовком и разделом (подставит view в конце страницы)
+        if (\Yii::$app->has('ogImage')) {
+            $parent = $model->level > 1 ? $model->parent : null;
+            //Корень называется «Главная страница» — для карточки берём заголовок или название сайта
+            $cardTitle = $model->level == 0 ? ($model->seo_h1 ?: ($model->meta_title ?: \Yii::$app->skeeks->site->name)) : $model->seoName;
+            \Yii::$app->get('ogImage')->setPage($cardTitle, $parent ? $parent->name : null);
+        }
+
 
         $this->view->registerMetaTag([
             'property' => 'og:url',

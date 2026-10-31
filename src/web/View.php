@@ -181,6 +181,19 @@ class View extends \yii\web\View
     }
 
     /**
+     * Before the head is rendered: the link preview card for a page without its own og:image.
+     * @param bool $ajaxMode
+     */
+    public function endPage($ajaxMode = false)
+    {
+        if (!$ajaxMode && \Yii::$app->has('ogImage')) {
+            \Yii::$app->get('ogImage')->apply($this);
+        }
+
+        parent::endPage($ajaxMode);
+    }
+
+    /**
      * @return string
      */
     /*public function getCurrentThemeId()
