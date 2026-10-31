@@ -562,6 +562,12 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                     </span>
                 </li>
                 <?php endif; ?>
+                <?php if ($model->replannedText) : ?>
+                <li>
+                    <span class="sx-properties--name">Перенесена</span>
+                    <span class="sx-properties--value"><?php echo $model->replannedIconHtml; ?> <?php echo \yii\helpers\Html::encode($model->replannedText); ?></span>
+                </li>
+                <?php endif; ?>
                 <?php if ($model->hasAttribute('remind_at') && $model->remind_at) : ?>
                 <li>
                     <span class="sx-properties--name">Напоминание</span>

@@ -171,7 +171,7 @@ if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
                 <div class="sx-task-calendar__cell-tasks">
                     <? foreach (array_slice($dayTasks, 0, $widget->monthCellLimit) as $task) : ?>
                         <?= Html::beginTag('a', $widget->taskLinkOptions($task)); ?>
-                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?></span>
+                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?></span>
                             <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                         <?= Html::endTag('a'); ?>
                     <? endforeach; ?>
@@ -245,7 +245,7 @@ if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
                     Html::addCssClass($options, 'sx-task-calendar__block');
                     ?>
                     <?= Html::beginTag('a', $options); ?>
-                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?></span>
+                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?></span>
                         <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                     <?= Html::endTag('a'); ?>
                 <? endforeach; ?>

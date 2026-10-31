@@ -10,7 +10,6 @@ namespace skeeks\cms\widgets\admin;
 use skeeks\cms\assets\admin\TaskCalendarAsset;
 use skeeks\cms\models\CmsTask;
 use skeeks\cms\models\CmsUser;
-use skeeks\cms\services\TaskPlanner;
 use yii\base\Widget;
 use yii\helpers\Html;
 
@@ -32,9 +31,6 @@ class CmsTaskDeadlinesWidget extends Widget
     public function run()
     {
         TaskCalendarAsset::register($this->view);
-        if (TaskPlanner::hasStartMode()) {
-            (new TaskPlanner())->plan($this->user);
-        }
 
         $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
         $today = new \DateTime('today', $tz);

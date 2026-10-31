@@ -87,6 +87,8 @@ class Notifications extends Component
      *     'importance' => 0|1|2,
      *     'audience' => worker|client|any,
      *     'mutable' => bool (default true; urgent kinds never are),
+     *     'quietHours' => bool (default true; false — delivered during the person's quiet hours too, without
+     *         being urgent: a reminder a person set for themself),
      *     'dealArea' => access area of a deal a client needs (step У4b),
      * ]
      *
@@ -146,8 +148,10 @@ class Notifications extends Component
             'task.resumed' => ['name' => 'Задача возобновлена'] + $task,
             'task.comment' => ['name' => 'Комментарий к задаче'] + $task,
             'task.order' => ['name' => 'Изменён порядок ваших задач', 'audience' => self::AUDIENCE_WORKER] + $task,
-            // A reminder a person set on a task (services\TaskReminders): important, never muted.
+            // A reminder set on a task (services\TaskReminders): important, never muted. Set by someone else it waits
+            // for the end of the person's quiet hours; set by the person for themself it comes at once.
             'task.reminder' => ['name' => 'Напоминание о задаче', 'importance' => self::IMPORTANCE_IMPORTANT, 'mutable' => false] + $task,
+            'task.reminder_self' => ['name' => 'Своё напоминание о задаче', 'importance' => self::IMPORTANCE_IMPORTANT, 'mutable' => false, 'quietHours' => false] + $task,
             'task.client_unassigned' => ['name' => 'Неразобранная задача от клиента', 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER] + $task,
             'lead.new' => ['name' => 'Новая сделка в Неразобранном', 'category' => self::CATEGORY_CLIENTS, 'importance' => self::IMPORTANCE_IMPORTANT, 'audience' => self::AUDIENCE_WORKER],
             'lead.delegated' => ['name' => 'Сделку по вашему клиенту ведёт другой сотрудник', 'category' => self::CATEGORY_CLIENTS, 'audience' => self::AUDIENCE_WORKER],
@@ -210,6 +214,14 @@ class Notifications extends Component
     public function kind(string $code): ?array
     {
         return $this->getKindList()[$code] ?? null;
+    }
+
+    /** Whether notifications of this kind come during quiet hours too (the kind option `quietHours` => false). */
+    public function ignoresQuietHours(?string $kind): bool
+    {
+        $config = $kind ? $this->kind($kind) : null;
+
+        return $config && array_key_exists('quietHours', $config) && $config['quietHours'] === false;
     }
 
     public function categoryName(?string $code): string

@@ -34,6 +34,9 @@ class TaskPlanner
     /** Schedule of an executor who has none: weekdays 9–18. */
     public const DEFAULT_SCHEDULE = [['day' => [1, 2, 3, 4, 5], 'startHour' => '09', 'startMinutes' => '00', 'endHour' => '18', 'endMinutes' => '00']];
 
+    /** A move of an auto task people are told about (another day is always told). */
+    public const NOTICEABLE_MOVE = 1800;
+
     /** @var int|null "now" of a test */
     public $now;
 
@@ -44,9 +47,9 @@ class TaskPlanner
      */
     public function plan(CmsUser $user, array $sortTaskIds = []): void
     {
-        $mutex = \Yii::$app->has('mutex') ? \Yii::$app->mutex : null;
+        // One layout of an executor at a time: two changes at once must not give two different layouts.
         $lock = 'cms-task-plan-'.(int)$user->id;
-        if ($mutex && !$mutex->acquire($lock, 10)) {
+        if (!$this->lock($lock)) {
             \Yii::warning('Task plan of user '.(int)$user->id.' is busy, skipped.', self::class);
             return;
         }
@@ -57,9 +60,28 @@ class TaskPlanner
                 CmsTask::updateAll($values, ['id' => $id]);
             }
         } finally {
-            if ($mutex) {
-                $mutex->release($lock);
-            }
+            $this->unlock($lock);
+        }
+    }
+
+    /** A database lock of MySQL/MariaDB (the site has no mutex component), else the mutex when there is one. */
+    protected function lock(string $name): bool
+    {
+        $db = CmsTask::getDb();
+        if ($db->driverName === 'mysql') {
+            return (int)$db->createCommand('SELECT GET_LOCK(:name, 10)', [':name' => $name])->queryScalar() === 1;
+        }
+
+        return !\Yii::$app->has('mutex') || \Yii::$app->mutex->acquire($name, 10);
+    }
+
+    protected function unlock(string $name): void
+    {
+        $db = CmsTask::getDb();
+        if ($db->driverName === 'mysql') {
+            $db->createCommand('SELECT RELEASE_LOCK(:name)', [':name' => $name])->execute();
+        } elseif (\Yii::$app->has('mutex')) {
+            \Yii::$app->mutex->release($name);
         }
     }
 
@@ -332,12 +354,20 @@ class TaskPlanner
                 $pos = $end;
             }
 
-            $this->put($result, $task, [
+            $values = [
                 'plan_start_at'   => $start,
                 'plan_end_at'     => $end,
                 'executor_end_at' => $end,
                 'executor_sort'   => ++$sort,
-            ], $all);
+            ];
+            // A noticeable move (another day or half an hour and more) is shown to people with the former start.
+            $old = (int)$task['plan_start_at'];
+            if (!$all && static::hasReplanned() && $old && $old !== $start
+                && (abs($start - $old) >= static::NOTICEABLE_MOVE || $this->dayOf($start) !== $this->dayOf($old))) {
+                $values['replanned_from'] = $old;
+                $values['replanned_at'] = $this->now();
+            }
+            $this->put($result, $task, $values, $all);
         }
 
         return $result;
@@ -460,6 +490,25 @@ class TaskPlanner
     protected function now(): int
     {
         return $this->now ?? time();
+    }
+
+    protected function dayOf(int $time): string
+    {
+        return \Yii::$app->formatter->asDate($time, 'php:Y-m-d');
+    }
+
+    /**
+     * Whether the table has the columns of a noticed move yet (code may run before its migration).
+     */
+    public static function hasReplanned(): bool
+    {
+        static $has = null;
+        if ($has === null) {
+            $schema = CmsTask::getTableSchema();
+            $has = $schema && $schema->getColumn('replanned_from') !== null;
+        }
+
+        return $has;
     }
 
     /**

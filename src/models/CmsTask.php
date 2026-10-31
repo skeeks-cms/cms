@@ -40,6 +40,9 @@ use yii\helpers\ArrayHelper;
  * @property int|null            $remind_offset Напомнить за столько секунд до начала (null — своё время remind_at)
  * @property int                 $remind_author Напомнить и автору
  * @property int|null            $reminded_at Когда напоминание отправлено
+ * @property int|null            $remind_by Кто поставил напоминание
+ * @property int|null            $replanned_from Прежнее начало авто-задачи, заметно перенесённой системой
+ * @property int|null            $replanned_at Когда система её перенесла
  * @property string              $reminder Выбор напоминания в форме: '' нет, число — секунд до начала, 'custom' — своё время
  * @property int|null            $plan_end_at Планируемое завершение
  *
@@ -163,6 +166,8 @@ class CmsTask extends ActiveRecord
                     'executor_sort',
                     'executor_end_at',
                     'reminded_at',
+                    'replanned_from',
+                    'replanned_at',
                 ],
                 'relation_map' => [
                     'cms_project_id' => 'cmsProject',
@@ -201,6 +206,14 @@ class CmsTask extends ActiveRecord
             if ($this->isAttributeChanged('remind_at', false) && $this->remind_at && (int)$this->remind_at > time()) {
                 $this->reminded_at = null;
             }
+            // Who set the reminder: a reminder set for oneself ignores one's quiet hours (TaskReminders).
+            // A reminder that only follows a moved start keeps its author.
+            $isChoice = $this->_reminder !== null || $this->isAttributeChanged('remind_offset', false) || $this->isAttributeChanged('remind_author', false)
+                || ($this->remind_offset === null && $this->isAttributeChanged('remind_at', false));
+            if ($this->hasAttribute('remind_by') && $isChoice) {
+                $userId = \Yii::$app->has('user', true) && !\Yii::$app->user->isGuest ? (int)\Yii::$app->user->id : 0;
+                $this->remind_by = $this->remind_at || $this->remind_offset !== null ? ($userId ?: ($this->remind_by ?: null)) : null;
+            }
         }
 
         // A start set by a person is fixed; an emptied start is given back to the planner.
@@ -211,6 +224,11 @@ class CmsTask extends ActiveRecord
                 $this->is_fixed_start = 1;
             } elseif (!$this->isAttributeChanged('is_fixed_start', false) && $this->isAttributeChanged('plan_start_at', false)) {
                 $this->is_fixed_start = 1;
+            }
+            // A person chose the time: the note «moved by the system» is no longer true.
+            if ($this->is_fixed_start && $this->hasAttribute('replanned_from') && $this->isAttributeChanged('plan_start_at', false)) {
+                $this->replanned_from = null;
+                $this->replanned_at = null;
             }
         }
 
@@ -1176,6 +1194,34 @@ class CmsTask extends ActiveRecord
 
         return ($this->reminded_at ? 'Напоминание отправлено: ' : 'Напомнит ').$when
             .($this->remind_author ? ' (исполнителю и автору)' : '');
+    }
+
+    /** «Перенесена системой с 2 ноября 10:00 (31 октября в 14:05)» for an auto task the planner moved noticeably. */
+    public function getReplannedText(): string
+    {
+        if (!$this->hasAttribute('replanned_from') || !$this->replanned_from || !in_array($this->status, static::activeStatuses(), true)) {
+            return '';
+        }
+        $f = \Yii::$app->formatter;
+
+        return 'Перенесена по графику с '.$f->asDate((int)$this->replanned_from, 'php:j F').' '.$f->asTime((int)$this->replanned_from, 'php:H:i')
+            .($this->replanned_at ? ' ('.$f->asDate((int)$this->replanned_at, 'php:j F').' в '.$f->asTime((int)$this->replanned_at, 'php:H:i').')' : '');
+    }
+
+    /** The mark of a task the planner moved: its former start in the title. */
+    public function getReplannedIconHtml(): string
+    {
+        $text = $this->replannedText;
+        if ($text === '') {
+            return '';
+        }
+
+        return \yii\helpers\Html::tag('i', '', [
+            'class'       => 'fas fa-history sx-task-replanned',
+            'style'       => 'color: var(--sx-color-text-muted);',
+            'title'       => $text,
+            'data-toggle' => 'tooltip',
+        ]);
     }
 
     /** The bell of a task with a reminder: shown in lists, calendars, «Сроки», Gantt and the card. */

@@ -135,7 +135,7 @@ JS
                             && in_array($task->status, \skeeks\cms\models\CmsTask::activeStatuses(), true);
                         ?>
                         <span title="<?= $isFixedStart ? 'Закреплена на это время' : 'Время рассчитано по графику и очереди'; ?>" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at, "d MMMM y 'г'., HH:mm"); ?></span>
-                        <?= $task->reminderIconHtml; ?>
+                        <?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?>
                         <? if ($isLateStart) : ?>
                             / <span class="sx-preview-card__meta--danger">Просрочена!</span>
                         <? endif; ?>

@@ -3,7 +3,9 @@
  * Task reminders on the stand database, rolled back; messengers, mail and push are switched off, nothing leaves
  * the stand. A reminder «before the start» follows the start (a form choice, the planner moving an auto task);
  * a reminder whose time came goes once as an important notification to the executor and, when asked, the
- * author; a moved reminder goes again; a custom time in the past is refused; a stale one is only marked.
+ * author; a reminder the author set for themself ignores quiet hours (task.reminder_self), one set by
+ * someone else waits for them (task.reminder); a moved reminder goes again; a custom time in the past is
+ * refused; a reminder the check missed goes late with «опоздало на N мин», still once.
  *
  * CMS_TASK_REMINDER_STAND_TEST=local php tests/task-reminder-stand.php
  * (TEST_APP_ROOT — the application root, /app by default)
@@ -49,6 +51,8 @@ try {
     $check(TaskPlanner::hasReminder(), 'the reminder migration is applied');
     $kind = Yii::$app->notifications->kind('task.reminder');
     $check($kind && (int)$kind['importance'] === Notifications::IMPORTANCE_IMPORTANT && !$kind['mutable'], 'task.reminder is an important kind that cannot be muted');
+    $check(!Yii::$app->notifications->ignoresQuietHours('task.reminder') && Yii::$app->notifications->ignoresQuietHours('task.reminder_self'),
+        'a reminder from someone else waits for quiet hours to end, one set for oneself does not');
 
     $workers = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.is_active' => 1])->limit(2)->all();
     $check(count($workers) === 2, 'the stand has two employees');
@@ -77,9 +81,12 @@ try {
     $check($sent >= 1, 'the reminder goes when its time came');
     $task->refresh();
     $check((int)$task->reminded_at > 0 && !$task->hasPendingReminder(), 'the reminder is marked as sent');
-    $toExecutor = CmsWebNotify::find()->andWhere(['cms_user_id' => (int)$executor->id, 'kind' => 'task.reminder', 'model_id' => (int)$task->id])->one();
-    $toAuthor = CmsWebNotify::find()->andWhere(['cms_user_id' => (int)$author->id, 'kind' => 'task.reminder', 'model_id' => (int)$task->id])->one();
+    $toExecutor = CmsWebNotify::find()->andWhere(['cms_user_id' => (int)$executor->id, 'kind' => ['task.reminder', 'task.reminder_self'], 'model_id' => (int)$task->id])->one();
+    $toAuthor = CmsWebNotify::find()->andWhere(['cms_user_id' => (int)$author->id, 'kind' => ['task.reminder', 'task.reminder_self'], 'model_id' => (int)$task->id])->one();
     $check((bool)$toExecutor && (bool)$toAuthor, 'the executor and the author get the notification');
+    $check((int)$task->remind_by === (int)$author->id, 'the reminder remembers who set it');
+    $check($toAuthor->kind === 'task.reminder_self' && $toExecutor->kind === 'task.reminder',
+        'the author set it for themself (no quiet hours), the executor got it from someone else');
     $check(strpos((string)$toExecutor->name, 'Напоминание') === 0, 'the text says it is a reminder: '.$toExecutor->name);
     $check($reminders->sendDue((int)$task->remind_at + 120) === 0, 'a reminder goes once');
 
@@ -108,11 +115,14 @@ try {
     $off->reminder = '';
     $check($off->save() && CmsTask::findOne($custom->id)->remind_at === null, 'a reminder can be removed');
 
-    CmsTask::updateAll(['remind_at' => time() - 3 * 86400, 'reminded_at' => null], ['id' => (int)$task->id]);
-    $before = CmsWebNotify::find()->andWhere(['kind' => 'task.reminder', 'model_id' => (int)$task->id])->count();
-    $reminders->sendDue();
-    $check(CmsTask::findOne($task->id)->reminded_at !== null
-        && CmsWebNotify::find()->andWhere(['kind' => 'task.reminder', 'model_id' => (int)$task->id])->count() == $before, 'a stale reminder is only marked');
+    // The check was down for 47 minutes: the reminder still goes, marked late, and only once.
+    $missedAt = time() - 47 * 60;
+    CmsTask::updateAll(['remind_at' => $missedAt, 'reminded_at' => null], ['id' => (int)$task->id]);
+    $check($reminders->sendDue() === 1, 'a missed reminder is sent after the check is back');
+    $late = CmsWebNotify::find()->andWhere(['cms_user_id' => (int)$executor->id, 'model_id' => (int)$task->id,
+        'event_key' => 'task.reminder:'.(int)$task->id.':'.$missedAt])->one();
+    $check($late && strpos((string)$late->name, 'опоздало на 47 мин') !== false, 'it says how late it is: '.($late ? $late->name : '—'));
+    $check($reminders->sendDue() === 0 && (new TaskReminders())->sendDue() === 0, 'a repeated or a second run does not send it again');
 } finally {
     $transaction->rollBack();
 }

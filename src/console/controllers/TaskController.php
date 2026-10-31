@@ -9,7 +9,7 @@ use yii\console\ExitCode;
 /**
  * Tasks.
  *
- *   php yii cms/task/plan            # lay out the active tasks of every executor (the agent cms/task/plan)
+ *   php yii cms/task/plan            # lay out the active tasks of every executor again (by hand: tasks move only on events)
  *   php yii cms/task/plan --user=110 # one executor
  *   php yii cms/task/remind          # send the reminders whose time came (the agent cms/task/remind)
  */

@@ -256,10 +256,7 @@ JS
                     ->orderBy(['last_start_at' => SORT_DESC])
                     ->all();
 
-                // Every active task has a start (TaskPlanner): auto tasks whose time passed move on first.
-                if (\skeeks\cms\services\TaskPlanner::hasStartMode()) {
-                    (new \skeeks\cms\services\TaskPlanner())->plan($model);
-                }
+                // Every active task has a start (TaskPlanner). The page does not replan: tasks move only on events.
 
                 $tasks = \skeeks\cms\models\CmsTask::find()
                     ->where(['executor_id' => $model->id])

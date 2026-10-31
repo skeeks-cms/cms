@@ -172,6 +172,13 @@ class User
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
 
+        // A changed work schedule (a vacation too) moves the employee's auto tasks: one of the events tasks move on.
+        $this->on(self::EVENT_AFTER_UPDATE, function (AfterSaveEvent $e) {
+            if (array_key_exists('work_shedule', (array)$e->changedAttributes) && \skeeks\cms\services\TaskPlanner::hasStartMode()) {
+                (new \skeeks\cms\services\TaskPlanner())->plan($this instanceof CmsUser ? $this : CmsUser::findOne((int)$this->id));
+            }
+        });
+
         // An employee with clients is not deactivated, made a non-employee or deleted until his clients are given
         // away («Передать всех клиентов», owner's decision 29.10.2026, п. 13а): every way goes through these events.
         $this->on(self::EVENT_BEFORE_UPDATE, function (\yii\base\ModelEvent $e) {

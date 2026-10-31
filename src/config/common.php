@@ -76,21 +76,6 @@ return [
                     'resourceKey' => static function () { return 'cms:task-remind'; },
                     'dedupKey' => static function () { return 'cms:task-remind'; },
                 ],
-                // Tasks: auto tasks whose time passed move on to free time (the agent cms/task/plan, TaskPlanner).
-                'cms.task-plan' => [
-                    'type' => 'cms.task-plan',
-                    'title' => 'Задачи: расставить по графику',
-                    'handler' => \skeeks\cms\jobs\TaskPlanJobHandler::class,
-                    'queue' => 'maintenance',
-                    'timeout' => 600,
-                    'leaseSeconds' => 120,
-                    'maxAttempts' => 1,
-                    'idempotent' => true,
-                    'overlapPolicy' => 'skip',
-                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
-                    'resourceKey' => static function () { return 'cms:task-plan'; },
-                    'dedupKey' => static function () { return 'cms:task-plan'; },
-                ],
                 // П2д: the daily recalculation of the client protection (the agent cms/crm/protection).
                 'cms.crm-protection' => [
                     'type' => 'cms.crm-protection',
@@ -258,13 +243,6 @@ return [
                     'class' => \skeeks\cms\agent\CmsAgent::class,
                     'name' => 'Задачи: отправить напоминания',
                     'interval' => 60,
-                ],
-
-                'cms/task/plan' => [
-                    'jobType' => 'cms.task-plan',
-                    'class' => \skeeks\cms\agent\CmsAgent::class,
-                    'name' => 'Задачи: расставить по графику',
-                    'interval' => 900,
                 ],
 
                 'cms/notify/cleanup' => [

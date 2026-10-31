@@ -90,6 +90,20 @@ try {
     $check($hm($get($d)->plan_start_at) === '11:15' && $hm($get($d)->plan_end_at) === '15:15', 'D continues after the lunch break: 11:15–15:15, got '.$hm($get($d)->plan_end_at));
     $check((int)$get($a)->executor_sort === 1 && (int)$get($d)->executor_sort === 4, 'queue numbers follow the order');
 
+    // A noticeable move of an auto task is marked with its former start; a small shift is not.
+    CmsTask::updateAll(['replanned_from' => null, 'replanned_at' => null], ['executor_id' => (int)$user->id]);
+    CmsTask::updateAll(['plan_start_at' => $at('09:00')], ['id' => (int)$fixed->id]);
+    $planner->plan($user);
+    $check($hm($get($a)->plan_start_at) === '09:30' && (int)$get($a)->replanned_from === $at('09:00'), 'A moved by half an hour shows its former start');
+    $check(strpos($get($a)->replannedText, 'Перенесена по графику с') === 0 && $get($a)->replannedIconHtml !== '', 'the note «перенесена» is drawn');
+    CmsTask::updateAll(['plan_start_at' => $at('10:00')], ['id' => (int)$fixed->id]);
+    CmsTask::updateAll(['replanned_from' => null, 'replanned_at' => null], ['executor_id' => (int)$user->id]);
+    $planner->plan($user);
+    $moved = $get($a);
+    $moved->plan_start_at = $at('16:00');
+    $check($moved->save() && $get($a)->replanned_from === null && (int)$get($a)->is_fixed_start === 1, 'a person choosing the time removes the note');
+    CmsTask::updateAll(['is_fixed_start' => 0], ['id' => (int)$a->id]);
+
     $planner->plan($user, [(int)$cTask->id, (int)$a->id]);
     $check($hm($get($cTask)->plan_start_at) === '09:00', 'a manual reorder puts C first');
     $check($hm($get($a)->plan_start_at) === '09:15' && $hm($get($a)->plan_end_at) === '10:45', 'A is split around the fixed call: ends 10:45');

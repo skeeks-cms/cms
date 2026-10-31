@@ -42,6 +42,7 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
                             <span><?= in_array($key, ['today', 'tomorrow'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
                             <? if ($isFixed) : ?><i class="fas fa-thumbtack" title="Закреплено на это время"></i><? endif; ?>
                             <?= $task->reminderIconHtml; ?>
+                            <?= $task->replannedIconHtml; ?>
                             <span><?= Html::encode($task->statusAsText); ?></span>
                         </div>
                         <a class="sx-task-deadlines__card-name" href="<?= Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/view', 'pk' => $task->id])); ?>" data-sx-task-open="<?= Html::encode($url); ?>" data-pjax="0"><?= Html::encode($task->name); ?></a>

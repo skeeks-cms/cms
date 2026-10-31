@@ -58,9 +58,6 @@ class CmsTaskCalendarWidget extends Widget
     public function run()
     {
         TaskCalendarAsset::register($this->view);
-        if (TaskPlanner::hasStartMode()) {
-            (new TaskPlanner())->plan($this->user);
-        }
 
         [$from, $to] = $this->range();
         $days = [];

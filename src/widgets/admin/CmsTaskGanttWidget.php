@@ -36,9 +36,6 @@ class CmsTaskGanttWidget extends Widget
     public function run()
     {
         TaskGanttAsset::register($this->view);
-        if (TaskPlanner::hasStartMode()) {
-            (new TaskPlanner())->plan($this->user);
-        }
 
         $this->options['id'] = $this->id;
         Html::addCssClass($this->options, 'sx-task-gantt');
@@ -55,13 +52,10 @@ class CmsTaskGanttWidget extends Widget
     }
 
     /**
-     * The data the page refreshes after a move: the planner may have moved other auto tasks.
+     * The data the page refreshes after a move: the planner (run by the move) may have moved other auto tasks.
      */
     public function data(): array
     {
-        if (TaskPlanner::hasStartMode()) {
-            (new TaskPlanner())->plan($this->user);
-        }
 
         return ['tasks' => $this->tasksData(), 'work' => $this->workData(), 'now' => time()];
     }
@@ -97,6 +91,7 @@ class CmsTaskGanttWidget extends Widget
                 'client'    => (string)$client,
                 'reminder'  => $task->hasAttribute('remind_at') && $task->remind_at ? $task->reminderText : '',
                 'reminded'  => $task->hasAttribute('reminded_at') && (bool)$task->reminded_at,
+                'replanned' => $task->replannedText,
                 'url'       => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-task/view', 'pk' => $task->id])
                     ->enableEmptyLayout()->enableNoActions()->url,
             ];
