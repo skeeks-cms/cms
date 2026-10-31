@@ -17,9 +17,13 @@ class TaskWorkflow
         if (!$actor->id) { throw new Exception('Authenticated CMS user is required.'); }
         if (!array_key_exists($status, CmsTask::statuses())) { throw new Exception('Unknown task status.'); }
         return CmsTask::getDb()->transaction(function () use ($task, $status, $endAt, $actor) {
-            // Serialize starts on different tasks for the same executor, then reload.
+            // Serialize starts on different tasks for the same executor, then reload. The layout lock comes first,
+            // before any row lock, in the same order as every other change of tasks (TaskPlanner).
             $db = CmsTask::getDb();
             $executorId = (int)$task->executor_id;
+            if (method_exists(TaskPlanner::class, 'lockExecutors') && !TaskPlanner::lockExecutors([$executorId])) {
+                throw new Exception(TaskPlanner::BUSY_MESSAGE);
+            }
             $db->createCommand('SELECT [[id]] FROM '.CmsUser::tableName().' WHERE [[id]]=:id FOR UPDATE', [':id' => $executorId])->queryScalar();
             $db->createCommand('SELECT [[id]] FROM '.CmsTask::tableName().' WHERE [[id]]=:id FOR UPDATE', [':id' => $task->id])->queryScalar();
             if (!$task->refresh() || (int)$task->executor_id !== $executorId) { throw new Exception('Task changed; read it again.'); }
@@ -56,7 +60,15 @@ class TaskWorkflow
                 }
             }
             $task->status = $status;
+            if ($status === CmsTask::STATUS_IN_WORK && $task->hasAttribute('is_fixed_start')) {
+                // A started task is fixed on when its work first started (owner's decision 3), before the queue is laid out.
+                $first = CmsTaskSchedule::find()->task($task)->min('start_at');
+                $task->plan_start_at = $first ? min((int)$first, $now) : $now;
+                $task->is_fixed_start = 1;
+                $task->startingWork = true;
+            }
             $this->save($task);
+            $task->startingWork = false;
             $schedule = $open ? $open[0] : null;
             if ($status === CmsTask::STATUS_IN_WORK) {
                 $schedule = new CmsTaskSchedule();

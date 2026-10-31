@@ -15,8 +15,10 @@ use skeeks\cms\models\CmsTask;
  * (CRM, MAX, Telegram, mail). A reminder a person set for themself (`remind_by`) is the kind `task.reminder_self`
  * and comes during their quiet hours too; one set by someone else (`task.reminder`) waits for them to end.
  * A reminder the check missed (the site or its queue was down) is not skipped: it goes with «опоздало на N мин».
- * Every reminder goes exactly once: the row is claimed by a conditional update before notifying, so a repeated
- * or a parallel run never sends it twice.
+ * Every reminder goes exactly once: in one transaction the row is read again with a lock (a task closed or moved
+ * after the selection is not reminded), marked sent and the notification stored with its deliveries. A repeated or
+ * a parallel run never sends it twice; a failure before the notification is stored rolls the mark back, and the
+ * next run sends it (late — with «опоздало»).
  */
 class TaskReminders
 {
@@ -42,23 +44,47 @@ class TaskReminders
 
         $sent = 0;
         foreach ($tasks as $task) {
-            $claimed = CmsTask::updateAll(['reminded_at' => $now], [
-                'id'          => (int)$task->id,
-                'reminded_at' => null,
-                'remind_at'   => (int)$task->remind_at,
-            ]);
-            if (!$claimed) {
-                continue;
-            }
             try {
-                $this->notify($task, $now);
-                $sent++;
+                if ($this->sendOne((int)$task->id, $now)) {
+                    $sent++;
+                }
             } catch (\Throwable $e) {
-                \Yii::error('Task reminder '.(int)$task->id.' failed: '.$e->getMessage(), self::class);
+                \Yii::error('Task reminder '.(int)$task->id.' failed, it will be sent by the next run: '.$e->getMessage(), self::class);
             }
         }
 
         return $sent;
+    }
+
+    /**
+     * Sends one reminder if it is still due: the task active, not reminded, its time come. The mark and the
+     * notification commit together.
+     */
+    protected function sendOne(int $id, int $now): bool
+    {
+        $db = CmsTask::getDb();
+
+        return (bool)$db->transaction(function () use ($db, $id, $now) {
+            $condition = ['and',
+                ['id' => $id, 'reminded_at' => null, 'status' => CmsTask::activeStatuses()],
+                ['<=', 'remind_at', $now],
+            ];
+            // A locking read sees the latest committed row and waits for a change in progress (a closing).
+            $command = (new \yii\db\Query())->select('id')->from(CmsTask::tableName())->where($condition)->createCommand($db);
+            if ($db->driverName === 'mysql') {
+                $command = $db->createCommand($command->getSql().' FOR UPDATE', $command->params);
+            }
+            if (!$command->queryScalar()) {
+                return false;
+            }
+            $task = CmsTask::findOne($id);
+            if (!$task || !CmsTask::updateAll(['reminded_at' => $now], $condition)) {
+                return false;
+            }
+            $this->notify($task, $now);
+
+            return true;
+        });
     }
 
     public function notify(CmsTask $task, ?int $now = null): void

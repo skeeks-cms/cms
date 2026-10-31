@@ -201,9 +201,15 @@
                 html += '<br><small class="sx-task-undo__warning">' + esc(text) + '</small>';
             });
             show(html, function () {
-                var back = prev.is_fixed_start
-                    ? {plan_start_at: prev.plan_start_at, fixed: 1, restore: 1, plan_duration: prev.plan_duration}
-                    : {mode: 'auto', plan_duration: prev.plan_duration};
+                // The former start, mode and reminder exactly (an auto task goes back to its place and is laid out).
+                var back = {
+                    plan_start_at: prev.plan_start_at,
+                    fixed: prev.is_fixed_start ? 1 : 0,
+                    restore: 1,
+                    plan_duration: prev.plan_duration,
+                    remind_at: prev.remind_at || '',
+                    reminded_at: prev.reminded_at || ''
+                };
                 post(url, id, back).done(function (r) {
                     if (r && r.success) {
                         show('Вернули на <b>' + esc(r.task.text) + '</b>');

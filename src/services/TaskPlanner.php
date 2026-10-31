@@ -11,6 +11,7 @@ use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsTask;
 use skeeks\cms\models\CmsTaskSchedule;
 use skeeks\cms\models\CmsUser;
+use yii\db\Connection;
 use yii\db\Expression;
 
 /**
@@ -22,6 +23,11 @@ use yii\db\Expression;
  *   work schedule, after one another, a task longer than a free window continuing in the next one.
  *
  * Writes go through updateAll(): no history records, no afterSave() and no recursion.
+ *
+ * Locks: every change of a task takes the layout lock of its executor before it reads the queue
+ * (CmsTask::beforeSave(), TaskWorkflow::transition(), plan()). Inside a transaction the lock is held until the
+ * transaction ends, and plan() reads the queue with a locking read: the next layout always sees the committed
+ * result of the previous one, two tasks created at once never get the same time.
  */
 class TaskPlanner
 {
@@ -37,8 +43,17 @@ class TaskPlanner
     /** A move of an auto task people are told about (another day is always told). */
     public const NOTICEABLE_MOVE = 1800;
 
+    /** Seconds a change waits for the layout lock of an executor. */
+    public const LOCK_TIMEOUT = 10;
+
+    /** What a person is told when the lock was not given: the change is refused, not saved half-laid-out. */
+    public const BUSY_MESSAGE = 'Расписание сотрудника сейчас пересчитывается — повторите через несколько секунд.';
+
     /** @var int|null "now" of a test */
     public $now;
+
+    /** @var true[] layout locks held until the current transaction ends: lock name => true */
+    protected static $held = [];
 
     /**
      * Lays out the active tasks of one executor.
@@ -48,34 +63,89 @@ class TaskPlanner
     public function plan(CmsUser $user, array $sortTaskIds = []): void
     {
         // One layout of an executor at a time: two changes at once must not give two different layouts.
-        $lock = 'cms-task-plan-'.(int)$user->id;
-        if (!$this->lock($lock)) {
-            \Yii::warning('Task plan of user '.(int)$user->id.' is busy, skipped.', self::class);
-            return;
+        // A busy lock is an error of the operation (rolled back with it), never a silently skipped layout.
+        $name = static::lockName((int)$user->id);
+        $wasHeld = isset(static::$held[$name]);
+        if (!static::lockExecutors([(int)$user->id])) {
+            throw new \yii\base\Exception(static::BUSY_MESSAGE);
         }
 
         try {
-            $placements = $this->layout($user, $this->loadTasks((int)$user->id), $sortTaskIds);
+            $placements = $this->layout($user, $this->loadTasks((int)$user->id, true), $sortTaskIds);
             foreach ($placements as $id => $values) {
                 CmsTask::updateAll($values, ['id' => $id]);
             }
         } finally {
-            $this->unlock($lock);
+            // Outside a transaction the lock is released here; inside one — when it ends.
+            if (!$wasHeld && !isset(static::$held[$name])) {
+                static::release($name);
+            }
         }
+    }
+
+    /**
+     * Takes the layout locks of executors, in the order of their ids (two changes never wait for each other).
+     * Inside a transaction a lock is held until it is committed or rolled back; outside one only plan() takes it
+     * and releases it itself.
+     *
+     * @return bool false when a lock was not given within LOCK_TIMEOUT seconds
+     */
+    public static function lockExecutors(array $userIds): bool
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $userIds))));
+        sort($ids);
+        $db = CmsTask::getDb();
+        $transaction = $db->getTransaction();
+        foreach ($ids as $id) {
+            $name = static::lockName($id);
+            if (isset(static::$held[$name])) {
+                continue;
+            }
+            if (!static::acquire($name)) {
+                return false;
+            }
+            if ($transaction && $transaction->isActive) {
+                if (!static::$held) {
+                    $db->on(Connection::EVENT_COMMIT_TRANSACTION, [static::class, 'releaseHeld']);
+                    $db->on(Connection::EVENT_ROLLBACK_TRANSACTION, [static::class, 'releaseHeld']);
+                }
+                static::$held[$name] = true;
+            }
+        }
+
+        return true;
+    }
+
+    /** Releases the locks held by the transaction that has just ended. */
+    public static function releaseHeld($event = null): void
+    {
+        $db = CmsTask::getDb();
+        $db->off(Connection::EVENT_COMMIT_TRANSACTION, [static::class, 'releaseHeld']);
+        $db->off(Connection::EVENT_ROLLBACK_TRANSACTION, [static::class, 'releaseHeld']);
+        $names = array_keys(static::$held);
+        static::$held = [];
+        foreach ($names as $name) {
+            static::release($name);
+        }
+    }
+
+    protected static function lockName(int $userId): string
+    {
+        return 'cms-task-plan-'.$userId;
     }
 
     /** A database lock of MySQL/MariaDB (the site has no mutex component), else the mutex when there is one. */
-    protected function lock(string $name): bool
+    protected static function acquire(string $name): bool
     {
         $db = CmsTask::getDb();
         if ($db->driverName === 'mysql') {
-            return (int)$db->createCommand('SELECT GET_LOCK(:name, 10)', [':name' => $name])->queryScalar() === 1;
+            return (int)$db->createCommand('SELECT GET_LOCK(:name, :timeout)', [':name' => $name, ':timeout' => static::LOCK_TIMEOUT])->queryScalar() === 1;
         }
 
-        return !\Yii::$app->has('mutex') || \Yii::$app->mutex->acquire($name, 10);
+        return !\Yii::$app->has('mutex') || \Yii::$app->mutex->acquire($name, static::LOCK_TIMEOUT);
     }
 
-    protected function unlock(string $name): void
+    protected static function release(string $name): void
     {
         $db = CmsTask::getDb();
         if ($db->driverName === 'mysql') {
@@ -219,9 +289,13 @@ class TaskPlanner
     }
 
     /**
-     * @return array id => task row with `worked` (seconds of work done) and `open_start` (start of an open interval)
+     * @param bool $forUpdate a locking read (MySQL/MariaDB): the latest committed rows even inside a transaction
+     *                        that began earlier, and no change of them until the layout is written
+     *
+     * @return array id => task row with `worked` (seconds of work done), `open_start` (start of an open interval)
+     *               and `first_start` (when the work on it first started)
      */
-    protected function loadTasks(int $userId): array
+    protected function loadTasks(int $userId, bool $forUpdate = false): array
     {
         $scheduleTable = CmsTaskSchedule::tableName();
         $taskTable = CmsTask::tableName();
@@ -238,6 +312,8 @@ class TaskPlanner
                 ->where(['cms_task_id' => new Expression($taskTable.'.id')])->andWhere(['not', ['end_at' => null]]),
             'open_start' => (new \yii\db\Query())->select(new Expression('MIN(start_at)'))->from($scheduleTable)
                 ->where(['cms_task_id' => new Expression($taskTable.'.id'), 'end_at' => null]),
+            'first_start' => (new \yii\db\Query())->select(new Expression('MIN(start_at)'))->from($scheduleTable)
+                ->where(['cms_task_id' => new Expression($taskTable.'.id')]),
         ];
         if (static::hasStartMode()) {
             $select[] = $taskTable.'.is_fixed_start';
@@ -247,10 +323,15 @@ class TaskPlanner
             $select[] = $taskTable.'.remind_at';
         }
 
-        $rows = (new \yii\db\Query())->select($select)->from($taskTable)
+        $db = CmsTask::getDb();
+        $command = (new \yii\db\Query())->select($select)->from($taskTable)
             ->where(['executor_id' => $userId, 'status' => CmsTask::activeStatuses()])
             ->orderBy([new Expression('CASE WHEN '.$taskTable.'.executor_sort IS NULL THEN 1 ELSE 0 END'), $taskTable.'.executor_sort' => SORT_ASC, $taskTable.'.id' => SORT_DESC])
-            ->all(CmsTask::getDb());
+            ->createCommand($db);
+        if ($forUpdate && $db->driverName === 'mysql') {
+            $command = $db->createCommand($command->getSql().' FOR UPDATE', $command->params);
+        }
+        $rows = $command->queryAll();
 
         $result = [];
         foreach ($rows as $row) {
@@ -303,18 +384,23 @@ class TaskPlanner
             }
         }
 
-        // A task in work does not move: its start is when the work started, it needs the rest of its time from now.
+        // A task in work does not move: it is fixed on when the work first started (owner's decision 3; set by
+        // TaskWorkflow when it starts), it needs the rest of its time from now.
         $cursor = $from;
         foreach ($inWork as $id => $task) {
-            $start = $this->isFixed($task) ? (int)$task['plan_start_at'] : (int)($task['open_start'] ?: ($task['plan_start_at'] ?: $now));
+            $start = (int)($task['first_start'] ?: ($task['open_start'] ?: ($task['plan_start_at'] ?: $now)));
             $end = max($now, $start) + $this->remaining($task);
             $cursor = max($cursor, $this->alignUp($end));
-            $this->put($result, $task, [
+            $values = [
                 'plan_start_at'   => $start,
                 'plan_end_at'     => $end,
                 'executor_end_at' => $end,
                 'executor_sort'   => ++$sort,
-            ], $all);
+            ];
+            if (static::hasStartMode()) {
+                $values['is_fixed_start'] = 1;
+            }
+            $this->put($result, $task, $values, $all);
         }
 
         $busy = $this->busyIntervals($tasks, $from);
@@ -375,12 +461,25 @@ class TaskPlanner
 
     protected function put(array &$result, array $task, array $values, bool $all): void
     {
-        // A reminder «N minutes before the start» moves with the start; a moved one is sent again.
-        if (isset($values['plan_start_at']) && isset($task['remind_offset']) && $task['remind_offset'] !== null) {
+        // A reminder «N minutes before the start» moves with the start; a moved one is sent again. A started task
+        // keeps its reminder: its start is now when the work started, not a time to remind of.
+        $moves = isset($values['plan_start_at']) && $task['status'] !== CmsTask::STATUS_IN_WORK;
+        if ($moves && isset($task['remind_offset']) && $task['remind_offset'] !== null) {
             $remindAt = (int)$values['plan_start_at'] - (int)$task['remind_offset'];
             if ((int)$task['remind_at'] !== $remindAt) {
                 $values['remind_at'] = $remindAt;
                 $values['reminded_at'] = null;
+            }
+        } elseif ($moves && !empty($task['remind_at']) && $task['plan_start_at']
+            && (int)$values['plan_start_at'] !== (int)$task['plan_start_at']) {
+            // A reminder of its own time moves with the task too, keeping its distance to the start; its author
+            // (`remind_by`) stays — this is not a new choice of a person.
+            $remindAt = CmsTask::followedReminderAt((int)$task['remind_at'], (int)$values['plan_start_at'] - (int)$task['plan_start_at'], $this->now());
+            if ($remindAt !== (int)$task['remind_at']) {
+                $values['remind_at'] = $remindAt;
+                if ($remindAt > $this->now()) {
+                    $values['reminded_at'] = null;
+                }
             }
         }
         if (!$all) {

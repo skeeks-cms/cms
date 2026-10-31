@@ -43,6 +43,13 @@ class m261031_100000__alter_table__cms_task_start_mode extends Migration
 
     public function safeDown()
     {
+        // Auto tasks go back to the old meaning — no start, a place in the queue (executor_sort stays): a calculated
+        // start kept here would turn them into fixed tasks on the next safeUp. Fixed tasks keep the time a person chose.
+        $schema = $this->db->getTableSchema('{{%cms_task}}', true);
+        if ($schema && $schema->getColumn('plan_start_at') && $schema->getColumn('plan_start_at')->allowNull) {
+            $this->update('{{%cms_task}}', ['plan_start_at' => null, 'plan_end_at' => null],
+                ['is_fixed_start' => 0, 'status' => ['new', 'accepted', 'on_pouse']]);
+        }
         $this->dropIndex('cms_task__executor_status_start', '{{%cms_task}}');
         $this->dropColumn('{{%cms_task}}', 'is_fixed_start');
 

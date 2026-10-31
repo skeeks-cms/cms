@@ -34,7 +34,10 @@ projectTaskSurfaceExpect(strpos($taskView, 'sx-task-content sx-surface-stack') !
 projectTaskSurfaceExpect(strpos($taskView, 'sx-task-layout sx-detail-layout sx-detail-layout--main-first') !== false, 'Task view does not use the main-first shared detail composition.');
 projectTaskSurfaceExpect(strpos($taskView, 'sx-task-layout__main sx-detail-layout__main') !== false, 'Task main column does not use the semantic detail-layout contract.');
 projectTaskSurfaceExpect(strpos($taskView, 'sx-task-layout__aside sx-detail-layout__aside') !== false, 'Task aside column does not use the semantic detail-layout contract.');
-projectTaskSurfaceExpect(strpos($taskView, 'sx-surface sx-task-description') !== false, 'Task description is not a canonical surface.');
+// The description is the body of the task's raised main surface (BackendSurfaceWidget), not a surface nested in it.
+projectTaskSurfaceExpect(preg_match("/BackendSurfaceWidget::begin\(\[\s*'raised'\s*=> true,[^\]]*'options'\s*=> \['class' => 'sx-task-main-surface'\]/s", $taskView) === 1
+    && preg_match("/'sx-task-main-surface'\],\s*\]\);\s*\?>\s*<div class=\"sx-task-description\">/s", $taskView) === 1, 'Task description is not the body of the raised main surface.');
+projectTaskSurfaceExpect(strpos($taskView, 'sx-surface sx-task-description') === false, 'Task description is a surface nested in the main surface.');
 projectTaskSurfaceExpect(strpos($calendarView, 'sx-surface sx-surface--raised sx-task-calendar__month') !== false
     && strpos($calendarView, 'sx-surface sx-surface--raised sx-task-calendar__timeline') !== false, 'Calendar grids are not raised surfaces.');
 projectTaskSurfaceExpect(strpos($reportView, 'sx-task-report sx-surface-stack') !== false, 'Task report does not use the canonical root surface stack.');

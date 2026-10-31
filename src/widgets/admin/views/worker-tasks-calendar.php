@@ -76,7 +76,7 @@ $model = $user;
                 //new sx.classes.AjaxHandlerStandartRespose(ajax); //отключение глобального загрузчика
                 new sx.classes.AjaxHandlerNotify(ajax, {
                     'error': "Изменения не сохранились",
-                    'success': "Изменения сохранены",
+                    'allow': ['error'],
                 }); //отключение глобального загрузчика
                 
                 ajax
@@ -91,6 +91,13 @@ $model = $user;
                 .onSuccess(function(e, data)
                 {
                     blocker.unblock();
+                    var response = data && data.response ? data.response : {};
+                    if (!response.success) {
+                        sx.notify.error(response.message || "Изменения не сохранились");
+                        _.delay(function() { window.location.reload(); }, 1500);
+                        return;
+                    }
+                    sx.notify.success(response.message || "Изменения сохранены");
                     
                     _.delay(function()
                     {

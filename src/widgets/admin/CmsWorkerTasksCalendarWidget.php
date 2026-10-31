@@ -58,12 +58,20 @@ class CmsWorkerTasksCalendarWidget extends Widget
                 ob_clean();
 
                 $rr = new RequestResponse();
-
-                CmsTask::recalculateTasksPriority($this->user, \Yii::$app->request->post("ids"));
-                /*$this->user->recalculateTasksPriority();*/
-
-                $rr->success = false;
-                $rr->message = "Сохранено";
+                $ids = array_values(array_unique(array_filter(array_map('intval', (array)\Yii::$app->request->post("ids")))));
+                if ($error = $this->orderError($ids)) {
+                    $rr->success = false;
+                    $rr->message = $error;
+                } else {
+                    try {
+                        CmsTask::recalculateTasksPriority($this->user, $ids);
+                        $rr->success = true;
+                        $rr->message = "Порядок задач сохранён";
+                    } catch (\yii\base\Exception $e) {
+                        $rr->success = false;
+                        $rr->message = \skeeks\cms\services\TaskPlanner::BUSY_MESSAGE;
+                    }
+                }
 
                 \Yii::$app->response->data = $rr;
                 \Yii::$app->end();
@@ -72,5 +80,22 @@ class CmsWorkerTasksCalendarWidget extends Widget
 
         $result = $this->render('worker-tasks-calendar');
         return $result;
+    }
+
+    /**
+     * Why the order cannot be saved: an empty list, or an id that is not a task of this executor the person may
+     * see (another executor's, a missing one). Nothing is laid out then.
+     */
+    protected function orderError(array $ids): ?string
+    {
+        if (!$ids) {
+            return 'Не передан порядок задач.';
+        }
+        $user = \Yii::$app->user->identity;
+        $found = CmsTask::find()->forManager($user)
+            ->andWhere([CmsTask::tableName().'.id' => $ids, CmsTask::tableName().'.executor_id' => (int)$this->user->id])
+            ->count();
+
+        return (int)$found === count($ids) ? null : 'Порядок не сохранён: в списке есть задачи другого сотрудника или недоступные вам. Обновите страницу.';
     }
 }

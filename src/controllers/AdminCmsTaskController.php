@@ -2843,9 +2843,10 @@ JS
      * - `day` (Y-m-d) with `keep_time=1` — a fixed task to another day at the same time of day, even over other
      *   tasks or outside the schedule (only a warning); `day` alone — an auto task to the first free time of that day;
      * - `mode=auto` — the start back to the planner; `plan_duration` alone — only the duration (a Gantt bar's edge);
-     * - `fixed=0|1` with `plan_start_at` — an undo restores the former start and mode exactly.
-     * A reminder of its own time moves with the task. The answer carries the former values for «Отменить».
-     * Closed tasks and the task in work do not move.
+     * - `fixed=0|1` with `plan_start_at` and `restore=1` — «Отменить» restores the former start, mode and reminder
+     *   (`remind_at`, `reminded_at`) exactly.
+     * A reminder of its own time moves with the task and keeps its author (CmsTask::beforeSave()). The answer carries
+     * the former values for «Отменить». Closed tasks and the task in work do not move (CmsTask::startChangeError()).
      */
     public function actionReschedule($pk)
     {
@@ -2864,9 +2865,8 @@ JS
         if (!\Yii::$app->user->can('cms/admin-task/manage', ['model' => $task])) {
             return ['success' => false, 'message' => 'Нет прав менять эту задачу.'];
         }
-        if (!in_array($task->status, CmsTask::activeStatuses(), true) || $task->status === CmsTask::STATUS_IN_WORK) {
-            return ['success' => false, 'message' => $task->status === CmsTask::STATUS_IN_WORK
-                ? 'Задача в работе — её время не двигается.' : 'Закрытую задачу нельзя перенести.'];
+        if ($error = $task->startChangeError()) {
+            return ['success' => false, 'message' => $error];
         }
 
         $f = \Yii::$app->formatter;
@@ -2878,6 +2878,8 @@ JS
             'plan_start_at'  => (int)$task->plan_start_at,
             'is_fixed_start' => (int)$task->is_fixed_start,
             'plan_duration'  => (int)$task->plan_duration,
+            'remind_at'      => $task->hasAttribute('remind_at') && $task->remind_at ? (int)$task->remind_at : null,
+            'reminded_at'    => $task->hasAttribute('remind_at') && $task->reminded_at ? (int)$task->reminded_at : null,
             'text'           => $text($task->plan_start_at),
         ];
 
@@ -2918,14 +2920,11 @@ JS
             $task->plan_start_at = $startAt;
             $task->is_fixed_start = $request->post('fixed') !== null ? (int)(bool)$request->post('fixed') : 1;
             $task->restoringStart = (bool)$request->post('restore');
-        }
-
-        // A reminder of its own time moves with the task (one «before the start» follows the start by itself).
-        if ($task->hasAttribute('remind_at') && $task->remind_at && $task->remind_offset === null
-            && $task->plan_start_at && $previous['plan_start_at'] && (int)$task->plan_start_at !== $previous['plan_start_at']) {
-            $moved = (int)$task->remind_at + ((int)$task->plan_start_at - $previous['plan_start_at']);
-            if ($moved > time()) {
-                $task->remind_at = $moved;
+            // «Отменить»: a reminder of its own time comes back exactly as it was, sent or not.
+            if ($task->restoringStart && $task->hasAttribute('remind_at') && $task->remind_offset === null
+                && $request->post('remind_at') !== null) {
+                $task->remind_at = (int)$request->post('remind_at') ?: null;
+                $task->reminded_at = (int)$request->post('reminded_at') ?: null;
             }
         }
 

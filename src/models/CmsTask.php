@@ -191,6 +191,19 @@ class CmsTask extends ActiveRecord
             return false;
         }
 
+        // The layout lock of the executor (and of the former one) before the queue is read: held until the save's
+        // transaction ends, so two changes at once never lay the same queue out twice (TaskPlanner).
+        if (\skeeks\cms\services\TaskPlanner::hasStartMode()
+            && !\skeeks\cms\services\TaskPlanner::lockExecutors([(int)$this->executor_id, (int)$this->getOldAttribute('executor_id')])) {
+            $this->addError('plan_start_at', \skeeks\cms\services\TaskPlanner::BUSY_MESSAGE);
+            return false;
+        }
+
+        // A reminder a person set in this save (a form, the API) as opposed to one that only follows the task.
+        $reminderChosen = $this->hasAttribute('remind_at') && ($this->_reminder !== null
+            || $this->isAttributeChanged('remind_at', false) || $this->isAttributeChanged('remind_offset', false)
+            || $this->isAttributeChanged('remind_author', false));
+
         // Every task has a start (owner's decision 31.10.2026, the column is NOT NULL): a task without one is an
         // auto task and gets the planner's provisional time at once; afterSave() lays the queue out exactly.
         $autoStart = false;
@@ -206,6 +219,13 @@ class CmsTask extends ActiveRecord
             }
             if ($this->remind_offset !== null && $this->remind_offset !== '' && $this->plan_start_at) {
                 $this->remind_at = (int)$this->plan_start_at - (int)$this->remind_offset;
+            } elseif (!$insert && !$reminderChosen && !$this->restoringStart && !$this->startingWork && $this->remind_at
+                && $this->status !== self::STATUS_IN_WORK && $this->getOldAttribute('plan_start_at') && $this->plan_start_at
+                && $this->isAttributeChanged('plan_start_at', false)) {
+                // A reminder of its own time moves with the task, keeping its distance to the start (every path:
+                // views, the API, a form); the planner does the same for the moves it makes.
+                $this->remind_at = static::followedReminderAt((int)$this->remind_at,
+                    (int)$this->plan_start_at - (int)$this->getOldAttribute('plan_start_at'), time());
             }
             if (!$this->remind_at) {
                 // An auto task gets its start (and the reminder) from the planner after saving.
@@ -214,25 +234,24 @@ class CmsTask extends ActiveRecord
                     $this->remind_offset = null;
                 }
             }
-            if ($this->isAttributeChanged('remind_at', false) && $this->remind_at && (int)$this->remind_at > time()) {
+            if (!$this->restoringStart && $this->isAttributeChanged('remind_at', false) && $this->remind_at && (int)$this->remind_at > time()) {
                 $this->reminded_at = null;
             }
             // Who set the reminder: a reminder set for oneself ignores one's quiet hours (TaskReminders).
-            // A reminder that only follows a moved start keeps its author.
-            $isChoice = $this->_reminder !== null || $this->isAttributeChanged('remind_offset', false) || $this->isAttributeChanged('remind_author', false)
-                || ($this->remind_offset === null && $this->isAttributeChanged('remind_at', false));
-            if ($this->hasAttribute('remind_by') && $isChoice) {
+            // A reminder that only follows a moved start (or comes back with «Отменить») keeps its author.
+            if ($this->hasAttribute('remind_by') && $reminderChosen && !$this->restoringStart) {
                 $userId = \Yii::$app->has('user', true) && !\Yii::$app->user->isGuest ? (int)\Yii::$app->user->id : 0;
                 $this->remind_by = $this->remind_at || $this->remind_offset !== null ? ($userId ?: ($this->remind_by ?: null)) : null;
             }
         }
 
-        // A start set by a person is fixed; an emptied start is given back to the planner.
+        // A start set by a person is fixed; an emptied start is given back to the planner. A start a package
+        // calculated (isAutoStart) leaves a new task auto: it is the planner's suggestion, not a person's choice.
         if ($this->hasAttribute('is_fixed_start')) {
             if (!$this->plan_start_at || $autoStart) {
                 $this->is_fixed_start = 0;
             } elseif ($insert) {
-                $this->is_fixed_start = 1;
+                $this->is_fixed_start = $this->isAutoStart ? 0 : 1;
             } elseif (!$this->isAttributeChanged('is_fixed_start', false) && $this->isAttributeChanged('plan_start_at', false)) {
                 $this->is_fixed_start = 1;
             }
@@ -243,13 +262,59 @@ class CmsTask extends ActiveRecord
             }
         }
 
-        if ($this->plan_start_at && $this->plan_duration) {
-            $this->plan_end_at = (int)$this->plan_start_at + (int)$this->plan_duration;
-        } else {
+        // The end follows a changed start or duration; an edit of anything else keeps the end the planner
+        // calculated (an auto task continuing after a break ends later than start + duration).
+        if (!$this->plan_start_at || !$this->plan_duration) {
             $this->plan_end_at = null;
+        } elseif ($insert || !$this->plan_end_at || $this->isAttributeChanged('plan_start_at', false) || $this->isAttributeChanged('plan_duration', false)) {
+            $this->plan_end_at = (int)$this->plan_start_at + (int)$this->plan_duration;
         }
 
         return true;
+    }
+
+    /**
+     * Every save of a task is one transaction: the layout lock taken in beforeSave() is held until it ends, and
+     * a failed layout in afterSave() rolls the change back instead of leaving it half laid out.
+     */
+    public function isTransactional($operation)
+    {
+        return $operation !== self::OP_DELETE || parent::isTransactional($operation);
+    }
+
+    /**
+     * Why the start, the duration or the mode of this task cannot change now: a closed task and the task in work
+     * (its start is when the work started) do not move — for the views, forms and the API alike.
+     * The state is the saved one: a change of the status in the same save does not open it.
+     */
+    public function startChangeError(bool $duration = false): ?string
+    {
+        if ($this->isNewRecord) {
+            return null;
+        }
+        $status = (string)$this->getOldAttribute('status');
+        if ($status === self::STATUS_IN_WORK) {
+            return $duration ? null : 'Задача в работе — её время не меняется.';
+        }
+        if (!in_array($status, static::activeStatuses(), true)) {
+            return 'Закрытую задачу нельзя перенести.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Where a reminder of its own time goes when the start moves by $delta: the same distance to the start; one
+     * that would fall into the past reminds now, one already due stays (it is not sent again).
+     */
+    public static function followedReminderAt(int $remindAt, int $delta, int $now): int
+    {
+        $moved = $remindAt + $delta;
+        if ($moved >= $now) {
+            return $moved;
+        }
+
+        return $remindAt <= $now ? $remindAt : $now;
     }
 
     public function afterSave($insert, $changedAttributes)
@@ -307,9 +372,41 @@ class CmsTask extends ActiveRecord
             static::updateAll(['executor_sort' => $maxSort + 100], ['id' => $this->id]);
         }
 
+        // A new auto task with a calculated start (isAutoStart) takes its place in the queue by that time: before
+        // the first auto task that starts later, not at the end of the queue.
+        $order = [];
+        if ($insert && $this->isAutoStart && $this->hasAttribute('is_fixed_start') && !$this->is_fixed_start && $this->executor_id) {
+            $table = static::tableName();
+            $rows = (new \yii\db\Query())->select(['id', 'plan_start_at'])->from($table)
+                ->andWhere(['executor_id' => (int)$this->executor_id, 'status' => $activeStatuses, 'is_fixed_start' => 0])
+                ->andWhere(['!=', 'id', (int)$this->id])
+                ->orderBy([new \yii\db\Expression('CASE WHEN executor_sort IS NULL THEN 1 ELSE 0 END'), 'executor_sort' => SORT_ASC, 'id' => SORT_DESC])
+                ->all(static::getDb());
+            foreach ($rows as $row) {
+                if (!in_array((int)$this->id, $order, true) && (int)$row['plan_start_at'] > (int)$this->plan_start_at) {
+                    $order[] = (int)$this->id;
+                }
+                $order[] = (int)$row['id'];
+            }
+            if (!in_array((int)$this->id, $order, true)) {
+                $order[] = (int)$this->id;
+            }
+        }
+
         foreach ($userIds as $userId) {
             $user = CmsUser::find()->andWhere([CmsUser::tableName().'.id' => $userId])->one();
-            if ($user) {
+            if (!$user) {
+                continue;
+            }
+            if ($order && $userId === (int)$this->executor_id) {
+                // Not a reorder by a person: the executor is not told about it.
+                static::$_isRecalculatingTasksPriority = true;
+                try {
+                    (new \skeeks\cms\services\TaskPlanner())->plan($user, $order);
+                } finally {
+                    static::$_isRecalculatingTasksPriority = false;
+                }
+            } else {
                 static::recalculateTasksPriority($user, []);
             }
         }
@@ -447,10 +544,25 @@ class CmsTask extends ActiveRecord
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_author'] : [], 'boolean'],
             [static::hasDeadline() ? ['deadline_at'] : [], 'integer'],
             [static::hasDeadline() ? ['deadline_at'] : [], 'default', 'value' => null],
+            // A closed task and the task in work do not move, whoever asks (views, forms, the API): checked before
+            // anything is saved. Their duration of a task in work may change (the rest of the work), not its start.
+            [
+                \skeeks\cms\services\TaskPlanner::hasStartMode() ? ['plan_start_at', 'is_fixed_start', 'plan_duration'] : ['plan_start_at', 'plan_duration'],
+                function ($attribute) {
+                    if ($this->startingWork || !$this->isAttributeChanged($attribute, false)
+                        || ($attribute === 'plan_duration' && !$this->getOldAttribute('plan_duration'))) {
+                        return;
+                    }
+                    if ($error = $this->startChangeError($attribute === 'plan_duration')) {
+                        $this->addError($attribute, $error);
+                    }
+                },
+                'skipOnEmpty' => false,
+            ],
             [
                 'remind_at',
                 function ($attribute) {
-                    if ($this->getReminder() !== 'custom' || !$this->isAttributeChanged($attribute, false)) {
+                    if ($this->restoringStart || $this->getReminder() !== 'custom' || !$this->isAttributeChanged($attribute, false)) {
                         return;
                     }
                     if (!$this->{$attribute}) {
@@ -506,8 +618,9 @@ class CmsTask extends ActiveRecord
                     }
 
                     // Any date and time may be chosen except the past (a few minutes of slack for the form);
-                    // «Отменить» of a move restores the former start, even an overdue one.
-                    if (!$this->restoringStart && (int)$this->{$attribute} < time() - 10 * 60) {
+                    // «Отменить» of a move restores the former start, even an overdue one; a started task is fixed
+                    // on when its work started.
+                    if (!$this->restoringStart && !$this->startingWork && (int)$this->{$attribute} < time() - 10 * 60) {
                         $this->addError($attribute, "Нельзя поставить задачу на прошедшее время.");
                         return false;
                     }
@@ -1206,8 +1319,8 @@ class CmsTask extends ActiveRecord
         if (!$this->hasAttribute('is_fixed_start')) {
             return 'Закрепление недоступно до обновления базы.';
         }
-        if (!in_array($this->status, static::activeStatuses(), true) || $this->status === static::STATUS_IN_WORK) {
-            return $this->status === static::STATUS_IN_WORK ? 'Задача в работе — её время не меняется.' : 'Закрытую задачу нельзя закрепить или открепить.';
+        if ($error = $this->startChangeError()) {
+            return $error;
         }
         if ((bool)$this->is_fixed_start === $fixed) {
             return null;
@@ -1235,8 +1348,21 @@ class CmsTask extends ActiveRecord
         return null;
     }
 
-    /** @var bool «Отменить» of a move: the former start is restored even when it has passed */
+    /**
+     * @var bool «Отменить» of a move: the former start (even a passed one) and the former reminder come back
+     *           exactly; the reminder keeps its author
+     */
     public $restoringStart = false;
+
+    /** @var bool the task is being started (TaskWorkflow): it is fixed on when its work started, even a past time */
+    public $startingWork = false;
+
+    /**
+     * @var bool the start of a new task was calculated by a package (TaskPlanner::nearestStart(): a call after a
+     *           proposal was opened, a reply to a mailing): the task stays auto and takes its place in the queue by
+     *           that time. Without it a start given to a new task is a person's choice and is fixed.
+     */
+    public $isAutoStart = false;
 
     /** @var string|null the reminder chosen in a form, applied on save */
     protected $_reminder;

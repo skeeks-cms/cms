@@ -2,10 +2,12 @@
     'use strict';
 
     var SCALES = {
-        // seconds per pixel, snap step of a move in seconds, width of a tick in seconds
-        day: {pps: 160 / 3600, snap: 300, tick: 3600},
-        week: {pps: 216 / 86400, snap: 300, tick: 86400},
-        month: {pps: 44 / 86400, snap: 86400, tick: 86400}
+        // seconds per pixel, snap step of a move and of a resize in seconds, width of a tick in seconds.
+        // The month moves by whole days keeping the time of day (owner's rule, as a move to another day in the
+        // list: a day there is 44 px, 5 minutes would be a fraction of a pixel).
+        day: {pps: 160 / 3600, snap: 300, resize: 300, tick: 3600},
+        week: {pps: 216 / 86400, snap: 300, resize: 300, tick: 86400},
+        month: {pps: 44 / 86400, snap: 86400, resize: 3600, tick: 86400, byDay: true}
     };
     var ROW = 34;
 
@@ -335,8 +337,8 @@
             } catch (err) {}
             e.preventDefault();
 
-            function snap(seconds) {
-                return Math.round(seconds / sc.snap) * sc.snap;
+            function snap(seconds, step) {
+                return Math.round(seconds / step) * step;
             }
 
             $(this).on('pointermove.gantt', function (ev) {
@@ -349,10 +351,15 @@
                 }
                 moved = true;
                 if (resize) {
-                    newDuration = Math.max(300, snap((task.end - task.start) + dx / sc.pps));
+                    newDuration = Math.max(300, snap((task.end - task.start) + dx / sc.pps, sc.resize));
                     bar.css('width', Math.max(6, newDuration * sc.pps));
+                } else if (sc.byDay) {
+                    // Whole days in the site's time zone: the time of day stays.
+                    var q = self.p(task.start);
+                    newStart = self.at(q.y, q.m, q.d + Math.round(dx / sc.pps / 86400), q.h, q.i);
+                    bar.css('left', (newStart - r.from) * sc.pps);
                 } else {
-                    newStart = task.start + snap(dx / sc.pps);
+                    newStart = task.start + snap(dx / sc.pps, sc.snap);
                     bar.css('left', (newStart - r.from) * sc.pps);
                 }
                 tip.text(self.label(newStart, newStart + newDuration)).css({left: (newStart - r.from) * sc.pps, top: index * ROW - 20}).show();
@@ -367,6 +374,10 @@
                 }
                 if (resize) {
                     self.save(task, {plan_duration: newDuration});
+                } else if (newStart !== task.start && sc.byDay) {
+                    // The same request as a move to another day in the list: the server keeps the time of day.
+                    var d = self.p(newStart);
+                    self.save(task, {day: d.y + '-' + (d.m < 10 ? '0' : '') + d.m + '-' + (d.d < 10 ? '0' : '') + d.d, keep_time: 1});
                 } else if (newStart !== task.start) {
                     self.save(task, {plan_start_at: newStart});
                 }
@@ -385,7 +396,7 @@
         this.el.addClass('is-busy');
         // «Было 17:40 → 18:00 · Отменить» (sx.taskMove of task-calendar.js); the bars are redrawn, the message stays.
         sx.taskMove(this.cfg.moveUrl, task.id, values, {
-            kind: values.plan_start_at ? 'time' : 'duration',
+            kind: values.day ? 'day' : (values.plan_start_at ? 'time' : 'duration'),
             done: function () {
                 self.reload();
             }
