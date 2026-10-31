@@ -29,7 +29,7 @@ workerTasksCalendarSortableExpect(
     'Worker tasks calendar does not preserve the dropOnEmpty=false behavior.'
 );
 workerTasksCalendarSortableExpect(
-    strpos($view, 'onUpdate: function()') !== false
+    strpos($view, 'onUpdate: function(event)') !== false
     && strpos($view, 'self.jSavePriorityButton.fadeIn();') !== false,
     'Worker tasks calendar does not expose saving after a completed reorder.'
 );

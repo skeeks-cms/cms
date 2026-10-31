@@ -30,8 +30,9 @@ $model = $user;
                 ?>
                 <?
                 $json = \yii\helpers\Json::encode([
-                    'url' => \Yii::$app->request->url,
-                    'id'  => $widget->id,
+                    'url'     => \Yii::$app->request->url,
+                    'id'      => $widget->id,
+                    'moveUrl' => \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']),
                 ]);
 
                 $this->registerJs(<<<JS
@@ -111,15 +112,52 @@ $model = $user;
                 providerOptions: {
                     direction: "vertical",
                     onMove: function(event) {
-                        if (event.from !== event.to && !$(event.to).children(".sx-task-tr").length) {
+                        // An empty list takes a task only when it is a day (a fixed task moves to that day).
+                        if (event.from !== event.to && !$(event.to).children(".sx-task-tr").length && !$(event.to).data("day")) {
                             return false;
                         }
                     }
                 },
-                onUpdate: function()
+                onUpdate: function(event)
                 {
+                    // A fixed (or overdue) task dropped on another day: the first free time of that day, still fixed.
+                    if (event && event.jItem && event.jItem.hasClass("sx-task-tr--fixed")) {
+                        var day = event.jContainer ? event.jContainer.data("day") : null;
+                        if (!day || event.from === event.container) {
+                            window.location.reload();
+                            return;
+                        }
+                        self.moveFixed(event.jItem.data("id"), day);
+                        return;
+                    }
                     self.jSavePriorityButton.fadeIn();
                 }
+            });
+        },
+
+        moveFixed: function(id, day)
+        {
+            var data = {day: day};
+            data[yii.getCsrfParam()] = yii.getCsrfToken();
+            var blocker = sx.block("#" + this.get('id'));
+            $.ajax({
+                url: this.get('moveUrl') + (this.get('moveUrl').indexOf('?') === -1 ? '?' : '&') + 'pk=' + id,
+                method: 'POST',
+                data: data,
+                dataType: 'json',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            }).done(function (response) {
+                if (!response || !response.success) {
+                    sx.notify.error(response && response.message ? response.message : 'Не удалось перенести задачу.');
+                } else {
+                    (response.warnings || []).forEach(function (text) { sx.notify.info(text); });
+                    sx.notify.success('Задача перенесена на ' + response.task.start_text + '.');
+                }
+            }).fail(function () {
+                sx.notify.error('Не удалось перенести задачу.');
+            }).always(function () {
+                blocker.unblock();
+                setTimeout(function () { window.location.reload(); }, 500);
             });
         },
 
@@ -241,7 +279,8 @@ JS
                     $isCan = \Yii::$app->user->id == $user->id || \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
                     $isFixed = !$task->hasAttribute('is_fixed_start') || (bool)$task->is_fixed_start;
                     $isInWork = $task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK;
-                    $class = [$isFixed || $isInWork ? 'sx-task-row-fixed' : 'sx-task-tr'];
+                    // Every task but the one in work moves: an auto one changes the queue, a fixed one goes to another day.
+                    $class = [$isInWork ? 'sx-task-row-fixed' : ($isFixed ? 'sx-task-tr sx-task-tr--fixed' : 'sx-task-tr')];
                     if (!$isCan) {
                         $class[] = 'sx-task-hidden';
                     }
@@ -261,7 +300,7 @@ JS
                     echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => ['id' => $task->id, 'executor_sort' => $task->executor_sort]]);
                     ?>
                     <td class="sx-task-calendar__handle-cell">
-                        <? if (!$isFixed && !$isInWork && $isCan) : ?>
+                        <? if (!$isInWork && $isCan) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
                                 <a href="#" class="btn sx-move-btn sx-task-calendar__move"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></a>
                             </span>
@@ -523,7 +562,7 @@ JS
                     <? endif; ?>
                     </thead>
 
-                    <tbody>
+                    <tbody data-day="<?= $date; ?>">
                     <? if (!empty($tasksByDate[$date])) : ?>
                         <? foreach ($tasksByDate[$date] as $task) : ?>
                             <?= $renderTaskRow($task); ?>

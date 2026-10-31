@@ -786,3 +786,16 @@
     white-space: nowrap;
     color: var(--sx-color-text);
 }
+
+/* «Задачи»: the same column of handles in every day, the same indent on the left as on the right. */
+.sx-worker-tasks-calendar-widget .sx-calendar-day td.sx-task-calendar__handle-cell {
+    width: 44px;
+    min-width: 44px;
+    padding-left: 12px !important;
+    padding-right: 0 !important;
+}
+
+.sx-worker-tasks-calendar-widget .sx-calendar-day td.sx-task-calendar__time-cell {
+    width: 82px;
+    min-width: 82px;
+}
