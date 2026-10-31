@@ -121,6 +121,47 @@
     outline-offset: 1px;
 }
 
+.sx-dt-pop__entry {
+    padding: 12px 12px 0;
+}
+
+.sx-dt-pop__input {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--sx-form-control-border-color, #ced4da);
+    border-radius: 10px;
+    background: var(--sx-form-control-background, #fff);
+    color: var(--sx-form-control-color, #212529);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+}
+
+.sx-dt-pop__input::placeholder {
+    color: var(--sx-form-control-placeholder-color, #8a9099);
+}
+
+.sx-dt-pop__input:focus {
+    outline: 0;
+    border-color: var(--sx-form-control-focus-border-color, var(--sx-color-accent, #ee4d7d));
+    box-shadow: var(--sx-form-control-focus-shadow, 0 0 0 3px rgba(238, 77, 125, .2));
+}
+
+.sx-dt-pop__input[aria-invalid="true"] {
+    border-color: var(--sx-color-danger, #dc3545);
+}
+
+.sx-dt-pop__hint {
+    min-height: 16px;
+    margin-top: 3px;
+    color: var(--sx-color-text-muted, #6f7484);
+    font-size: 12px;
+}
+
+.sx-dt-pop__hint.is-error {
+    color: var(--sx-color-danger-on-surface, var(--sx-color-danger, #dc3545));
+}
+
 .sx-dt-pop__body {
     display: flex;
     gap: 4px;

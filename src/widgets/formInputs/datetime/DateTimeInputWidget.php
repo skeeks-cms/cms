@@ -8,7 +8,6 @@
 namespace skeeks\cms\widgets\formInputs\datetime;
 
 use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -33,6 +32,9 @@ use yii\widgets\InputWidget;
  * from outside and firing `change` on it (or emptying the mirror) updates
  * the field.
  *
+ * The value can also be typed in the window ("05.11.2026 14:30", "5.11 14:30",
+ * "2026-11-05 14:30"): it is checked with a hint and applied by Enter.
+ *
  * Wall time is in `timeZone` (the formatter time zone by default); the
  * unix timestamp is converted, string save formats keep that wall time.
  *
@@ -42,8 +44,6 @@ class DateTimeInputWidget extends InputWidget
 {
     const TYPE_DATE = 'date';
     const TYPE_DATETIME = 'datetime';
-    /** Reserved: a period of two values. Not implemented yet (see the skill reference). */
-    const TYPE_RANGE = 'range';
 
     /** DateControl-compatible names of the types. */
     const FORMAT_DATE = self::TYPE_DATE;
@@ -67,7 +67,7 @@ class DateTimeInputWidget extends InputWidget
 
     const MONTHS_SHORT = ['янв.', 'февр.', 'мар.', 'апр.', 'мая', 'июн.', 'июл.', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.'];
 
-    /** @var string date|datetime (range is reserved) */
+    /** @var string date|datetime (a period is a separate field, not a type of this one) */
     public $type = self::TYPE_DATETIME;
 
     /** @var string "human" or a PHP date pattern, with or without the DateControl prefix "php:" */
@@ -131,9 +131,6 @@ class DateTimeInputWidget extends InputWidget
     {
         parent::init();
 
-        if ($this->type === self::TYPE_RANGE) {
-            throw new NotSupportedException('DateTimeInputWidget: the range type is reserved and not implemented yet.');
-        }
         if (!in_array($this->type, [self::TYPE_DATE, self::TYPE_DATETIME], true)) {
             throw new InvalidConfigException("DateTimeInputWidget: unknown type '{$this->type}'.");
         }

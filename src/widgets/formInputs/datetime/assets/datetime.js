@@ -333,6 +333,17 @@
         }
         host.appendChild(pop);
 
+        var entry = document.createElement('div');
+        entry.className = 'sx-dt-pop__entry';
+        entry.innerHTML = '<input type="text" class="sx-dt-pop__input" autocomplete="off" spellcheck="false"'
+            + ' placeholder="' + (cfg.type === 'date' ? 'дд.мм.гггг' : 'дд.мм.гггг чч:мм') + '"'
+            + ' aria-label="' + (cfg.type === 'date' ? 'Дата' : 'Дата и время') + ' с клавиатуры" aria-describedby="' + pop.id + '-hint">'
+            + '<div class="sx-dt-pop__hint" id="' + pop.id + '-hint" aria-live="polite"></div>';
+        var view = document.createElement('div');
+        view.className = 'sx-dt-pop__view';
+        pop.appendChild(entry);
+        pop.appendChild(view);
+
         cur = {
             root: root,
             cfg: cfg,
@@ -341,10 +352,14 @@
             sheet: sheet,
             draft: w,
             dirty: false,
-            view: 'days',
+            mode: 'days',
             month: {y: start.y, m: start.m},
-            focus: dayKey(start)
+            focus: dayKey(start),
+            view: view,
+            input: entry.querySelector('input'),
+            hint: entry.querySelector('.sx-dt-pop__hint')
         };
+        cur.input.addEventListener('input', onTyped);
 
         var trigger = part(root, 'trigger');
         trigger.setAttribute('aria-expanded', 'true');
@@ -482,6 +497,96 @@
         return html + '</div>';
     }
 
+    /* ---------- typing ---------- */
+
+    function typedText(w, cfg) {
+        return w ? format(w, cfg.type === 'date' ? 'd.m.Y' : 'd.m.Y H:i', cfg) : '';
+    }
+
+    function limitText(limit, cfg) {
+        var w = {y: +limit.slice(0, 4), m: +limit.slice(5, 7), d: +limit.slice(8, 10), H: +limit.slice(11, 13), i: +limit.slice(14, 16)};
+        return label(w, {type: cfg.type, display: 'human', tz: cfg.tz});
+    }
+
+    /**
+     * A typed value: "05.11.2026 14:30", "5.11 14:30" (this year), "05.11.26",
+     * "2026-11-05 14:30"; without a time the chosen or the default time is kept.
+     * Returns {w}, {error} or {} for an empty text.
+     */
+    function parseTyped(text, cfg) {
+        text = String(text).trim().replace(/\s+/g, ' ');
+        if (!text) {
+            return {};
+        }
+        var example = 'Не похоже на дату. Пример: 05.11.2026' + (cfg.type === 'date' ? '' : ' 14:30');
+        var t = now(cfg), m, y, mo, d, H = null, i = null;
+        if ((m = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T,]+(\d{1,2})[:.](\d{2}))?$/.exec(text))) {
+            y = +m[1]; mo = +m[2]; d = +m[3]; H = m[4]; i = m[5];
+        } else if ((m = /^(\d{1,2})[./](\d{1,2})(?:[./](\d{4}|\d{2}))?(?:[ ,]+(\d{1,2})[:.](\d{2}))?$/.exec(text))) {
+            d = +m[1]; mo = +m[2]; H = m[4]; i = m[5];
+            y = m[3] ? (m[3].length === 2 ? 2000 + +m[3] : +m[3]) : t.y;
+        } else {
+            return {error: example};
+        }
+        var day = {y: y, m: mo, d: d};
+        var back = mo >= 1 && mo <= 12 && d >= 1 ? fromNum(dayNum(day)) : null;
+        if (!back || back.m !== mo || back.d !== d) {
+            return {error: 'Такой даты нет'};
+        }
+        var w;
+        if (cfg.type === 'date') {
+            w = withTime(day, 0, 0);
+        } else if (H == null) {
+            var time = cur && cur.draft && cur.draft.H != null ? cur.draft : timeFor(day, cfg);
+            w = withTime(day, time.H, time.i);
+        } else {
+            if (+H > 23 || +i > 59) {
+                return {error: 'Время — от 00:00 до 23:59'};
+            }
+            w = withTime(day, +H, +i);
+        }
+        var k = cfg.type === 'date' ? dayKey(w) : timeKey(w);
+        if (cfg.min && k < (cfg.type === 'date' ? cfg.min.slice(0, 10) : cfg.min)) {
+            return {error: 'Не раньше: ' + limitText(cfg.min, cfg)};
+        }
+        if (cfg.max && k > (cfg.type === 'date' ? cfg.max.slice(0, 10) : cfg.max)) {
+            return {error: 'Не позже: ' + limitText(cfg.max, cfg)};
+        }
+        return {w: w};
+    }
+
+    function hint(text, error) {
+        cur.hint.textContent = text;
+        cur.hint.classList.toggle('is-error', !!error);
+        cur.input.setAttribute('aria-invalid', error ? 'true' : 'false');
+    }
+
+    /** Typing moves the draft and the month at once; Enter applies (see onPopKey). */
+    function onTyped() {
+        var r = parseTyped(cur.input.value, cur.cfg);
+        if (r.w) {
+            cur.draft = r.w;
+            cur.dirty = true;
+            cur.focus = dayKey(r.w);
+            cur.month = {y: r.w.y, m: r.w.m};
+            draw();
+            hint(label(r.w, cur.cfg));
+        } else {
+            hint(r.error || '', !!r.error);
+        }
+    }
+
+    function applyTyped() {
+        var r = parseTyped(cur.input.value, cur.cfg);
+        if (r.w) {
+            commit(r.w, true);
+        } else if (!r.error && cur.cfg.clear) {
+            commit(null, true);
+        } else {
+            hint(r.error || 'Введите дату', true);
+        }
+    }
+
     function fromDayKey(k) {
         return {y: +k.slice(0, 4), m: +k.slice(5, 7), d: +k.slice(8, 10)};
     }
@@ -508,7 +613,7 @@
         var html = '<div class="sx-dt-pop__foot">';
         if (cfg.type === 'datetime') {
             var time = cur.draft && cur.draft.H != null ? pad(cur.draft.H) + ':' + pad(cur.draft.i || 0) : 'Время';
-            html += '<button type="button" class="sx-dt-pop__time' + (cur.view === 'time' ? ' is-active' : '') + '" data-act="time" aria-label="Время: ' + time + '">' + icon('clock') + '<span>' + time + '</span></button>';
+            html += '<button type="button" class="sx-dt-pop__time' + (cur.mode === 'time' ? ' is-active' : '') + '" data-act="time" aria-label="Время: ' + time + '">' + icon('clock') + '<span>' + time + '</span></button>';
         }
         html += '<span class="sx-dt-pop__spacer"></span>';
         if (cfg.clear) {
@@ -522,8 +627,12 @@
 
     function draw(focusSelector) {
         var pop = cur.pop;
-        pop.innerHTML = '<div class="sx-dt-pop__body"><div class="sx-dt-pop__main">'
-            + (cur.view === 'time' ? drawTime() : drawDays()) + '</div>' + drawSide() + '</div>' + drawFoot();
+        if (document.activeElement !== cur.input) {
+            cur.input.value = typedText(cur.draft, cur.cfg);
+            hint('');
+        }
+        cur.view.innerHTML = '<div class="sx-dt-pop__body"><div class="sx-dt-pop__main">'
+            + (cur.mode === 'time' ? drawTime() : drawDays()) + '</div>' + drawSide() + '</div>' + drawFoot();
         place();
         var target = focusSelector && pop.querySelector(focusSelector);
         if (target) {
@@ -556,11 +665,11 @@
             cur.month = {y: cur.month.y + (m < 1 ? -1 : (m > 12 ? 1 : 0)), m: (m + 11) % 12 + 1};
             draw('[data-act="' + act + '"]');
         } else if (act === 'time') {
-            cur.view = cur.view === 'time' ? 'days' : 'time';
-            draw(cur.view === 'time' ? '.sx-dt-pop__hours .is-selected, .sx-dt-pop__hours [data-hour="9"]' : '[data-day="' + cur.focus + '"]');
+            cur.mode = cur.mode === 'time' ? 'days' : 'time';
+            draw(cur.mode === 'time' ? '.sx-dt-pop__hours .is-selected, .sx-dt-pop__hours [data-hour="9"]' : '[data-day="' + cur.focus + '"]');
             fixTimeFocus();
         } else if (act === 'days') {
-            cur.view = 'days';
+            cur.mode = 'days';
             draw('[data-day="' + cur.focus + '"]');
         } else if (act === 'clear') {
             commit(null, true);
@@ -598,7 +707,7 @@
             var b = cur.draft || withTime(fromDayKey(cur.focus), 0, 0);
             cur.draft = withTime(b, b.H != null ? b.H : 0, +btn.getAttribute('data-minute'));
             cur.dirty = true;
-            cur.view = 'days';
+            cur.mode = 'days';
             cur.focus = dayKey(cur.draft);
             draw('[data-act="done"]');
         }
@@ -606,7 +715,7 @@
 
     /** Roving focus of a time grid: the selected cell or the first allowed one. */
     function fixTimeFocus(scope) {
-        if (!cur || cur.view !== 'time') {
+        if (!cur || cur.mode !== 'time') {
             return;
         }
         ['.sx-dt-pop__hours', '.sx-dt-pop__minutes'].forEach(function (grid) {
@@ -653,6 +762,20 @@
             close(true);
             return;
         }
+        if (el === cur.input) {
+            if (key === 'Enter') {
+                e.preventDefault();
+                applyTyped();
+            }
+            if (key !== 'Tab') {
+                return;
+            }
+        } else if (/^\d$/.test(key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            // A digit typed over the calendar starts typing the date.
+            cur.input.value = '';
+            cur.input.focus();
+            return;
+        }
         if (key === 'Enter' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
             if (cur.draft) {
@@ -661,7 +784,7 @@
             return;
         }
         if (key === 'Tab') {
-            var items = Array.prototype.filter.call(cur.pop.querySelectorAll('button'), function (b) {
+            var items = Array.prototype.filter.call(cur.pop.querySelectorAll('button, input'), function (b) {
                 return !b.disabled && b.tabIndex >= 0;
             });
             var index = items.indexOf(el);
