@@ -2951,6 +2951,44 @@ JS
         ];
     }
 
+    /**
+     * The pin of a task in the lists and the card (POST `fixed=1|0`): fixing keeps the current start, unfixing
+     * gives it to the planner (the views ask the person first). Rights as for changing the task.
+     */
+    public function actionPin($pk)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (!\Yii::$app->request->isPost) {
+            throw new \yii\web\MethodNotAllowedHttpException('POST only.');
+        }
+        $query = CmsTask::find()->andWhere([CmsTask::tableName().'.id' => (int)$pk]);
+        self::initQuery($query);
+        $task = $query->one();
+        if (!$task) {
+            throw new \yii\web\NotFoundHttpException('Задача не найдена.');
+        }
+        if (!\Yii::$app->user->can('cms/admin-task/manage', ['model' => $task])) {
+            return ['success' => false, 'message' => 'Нет прав менять эту задачу.'];
+        }
+        $fixed = (bool)\Yii::$app->request->post('fixed');
+        if ($error = $task->setFixedStart($fixed)) {
+            return ['success' => false, 'message' => $error];
+        }
+        $task->refresh();
+        $f = \Yii::$app->formatter;
+
+        return [
+            'success' => true,
+            'task'    => [
+                'id'             => (int)$task->id,
+                'is_fixed_start' => (int)$task->is_fixed_start,
+                'plan_start_at'  => (int)$task->plan_start_at,
+                'text'           => $f->asDate((int)$task->plan_start_at, 'php:D j M').' '.$f->asTime((int)$task->plan_start_at, 'php:H:i'),
+            ],
+            'message' => $fixed ? 'Задача закреплена на '.$f->asTime((int)$task->plan_start_at, 'php:H:i').'.' : 'Закрепление снято: задача встала на '.$f->asDate((int)$task->plan_start_at, 'php:D j M').' '.$f->asTime((int)$task->plan_start_at, 'php:H:i').'.',
+        ];
+    }
+
     public function actionUnlinkRelatedTask($pk)
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

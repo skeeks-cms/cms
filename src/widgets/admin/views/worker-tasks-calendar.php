@@ -293,8 +293,11 @@ JS
                     <td class="sx-task-calendar__handle-cell">
                         <? if (!$isInWork && $isCan && $isFixed) : ?>
                             <? /* A fixed time: a pin instead of the grip; it moves only to another day, keeping its time. */ ?>
-                            <span title="Время закреплено: <?= $time; ?>. Изменить — в карточке или в календаре; на другой день — перетащите, время сохранится" data-toggle="tooltip">
-                                <a href="#" class="btn sx-move-btn sx-task-calendar__move sx-task-calendar__move--pin"><?= \skeeks\cms\backend\helpers\BackendIcon::render('pin', ['size' => 16]); ?></a>
+                            <span title="Время закреплено: <?= $time; ?>. Нажмите, чтобы снять закрепление; изменить время — в карточке или в календаре; на другой день — перетащите, время сохранится" data-toggle="tooltip">
+                                <a href="#" class="btn sx-move-btn sx-task-calendar__move sx-task-calendar__move--pin"
+                                   data-sx-task-pin="<?= (int)$task->id; ?>" data-fixed="1" data-time="<?= $time; ?>"
+                                   data-reminder="<?= $task->hasAttribute('remind_at') && $task->remind_at && !$task->reminded_at ? 1 : 0; ?>"
+                                   data-url="<?= \yii\helpers\Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/pin'])); ?>"><?= \skeeks\cms\backend\helpers\BackendIcon::render('pin', ['size' => 16]); ?></a>
                             </span>
                         <? elseif (!$isInWork && $isCan) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
@@ -309,6 +312,11 @@ JS
                             <? endif; ?>
                             <?= $time; ?>
                             <? if ($isFixed && !($isCan && !$isInWork)) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
+                            <? if (!$isFixed && $isCan && !$isInWork) : ?>
+                                <button type="button" class="sx-task-pin-toggle" title="Закрепить на <?= $time; ?>" data-toggle="tooltip"
+                                        data-sx-task-pin="<?= (int)$task->id; ?>" data-fixed="0" data-time="<?= $time; ?>"
+                                        data-url="<?= \yii\helpers\Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/pin'])); ?>"><?= \skeeks\cms\models\CmsTask::icon('pin', 12); ?></button>
+                            <? endif; ?>
                         </span>
                         <span class="sx-task-calendar__duration"><?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText((int)$task->plan_duration); ?></span>
                     </td>

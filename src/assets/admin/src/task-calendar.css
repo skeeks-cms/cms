@@ -895,3 +895,54 @@
     font-weight: 600;
     line-height: 16px;
 }
+
+/* The pin toggle and its confirmation. */
+.sx-task-pin-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--sx-color-text-muted);
+    opacity: .45;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.sx-task-pin-toggle:hover,
+.sx-task-pin-toggle.is-fixed {
+    opacity: 1;
+    color: var(--sx-color-accent);
+}
+
+.sx-task-confirm {
+    position: fixed;
+    inset: 0;
+    z-index: 2100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, .35);
+}
+
+.sx-task-confirm__box {
+    max-width: 440px;
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--sx-color-surface);
+    color: var(--sx-color-text);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
+    line-height: 1.45;
+}
+
+.sx-task-confirm__buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}

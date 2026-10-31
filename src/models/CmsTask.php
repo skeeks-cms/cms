@@ -169,6 +169,8 @@ class CmsTask extends ActiveRecord
                     'reminded_at',
                     'replanned_from',
                     'replanned_at',
+                    // The pin is logged by setFixedStart() in words: «Закреплено на 17:40» / «Закрепление снято».
+                    'is_fixed_start',
                 ],
                 'relation_map' => [
                     'cms_project_id' => 'cmsProject',
@@ -1190,6 +1192,47 @@ class CmsTask extends ActiveRecord
             'title'       => $this->deadlineText,
             'data-toggle' => 'tooltip',
         ]);
+    }
+
+    /**
+     * The pin of a task (owner, 31.10.2026): fixing keeps the current start; unfixing gives the start back to
+     * the planner (it may change at once). A history record names it and the author; the API does it without
+     * a confirmation. Closed tasks and the task in work are refused.
+     *
+     * @return string|null an error, null when done
+     */
+    public function setFixedStart(bool $fixed): ?string
+    {
+        if (!$this->hasAttribute('is_fixed_start')) {
+            return 'Закрепление недоступно до обновления базы.';
+        }
+        if (!in_array($this->status, static::activeStatuses(), true) || $this->status === static::STATUS_IN_WORK) {
+            return $this->status === static::STATUS_IN_WORK ? 'Задача в работе — её время не меняется.' : 'Закрытую задачу нельзя закрепить или открепить.';
+        }
+        if ((bool)$this->is_fixed_start === $fixed) {
+            return null;
+        }
+        $time = \Yii::$app->formatter->asDate((int)$this->plan_start_at, 'php:j M').' '.\Yii::$app->formatter->asTime((int)$this->plan_start_at, 'php:H:i');
+        $this->is_fixed_start = (int)$fixed;
+        if (!$this->save(true, ['is_fixed_start', 'plan_end_at', 'updated_at', 'updated_by'])) {
+            return implode(' ', $this->getFirstErrors()) ?: 'Не удалось сохранить.';
+        }
+
+        $log = new CmsLog();
+        $log->model_code = $this->skeeksModelCode;
+        $log->model_id = $this->id;
+        $log->model_as_text = $this->asText;
+        $log->log_type = CmsLog::LOG_TYPE_UPDATE;
+        $log->data = ['is_fixed_start' => [
+            'name' => 'Закрепление',
+            'old'  => $fixed ? 'по графику' : 'закреплено на '.$time,
+            'new'  => $fixed ? 'Закреплено на '.$time : 'Закрепление снято (было '.$time.')',
+        ]];
+        if (!$log->save()) {
+            \Yii::warning('Task pin log: '.json_encode($log->getErrors(), JSON_UNESCAPED_UNICODE), self::class);
+        }
+
+        return null;
     }
 
     /** @var bool «Отменить» of a move: the former start is restored even when it has passed */

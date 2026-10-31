@@ -307,3 +307,67 @@
         e.preventDefault();
     });
 }(sx, sx.$));
+
+/**
+ * The pin of a task as a toggle (owner, 31.10.2026): [data-sx-task-pin] — fixing keeps the current start at once;
+ * unfixing asks first («Снять закрепление с 17:40?», «Снять» / «Оставить»), mentioning a reminder when there is one.
+ */
+(function (sx, $) {
+    'use strict';
+
+    sx.taskConfirm = function (html, okLabel, cancelLabel, onOk) {
+        var overlay = $('<div class="sx-task-confirm" role="dialog" aria-modal="true"></div>');
+        var box = $('<div class="sx-task-confirm__box"></div>').appendTo(overlay);
+        $('<div class="sx-task-confirm__text"></div>').html(html).appendTo(box);
+        var buttons = $('<div class="sx-task-confirm__buttons"></div>').appendTo(box);
+        var close = function () { overlay.remove(); $(document).off('keydown.sxconfirm'); };
+        $('<button type="button" class="btn btn-default btn-sm"></button>').text(cancelLabel).on('click', close).appendTo(buttons);
+        $('<button type="button" class="btn btn-primary btn-sm"></button>').text(okLabel).on('click', function () {
+            close();
+            onOk();
+        }).appendTo(buttons);
+        overlay.on('click', function (e) { if (e.target === overlay[0]) { close(); } });
+        $(document).on('keydown.sxconfirm', function (e) { if (e.key === 'Escape') { close(); } });
+        overlay.appendTo('body');
+        buttons.find('.btn-default').trigger('focus');
+    };
+
+    function pin(el, fixed) {
+        var data = {fixed: fixed ? 1 : 0};
+        data[yii.getCsrfParam()] = yii.getCsrfToken();
+        var url = el.data('url');
+        $.ajax({
+            url: url + (url.indexOf('?') === -1 ? '?' : '&') + 'pk=' + el.data('sxTaskPin'),
+            method: 'POST',
+            data: data,
+            dataType: 'json',
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        }).done(function (response) {
+            if (!response || !response.success) {
+                sx.notify.error(response && response.message ? response.message : 'Не удалось изменить закрепление.');
+                return;
+            }
+            sx.notify.success(response.message);
+            setTimeout(function () { window.location.reload(); }, 900);
+        }).fail(function () {
+            sx.notify.error('Не удалось изменить закрепление.');
+        });
+    }
+
+    $(document).on('click', '[data-sx-task-pin]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var el = $(this);
+        if (!el.data('fixed')) {
+            pin(el, true);
+            return;
+        }
+        var esc = function (t) { return $('<span>').text(t || '').html(); };
+        var html = '<b>Снять закрепление с ' + esc(el.data('time')) + '?</b><br>Задача станет обычной, и система сама поставит её '
+            + 'в свободное время. Если вы обещали это время клиенту, лучше перенесите задачу в карточке.';
+        if (el.data('reminder')) {
+            html += '<br><br>Напоминание тоже сдвинется вместе с задачей.';
+        }
+        sx.taskConfirm(html, 'Снять', 'Оставить', function () { pin(el, false); });
+    });
+}(sx, sx.$));
