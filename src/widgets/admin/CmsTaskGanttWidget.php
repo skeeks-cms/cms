@@ -101,7 +101,7 @@ class CmsTaskGanttWidget extends Widget
                 'status'    => (string)$task->status,
                 'statusText'=> (string)$task->statusAsText,
                 'inWork'    => $task->status === CmsTask::STATUS_IN_WORK,
-                'late'      => $task->status !== CmsTask::STATUS_IN_WORK && $start < time() - 60,
+                'late'      => (!$task->hasAttribute('is_fixed_start') || $task->is_fixed_start) && $task->status !== CmsTask::STATUS_IN_WORK && $start < time() - 60,
                 'movable'   => $canManage && $task->status !== CmsTask::STATUS_IN_WORK,
                 'project'   => $task->cmsProject ? (string)$task->cmsProject->name : '',
                 'client'    => (string)$client,

@@ -131,7 +131,8 @@ JS
                     <? if ($task->plan_start_at) : ?>
                         <?
                         $isFixedStart = !$task->hasAttribute('is_fixed_start') || $task->is_fixed_start;
-                        $isLateStart = $task->plan_start_at < time() - 60 && $task->status !== \skeeks\cms\models\CmsTask::STATUS_IN_WORK
+                        // Only a fixed time can be overdue: an auto task whose time passed waits in the queue.
+                        $isLateStart = $isFixedStart && $task->plan_start_at < time() - 60 && $task->status !== \skeeks\cms\models\CmsTask::STATUS_IN_WORK
                             && in_array($task->status, \skeeks\cms\models\CmsTask::activeStatuses(), true);
                         ?>
                         <span title="<?= $isFixedStart ? 'Закреплена на это время' : 'Время рассчитано по графику и очереди'; ?>" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at, "d MMMM y 'г'., HH:mm"); ?></span>

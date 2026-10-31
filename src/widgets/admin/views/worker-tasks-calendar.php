@@ -307,7 +307,7 @@ JS
                         <? endif; ?>
                     </td>
                     <td class="sx-task-calendar__time-cell">
-                        <span class="sx-task-calendar__time <?= $isFixed ? 'is-fixed' : 'is-auto'; ?>" title="<?= \yii\helpers\Html::encode($hint); ?>" data-toggle="tooltip">
+                        <span class="sx-task-calendar__time <?= $isFixed ? 'is-fixed' : 'is-auto'; ?> <?= $withDate ? 'is-dated' : ''; ?>" title="<?= \yii\helpers\Html::encode($hint); ?>" data-toggle="tooltip">
                             <? if ($withDate && $start) : ?>
                                 <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
                             <? endif; ?>

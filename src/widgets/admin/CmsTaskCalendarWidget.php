@@ -191,7 +191,7 @@ class CmsTaskCalendarWidget extends Widget
 
     public function isLate(CmsTask $task): bool
     {
-        return $this->isActive($task) && $task->status !== CmsTask::STATUS_IN_WORK && (int)$task->plan_start_at < time() - 60;
+        return $this->isActive($task) && $this->isFixed($task) && $task->status !== CmsTask::STATUS_IN_WORK && (int)$task->plan_start_at < time() - 60;
     }
 
     /** CSS classes of a task item. */

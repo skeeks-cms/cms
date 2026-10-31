@@ -799,3 +799,9 @@
     width: 82px;
     min-width: 82px;
 }
+
+/* An overdue row shows its date: the date and the time in one muted colour. */
+.sx-worker-tasks-calendar-widget .sx-task-calendar__time.is-dated {
+    color: var(--sx-color-text-muted);
+    font-weight: 500;
+}
