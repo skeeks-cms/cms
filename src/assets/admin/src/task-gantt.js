@@ -172,6 +172,8 @@
         this.el.find('[data-gantt-scale]').removeClass('btn-primary').addClass('btn-default')
             .filter('[data-gantt-scale="' + this.scale + '"]').removeClass('btn-default').addClass('btn-primary');
         this.el.find('[data-gantt-title]').text(this.title(r));
+        // «Сегодня» is needed only away from the current period.
+        this.el.find('[data-gantt-today]').toggle(!(this.now >= r.from && this.now < r.to));
 
         var side = $('<div class="sx-task-gantt__side"><div class="sx-task-gantt__side-head">Задача</div></div>');
         var main = $('<div class="sx-task-gantt__main"></div>');

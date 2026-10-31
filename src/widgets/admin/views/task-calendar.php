@@ -97,19 +97,25 @@ $lanes = static function (array $dayTasks) {
 <?
 ob_start();
 ?>
-    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(-1)])); ?>" title="Назад"><?= \skeeks\cms\backend\helpers\BackendIcon::render('chevron-left', ['size' => 16]); ?></a>
-    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $today])); ?>">Сегодня</a>
-    <a class="btn btn-default btn-sm" href="<?= Html::encode($widget->url(['date' => $widget->shift(1)])); ?>" title="Вперёд"><?= \skeeks\cms\backend\helpers\BackendIcon::render('chevron-right', ['size' => 16]); ?></a>
-    <h2 class="sx-task-calendar__title"><?= Html::encode($widget->title()); ?></h2>
-<?
-$start = ob_get_clean();
-ob_start();
-?>
     <div class="btn-group sx-task-calendar__modes" role="group">
         <? foreach ([CmsTaskCalendarWidget::MODE_DAY => 'День', CmsTaskCalendarWidget::MODE_WEEK => 'Неделя', CmsTaskCalendarWidget::MODE_MONTH => 'Месяц'] as $mode => $label) : ?>
             <a class="btn btn-sm <?= $widget->mode === $mode ? 'btn-primary' : 'btn-default'; ?>" href="<?= Html::encode($widget->url(['mode' => $mode])); ?>"><?= $label; ?></a>
         <? endforeach; ?>
     </div>
+<?
+$start = ob_get_clean();
+[$periodFrom, $periodTo] = $widget->range();
+$isCurrent = time() >= $periodFrom->getTimestamp() && time() < $periodTo->getTimestamp();
+ob_start();
+?>
+    <div class="sx-task-period">
+        <a class="sx-task-period__arrow" href="<?= Html::encode($widget->url(['date' => $widget->shift(-1)])); ?>" title="Назад"><?= \skeeks\cms\backend\helpers\BackendIcon::render('chevron-left', ['size' => 16]); ?></a>
+        <span class="sx-task-period__label"><?= Html::encode($widget->title()); ?></span>
+        <a class="sx-task-period__arrow" href="<?= Html::encode($widget->url(['date' => $widget->shift(1)])); ?>" title="Вперёд"><?= \skeeks\cms\backend\helpers\BackendIcon::render('chevron-right', ['size' => 16]); ?></a>
+    </div>
+    <? if (!$isCurrent) : ?>
+        <a class="btn btn-default btn-sm sx-task-period__today" href="<?= Html::encode($widget->url(['date' => $today])); ?>">Сегодня</a>
+    <? endif; ?>
 <?
 $tools = ob_get_clean();
 echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $widget->context, 'start' => $start, 'tools' => $tools]);

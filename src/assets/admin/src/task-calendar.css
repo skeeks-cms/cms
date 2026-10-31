@@ -746,3 +746,43 @@
 .sx-task-deadlines__column.is-weekend .sx-task-deadlines__head {
     color: var(--sx-tc-danger);
 }
+
+/* The period of a view: «‹ 9 нояб. — 15 нояб. ›» as one control; «Сегодня» apart. */
+.sx-task-period {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    border: 1px solid var(--sx-color-border);
+    border-radius: 8px;
+    background: var(--sx-color-surface);
+    overflow: hidden;
+}
+
+.sx-task-period__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--sx-color-text-muted);
+    cursor: pointer;
+}
+
+.sx-task-period__arrow:hover {
+    color: var(--sx-color-accent);
+    background: var(--sx-color-surface-muted);
+    text-decoration: none;
+}
+
+.sx-task-period__label {
+    min-width: 150px;
+    padding: 0 6px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--sx-color-text);
+}

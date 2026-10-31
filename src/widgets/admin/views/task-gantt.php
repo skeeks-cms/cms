@@ -12,17 +12,19 @@ use yii\helpers\Html;
 <?= Html::beginTag('div', $widget->options); ?>
 <?= \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget([
     'context' => $widget->context,
-    'start'   => '<button type="button" class="btn btn-default btn-sm" data-gantt-shift="-1" title="Назад">'.\skeeks\cms\backend\helpers\BackendIcon::render('chevron-left', ['size' => 16]).'</button>'
-        .'<button type="button" class="btn btn-default btn-sm" data-gantt-today>Сегодня</button>'
-        .'<button type="button" class="btn btn-default btn-sm" data-gantt-shift="1" title="Вперёд">'.\skeeks\cms\backend\helpers\BackendIcon::render('chevron-right', ['size' => 16]).'</button>'
-        .'<h2 class="sx-task-calendar__title" data-gantt-title></h2>',
-    'tools'   => '<select class="form-control form-control-sm sx-task-gantt__group" data-gantt-group title="Группировка">'
+    'start'   => '<select class="form-control form-control-sm sx-task-gantt__group" data-gantt-group title="Группировка">'
         .'<option value="">Без групп</option><option value="project">По проекту</option><option value="client">По клиенту</option></select>'
         .'<div class="btn-group" role="group">'
         .'<button type="button" class="btn btn-sm btn-default" data-gantt-scale="day">День</button>'
         .'<button type="button" class="btn btn-sm btn-default" data-gantt-scale="week">Неделя</button>'
         .'<button type="button" class="btn btn-sm btn-default" data-gantt-scale="month">Месяц</button>'
         .'</div>',
+    'tools'   => '<div class="sx-task-period">'
+        .'<button type="button" class="sx-task-period__arrow" data-gantt-shift="-1" title="Назад">'.\skeeks\cms\backend\helpers\BackendIcon::render('chevron-left', ['size' => 16]).'</button>'
+        .'<span class="sx-task-period__label" data-gantt-title></span>'
+        .'<button type="button" class="sx-task-period__arrow" data-gantt-shift="1" title="Вперёд">'.\skeeks\cms\backend\helpers\BackendIcon::render('chevron-right', ['size' => 16]).'</button>'
+        .'</div>'
+        .'<button type="button" class="btn btn-default btn-sm sx-task-period__today" data-gantt-today>Сегодня</button>',
 ]); ?>
 <div class="sx-task-gantt__legend">
     <span><i class="sx-task-gantt__swatch is-fixed"></i> закреплено на время</span>
