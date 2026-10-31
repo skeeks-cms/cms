@@ -369,7 +369,8 @@
 /* «Сроки» */
 .sx-task-deadlines__board {
     display: grid;
-    grid-template-columns: repeat(5, minmax(220px, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 1fr);
     grid-template-rows: minmax(0, 1fr);
     gap: 12px;
     overflow-x: auto;
@@ -547,7 +548,7 @@
     }
 
     .sx-task-deadlines__board {
-        grid-template-columns: repeat(5, minmax(78vw, 1fr));
+        grid-auto-columns: minmax(78vw, 1fr);
         scroll-snap-type: x mandatory;
     }
 
@@ -736,4 +737,12 @@
 .sx-worker-tasks-calendar-widget .sx-expired-tasks__toggle td {
     padding: 10px !important;
     text-align: center;
+}
+
+.sx-task-deadlines__column.is-weekend {
+    opacity: .85;
+}
+
+.sx-task-deadlines__column.is-weekend .sx-task-deadlines__head {
+    color: var(--sx-tc-danger);
 }

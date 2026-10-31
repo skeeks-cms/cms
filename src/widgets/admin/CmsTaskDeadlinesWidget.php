@@ -26,6 +26,9 @@ class CmsTaskDeadlinesWidget extends Widget
     /** @var TaskViewContext|null whose tasks and the search; null — the employee $user, fixed */
     public $context;
 
+    /** Day columns after «Просрочены»: today, tomorrow and the rest of a week. */
+    public const DAYS = 7;
+
     /** @var int cards drawn in a column */
     public $columnLimit = 60;
 
@@ -41,22 +44,25 @@ class CmsTaskDeadlinesWidget extends Widget
 
         $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
         $today = new \DateTime('today', $tz);
-        $tomorrow = (clone $today)->modify('+1 day');
-        $afterTomorrow = (clone $today)->modify('+2 days');
-        $nextWeek = (clone $today)->modify('+'.(8 - (int)$today->format('N')).' days');
-
         $f = \Yii::$app->formatter;
-        $columns = [
-            'late'     => ['title' => 'Просрочены', 'day' => null, 'sub' => '', 'tasks' => []],
-            'today'    => ['title' => 'Сегодня', 'day' => $today->format('Y-m-d'), 'sub' => $f->asDate($today->getTimestamp(), 'php:D, j M'), 'tasks' => []],
-            'tomorrow' => ['title' => 'Завтра', 'day' => $tomorrow->format('Y-m-d'), 'sub' => $f->asDate($tomorrow->getTimestamp(), 'php:D, j M'), 'tasks' => []],
-        ];
-        if ($afterTomorrow < $nextWeek) {
-            $columns['week'] = ['title' => 'На этой неделе', 'day' => $afterTomorrow->format('Y-m-d'),
-                'sub' => 'до '.$f->asDate((clone $nextWeek)->modify('-1 day')->getTimestamp(), 'php:D, j M'), 'tasks' => []];
+
+        // Overdue, then a column for every day of the coming week (owner, 31.10.2026), then «Позже».
+        $columns = ['late' => ['title' => 'Просрочены', 'day' => null, 'sub' => '', 'from' => null, 'tasks' => []]];
+        for ($i = 0; $i < static::DAYS; $i++) {
+            $day = (clone $today)->modify('+'.$i.' day');
+            $title = $i === 0 ? 'Сегодня' : ($i === 1 ? 'Завтра' : mb_convert_case($f->asDate($day->getTimestamp(), 'php:l'), MB_CASE_TITLE));
+            $columns['d'.$i] = [
+                'title'   => $title,
+                'day'     => $day->format('Y-m-d'),
+                'sub'     => $f->asDate($day->getTimestamp(), $i < 2 ? 'php:D, j M' : 'php:j M'),
+                'from'    => $day->getTimestamp(),
+                'weekend' => (int)$day->format('N') >= 6,
+                'tasks'   => [],
+            ];
         }
-        $columns['later'] = ['title' => 'Позже', 'day' => max($nextWeek, $afterTomorrow)->format('Y-m-d'),
-            'sub' => 'с '.$f->asDate(max($nextWeek, $afterTomorrow)->getTimestamp(), 'php:j M'), 'tasks' => []];
+        $laterDay = (clone $today)->modify('+'.static::DAYS.' day');
+        $columns['later'] = ['title' => 'Позже', 'day' => $laterDay->format('Y-m-d'),
+            'sub' => 'с '.$f->asDate($laterDay->getTimestamp(), 'php:j M'), 'from' => $laterDay->getTimestamp(), 'tasks' => []];
 
         $query = CmsTask::find()
             ->andWhere(['executor_id' => (int)$this->user->id, 'status' => CmsTask::activeStatuses()])
@@ -66,16 +72,14 @@ class CmsTaskDeadlinesWidget extends Widget
         $now = time();
         foreach ($tasks as $task) {
             $start = (int)$task->plan_start_at;
-            if ($task->status !== CmsTask::STATUS_IN_WORK && $start < $now - 60) {
-                $key = 'late';
-            } elseif ($start < $tomorrow->getTimestamp()) {
-                $key = 'today';
-            } elseif ($start < $afterTomorrow->getTimestamp()) {
-                $key = 'tomorrow';
-            } elseif (isset($columns['week']) && $start < $nextWeek->getTimestamp()) {
-                $key = 'week';
-            } else {
-                $key = 'later';
+            $key = 'late';
+            if ($task->status === CmsTask::STATUS_IN_WORK || $start >= $now - 60) {
+                $key = 'd0';
+                foreach ($columns as $code => $column) {
+                    if ($column['from'] !== null && $start >= $column['from']) {
+                        $key = $code;
+                    }
+                }
             }
             $columns[$key]['tasks'][] = $task;
         }

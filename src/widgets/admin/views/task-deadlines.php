@@ -20,7 +20,7 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
 </p>
 <div class="sx-task-deadlines__board" data-sx-task-deadlines data-sx-fit-screen="height" id="<?= $widget->id; ?>-board" data-move-url="<?= Html::encode($moveUrl); ?>">
     <? foreach ($columns as $key => $column) : ?>
-        <div class="sx-task-deadlines__column <?= $key === 'late' ? 'is-late' : ''; ?>" data-sx-deadlines-column="<?= $key; ?>" data-day="<?= Html::encode((string)$column['day']); ?>">
+        <div class="sx-task-deadlines__column <?= $key === 'late' ? 'is-late' : ''; ?> <?= !empty($column['weekend']) ? 'is-weekend' : ''; ?>" data-sx-deadlines-column="<?= $key; ?>" data-day="<?= Html::encode((string)$column['day']); ?>">
             <div class="sx-task-deadlines__head">
                 <span><?= Html::encode($column['title']); ?> <span class="sx-task-deadlines__sub"><?= Html::encode($column['sub']); ?></span></span>
                 <span class="sx-task-deadlines__sub"><?= count($column['tasks']); ?></span>
@@ -40,7 +40,7 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
                             <span class="sx-task-deadlines__handle" data-sx-deadlines-handle title="Перетащите в другую колонку"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></span>
                         <? endif; ?>
                         <div class="sx-task-deadlines__card-time">
-                            <span><?= in_array($key, ['today', 'tomorrow'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
+                            <span><?= in_array($key, ['d0', 'd1'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
                             <? if ($isFixed) : ?><span title="Закреплено на это время"><?= \skeeks\cms\models\CmsTask::icon('pin', 12); ?></span><? endif; ?>
                             <?= $task->reminderIconHtml; ?>
                             <?= $task->replannedIconHtml; ?>
