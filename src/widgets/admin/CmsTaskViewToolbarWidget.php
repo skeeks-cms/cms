@@ -15,8 +15,8 @@ use yii\helpers\Html;
 
 /**
  * One toolbar of every task view, the same order, size and behaviour everywhere (owner, 31.10.2026):
- * the search first, then the employee (when the viewer may choose), then the view's own controls
- * (period, scale, grouping); «Добавить задачу» on the right.
+ * the first row — the search, the employee (when the viewer may choose) and «Добавить задачу» on the right;
+ * the second row — the view's own controls (period, title, grouping, scale), only when the view has them.
  */
 class CmsTaskViewToolbarWidget extends Widget
 {
@@ -31,6 +31,9 @@ class CmsTaskViewToolbarWidget extends Widget
 
     /** @var bool */
     public $showAdd = true;
+
+    /** @var string hidden controls that appear on their own (the floating «Сохранить порядок задач») */
+    public $floating = '';
 
     public function run()
     {
@@ -86,11 +89,15 @@ class CmsTaskViewToolbarWidget extends Widget
 
         return Html::tag('form',
             $hidden
-            .Html::tag('div', $search.$user
-                .($this->start !== '' ? Html::tag('div', $this->start, ['class' => 'sx-task-toolbar__group']) : '')
+            .$this->floating
+            .Html::tag('div',
+                Html::tag('div', $search.$user, ['class' => 'sx-task-toolbar__start'])
+                .Html::tag('div', $this->showAdd ? $this->addButton() : '', ['class' => 'sx-task-toolbar__end']),
+                ['class' => 'sx-task-toolbar__row'])
+            .($this->start !== '' || $this->tools !== '' ? Html::tag('div',
+                ($this->start !== '' ? Html::tag('div', $this->start, ['class' => 'sx-task-toolbar__group']) : '')
                 .($this->tools !== '' ? Html::tag('div', $this->tools, ['class' => 'sx-task-toolbar__group']) : ''),
-                ['class' => 'sx-task-toolbar__start'])
-            .Html::tag('div', $this->showAdd ? $this->addButton() : '', ['class' => 'sx-task-toolbar__end']),
+                ['class' => 'sx-task-toolbar__row sx-task-toolbar__row--view']) : ''),
             ['class' => 'sx-task-toolbar', 'method' => 'get', 'action' => '']);
     }
 

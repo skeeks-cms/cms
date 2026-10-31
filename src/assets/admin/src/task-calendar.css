@@ -565,11 +565,22 @@
 /* One toolbar of every task view (CmsTaskViewToolbarWidget): same order, size and controls. */
 .sx-task-toolbar {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.sx-task-toolbar__row {
+    display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 10px 12px;
-    margin-bottom: 14px;
+}
+
+.sx-task-toolbar__row--view {
+    justify-content: flex-start;
+    gap: 10px 16px;
 }
 
 .sx-task-toolbar__start {

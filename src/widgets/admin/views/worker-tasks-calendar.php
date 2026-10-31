@@ -19,7 +19,7 @@ $model = $user;
 
         <?= \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget([
             'context' => $widget->context,
-            'start'   => '<button type="button" class="btn btn-primary btn-sm sx-save-priority-btn">'.\skeeks\cms\backend\helpers\BackendIcon::render('check-circle', ['size' => 16]).' Сохранить порядок задач</button>',
+            'floating' => '<button type="button" class="btn btn-primary btn-sm sx-save-priority-btn">'.\skeeks\cms\backend\helpers\BackendIcon::render('check-circle', ['size' => 16]).' Сохранить порядок задач</button>',
         ]); ?>
 
         <div class="row">
