@@ -129,7 +129,7 @@ if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
 </div>
 
 <? if ($widget->mode === CmsTaskCalendarWidget::MODE_MONTH) : ?>
-    <div class="sx-task-calendar__month">
+    <div class="sx-surface sx-surface--raised sx-task-calendar__month">
         <? foreach (['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $i => $weekday) : ?>
             <div class="sx-task-calendar__weekday <?= $i >= 5 ? 'is-weekend' : ''; ?>"><?= $weekday; ?></div>
         <? endforeach; ?>
@@ -171,7 +171,7 @@ if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
                 <div class="sx-task-calendar__cell-tasks">
                     <? foreach (array_slice($dayTasks, 0, $widget->monthCellLimit) as $task) : ?>
                         <?= Html::beginTag('a', $widget->taskLinkOptions($task)); ?>
-                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?></span>
+                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<i class="fas fa-exclamation-circle" style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'"></i>' : ''; ?></span>
                             <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                         <?= Html::endTag('a'); ?>
                     <? endforeach; ?>
@@ -186,7 +186,7 @@ if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
         <? endforeach; ?>
     </div>
 <? else : ?>
-    <div class="sx-task-calendar__timeline" style="--sx-task-calendar-days: <?= count($days); ?>; --sx-task-calendar-hours: <?= $hourTo - $hourFrom; ?>;">
+    <div class="sx-surface sx-surface--raised sx-task-calendar__timeline" style="--sx-task-calendar-days: <?= count($days); ?>; --sx-task-calendar-hours: <?= $hourTo - $hourFrom; ?>;">
         <div class="sx-task-calendar__corner"></div>
         <? foreach ($days as $date) : ?>
             <?
@@ -245,7 +245,7 @@ if ($taskController = \Yii::$app->createController('/cms/admin-cms-task')) {
                     Html::addCssClass($options, 'sx-task-calendar__block');
                     ?>
                     <?= Html::beginTag('a', $options); ?>
-                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?></span>
+                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><i class="fas fa-thumbtack"></i><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<i class="fas fa-exclamation-circle" style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'"></i>' : ''; ?></span>
                         <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                     <?= Html::endTag('a'); ?>
                 <? endforeach; ?>

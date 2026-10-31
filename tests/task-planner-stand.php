@@ -77,6 +77,12 @@ try {
     $cTask = $make('C', 15);
     $d = $make('D', 180);
     $check((int)$a->is_fixed_start === 0, 'a task without a start is auto');
+    $check((int)$a->plan_start_at > 0, 'a new auto task gets a start at once (the column is NOT NULL)');
+    $nobody = new CmsTask(['name' => 'Без исполнителя', 'plan_duration' => 600]);
+    $nobody->scenario = CmsTask::SCENARIO_CLIENT_SUPPORT;
+    $check($nobody->save(false) && (int)CmsTask::findOne($nobody->id)->plan_start_at >= time() - 300, 'a task without an executor starts now');
+    $column = Yii::$app->db->getTableSchema(CmsTask::tableName(), true)->getColumn('plan_start_at');
+    $check($column && !$column->allowNull, 'the start column is NOT NULL');
 
     $planner = new TaskPlanner();
     $planner->now = $at('09:00');
@@ -103,6 +109,15 @@ try {
     $moved->plan_start_at = $at('16:00');
     $check($moved->save() && $get($a)->replanned_from === null && (int)$get($a)->is_fixed_start === 1, 'a person choosing the time removes the note');
     CmsTask::updateAll(['is_fixed_start' => 0], ['id' => (int)$a->id]);
+
+    // A deadline: the planned end after it is the mark «не успевает», before it — nothing.
+    $dTask = $get($d);
+    $dTask->deadline_at = (int)$dTask->plan_end_at - 3600;
+    $check($dTask->save(['deadline_at']) && $get($d)->isBehindDeadline() && strpos($get($d)->deadlineMarkHtml, 'не успевает') !== false,
+        'D ends after its deadline: «не успевает»');
+    $dTask = $get($d);
+    $dTask->deadline_at = (int)$dTask->plan_end_at + 3600;
+    $check($dTask->save(['deadline_at']) && !$get($d)->isBehindDeadline() && $get($d)->deadlineMarkHtml === '', 'D makes a later deadline: no mark');
 
     $planner->plan($user, [(int)$cTask->id, (int)$a->id]);
     $check($hm($get($cTask)->plan_start_at) === '09:00', 'a manual reorder puts C first');

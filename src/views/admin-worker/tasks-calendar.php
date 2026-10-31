@@ -11,4 +11,6 @@ if (!isset($model) || !$model) {
     $model = $this->context->action->model;
 }
 
+// Unassigned client requests stay on top for administrators, as before the calendar grid.
+echo \skeeks\cms\widgets\admin\CmsUnassignedClientTasksWidget::widget(['user' => $model]);
 echo \skeeks\cms\widgets\admin\CmsTaskCalendarWidget::widget(['user' => $model]);

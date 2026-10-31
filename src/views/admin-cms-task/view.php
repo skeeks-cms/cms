@@ -373,11 +373,14 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                     <span class="sx-task-deadline<?php echo $isOverdue ? ' sx-task-deadline--overdue' : ''; ?>"
                           title="Планируемое завершение">
                         <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('clock', ['size' => 14]); ?>
-                        <?php echo $isOverdue ? 'Просрочена: ' : 'Срок: '; ?><?php echo \Yii::$app->formatter->asDatetime($deadline, 'php:d.m.Y H:i'); ?>
+                        <?php echo $isOverdue ? 'Просрочена: ' : 'Закончится: '; ?><?php echo \Yii::$app->formatter->asDatetime($deadline, 'php:d.m.Y H:i'); ?>
                     </span>
                 <?php endif; ?>
                 <?php if ($model->hasAttribute('remind_at') && $model->remind_at) : ?>
                     <span class="sx-task-deadline"><?php echo $model->reminderIconHtml; ?></span>
+                <?php endif; ?>
+                <?php if ($model->isBehindDeadline()) : ?>
+                    <span class="sx-task-deadline"><?php echo $model->deadlineMarkHtml; ?></span>
                 <?php endif; ?>
             </div>
         <?php BackendSurfaceWidget::end(); ?>
@@ -560,6 +563,12 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                             </span>
                         <?php endif; ?>
                     </span>
+                </li>
+                <?php endif; ?>
+                <?php if ($model->deadlineText) : ?>
+                <li>
+                    <span class="sx-properties--name">Крайний срок</span>
+                    <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime((int)$model->deadline_at, 'php:d.m.Y H:i'); ?> <?php echo $model->deadlineMarkHtml; ?></span>
                 </li>
                 <?php endif; ?>
                 <?php if ($model->replannedText) : ?>

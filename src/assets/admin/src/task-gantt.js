@@ -218,12 +218,20 @@
             if (task.reminder) {
                 item.append($('<i class="fas fa-bell sx-task-gantt__bell"></i>').toggleClass('is-sent', task.reminded).attr('title', task.reminder));
             }
+            if (task.behind) {
+                item.append($('<span class="sx-task-gantt__behind"><i class="fas fa-exclamation-circle"></i> не успевает</span>').attr('title', task.behind));
+            }
             if (task.replanned) {
                 item.append($('<i class="fas fa-history sx-task-gantt__bell is-sent"></i>').attr('title', task.replanned));
             }
             side.append(item);
             canvas.append($('<div class="sx-task-gantt__row-line"></div>').css({top: index * ROW}));
             canvas.append(self.bar(task, index));
+            // The deadline: a red tick on the row.
+            if (task.deadline && task.deadline > r.from && task.deadline < r.to) {
+                canvas.append($('<div class="sx-task-gantt__deadline"></div>').attr('title', 'Крайний срок')
+                    .css({left: (task.deadline - r.from) * SCALES[self.scale].pps, top: index * ROW + 3}));
+            }
         });
         if (!rows.length) {
             side.append('<div class="sx-task-gantt__empty">Нет задач в этом периоде</div>');
@@ -277,11 +285,12 @@
         var width = Math.max(6, (task.end - task.start) * sc.pps);
         var bar = $('<div class="sx-task-gantt__task"></div>')
             .addClass(task.inWork ? 'is-in-work' : (task.late ? 'is-late' : (task.fixed ? 'is-fixed' : 'is-auto')))
+            .toggleClass('is-behind', !!task.behind)
             .toggleClass('is-movable', task.movable)
             .attr('data-id', task.id)
             .css({left: left, width: width, top: index * ROW + 6})
             .attr('title', task.name + ' · ' + this.label(task.start, task.end) + ' · ' + task.statusText
-                + (task.fixed ? ' · закреплено на время' : ' · по графику') + (task.reminder ? ' · ' + task.reminder : '') + (task.replanned ? ' · ' + task.replanned : ''));
+                + (task.fixed ? ' · закреплено на время' : ' · по графику') + (task.reminder ? ' · ' + task.reminder : '') + (task.replanned ? ' · ' + task.replanned : '') + (task.behind ? ' · не успевает: ' + task.behind : ''));
         var text = $('<span class="sx-task-gantt__task-text"></span>').text(this.fmtTime.format(new Date(task.start * 1000)) + ' ' + task.name);
         if (task.fixed) {
             text.prepend('<i class="fas fa-thumbtack sx-task-gantt__pin"></i> ');

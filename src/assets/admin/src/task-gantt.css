@@ -332,3 +332,30 @@
         display: none;
     }
 }
+
+.sx-task-gantt__behind {
+    flex: none;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sx-tg-danger);
+    white-space: nowrap;
+}
+
+.sx-task-gantt__task.is-behind {
+    box-shadow: inset 0 0 0 2px var(--sx-tg-danger);
+}
+
+.sx-task-gantt__deadline {
+    position: absolute;
+    z-index: 3;
+    width: 0;
+    height: calc(var(--sx-tg-row) - 6px);
+    border-left: 2px dashed var(--sx-tg-danger);
+    pointer-events: none;
+}
+
+@media (max-width: 767px) {
+    .sx-task-gantt__behind {
+        display: none;
+    }
+}

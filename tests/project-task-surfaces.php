@@ -2,7 +2,9 @@
 
 $projectView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-project/view.php');
 $taskView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-task/view.php');
-$calendarView = file_get_contents(dirname(__DIR__).'/src/views/admin-worker/tasks-calendar.php');
+// «Мой календарь» is a thin view around CmsTaskCalendarWidget (tasks, step Т-В): check both.
+$calendarView = file_get_contents(dirname(__DIR__).'/src/views/admin-worker/tasks-calendar.php')
+    .file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/task-calendar.php');
 $reportView = file_get_contents(dirname(__DIR__).'/src/views/admin-cms-task/report.php');
 
 function projectTaskSurfaceExpect($condition, $message)
@@ -33,7 +35,8 @@ projectTaskSurfaceExpect(strpos($taskView, 'sx-task-layout sx-detail-layout sx-d
 projectTaskSurfaceExpect(strpos($taskView, 'sx-task-layout__main sx-detail-layout__main') !== false, 'Task main column does not use the semantic detail-layout contract.');
 projectTaskSurfaceExpect(strpos($taskView, 'sx-task-layout__aside sx-detail-layout__aside') !== false, 'Task aside column does not use the semantic detail-layout contract.');
 projectTaskSurfaceExpect(strpos($taskView, 'sx-surface sx-task-description') !== false, 'Task description is not a canonical surface.');
-projectTaskSurfaceExpect(strpos($calendarView, "'sx-surface', 'sx-surface--raised', 'sx-worker-calendar-day'") !== false, 'Calendar day cards are not raised surfaces.');
+projectTaskSurfaceExpect(strpos($calendarView, 'sx-surface sx-surface--raised sx-task-calendar__month') !== false
+    && strpos($calendarView, 'sx-surface sx-surface--raised sx-task-calendar__timeline') !== false, 'Calendar grids are not raised surfaces.');
 projectTaskSurfaceExpect(strpos($reportView, 'sx-task-report sx-surface-stack') !== false, 'Task report does not use the canonical root surface stack.');
 projectTaskSurfaceExpect(strpos($reportView, 'sx-report-card sx-surface sx-surface--raised sx-surface--padded') !== false, 'Report cards are not raised padded surfaces.');
 

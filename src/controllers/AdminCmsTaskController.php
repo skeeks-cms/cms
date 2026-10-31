@@ -2495,6 +2495,18 @@ JS
                 ],
             ],
 
+            'deadline_at' => [
+                'class'        => WidgetField::class,
+                'label'        => 'Крайний срок',
+                'hint'         => 'Необязательно. Если по расчёту задача не успевает к этому времени, она получит пометку «не успевает».',
+                'widgetClass'  => DateTimeInputWidget::class,
+                'widgetConfig' => [
+                    'type'       => DateTimeInputWidget::TYPE_DATETIME,
+                    'saveFormat' => 'php:U',
+                    'minuteStep' => 5,
+                ],
+            ],
+
             'remind_author' => [
                 'class' => BoolField::class,
                 'label' => 'Напомнить и мне (автору задачи)',

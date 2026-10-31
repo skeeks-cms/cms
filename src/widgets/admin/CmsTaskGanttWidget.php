@@ -92,6 +92,8 @@ class CmsTaskGanttWidget extends Widget
                 'reminder'  => $task->hasAttribute('remind_at') && $task->remind_at ? $task->reminderText : '',
                 'reminded'  => $task->hasAttribute('reminded_at') && (bool)$task->reminded_at,
                 'replanned' => $task->replannedText,
+                'behind'    => $task->isBehindDeadline() ? $task->deadlineText : '',
+                'deadline'  => $task->hasAttribute('deadline_at') && $task->deadline_at ? (int)$task->deadline_at : null,
                 'url'       => (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-task/view', 'pk' => $task->id])
                     ->enableEmptyLayout()->enableNoActions()->url,
             ];

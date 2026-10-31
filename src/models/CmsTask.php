@@ -41,6 +41,7 @@ use yii\helpers\ArrayHelper;
  * @property int                 $remind_author Напомнить и автору
  * @property int|null            $reminded_at Когда напоминание отправлено
  * @property int|null            $remind_by Кто поставил напоминание
+ * @property int|null            $deadline_at Крайний срок (необязательный): позже него расчётный конец — «не успевает»
  * @property int|null            $replanned_from Прежнее начало авто-задачи, заметно перенесённой системой
  * @property int|null            $replanned_at Когда система её перенесла
  * @property string              $reminder Выбор напоминания в форме: '' нет, число — секунд до начала, 'custom' — своё время
@@ -188,6 +189,14 @@ class CmsTask extends ActiveRecord
             return false;
         }
 
+        // Every task has a start (owner's decision 31.10.2026, the column is NOT NULL): a task without one is an
+        // auto task and gets the planner's provisional time at once; afterSave() lays the queue out exactly.
+        $autoStart = false;
+        if (!$this->plan_start_at && \skeeks\cms\services\TaskPlanner::hasStartMode()) {
+            $this->plan_start_at = $this->provisionalStart();
+            $autoStart = true;
+        }
+
         // A reminder «before the start» follows the start; a reminder moved to the future is sent again.
         if ($this->hasAttribute('remind_at')) {
             if ($this->_reminder !== null) {
@@ -218,7 +227,7 @@ class CmsTask extends ActiveRecord
 
         // A start set by a person is fixed; an emptied start is given back to the planner.
         if ($this->hasAttribute('is_fixed_start')) {
-            if (!$this->plan_start_at) {
+            if (!$this->plan_start_at || $autoStart) {
                 $this->is_fixed_start = 0;
             } elseif ($insert) {
                 $this->is_fixed_start = 1;
@@ -434,6 +443,8 @@ class CmsTask extends ActiveRecord
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_at', 'remind_offset'] : [], 'integer'],
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_offset'] : [], 'integer', 'min' => 0, 'max' => 30 * 86400],
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_author'] : [], 'boolean'],
+            [static::hasDeadline() ? ['deadline_at'] : [], 'integer'],
+            [static::hasDeadline() ? ['deadline_at'] : [], 'default', 'value' => null],
             [
                 'remind_at',
                 function ($attribute) {
@@ -689,6 +700,7 @@ class CmsTask extends ActiveRecord
 
             'plan_start_at' => 'Планируемое начало',
             'is_fixed_start' => 'Закреплено на время',
+            'deadline_at'    => 'Крайний срок',
             'remind_at'      => 'Когда напомнить',
             'remind_offset'  => 'Напомнить до начала',
             'remind_author'  => 'Напомнить и мне',
@@ -1128,6 +1140,57 @@ class CmsTask extends ActiveRecord
     /**
      * @return float|int
      */
+    /**
+     * The start of an auto task before the planner lays the queue out: the end of the executor's queue
+     * (an edited auto task keeps its place); a task without an executor (a client's request) — now.
+     */
+    protected function provisionalStart(): int
+    {
+        $executor = $this->executor_id ? CmsUser::findOne((int)$this->executor_id) : null;
+        if ($executor) {
+            return (new \skeeks\cms\services\TaskPlanner())->estimate($executor, max(0, (int)$this->plan_duration), $this->isNewRecord ? null : (int)$this->id)[0];
+        }
+
+        return (int)(ceil(time() / \skeeks\cms\services\TaskPlanner::STEP) * \skeeks\cms\services\TaskPlanner::STEP);
+    }
+
+    /** Whether the planned end is after the deadline: the red mark «не успевает» (no notification). */
+    public function isBehindDeadline(): bool
+    {
+        return $this->hasAttribute('deadline_at') && $this->deadline_at && $this->plan_end_at
+            && (int)$this->plan_end_at > (int)$this->deadline_at
+            && in_array($this->status, static::activeStatuses(), true);
+    }
+
+    /** «Крайний срок 3 ноября 18:00, по расчёту закончится 4 ноября 10:15». */
+    public function getDeadlineText(): string
+    {
+        if (!$this->hasAttribute('deadline_at') || !$this->deadline_at) {
+            return '';
+        }
+        $f = \Yii::$app->formatter;
+        $at = static function ($t) use ($f) {
+            return $f->asDate((int)$t, 'php:j F').' '.$f->asTime((int)$t, 'php:H:i');
+        };
+
+        return 'Крайний срок '.$at($this->deadline_at).($this->isBehindDeadline() ? ', по расчёту закончится '.$at($this->plan_end_at) : '');
+    }
+
+    /** The red mark of a task that does not make its deadline; shown in every task view. */
+    public function getDeadlineMarkHtml(): string
+    {
+        if (!$this->isBehindDeadline()) {
+            return '';
+        }
+
+        return \yii\helpers\Html::tag('span', '<i class="fas fa-exclamation-circle"></i> не успевает', [
+            'class'       => 'sx-task-behind',
+            'style'       => 'color: var(--sx-color-danger); font-weight: 600; white-space: nowrap;',
+            'title'       => $this->deadlineText,
+            'data-toggle' => 'tooltip',
+        ]);
+    }
+
     /** @var string|null the reminder chosen in a form, applied on save */
     protected $_reminder;
 
@@ -1222,6 +1285,18 @@ class CmsTask extends ActiveRecord
             'title'       => $text,
             'data-toggle' => 'tooltip',
         ]);
+    }
+
+    /** Whether the table has the deadline yet (code may run before its migration). */
+    public static function hasDeadline(): bool
+    {
+        static $has = null;
+        if ($has === null) {
+            $schema = static::getTableSchema();
+            $has = $schema && $schema->getColumn('deadline_at') !== null;
+        }
+
+        return $has;
     }
 
     /** The bell of a task with a reminder: shown in lists, calendars, «Сроки», Gantt and the card. */
