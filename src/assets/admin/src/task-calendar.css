@@ -420,11 +420,16 @@
     flex: 1;
     min-height: 120px;
     padding: 10px;
+    overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .sx-task-deadlines__card {
     position: relative;
+    flex: none;
+    min-width: 0;
+    max-width: 100%;
     padding: 8px 10px 8px 26px;
     border-radius: 8px;
     border: 1px solid var(--sx-tc-border);
