@@ -283,7 +283,8 @@ Every active task has a start (owner's decision 31.10.2026): `is_fixed_start`
 tells a time chosen by a person from one given by `services\TaskPlanner`
 (free time of `work_shedule` after fixed tasks, queue `executor_sort`).
 Migrations m261031_100000 (mode, old tasks laid out) and m261031_120000
-(reminders). Agents `cms/task/plan` (15 min) and `cms/task/remind` (1 min).
+(reminders), m261031_130000 (`remind_by`, «перенесена»). The planner runs
+only on events (no replan on page open or by a timer); agent `cms/task/remind` (1 min).
 Views of `admin-cms-task`: «Мои задачи» (day list, start time), «Сроки»
 (`CmsTaskDeadlinesWidget`), «Мой календарь» (`CmsTaskCalendarWidget`, month,
 week, day), «Гант» (`CmsTaskGanttWidget`); the last one opened is remembered
