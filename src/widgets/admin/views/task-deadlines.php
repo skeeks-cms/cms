@@ -35,12 +35,12 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
                     $start = (int)$task->plan_start_at;
                     $canMove = $widget->canMove($task);
                     ?>
-                    <div class="sx-task-deadlines__card <?= $key === 'late' ? 'is-late' : ''; ?>" <?= $canMove ? 'data-sx-deadlines-card' : ''; ?> data-pk="<?= (int)$task->id; ?>">
+                    <div class="sx-task-deadlines__card <?= $key === 'late' ? 'is-late' : ''; ?>" <?= $canMove ? 'data-sx-deadlines-card' : ''; ?> data-pk="<?= (int)$task->id; ?>" data-fixed="<?= $isFixed ? 1 : 0; ?>">
                         <? if ($canMove) : ?>
                             <span class="sx-task-deadlines__handle" data-sx-deadlines-handle title="Перетащите в другую колонку"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></span>
                         <? endif; ?>
                         <div class="sx-task-deadlines__card-time">
-                            <span><?= in_array($key, ['d0', 'd1'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
+                            <span data-sx-deadlines-time><?= in_array($key, ['d0', 'd1'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
                             <? if ($isFixed) : ?><span title="Закреплено на это время"><?= \skeeks\cms\models\CmsTask::icon('pin', 12); ?></span><? endif; ?>
                             <?= $task->reminderIconHtml; ?>
                             <?= $task->replannedIconHtml; ?>

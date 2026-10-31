@@ -120,51 +120,30 @@ $model = $user;
                 },
                 onUpdate: function(event)
                 {
-                    // A fixed (or overdue) task goes where it was dropped: right after the task above it, or the first
-                    // free time of that day when there is none above (or its end has passed); it stays fixed.
+                    // A fixed time changes only by a choice a person sees (owner, 31.10.2026): within its day a fixed
+                    // task does not move; on another day it keeps its time of day («завтра 17:40» → «пн 17:40»).
                     if (event && event.jItem && event.jItem.hasClass("sx-task-tr--fixed")) {
+                        var item = event.jItem;
                         var day = event.jContainer ? event.jContainer.data("day") : null;
-                        if (!day) {
+                        if (!day || day === item.data("day")) {
                             window.location.reload();
                             return;
                         }
-                        var prev = event.jItem.prevAll("tr[data-end]").first();
-                        var after = prev.length ? parseInt(prev.data("end"), 10) : 0;
-                        var now = Math.floor(Date.now() / 1000);
-                        if (after && after > now + 60) {
-                            self.moveFixed(event.jItem.data("id"), {plan_start_at: Math.ceil(after / 300) * 300});
-                        } else {
-                            self.moveFixed(event.jItem.data("id"), {day: day});
-                        }
+                        sx.taskMove(self.get('moveUrl'), item.data("id"), {day: day, keep_time: 1}, {
+                            kind: 'day',
+                            done: function (state, response) {
+                                if (state === 'moved') {
+                                    item.data("day", day).attr("data-day", day);
+                                    item.find(".sx-task-calendar__time-date").remove();
+                                    return;
+                                }
+                                window.location.reload();
+                            }
+                        });
                         return;
                     }
                     self.jSavePriorityButton.fadeIn();
                 }
-            });
-        },
-
-        moveFixed: function(id, data)
-        {
-            data[yii.getCsrfParam()] = yii.getCsrfToken();
-            var blocker = sx.block("#" + this.get('id'));
-            $.ajax({
-                url: this.get('moveUrl') + (this.get('moveUrl').indexOf('?') === -1 ? '?' : '&') + 'pk=' + id,
-                method: 'POST',
-                data: data,
-                dataType: 'json',
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
-            }).done(function (response) {
-                if (!response || !response.success) {
-                    sx.notify.error(response && response.message ? response.message : 'Не удалось перенести задачу.');
-                } else {
-                    (response.warnings || []).forEach(function (text) { sx.notify.info(text); });
-                    sx.notify.success('Задача перенесена на ' + response.task.start_text + '.');
-                }
-            }).fail(function () {
-                sx.notify.error('Не удалось перенести задачу.');
-            }).always(function () {
-                blocker.unblock();
-                setTimeout(function () { window.location.reload(); }, 500);
             });
         },
 
@@ -307,11 +286,17 @@ JS
                     echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => [
                         'id'            => $task->id,
                         'executor_sort' => $task->executor_sort,
-                        'end'           => (int)$task->plan_end_at ?: null,
+                        // The day the row stands in: a fixed task moves only to another day.
+                        'day'           => $withDate ? '' : \Yii::$app->formatter->asDate(max((int)$task->plan_start_at, time()), 'php:Y-m-d'),
                     ]]);
                     ?>
                     <td class="sx-task-calendar__handle-cell">
-                        <? if (!$isInWork && $isCan) : ?>
+                        <? if (!$isInWork && $isCan && $isFixed) : ?>
+                            <? /* A fixed time: a pin instead of the grip; it moves only to another day, keeping its time. */ ?>
+                            <span title="Время закреплено: <?= $time; ?>. Изменить — в карточке или в календаре; на другой день — перетащите, время сохранится" data-toggle="tooltip">
+                                <a href="#" class="btn sx-move-btn sx-task-calendar__move sx-task-calendar__move--pin"><?= \skeeks\cms\backend\helpers\BackendIcon::render('pin', ['size' => 16]); ?></a>
+                            </span>
+                        <? elseif (!$isInWork && $isCan) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
                                 <a href="#" class="btn sx-move-btn sx-task-calendar__move"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></a>
                             </span>
@@ -323,7 +308,7 @@ JS
                                 <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
                             <? endif; ?>
                             <?= $time; ?>
-                            <? if ($isFixed) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
+                            <? if ($isFixed && !($isCan && !$isInWork)) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
                         </span>
                         <span class="sx-task-calendar__duration"><?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText((int)$task->plan_duration); ?></span>
                     </td>

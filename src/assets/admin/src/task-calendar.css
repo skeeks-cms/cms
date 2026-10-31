@@ -805,3 +805,93 @@
     color: var(--sx-color-text-muted);
     font-weight: 500;
 }
+
+/* The message of a move with «Отменить» (sx.taskMove). */
+.sx-task-undo {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: min(560px, calc(100vw - 32px));
+    padding: 12px 14px 12px 18px;
+    border-radius: 10px;
+    background: var(--sx-color-text);
+    color: var(--sx-color-surface);
+    font-size: 14px;
+    line-height: 1.35;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+    transform: translate(-50%, 150%);
+    opacity: 0;
+    transition: transform .2s ease, opacity .2s ease;
+    pointer-events: none;
+}
+
+.sx-task-undo.is-shown {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sx-task-undo__text {
+    flex: 1;
+}
+
+.sx-task-undo__warning {
+    color: var(--sx-color-warning);
+}
+
+.sx-task-undo__btn {
+    flex: none;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--sx-color-accent);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sx-task-undo__close {
+    flex: none;
+    padding: 0 4px;
+    border: none;
+    background: none;
+    color: inherit;
+    opacity: .6;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.sx-worker-tasks-calendar-widget .sx-task-calendar__move--pin {
+    color: var(--sx-color-accent) !important;
+}
+
+/* Dragging a block of the week or the day: the new time is shown on it. */
+.sx-task-calendar__block.is-movable {
+    cursor: grab;
+    touch-action: none;
+}
+
+.sx-task-calendar__block.is-dragging {
+    z-index: 6;
+    cursor: grabbing;
+    opacity: .9;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .2);
+}
+
+.sx-task-calendar__drag-tip {
+    position: absolute;
+    right: 4px;
+    top: 0;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: var(--sx-color-text);
+    color: var(--sx-color-surface);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 16px;
+}

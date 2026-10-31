@@ -503,8 +503,9 @@ class CmsTask extends ActiveRecord
                         return true;
                     }
 
-                    // Any date and time may be chosen except the past (a few minutes of slack for the form).
-                    if ((int)$this->{$attribute} < time() - 10 * 60) {
+                    // Any date and time may be chosen except the past (a few minutes of slack for the form);
+                    // «Отменить» of a move restores the former start, even an overdue one.
+                    if (!$this->restoringStart && (int)$this->{$attribute} < time() - 10 * 60) {
                         $this->addError($attribute, "Нельзя поставить задачу на прошедшее время.");
                         return false;
                     }
@@ -1190,6 +1191,9 @@ class CmsTask extends ActiveRecord
             'data-toggle' => 'tooltip',
         ]);
     }
+
+    /** @var bool «Отменить» of a move: the former start is restored even when it has passed */
+    public $restoringStart = false;
 
     /** @var string|null the reminder chosen in a form, applied on save */
     protected $_reminder;

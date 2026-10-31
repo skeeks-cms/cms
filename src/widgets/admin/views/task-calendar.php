@@ -92,7 +92,8 @@ $lanes = static function (array $dayTasks) {
 };
 
 ?>
-<?= Html::beginTag('div', $widget->options + ['data-sx-task-calendar' => '1', 'data-now' => $now]); ?>
+<?= Html::beginTag('div', $widget->options + ['data-sx-task-calendar' => '1', 'data-now' => $now,
+    'data-move-url' => \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule'])]); ?>
 
 <?
 ob_start();
@@ -236,6 +237,13 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                     $options = $widget->taskLinkOptions($task);
                     $options['style'] = sprintf('top: %.3f%%; height: %.3f%%; left: %.3f%%; width: %.3f%%;', $top, $height, $lane / $laneCount * 100, 100 / $laneCount);
                     Html::addCssClass($options, 'sx-task-calendar__block');
+                    // Dragging a block changes the time (step 5 minutes) — a choice a person sees while making it.
+                    if ($widget->canMove($task)) {
+                        Html::addCssClass($options, 'is-movable');
+                        $options['data-sx-task-drag'] = (int)$task->id;
+                        $options['data-start'] = (int)$task->plan_start_at;
+                        $options['draggable'] = 'false';
+                    }
                     ?>
                     <?= Html::beginTag('a', $options); ?>
                         <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>

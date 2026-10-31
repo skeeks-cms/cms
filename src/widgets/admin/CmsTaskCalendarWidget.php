@@ -194,6 +194,13 @@ class CmsTaskCalendarWidget extends Widget
         return $this->isActive($task) && $this->isFixed($task) && $task->status !== CmsTask::STATUS_IN_WORK && (int)$task->plan_start_at < time() - 60;
     }
 
+    /** Whether the viewer may drag the task to another time (the calendar's week and day). */
+    public function canMove(CmsTask $task): bool
+    {
+        return $this->isActive($task) && $task->status !== CmsTask::STATUS_IN_WORK
+            && ((int)\Yii::$app->user->id === (int)$this->user->id || \Yii::$app->user->can('cms/admin-task/manage', ['model' => $task]));
+    }
+
     /** CSS classes of a task item. */
     public function taskClass(CmsTask $task): string
     {

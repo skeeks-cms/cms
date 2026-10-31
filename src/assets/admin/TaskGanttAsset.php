@@ -14,6 +14,7 @@ class TaskGanttAsset extends AssetBundle
     public $js = ['task-gantt.js'];
     public $depends = [
         BackendUiAsset::class,
+        TaskCalendarAsset::class,
         ControllerActionsWidgetAsset::class,
         'yii\web\YiiAsset',
     ];

@@ -2838,9 +2838,14 @@ JS
     }
 
     /**
-     * Moves a task in time from the task views («Сроки», calendar, Gantt): POST plan_start_at (unix time)
-     * and optionally plan_duration (seconds), or mode=auto to give the start back to the planner.
-     * A moved task becomes fixed; a closed task and a task in work do not move.
+     * Moves a task in time from the task views (owner's decisions 31.10.2026):
+     * - `plan_start_at` (unix time) — a time a person saw while choosing it (calendar, Gantt); the task becomes fixed;
+     * - `day` (Y-m-d) with `keep_time=1` — a fixed task to another day at the same time of day, even over other
+     *   tasks or outside the schedule (only a warning); `day` alone — an auto task to the first free time of that day;
+     * - `mode=auto` — the start back to the planner; `plan_duration` alone — only the duration (a Gantt bar's edge);
+     * - `fixed=0|1` with `plan_start_at` — an undo restores the former start and mode exactly.
+     * A reminder of its own time moves with the task. The answer carries the former values for «Отменить».
+     * Closed tasks and the task in work do not move.
      */
     public function actionReschedule($pk)
     {
@@ -2864,6 +2869,18 @@ JS
                 ? 'Задача в работе — её время не двигается.' : 'Закрытую задачу нельзя перенести.'];
         }
 
+        $f = \Yii::$app->formatter;
+        $tz = new \DateTimeZone($f->timeZone);
+        $text = static function ($time) use ($f) {
+            return $f->asDate((int)$time, 'php:D j M').' '.$f->asTime((int)$time, 'php:H:i');
+        };
+        $previous = [
+            'plan_start_at'  => (int)$task->plan_start_at,
+            'is_fixed_start' => (int)$task->is_fixed_start,
+            'plan_duration'  => (int)$task->plan_duration,
+            'text'           => $text($task->plan_start_at),
+        ];
+
         if ($request->post('plan_duration') !== null && (int)$request->post('plan_duration') > 0) {
             $task->plan_duration = (int)$request->post('plan_duration');
         }
@@ -2877,22 +2894,39 @@ JS
         } elseif ($request->post('mode') === 'auto') {
             $task->plan_start_at = null;
         } elseif ($day !== '') {
-            // A day (a column of «Сроки»): the first free time of the executor on that day or after it.
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $day)) {
                 return ['success' => false, 'message' => 'Неверный день.'];
             }
-            $dayStart = (new \DateTime($day.' 00:00:00', new \DateTimeZone(\Yii::$app->formatter->timeZone)))->getTimestamp();
-            $task->plan_start_at = (new \skeeks\cms\services\TaskPlanner())->nearestStart(
-                $task->executor, max(900, (int)$task->plan_duration), max($dayStart, time()), (int)$task->id
-            );
-            $task->is_fixed_start = 1;
+            if ($request->post('keep_time')) {
+                // A fixed task to another day keeps its time of day: «завтра 17:40» → «пн 17:40».
+                $time = (new \DateTime('@'.(int)$task->plan_start_at))->setTimezone($tz)->format('H:i');
+                $task->plan_start_at = (new \DateTime($day.' '.$time, $tz))->getTimestamp();
+                $task->is_fixed_start = 1;
+            } else {
+                // An auto task to a day (a column of «Сроки»): the first free time of the executor on that day.
+                $dayStart = (new \DateTime($day.' 00:00:00', $tz))->getTimestamp();
+                $task->plan_start_at = (new \skeeks\cms\services\TaskPlanner())->nearestStart(
+                    $task->executor, max(900, (int)$task->plan_duration), max($dayStart, time()), (int)$task->id
+                );
+                $task->is_fixed_start = 1;
+            }
         } else {
             $startAt = (int)$request->post('plan_start_at');
             if ($startAt <= 0) {
                 return ['success' => false, 'message' => 'Не указано время начала.'];
             }
             $task->plan_start_at = $startAt;
-            $task->is_fixed_start = 1;
+            $task->is_fixed_start = $request->post('fixed') !== null ? (int)(bool)$request->post('fixed') : 1;
+            $task->restoringStart = (bool)$request->post('restore');
+        }
+
+        // A reminder of its own time moves with the task (one «before the start» follows the start by itself).
+        if ($task->hasAttribute('remind_at') && $task->remind_at && $task->remind_offset === null
+            && $task->plan_start_at && $previous['plan_start_at'] && (int)$task->plan_start_at !== $previous['plan_start_at']) {
+            $moved = (int)$task->remind_at + ((int)$task->plan_start_at - $previous['plan_start_at']);
+            if ($moved > time()) {
+                $task->remind_at = $moved;
+            }
         }
 
         if (!$task->save()) {
@@ -2902,13 +2936,16 @@ JS
 
         return [
             'success'  => true,
+            'previous' => $previous,
             'task'     => [
                 'id'             => (int)$task->id,
                 'plan_start_at'  => (int)$task->plan_start_at,
                 'plan_end_at'    => (int)$task->plan_end_at,
                 'plan_duration'  => (int)$task->plan_duration,
                 'is_fixed_start' => (int)$task->is_fixed_start,
-                'start_text'     => \Yii::$app->formatter->asDate((int)$task->plan_start_at, 'php:j F').' '.\Yii::$app->formatter->asTime((int)$task->plan_start_at, 'php:H:i'),
+                'start_text'     => $f->asDate((int)$task->plan_start_at, 'php:j F').' '.$f->asTime((int)$task->plan_start_at, 'php:H:i'),
+                'text'           => $text($task->plan_start_at),
+                'reminder'       => $task->hasAttribute('remind_at') && $task->remind_at ? $task->reminderText : '',
             ],
             'warnings' => (new \skeeks\cms\services\TaskPlanner())->warnings($task),
         ];

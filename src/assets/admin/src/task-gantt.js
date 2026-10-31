@@ -4,7 +4,7 @@
     var SCALES = {
         // seconds per pixel, snap step of a move in seconds, width of a tick in seconds
         day: {pps: 160 / 3600, snap: 300, tick: 3600},
-        week: {pps: 216 / 86400, snap: 900, tick: 86400},
+        week: {pps: 216 / 86400, snap: 300, tick: 86400},
         month: {pps: 44 / 86400, snap: 86400, tick: 86400}
     };
     var ROW = 34;
@@ -315,7 +315,8 @@
             text.prepend(' ').prepend($('<span class="sx-task-gantt__pin"></span>').html(this.cfg.icons.pin));
         }
         bar.append(text);
-        if (task.movable) {
+        // The edge that changes the duration only on a bar wide enough to grab both: a narrow bar only moves.
+        if (task.movable && width >= 28) {
             bar.append('<span class="sx-task-gantt__handle" title="Потяните, чтобы изменить длительность"></span>');
         }
 
@@ -381,25 +382,13 @@
 
     Gantt.prototype.save = function (task, values) {
         var self = this;
-        var data = $.extend({}, values);
-        data[yii.getCsrfParam()] = yii.getCsrfToken();
         this.el.addClass('is-busy');
-        $.ajax({
-            url: this.cfg.moveUrl + (this.cfg.moveUrl.indexOf('?') === -1 ? '?' : '&') + 'pk=' + task.id,
-            method: 'POST',
-            data: data,
-            dataType: 'json',
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
-        }).done(function (response) {
-            if (!response || !response.success) {
-                sx.notify.error(response && response.message ? response.message : 'Не удалось изменить задачу.');
-            } else {
-                (response.warnings || []).forEach(function (text) { sx.notify.info(text); });
+        // «Было 17:40 → 18:00 · Отменить» (sx.taskMove of task-calendar.js); the bars are redrawn, the message stays.
+        sx.taskMove(this.cfg.moveUrl, task.id, values, {
+            kind: values.plan_start_at ? 'time' : 'duration',
+            done: function () {
+                self.reload();
             }
-        }).fail(function () {
-            sx.notify.error('Не удалось изменить задачу. Обновите страницу.');
-        }).always(function () {
-            self.reload();
         });
     };
 

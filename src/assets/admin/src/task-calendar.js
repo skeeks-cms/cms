@@ -86,29 +86,22 @@
             revert(event);
             return;
         }
-        var data = {day: day};
-        data[yii.getCsrfParam()] = yii.getCsrfToken();
+        // A fixed task keeps its time of day; an auto task takes the first free time of that day.
+        var data = event.jItem.data('fixed') ? {day: day, keep_time: 1} : {day: day};
         board.addClass('is-busy');
-        $.ajax({
-            url: board.data('moveUrl') + (board.data('moveUrl').indexOf('?') === -1 ? '?' : '&') + 'pk=' + event.jItem.data('pk'),
-            method: 'POST',
-            data: data,
-            dataType: 'json',
-            headers: {'X-Requested-With': 'XMLHttpRequest'}
-        }).done(function (response) {
-            if (!response || !response.success) {
-                revert(event);
-                sx.notify.error(response && response.message ? response.message : 'Не удалось перенести задачу.');
-                return;
+        sx.taskMove(board.data('moveUrl'), event.jItem.data('pk'), data, {
+            kind: 'day',
+            done: function (state, response) {
+                board.removeClass('is-busy');
+                if (state === 'moved') {
+                    event.jItem.find('[data-sx-deadlines-time]').text(response.task.text);
+                    return;
+                }
+                if (state === false) {
+                    revert(event);
+                }
+                window.location.reload();
             }
-            (response.warnings || []).forEach(function (text) { sx.notify.info(text); });
-            sx.notify.success('Задача перенесена на ' + response.task.start_text + '.');
-            setTimeout(function () { window.location.reload(); }, 600);
-        }).fail(function () {
-            revert(event);
-            sx.notify.error('Не удалось перенести задачу. Обновите страницу.');
-        }).always(function () {
-            board.removeClass('is-busy');
         });
     }
 
@@ -131,5 +124,186 @@
                 }
             });
         });
+    });
+}(sx, sx.$));
+
+/**
+ * One move of a task from every task view (owner, 31.10.2026): the request, then a message at the bottom —
+ * «Было 17:40 → 18:00» or «Перенесено на пн 2 нояб. 17:40», the reminder's new time, warnings — and «Отменить»,
+ * which restores the former start and mode exactly. `opts.kind`: "time" (calendar, Gantt) or "day" (list, «Сроки»);
+ * `opts.done(state, response)` runs with 'moved', 'undone' or false (a reload or a redraw).
+ */
+(function (sx, $) {
+    'use strict';
+
+    var box = null;
+    var timer = null;
+
+    function show(html, undo) {
+        if (!box) {
+            box = $('<div class="sx-task-undo" role="status"></div>').appendTo('body');
+        }
+        clearTimeout(timer);
+        box.empty().append($('<span class="sx-task-undo__text"></span>').html(html));
+        if (undo) {
+            $('<button type="button" class="sx-task-undo__btn">Отменить</button>').on('click', function () {
+                box.removeClass('is-shown');
+                undo();
+            }).appendTo(box);
+        }
+        $('<button type="button" class="sx-task-undo__close" title="Закрыть">&times;</button>').on('click', function () {
+            box.removeClass('is-shown');
+        }).appendTo(box);
+        box.addClass('is-shown');
+        timer = setTimeout(function () { box.removeClass('is-shown'); }, 12000);
+    }
+
+    function esc(text) {
+        return $('<span>').text(text || '').html();
+    }
+
+    function post(url, id, data) {
+        data = $.extend({}, data);
+        data[yii.getCsrfParam()] = yii.getCsrfToken();
+        return $.ajax({
+            url: url + (url.indexOf('?') === -1 ? '?' : '&') + 'pk=' + id,
+            method: 'POST',
+            data: data,
+            dataType: 'json',
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        });
+    }
+
+    sx.taskMove = function (url, id, data, opts) {
+        opts = opts || {};
+        var done = opts.done || function () {};
+        post(url, id, data).done(function (response) {
+            if (!response || !response.success) {
+                sx.notify.error(response && response.message ? response.message : 'Не удалось перенести задачу.');
+                done(false);
+                return;
+            }
+            var prev = response.previous || {};
+            var task = response.task || {};
+            var minutes = function (seconds) {
+                var m = Math.round((seconds || 0) / 60);
+                return m >= 60 ? (Math.floor(m / 60) + ' ч' + (m % 60 ? ' ' + (m % 60) + ' мин' : '')) : m + ' мин';
+            };
+            var html = opts.kind === 'time'
+                ? 'Было ' + esc(prev.text) + ' → <b>' + esc(task.text) + '</b>'
+                : (opts.kind === 'duration'
+                    ? 'Длительность ' + minutes(prev.plan_duration) + ' → <b>' + minutes(task.plan_duration) + '</b>'
+                    : 'Перенесено на <b>' + esc(task.text) + '</b>');
+            if (task.reminder) {
+                html += '<br><small>' + esc(task.reminder) + '</small>';
+            }
+            (response.warnings || []).forEach(function (text) {
+                html += '<br><small class="sx-task-undo__warning">' + esc(text) + '</small>';
+            });
+            show(html, function () {
+                var back = prev.is_fixed_start
+                    ? {plan_start_at: prev.plan_start_at, fixed: 1, restore: 1, plan_duration: prev.plan_duration}
+                    : {mode: 'auto', plan_duration: prev.plan_duration};
+                post(url, id, back).done(function (r) {
+                    if (r && r.success) {
+                        show('Вернули на <b>' + esc(r.task.text) + '</b>');
+                    } else {
+                        sx.notify.error(r && r.message ? r.message : 'Не удалось отменить перенос.');
+                    }
+                    done('undone');
+                }).fail(function () {
+                    sx.notify.error('Не удалось отменить перенос.');
+                });
+            });
+            done('moved', response);
+        }).fail(function () {
+            sx.notify.error('Не удалось перенести задачу. Обновите страницу.');
+            done(false);
+        });
+    };
+}(sx, sx.$));
+
+/**
+ * The calendar's week and day: a block dragged up, down or to another day changes the start in steps of
+ * 5 minutes, with the new time shown while dragging; then «Было → стало · Отменить» (sx.taskMove).
+ */
+(function (sx, $) {
+    'use strict';
+
+    var STEP = 300;
+
+    function fmt(ts) {
+        var d = new Date(ts * 1000);
+        return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    }
+
+    $(document).on('pointerdown', '.sx-task-calendar__block[data-sx-task-drag]', function (e) {
+        if (e.button !== 0) {
+            return;
+        }
+        var block = $(this);
+        var calendar = block.closest('[data-sx-task-calendar]');
+        var startCol = block.closest('.sx-task-calendar__col');
+        var x0 = e.clientX, y0 = e.clientY;
+        var moved = false;
+        var start = parseInt(block.data('start'), 10);
+        var newStart = start;
+        var col = startCol;
+        var top0 = parseFloat(block[0].style.top);
+        var tip = $('<div class="sx-task-calendar__drag-tip"></div>');
+        try { this.setPointerCapture(e.pointerId); } catch (err) {}
+
+        block.on('pointermove.sxdrag', function (ev) {
+            var dx = ev.clientX - x0, dy = ev.clientY - y0;
+            if (!moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) {
+                return;
+            }
+            if (!moved) {
+                moved = true;
+                block.addClass('is-dragging');
+            }
+            // The column under the pointer (another day of the week).
+            var under = $(document.elementsFromPoint(ev.clientX, ev.clientY)).filter('.sx-task-calendar__col').first();
+            if (under.length && under[0] !== col[0]) {
+                col = under;
+                col.append(block);
+            }
+            var span = parseInt(col.data('span'), 10);
+            var dayStart = parseInt(col.data('dayStart'), 10);
+            var height = col[0].getBoundingClientRect().height;
+            var startDay = parseInt(startCol.data('dayStart'), 10);
+            var offset = start - startDay + dy / height * span;
+            newStart = dayStart + Math.round(offset / STEP) * STEP;
+            newStart = Math.max(dayStart, Math.min(dayStart + span - STEP, newStart));
+            block.css('top', ((newStart - dayStart) / span * 100) + '%');
+            tip.text(fmt(newStart));
+            if (!tip.parent().length) {
+                tip.appendTo(block);
+            }
+            ev.preventDefault();
+        }).on('pointerup.sxdrag pointercancel.sxdrag', function (ev) {
+            block.off('.sxdrag').removeClass('is-dragging');
+            tip.remove();
+            if (!moved) {
+                return; // a click opens the task
+            }
+            // A drag is not a click.
+            block.one('click', function (c) { c.preventDefault(); c.stopImmediatePropagation(); });
+            if (newStart === start) {
+                return;
+            }
+            sx.taskMove(calendar.data('moveUrl'), block.data('sxTaskDrag'), {plan_start_at: newStart}, {
+                kind: 'time',
+                done: function (state) {
+                    if (state === 'moved') {
+                        block.data('start', newStart).attr('data-start', newStart);
+                        block.find('.sx-task-calendar__task-time').contents().first().replaceWith(fmt(newStart));
+                        return;
+                    }
+                    window.location.reload();
+                }
+            });
+        });
+        e.preventDefault();
     });
 }(sx, sx.$));
