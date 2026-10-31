@@ -224,7 +224,7 @@
     border: 1px solid var(--sx-tc-border);
     border-radius: var(--sx-tc-radius);
     background: var(--sx-tc-surface);
-    max-height: calc(100vh - 220px);
+    max-height: calc(100vh - 220px); /* until task-calendar.js fits it to the screen */
     overflow: auto;
 }
 
@@ -370,8 +370,10 @@
 .sx-task-deadlines__board {
     display: grid;
     grid-template-columns: repeat(5, minmax(220px, 1fr));
+    grid-template-rows: minmax(0, 1fr);
     gap: 12px;
     overflow-x: auto;
+    overflow-y: hidden;
     padding-bottom: 8px;
 }
 
@@ -384,6 +386,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     border: 1px solid var(--sx-tc-border);
     border-radius: var(--sx-tc-radius);
     background: var(--sx-tc-muted);
@@ -417,6 +420,7 @@
     flex: 1;
     min-height: 120px;
     padding: 10px;
+    overflow-y: auto;
 }
 
 .sx-task-deadlines__card {
@@ -563,6 +567,15 @@
     margin-bottom: 14px;
 }
 
+.sx-task-toolbar__start {
+    flex: 1 1 auto;
+}
+
+.sx-task-toolbar__end {
+    flex: none;
+    margin-left: auto;
+}
+
 .sx-task-toolbar__start,
 .sx-task-toolbar__end {
     display: flex;
@@ -667,4 +680,18 @@
 /* «Сохранить порядок задач» of the day view stays hidden until a reorder (it floats in the middle then). */
 .sx-worker-tasks-calendar-widget .sx-task-toolbar .sx-save-priority-btn {
     display: none;
+}
+
+.sx-task-toolbar .sx-task-calendar__title {
+    margin: 0 4px;
+    font-size: 18px;
+}
+
+/* The period navigation and the view controls do not break apart when the toolbar wraps. */
+.sx-task-toolbar__group {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }

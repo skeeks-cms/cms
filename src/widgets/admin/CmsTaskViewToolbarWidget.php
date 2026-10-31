@@ -14,8 +14,9 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
- * One toolbar of every task view: the view's own controls on the left (period, scale), then the employee
- * (when the viewer may choose), the search and «Добавить задачу» — the same order, size and behaviour everywhere.
+ * One toolbar of every task view, the same order, size and behaviour everywhere (owner, 31.10.2026):
+ * the search first, then the employee (when the viewer may choose), then the view's own controls
+ * (period, scale, grouping); «Добавить задачу» on the right.
  */
 class CmsTaskViewToolbarWidget extends Widget
 {
@@ -85,8 +86,11 @@ class CmsTaskViewToolbarWidget extends Widget
 
         return Html::tag('form',
             $hidden
-            .Html::tag('div', $this->start, ['class' => 'sx-task-toolbar__start'])
-            .Html::tag('div', $this->tools.$user.$search.($this->showAdd ? $this->addButton() : ''), ['class' => 'sx-task-toolbar__end']),
+            .Html::tag('div', $search.$user
+                .($this->start !== '' ? Html::tag('div', $this->start, ['class' => 'sx-task-toolbar__group']) : '')
+                .($this->tools !== '' ? Html::tag('div', $this->tools, ['class' => 'sx-task-toolbar__group']) : ''),
+                ['class' => 'sx-task-toolbar__start'])
+            .Html::tag('div', $this->showAdd ? $this->addButton() : '', ['class' => 'sx-task-toolbar__end']),
             ['class' => 'sx-task-toolbar', 'method' => 'get', 'action' => '']);
     }
 

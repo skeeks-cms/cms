@@ -29,7 +29,23 @@
         });
     }
 
+    /**
+     * A board or a timeline marked [data-sx-fit-screen] ends at the bottom of the screen: its own scrollbars
+     * (the horizontal one too) stay in sight instead of being far below on the page.
+     */
+    function fitScreen() {
+        $('[data-sx-fit-screen]').each(function () {
+            var el = $(this);
+            // "height" for a board whose columns scroll each on their own, max-height otherwise.
+            el.css(el.data('sxFitScreen') === 'height' ? 'height' : 'max-height', Math.max(320, window.innerHeight - el.offset().top - 16));
+        });
+    }
+
+    $(window).on('resize load', fitScreen);
+
     $(function () {
+        fitScreen();
+        setTimeout(fitScreen, 400);
         moveNowLines();
         setInterval(moveNowLines, 60000);
 

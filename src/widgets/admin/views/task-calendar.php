@@ -173,7 +173,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
         <? endforeach; ?>
     </div>
 <? else : ?>
-    <div class="sx-surface sx-surface--raised sx-task-calendar__timeline" style="--sx-task-calendar-days: <?= count($days); ?>; --sx-task-calendar-hours: <?= $hourTo - $hourFrom; ?>;">
+    <div class="sx-surface sx-surface--raised sx-task-calendar__timeline" data-sx-fit-screen style="--sx-task-calendar-days: <?= count($days); ?>; --sx-task-calendar-hours: <?= $hourTo - $hourFrom; ?>;">
         <div class="sx-task-calendar__corner"></div>
         <? foreach ($days as $date) : ?>
             <?

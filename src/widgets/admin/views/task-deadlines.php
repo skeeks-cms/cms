@@ -18,7 +18,7 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
 <p class="sx-task-deadlines__hint text-muted">
     Перетащите задачу в другую колонку — она встанет в первое свободное время этого дня по графику и закрепится.
 </p>
-<div class="sx-task-deadlines__board" data-sx-task-deadlines id="<?= $widget->id; ?>-board" data-move-url="<?= Html::encode($moveUrl); ?>">
+<div class="sx-task-deadlines__board" data-sx-task-deadlines data-sx-fit-screen="height" id="<?= $widget->id; ?>-board" data-move-url="<?= Html::encode($moveUrl); ?>">
     <? foreach ($columns as $key => $column) : ?>
         <div class="sx-task-deadlines__column <?= $key === 'late' ? 'is-late' : ''; ?>" data-sx-deadlines-column="<?= $key; ?>" data-day="<?= Html::encode((string)$column['day']); ?>">
             <div class="sx-task-deadlines__head">
