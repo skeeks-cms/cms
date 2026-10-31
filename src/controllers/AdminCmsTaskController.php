@@ -1998,6 +1998,11 @@ JS
         }
         $isExecutorLocked = !$model->isNewRecord && CmsTaskSchedule::find()->task($model)->exists();
 
+        // A start given by the planner is not a person's choice: the form shows "automatically" for it.
+        if (!$model->isNewRecord && $model->hasAttribute('is_fixed_start') && !$model->is_fixed_start && !\Yii::$app->request->isPost) {
+            $model->plan_start_at = null;
+        }
+
         $projectAjaxUrl = \yii\helpers\Json::encode(\yii\helpers\Url::current([
             'ajaxid' => 'cmstask-project-relation-select',
         ]));
@@ -2868,77 +2873,11 @@ JS
      */
     protected function calculateEstimatedTaskEndAt(CmsUser $user, int $duration, ?int $excludeTaskId = null): ?int
     {
-        $remaining = max(0, $duration);
-        if (!$remaining) {
+        if ($duration <= 0) {
             return null;
         }
 
-        $scheduleTotalTime = CmsTaskSchedule::find()->select([
-            'SUM(end_at - start_at) as total_timestamp',
-        ])->where([
-            'cms_task_id' => new Expression(CmsTask::tableName().".id"),
-        ]);
-
-        $tasksQuery = CmsTask::find()->select([
-            CmsTask::tableName().'.id',
-            CmsTask::tableName().'.plan_duration',
-            'scheduleTotalTime' => $scheduleTotalTime,
-        ])->where([
-            'executor_id' => $user->id,
-            'status' => [
-                CmsTask::STATUS_NEW,
-                CmsTask::STATUS_IN_WORK,
-                CmsTask::STATUS_ON_PAUSE,
-                CmsTask::STATUS_ACCEPTED,
-            ],
-        ])->orderBy([
-            'executor_sort' => SORT_ASC,
-            'id'            => SORT_DESC,
-        ])->asArray();
-
-        if ($excludeTaskId) {
-            $tasksQuery->andWhere(['!=', CmsTask::tableName().'.id', $excludeTaskId]);
-        }
-
-        foreach ($tasksQuery->all() as $task) {
-            $taskDuration = (int)ArrayHelper::getValue($task, 'plan_duration', 0);
-            $taskWorked = (int)ArrayHelper::getValue($task, 'scheduleTotalTime', 0);
-            $remaining += max(0, $taskDuration - $taskWorked);
-        }
-
-        $now = time();
-        $workSchedule = (array)$user->work_shedule;
-
-        for ($i = 0; $i <= 1000; $i++) {
-            $date = date("Y-m-d", strtotime("+{$i} day"));
-            $periods = CmsScheduleHelper::getSchedulesByWorktimeForDate($workSchedule, $date);
-
-            foreach ($periods as $period) {
-                $startAt = (int)$period->start_at;
-                $endAt = (int)$period->end_at;
-
-                if ($endAt <= $now) {
-                    continue;
-                }
-
-                if ($startAt < $now) {
-                    $startAt = $now;
-                }
-
-                $available = max(0, $endAt - $startAt);
-                if (!$available) {
-                    continue;
-                }
-
-                if ($remaining <= $available) {
-                    return $startAt + $remaining;
-                }
-
-                $remaining -= $available;
-            }
-        }
-
-        return null;
+        return (new \skeeks\cms\services\TaskPlanner())->estimate($user, $duration, $excludeTaskId)[1];
     }
 
     protected function formatEstimatedTaskEndAt(int $timestamp): string

@@ -34,7 +34,8 @@ use yii\helpers\ArrayHelper;
  * @property int                 $is_internal Внутренняя задача сделки: клиент не видит
  * @property int|null            $parent_cms_task_id Связанная задача
  *
- * @property int|null            $plan_start_at Планируемое начало
+ * @property int|null            $plan_start_at Планируемое начало (есть у каждой активной задачи, см. TaskPlanner)
+ * @property int                 $is_fixed_start Начало выбрано человеком и не сдвигается; 0 — его ставит TaskPlanner
  * @property int|null            $plan_end_at Планируемое завершение
  *
  * @property int|null            $plan_duration Длительность по плану в секундах
@@ -176,6 +177,15 @@ class CmsTask extends ActiveRecord
             return false;
         }
 
+        // A start set by a person is fixed; an emptied start is given back to the planner.
+        if ($this->hasAttribute('is_fixed_start')) {
+            if (!$this->plan_start_at) {
+                $this->is_fixed_start = 0;
+            } elseif (!$this->isAttributeChanged('is_fixed_start', false) && $this->isAttributeChanged('plan_start_at', false)) {
+                $this->is_fixed_start = 1;
+            }
+        }
+
         if ($this->plan_start_at && $this->plan_duration) {
             $this->plan_end_at = (int)$this->plan_start_at + (int)$this->plan_duration;
         } else {
@@ -200,6 +210,8 @@ class CmsTask extends ActiveRecord
         $recalculateAttributes = [
             'executor_id',
             'plan_duration',
+            'plan_start_at',
+            'is_fixed_start',
             'status',
         ];
         $needRecalculate = $insert;
@@ -239,7 +251,7 @@ class CmsTask extends ActiveRecord
         }
 
         foreach ($userIds as $userId) {
-            $user = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $userId])->one();
+            $user = CmsUser::find()->andWhere([CmsUser::tableName().'.id' => $userId])->one();
             if ($user) {
                 static::recalculateTasksPriority($user, []);
             }
@@ -371,6 +383,8 @@ class CmsTask extends ActiveRecord
             [['status'], 'string'],
 
             [['plan_duration', 'fact_duration'], 'integer'],
+            // Before its migration the column is absent: the validator would read it anyway.
+            [\skeeks\cms\services\TaskPlanner::hasStartMode() ? ['is_fixed_start'] : [], 'boolean'],
 
             [['name'], 'string', 'max' => 255],
 
@@ -408,14 +422,13 @@ class CmsTask extends ActiveRecord
                         return true;
                     }
 
-                    if (!$this->isNewRecord && !$this->isAttributeChanged($attribute)) {
+                    if (!$this->isNewRecord && !$this->isAttributeChanged($attribute, false)) {
                         return true;
                     }
 
-                    $minStartAt = time() + 30 * 60;
-                    $minStartAt = $minStartAt - ($minStartAt % 60);
-                    if ((int)$this->{$attribute} < $minStartAt) {
-                        $this->addError($attribute, "Нельзя указать время начала задачи раньше чем через 30 минут.");
+                    // Any date and time may be chosen except the past (a few minutes of slack for the form).
+                    if ((int)$this->{$attribute} < time() - 10 * 60) {
+                        $this->addError($attribute, "Нельзя поставить задачу на прошедшее время.");
                         return false;
                     }
 
@@ -609,6 +622,7 @@ class CmsTask extends ActiveRecord
             'parent_cms_task_id' => 'Связанная задача',
 
             'plan_start_at' => 'Планируемое начало',
+            'is_fixed_start' => 'Закреплено на время',
             'plan_end_at'   => 'Планируемое завершение',
             'plan_duration' => 'Длительность по плану',
             'fact_duration' => 'Фактическая длительность',
@@ -1099,143 +1113,20 @@ class CmsTask extends ActiveRecord
         return time() - $readyAt <= self::READY_RESUME_SECONDS;
     }
 
+    /**
+     * Lays out the executor's active tasks (TaskPlanner) and tells the executor when another person reordered them.
+     *
+     * @param int[] $sortTaskIds auto tasks to put first, in this order
+     */
     static public function recalculateTasksPriority(CmsUser $user, $sortTaskIds)
     {
-        $currentUser = \Yii::$app->user->identity;
-        /**
-         * @var $task self
-         */
-        $scheduleTotalTime = CmsTaskSchedule::find()->select([
-            'SUM(end_at - start_at) as total_timestamp',
-        ])->where([
-            'cms_task_id' => new \yii\db\Expression(CmsTask::tableName().".id"),
-        ]);
+        $currentUser = \Yii::$app->has('user', true) ? \Yii::$app->user->identity : null;
 
-        $tasks = CmsTask::find()->select([
-            CmsTask::tableName().'.*',
-            'scheduleTotalTime' => $scheduleTotalTime,
-            'planTotalTime'     => new \yii\db\Expression(CmsTask::tableName().".plan_duration"),
-        ])->where([
-            'executor_id' => $user->id,
-        ])->andWhere([
-            'status' => [
-                CmsTask::STATUS_NEW,
-                CmsTask::STATUS_IN_WORK,
-                CmsTask::STATUS_ON_PAUSE,
-                CmsTask::STATUS_ACCEPTED,
-            ],
-        ])->orderBy([
-            'executor_sort' => SORT_ASC,
-            'id'            => SORT_DESC,
-        ])
-            ->all();
-
-
-        if ($sortTaskIds) {
-            $tasksTmp = [];
-            $tasks = ArrayHelper::map($tasks, 'id', function ($model) {
-                return $model;
-            });
-
-            foreach ($sortTaskIds as $id) {
-                if (isset($tasks[$id])) {
-                    $tasksTmp[$id] = $tasks[$id];
-                    unset($tasks[$id]);
-                }
-            }
-
-            $resultTasks = ArrayHelper::merge((array)$tasksTmp, (array)$tasks);
-            $tasks = $resultTasks;
-            /*print_r(array_keys($tasks));die;*/
-        }
-
-
-        $priority = 0;
-        $tasks = array_values((array)$tasks);
-        $taskIndex = 0;
-        $taskRemaining = null;
-
-        for ($i = 0; $i <= 1000; $i++) {
-
-            $workShedule = $user->work_shedule;
-            $date = date("Y-m-d", strtotime("+{$i} day"));
-            $times = \skeeks\cms\helpers\CmsScheduleHelper::getSchedulesByWorktimeForDate($workShedule, $date);
-
-            if (!$times) {
-                continue;
-            }
-
-            $todayDate = \Yii::$app->formatter->asDate(time(), "php:Y-m-d");
-            //Тут отфильтровать время согласно текущему времени
-            if ($todayDate == $date) {
-                $now = time();
-                foreach ($times as $key => $period) {
-                    if ($period->end_at <= $now) {
-                        ArrayHelper::remove($times, $key);
-                        continue;
-                    }
-
-                    if ($period->start_at < $now) {
-                        $period->start_at = $now;
-                    }
-                }
-            }
-
-            if (!$times) {
-                continue;
-            }
-
-            if (!isset($tasks[$taskIndex])) {
-                break;
-            }
-
-            foreach ($times as $period)
-            {
-                $periodCursor = (int)$period->start_at;
-                $periodEndAt = (int)$period->end_at;
-
-                while (isset($tasks[$taskIndex]) && $periodCursor < $periodEndAt) {
-                    $task = $tasks[$taskIndex];
-
-                    if ($taskRemaining === null) {
-                        //время по плану на задачу минус то что уже отработано по задаче
-                        $taskRemaining = (int)$task->raw_row['planTotalTime'] - (int)$task->raw_row['scheduleTotalTime'];
-                        if ($taskRemaining < 0) {
-                            $taskRemaining = 0;
-                        }
-                    }
-
-                    if ($taskRemaining <= 0) {
-                        $priority++;
-                        $taskEndAt = $periodCursor;
-                        static::updateAll([
-                            'executor_sort'   => $priority,
-                            'executor_end_at' => $taskEndAt,
-                            'plan_end_at'     => $taskEndAt,
-                        ], ['id' => $task->id]);
-                        $taskIndex++;
-                        $taskRemaining = null;
-                        continue;
-                    }
-
-                    $available = $periodEndAt - $periodCursor;
-                    $duration = min($available, $taskRemaining);
-
-                    $periodCursor += $duration;
-                    $taskRemaining -= $duration;
-
-                    if ($taskRemaining <= 0) {
-                        $priority++;
-                        static::updateAll([
-                            'executor_sort'   => $priority,
-                            'executor_end_at' => $periodCursor,
-                            'plan_end_at'     => $periodCursor,
-                        ], ['id' => $task->id]);
-                        $taskIndex++;
-                        $taskRemaining = null;
-                    }
-                }
-            }
+        static::$_isRecalculatingTasksPriority = true;
+        try {
+            (new \skeeks\cms\services\TaskPlanner())->plan($user, array_map('intval', (array)$sortTaskIds));
+        } finally {
+            static::$_isRecalculatingTasksPriority = false;
         }
 
         //Если приоритет задач обновил другой пользователь, то уведомим исполнителя
