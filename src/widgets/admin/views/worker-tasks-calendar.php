@@ -120,14 +120,22 @@ $model = $user;
                 },
                 onUpdate: function(event)
                 {
-                    // A fixed (or overdue) task dropped on another day: the first free time of that day, still fixed.
+                    // A fixed (or overdue) task goes where it was dropped: right after the task above it, or the first
+                    // free time of that day when there is none above (or its end has passed); it stays fixed.
                     if (event && event.jItem && event.jItem.hasClass("sx-task-tr--fixed")) {
                         var day = event.jContainer ? event.jContainer.data("day") : null;
-                        if (!day || event.from === event.container) {
+                        if (!day) {
                             window.location.reload();
                             return;
                         }
-                        self.moveFixed(event.jItem.data("id"), day);
+                        var prev = event.jItem.prevAll("tr[data-end]").first();
+                        var after = prev.length ? parseInt(prev.data("end"), 10) : 0;
+                        var now = Math.floor(Date.now() / 1000);
+                        if (after && after > now + 60) {
+                            self.moveFixed(event.jItem.data("id"), {plan_start_at: Math.ceil(after / 300) * 300});
+                        } else {
+                            self.moveFixed(event.jItem.data("id"), {day: day});
+                        }
                         return;
                     }
                     self.jSavePriorityButton.fadeIn();
@@ -135,9 +143,8 @@ $model = $user;
             });
         },
 
-        moveFixed: function(id, day)
+        moveFixed: function(id, data)
         {
-            var data = {day: day};
             data[yii.getCsrfParam()] = yii.getCsrfToken();
             var blocker = sx.block("#" + this.get('id'));
             $.ajax({
@@ -297,7 +304,11 @@ JS
                         $hint = 'В работе с этого времени';
                     }
                     ob_start();
-                    echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => ['id' => $task->id, 'executor_sort' => $task->executor_sort]]);
+                    echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => [
+                        'id'            => $task->id,
+                        'executor_sort' => $task->executor_sort,
+                        'end'           => (int)$task->plan_end_at ?: null,
+                    ]]);
                     ?>
                     <td class="sx-task-calendar__handle-cell">
                         <? if (!$isInWork && $isCan) : ?>
