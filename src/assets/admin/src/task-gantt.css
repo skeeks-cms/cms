@@ -94,19 +94,27 @@
     border: 1px solid var(--sx-tg-border);
     border-radius: var(--sx-radius-panel, 10px);
     background: var(--sx-tg-surface);
-    overflow: hidden;
+    overflow: auto;
+    max-height: calc(100vh - 240px);
+    min-height: 240px;
 }
 
 .sx-task-gantt__side {
+    position: sticky;
+    left: 0;
     flex: 0 0 var(--sx-tg-side);
     width: var(--sx-tg-side);
+    height: max-content;
     border-right: 1px solid var(--sx-tg-border);
     background: var(--sx-tg-surface);
-    z-index: 2;
+    z-index: 4;
 }
 
 .sx-task-gantt__side-head,
 .sx-task-gantt__scale {
+    position: sticky;
+    top: 0;
+    z-index: 3;
     height: 38px;
     border-bottom: 1px solid var(--sx-tg-border);
     background: var(--sx-tg-muted);
@@ -168,14 +176,12 @@
 }
 
 .sx-task-gantt__main {
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
+    flex: none;
+    height: max-content;
 }
 
-.sx-task-gantt__scale {
-    position: relative;
+.sx-task-gantt__side-head {
+    z-index: 5;
 }
 
 .sx-task-gantt__tick {

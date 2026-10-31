@@ -63,6 +63,9 @@
         });
 
         this.render(true);
+        // The page may still be laying out (fonts, select widgets): fit again when it settles.
+        $(window).on('resize load', function () { self.fit(); });
+        setTimeout(function () { self.fit(); }, 400);
         setInterval(function () {
             self.now = Math.floor(Date.now() / 1000);
             self.drawNow();
@@ -238,20 +241,34 @@
         }
 
         main.append(scale).append(canvas);
-        this.el.find('[data-gantt-body]').empty().append(side).append(main);
-        this.main = main;
+        // The body scrolls both ways within the screen: its horizontal scrollbar is always at hand,
+        // the time scale stays on top and the task names on the left.
+        var body = this.el.find('[data-gantt-body]');
+        body.off('scroll.gantt').empty().append(side).append(main);
+        this.main = body;
         this.canvas = canvas;
         // Marks of overdue tasks stay at the visible left edge.
-        main.on('scroll', function () {
-            canvas.find('.sx-task-gantt__task--before').css('left', main.scrollLeft());
+        body.on('scroll.gantt', function () {
+            canvas.find('.sx-task-gantt__task--before').css('left', body.scrollLeft());
         });
         this.drawNow();
+        this.fit();
 
         if (scrollToNow) {
             var target = this.now > r.from && this.now < r.to ? (this.now - r.from) * sc.pps - 120 : 0;
             // After the layout: the stylesheet may come after the script.
-            setTimeout(function () { main.scrollLeft(Math.max(0, target)).trigger('scroll'); }, 50);
+            setTimeout(function () { body.scrollLeft(Math.max(0, target)).trigger('scroll'); }, 50);
         }
+    };
+
+    /** The body ends at the bottom of the screen: its horizontal scrollbar is always visible. */
+    Gantt.prototype.fit = function () {
+        if (!this.main) {
+            return;
+        }
+        // From the body's place on the page to the bottom of the screen, without scrolling the page.
+        var top = this.main.offset().top;
+        this.main.css('max-height', Math.max(320, window.innerHeight - top - 16));
     };
 
     Gantt.prototype.drawNow = function () {

@@ -62,12 +62,17 @@ class CmsTaskViewToolbarWidget extends Widget
                 ['class' => 'form-control form-control-sm sx-task-toolbar__user', 'onchange' => 'this.form.submit()', 'title' => 'Чьи задачи']);
         }
 
+        // The search of list filters: the same icon, a submit button on the right.
         $search = Html::tag('div',
-            Html::tag('i', '', ['class' => 'fas fa-search']).
             Html::input('search', 'q', $this->context->q, [
                 'class'       => 'form-control form-control-sm',
                 'placeholder' => 'Поиск: задача, клиент, проект, №',
                 'autocomplete'=> 'off',
+            ])
+            .Html::tag('button', \skeeks\cms\backend\helpers\BackendIcon::render('search', ['size' => 16]), [
+                'type'  => 'submit',
+                'class' => 'sx-task-toolbar__search-btn',
+                'title' => 'Найти',
             ]), ['class' => 'sx-task-toolbar__search']);
 
         return Html::tag('form',

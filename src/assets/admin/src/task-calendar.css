@@ -600,18 +600,29 @@
     width: 240px;
 }
 
-.sx-task-toolbar__search .fa-search {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    color: var(--sx-color-text-muted);
-    pointer-events: none;
+.sx-task-toolbar__search .form-control {
+    padding-right: 36px;
 }
 
-.sx-task-toolbar__search .form-control {
-    padding-left: 30px;
+.sx-task-toolbar .sx-task-toolbar__search-btn {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--sx-filter-search-icon-color, var(--sx-color-text-muted));
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.sx-task-toolbar .sx-task-toolbar__search-btn:focus {
+    outline: none;
 }
 
 .sx-task-toolbar__add .fa,
