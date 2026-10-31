@@ -366,6 +366,16 @@ JS
                     if ($i > 6 && (!$lastDate || $date > $lastDate)) {
                         break;
                     }
+                    // A search shows only the days with tasks found.
+                    if ($isSearch && empty($tasksByDate[$date])) {
+                        if (!$lastDate || $date > $lastDate) {
+                            if (!$tasksByDate && !$expiredTasks) {
+                                echo '<div class="sx-task-calendar__later text-center text-muted">Ничего не найдено</div>';
+                            }
+                            break;
+                        }
+                        continue;
+                    }
                     if (!$isSearch && $date > $lastShownDate) {
                         $laterCount = 0;
                         foreach ($tasksByDate as $taskDate => $dateTasks) {

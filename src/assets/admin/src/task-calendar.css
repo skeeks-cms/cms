@@ -625,6 +625,31 @@
     outline: none;
 }
 
+.sx-task-toolbar__search.is-filled .form-control {
+    padding-right: 60px;
+}
+
+.sx-task-toolbar .sx-task-toolbar__search-clear {
+    position: absolute;
+    top: 50%;
+    right: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--sx-color-text-muted);
+    text-decoration: none;
+    transform: translateY(-50%);
+}
+
+.sx-task-toolbar .sx-task-toolbar__search-clear:hover {
+    color: var(--sx-color-text);
+    text-decoration: none;
+}
+
 .sx-task-toolbar__add .fa,
 .sx-task-toolbar__add .fas {
     margin: 0;

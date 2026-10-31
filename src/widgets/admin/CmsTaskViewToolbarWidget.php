@@ -63,8 +63,16 @@ class CmsTaskViewToolbarWidget extends Widget
         }
 
         // The search of list filters: the same icon, a submit button on the right.
+        $clear = '';
+        if ($this->context->q !== '') {
+            $clear = Html::a('&times;', \yii\helpers\Url::current(['q' => null]), [
+                'class'     => 'sx-task-toolbar__search-clear',
+                'title'     => 'Сбросить поиск',
+                'data-pjax' => '0',
+            ]);
+        }
         $search = Html::tag('div',
-            Html::input('search', 'q', $this->context->q, [
+            Html::input('text', 'q', $this->context->q, [
                 'class'       => 'form-control form-control-sm',
                 'placeholder' => 'Поиск: задача, клиент, проект, №',
                 'autocomplete'=> 'off',
@@ -73,7 +81,7 @@ class CmsTaskViewToolbarWidget extends Widget
                 'type'  => 'submit',
                 'class' => 'sx-task-toolbar__search-btn',
                 'title' => 'Найти',
-            ]), ['class' => 'sx-task-toolbar__search']);
+            ]).$clear, ['class' => 'sx-task-toolbar__search'.($clear ? ' is-filled' : '')]);
 
         return Html::tag('form',
             $hidden
