@@ -602,6 +602,12 @@
     min-width: 0;
 }
 
+/* The quick people picker stands in the row next to the fields, centred with them (in forms it sits under a field). */
+.sx-task-toolbar__start > .sx-quick-access-picker {
+    margin: 0;
+    flex-wrap: nowrap;
+}
+
 .sx-task-toolbar .btn,
 .sx-task-toolbar .form-control {
     height: 32px;
