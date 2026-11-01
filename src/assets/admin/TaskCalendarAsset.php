@@ -19,4 +19,14 @@ class TaskCalendarAsset extends AssetBundle
         ControllerActionsWidgetAsset::class,
         'yii\web\YiiAsset',
     ];
+
+    public function init()
+    {
+        parent::init();
+        // The standard confirmation dialog of the backend (unpinning asks first); an older cms-backend has none and
+        // task-calendar.js falls back to window.confirm().
+        if (class_exists(\skeeks\cms\backend\assets\BackendConfirmAsset::class)) {
+            $this->depends[] = \skeeks\cms\backend\assets\BackendConfirmAsset::class;
+        }
+    }
 }

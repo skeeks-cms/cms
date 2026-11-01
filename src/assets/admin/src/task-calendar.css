@@ -892,7 +892,7 @@
     line-height: 16px;
 }
 
-/* The pin toggle (like the pin of a comment): empty and grey — auto, filled accent — fixed; and its confirmation. */
+/* The pin toggle (like the pin of a comment): empty and grey — auto, filled accent — fixed. */
 .sx-task-pin-toggle {
     display: inline-flex;
     align-items: center;
@@ -935,30 +935,3 @@
     outline: none;
 }
 
-.sx-task-confirm {
-    position: fixed;
-    inset: 0;
-    z-index: 2100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    background: rgba(0, 0, 0, .35);
-}
-
-.sx-task-confirm__box {
-    max-width: 440px;
-    padding: 20px;
-    border-radius: 12px;
-    background: var(--sx-color-surface);
-    color: var(--sx-color-text);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
-    line-height: 1.45;
-}
-
-.sx-task-confirm__buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 16px;
-}

@@ -317,26 +317,20 @@
 /**
  * The pin of a task as a toggle (owner, 31.10.2026): [data-sx-task-pin] — fixing keeps the current start at once;
  * unfixing asks first («Снять закрепление с 17:40?», «Снять» / «Оставить»), mentioning a reminder when there is one.
+ * The question is the standard dialog of the backend, sx.backend.confirm() (BackendConfirmAsset of skeeks/cms-backend).
  */
 (function (sx, $) {
     'use strict';
 
-    sx.taskConfirm = function (html, okLabel, cancelLabel, onOk) {
-        var overlay = $('<div class="sx-task-confirm" role="dialog" aria-modal="true"></div>');
-        var box = $('<div class="sx-task-confirm__box"></div>').appendTo(overlay);
-        $('<div class="sx-task-confirm__text"></div>').html(html).appendTo(box);
-        var buttons = $('<div class="sx-task-confirm__buttons"></div>').appendTo(box);
-        var close = function () { overlay.remove(); $(document).off('keydown.sxconfirm'); };
-        $('<button type="button" class="btn btn-default btn-sm"></button>').text(cancelLabel).on('click', close).appendTo(buttons);
-        $('<button type="button" class="btn btn-primary btn-sm"></button>').text(okLabel).on('click', function () {
-            close();
-            onOk();
-        }).appendTo(buttons);
-        overlay.on('click', function (e) { if (e.target === overlay[0]) { close(); } });
-        $(document).on('keydown.sxconfirm', function (e) { if (e.key === 'Escape') { close(); } });
-        overlay.appendTo('body');
-        buttons.find('.btn-default').trigger('focus');
-    };
+    function confirmUnpin(options) {
+        if (sx.backend && sx.backend.confirm) {
+            sx.backend.confirm(options);
+            return;
+        }
+        if (window.confirm(options.title + '\n\n' + options.text)) {
+            options.onOk();
+        }
+    }
 
     function pin(el, fixed) {
         var data = {fixed: fixed ? 1 : 0};
@@ -368,12 +362,17 @@
             pin(el, true);
             return;
         }
-        var esc = function (t) { return $('<span>').text(t || '').html(); };
-        var html = '<b>Снять закрепление с ' + esc(el.data('time')) + '?</b><br>Задача станет обычной, и система сама поставит её '
-            + 'в свободное время. Если вы обещали это время клиенту, лучше перенесите задачу в карточке.';
+        var text = 'Задача станет обычной, и система сама поставит её в свободное время. '
+            + 'Если вы обещали это время клиенту, лучше перенесите задачу в карточке.';
         if (el.data('reminder')) {
-            html += '<br><br>Напоминание тоже сдвинется вместе с задачей.';
+            text += '\n\nНапоминание тоже сдвинется вместе с задачей.';
         }
-        sx.taskConfirm(html, 'Снять', 'Оставить', function () { pin(el, false); });
+        confirmUnpin({
+            title: 'Снять закрепление с ' + el.data('time') + '?',
+            text: text,
+            ok: 'Снять',
+            cancel: 'Оставить',
+            onOk: function () { pin(el, false); }
+        });
     });
 }(sx, sx.$));
