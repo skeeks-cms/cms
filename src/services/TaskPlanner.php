@@ -134,12 +134,26 @@ class TaskPlanner
         return 'cms-task-plan-'.$userId;
     }
 
-    /** A database lock of MySQL/MariaDB (the site has no mutex component), else the mutex when there is one. */
+    /**
+     * A database lock of MySQL/MariaDB (the site has no mutex component), else the mutex when there is one.
+     * A compound operation over several executors in one outer transaction (A: 1 then 23, B: 23 then 1) cannot keep
+     * the order of ids across its calls; the database then names one of them a deadlock victim — that is the same
+     * refusal as a busy lock (BUSY_MESSAGE), not an SQL error. Such an operation takes all its executors at once
+     * (lockExecutors([...])) when it knows them beforehand.
+     */
     protected static function acquire(string $name): bool
     {
         $db = CmsTask::getDb();
         if ($db->driverName === 'mysql') {
-            return (int)$db->createCommand('SELECT GET_LOCK(:name, :timeout)', [':name' => $name, ':timeout' => static::LOCK_TIMEOUT])->queryScalar() === 1;
+            try {
+                return (int)$db->createCommand('SELECT GET_LOCK(:name, :timeout)', [':name' => $name, ':timeout' => static::LOCK_TIMEOUT])->queryScalar() === 1;
+            } catch (\yii\db\Exception $e) {
+                // 1213 ER_LOCK_DEADLOCK (MariaDB), 3058 ER_USER_LOCK_DEADLOCK (MySQL).
+                if (in_array((int)($e->errorInfo[1] ?? 0), [1213, 3058], true)) {
+                    return false;
+                }
+                throw $e;
+            }
         }
 
         return !\Yii::$app->has('mutex') || \Yii::$app->mutex->acquire($name, static::LOCK_TIMEOUT);

@@ -1444,6 +1444,21 @@ class CmsTask extends ActiveRecord
             .($this->replanned_at ? ' ('.$f->asDate((int)$this->replanned_at, 'php:j F').' в '.$f->asTime((int)$this->replanned_at, 'php:H:i').')' : '');
     }
 
+    /**
+     * The marks next to the start of a task row: the bell, «перенесена», «не успевает» and «Просрочена!» (only a fixed
+     * time can be overdue: an auto task whose time passed waits in the queue). The pin answers them for every task
+     * whose marks changed, so the list shows them without a reload.
+     */
+    public function startMarksHtml(): string
+    {
+        $isFixed = !$this->hasAttribute('is_fixed_start') || $this->is_fixed_start;
+        $isLate = $isFixed && $this->plan_start_at && $this->plan_start_at < time() - 60 && $this->status !== static::STATUS_IN_WORK
+            && in_array($this->status, static::activeStatuses(), true);
+
+        return $this->reminderIconHtml.$this->replannedIconHtml.' '.$this->deadlineMarkHtml
+            .($isLate ? ' / <span class="sx-preview-card__meta--danger">Просрочена!</span>' : '');
+    }
+
     /** The mark of a task the planner moved: its former start in the title. */
     public function getReplannedIconHtml(): string
     {
@@ -1490,6 +1505,7 @@ class CmsTask extends ActiveRecord
                 'data-sx-task-pin' => (int)$this->id,
                 'data-fixed'    => $fixed ? 1 : 0,
                 'data-time'     => $time,
+                'data-start'    => (int)$this->plan_start_at,
                 'data-reminder' => $this->hasAttribute('remind_at') && $this->remind_at && !$this->reminded_at ? 1 : 0,
                 'data-url'      => \yii\helpers\Url::to(['/cms/admin-cms-task/pin']),
             ]

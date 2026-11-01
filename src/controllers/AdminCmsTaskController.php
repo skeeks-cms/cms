@@ -2970,30 +2970,47 @@ JS
             return ['success' => false, 'message' => 'Нет прав менять эту задачу.'];
         }
         $fixed = (bool)\Yii::$app->request->post('fixed');
-        // The executor's queue before the change: the list updates the moved rows in place instead of reloading.
-        $queue = function () use ($task) {
-            return CmsTask::find()->select(['plan_start_at', 'id'])
+        // The executor's queue before the change: the list updates the changed rows in place instead of reloading.
+        // Everything a row shows of its start: the time, the reminder, «перенесена», the planned end against the deadline.
+        $columns = array_values(array_filter(['id', 'plan_start_at', 'plan_end_at', 'is_fixed_start', 'remind_at', 'reminded_at', 'replanned_from', 'deadline_at'],
+            static fn($name) => CmsTask::getTableSchema()->getColumn($name) !== null));
+        $queue = function () use ($task, $columns) {
+            return CmsTask::find()->select($columns)
                 ->andWhere(['executor_id' => $task->executor_id, 'status' => CmsTask::activeStatuses()])
-                ->indexBy('id')->column();
+                ->indexBy('id')->asArray()->all();
         };
         $before = $task->executor_id ? $queue() : [];
         if ($error = $task->setFixedStart($fixed)) {
             return ['success' => false, 'message' => $error];
         }
         $task->refresh();
+        $changed = [];
+        foreach ($task->executor_id ? $queue() : [] as $id => $row) {
+            if (!isset($before[$id]) || $before[$id] != $row) {
+                $changed[] = (int)$id;
+            }
+        }
+        // The layout counts the whole queue, the answer names only the tasks this person may see (manager query).
+        $visible = [];
+        if ($changed) {
+            $query = CmsTask::find()->andWhere([CmsTask::tableName().'.id' => $changed]);
+            self::initQuery($query);
+            $visible = $query->all();
+        }
         $f = \Yii::$app->formatter;
         $moved = [];
-        foreach ($task->executor_id ? $queue() : [] as $id => $start) {
-            if (!array_key_exists($id, $before) || (int)$before[$id] !== (int)$start) {
-                $moved[] = [
-                    'id'    => (int)$id,
-                    'start' => (int)$start,
-                    'day'   => $start ? $f->asDate(max((int)$start, time()), 'php:Y-m-d') : '',
-                    'time'  => $start ? $f->asTime((int)$start, 'php:H:i') : '',
-                    // The same text as the start line of a task row (task-view.php).
-                    'text'  => $start ? $f->asDatetime((int)$start, "d MMMM y 'г'., HH:mm") : '',
-                ];
-            }
+        foreach ($visible as $row) {
+            $start = (int)$row->plan_start_at;
+            $moved[] = [
+                'id'       => (int)$row->id,
+                'start'    => $start,
+                'day'      => $start ? $f->asDate(max($start, time()), 'php:Y-m-d') : '',
+                'time'     => $start ? $f->asTime($start, 'php:H:i') : '',
+                // The same text and marks as the start line of a task row (task-view.php).
+                'text'     => $start ? $f->asDatetime($start, "d MMMM y 'г'., HH:mm") : '',
+                'marks'    => $row->startMarksHtml(),
+                'reminder' => $row->hasAttribute('remind_at') && $row->remind_at && !$row->reminded_at ? 1 : 0,
+            ];
         }
 
         return [

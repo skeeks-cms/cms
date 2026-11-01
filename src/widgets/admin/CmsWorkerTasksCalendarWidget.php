@@ -83,8 +83,9 @@ class CmsWorkerTasksCalendarWidget extends Widget
     }
 
     /**
-     * Why the order cannot be saved: an empty list, or an id that is not a task of this executor the person may
-     * see (another executor's, a missing one). Nothing is laid out then.
+     * Why the order cannot be saved: an empty list, an id that is not a task of this executor the person may
+     * see (another executor's, a missing one), or a task that is not in the queue — fixed, in work or closed.
+     * Nothing is laid out then.
      */
     protected function orderError(array $ids): ?string
     {
@@ -92,10 +93,21 @@ class CmsWorkerTasksCalendarWidget extends Widget
             return 'Не передан порядок задач.';
         }
         $user = \Yii::$app->user->identity;
-        $found = CmsTask::find()->forManager($user)
-            ->andWhere([CmsTask::tableName().'.id' => $ids, CmsTask::tableName().'.executor_id' => (int)$this->user->id])
-            ->count();
+        $t = CmsTask::tableName();
+        $rows = CmsTask::find()->forManager($user)
+            ->select(array_merge([$t.'.id', $t.'.status'], CmsTask::getTableSchema()->getColumn('is_fixed_start') ? [$t.'.is_fixed_start'] : []))
+            ->andWhere([$t.'.id' => $ids, $t.'.executor_id' => (int)$this->user->id])
+            ->asArray()->all();
+        if (count($rows) !== count($ids)) {
+            return 'Порядок не сохранён: в списке есть задачи другого сотрудника или недоступные вам. Обновите страницу.';
+        }
+        $queue = array_diff(CmsTask::activeStatuses(), [CmsTask::STATUS_IN_WORK]);
+        foreach ($rows as $row) {
+            if (!empty($row['is_fixed_start']) || !in_array($row['status'], $queue, true)) {
+                return 'Порядок не сохранён: закреплённые, начатые и закрытые задачи не входят в очередь. Обновите страницу.';
+            }
+        }
 
-        return (int)$found === count($ids) ? null : 'Порядок не сохранён: в списке есть задачи другого сотрудника или недоступные вам. Обновите страницу.';
+        return null;
     }
 }

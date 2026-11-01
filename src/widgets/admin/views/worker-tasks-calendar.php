@@ -57,7 +57,8 @@ $model = $user;
                 
                 var newSort = [];
                 
-                $(".sx-task-tr", self.jWrapper).each(function(i, element)
+                // The order is the queue of auto tasks: a fixed one keeps its time and is not sent (the server refuses it).
+                $(".sx-task-tr:not(.sx-task-tr--fixed)", self.jWrapper).each(function(i, element)
                 {
                     newSort.push($(this).data("id"));
                 });

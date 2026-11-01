@@ -351,16 +351,19 @@
     }
 
     /**
-     * Shows a pin change without a reload (owner, 01.11.2026: an employee has many tasks). In the list the moved rows
-     * (`moved` of admin-cms-task/pin: the executor's tasks whose start changed) get their new time and order inside
-     * their day; a row that changes its day, or a card whose start changed, needs a reload — returns false then.
+     * Shows a pin change without a reload (owner, 01.11.2026: an employee has many tasks). In the list the changed rows
+     * (`moved` of admin-cms-task/pin: the visible tasks of the executor whose start or marks changed) get their new
+     * time, marks and order inside their day; a row that changes its day, or a card whose start changed, needs
+     * a reload — returns false then.
      */
     function applyPin(el, fixed, moved) {
         var row = el.closest('tr[data-id]');
         if (!row.length) {
             // The card: only the toggle changes when the start stayed.
-            if (moved.length) {
-                return false;
+            for (var j = 0; j < moved.length; j++) {
+                if (+moved[j].id === +el.data('sxTaskPin') && +moved[j].start !== +el.attr('data-start')) {
+                    return false;
+                }
             }
             setPinState(el, fixed);
             return true;
@@ -383,9 +386,18 @@
             var tr = item[0], m = item[1];
             tr.attr('data-start', m.start).data('start', m.start);
             tr.find('.sx-task-calendar__time-value').text(m.time);
-            tr.find('[data-sx-task-pin]').attr('data-time', m.time);
-            setPinState(tr.find('[data-sx-task-pin]'), !!tr.find('[data-sx-task-pin]').hasClass('is-fixed'));
+            var toggle = tr.find('[data-sx-task-pin]');
+            toggle.attr('data-time', m.time).attr('data-start', m.start)
+                .attr('data-reminder', m.reminder ? 1 : 0).data('reminder', m.reminder ? 1 : 0);
+            setPinState(toggle, toggle.hasClass('is-fixed'));
             tr.find('.sx-task-start-text').text(m.text);
+            // The bell, «перенесена», «не успевает», «Просрочена!» — rendered by the server for the new state.
+            var marks = tr.find('.sx-task-start-marks');
+            marks.find('[data-toggle="tooltip"]').each(function () { if ($.fn.tooltip) { $(this).tooltip('dispose'); } });
+            marks.html(m.marks || '');
+            if ($.fn.tooltip) {
+                marks.find('[data-toggle="tooltip"]').tooltip();
+            }
             if ($.inArray(tr.closest('tbody')[0], bodies) === -1) {
                 bodies.push(tr.closest('tbody')[0]);
             }

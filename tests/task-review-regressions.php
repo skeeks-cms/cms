@@ -10,6 +10,8 @@
  * - F11 the order of the day list refuses another executor's or a missing task;
  * - F2 a failure before the notification is stored leaves the reminder to the next run;
  * - F8 a task closed after the selection is not reminded.
+ * Round 2 (01.11.2026): the pin answers only visible tasks (N1) with their new marks (N4); a schedule change waits for
+ * the layout lock and is refused when it is busy (N2); the order refuses fixed tasks.
  * Two processes at once (F1, F2, F8) — tests/task-concurrency-disposable.php.
  *
  * CMS_TASK_REVIEW_TEST=local php tests/task-review-regressions.php
@@ -205,18 +207,84 @@ try {
         Yii::$app->request->setBodyParams(['fixed' => $fixed ? 1 : 0]);
         return Yii::$app->createController('cms/admin-cms-task')[0]->runAction('pin', ['pk' => (int)$task->id]);
     };
+    // The order of the queue takes auto tasks only: a fixed, a started or a closed one is refused.
+    $check($orderError->invoke($widget, [(int)$second->id, (int)$person->id]) !== null, 'F11: a fixed task is refused in the order');
+    $firstStart = (int)$get($first)->plan_start_at;
     $pinned = $pinAction($first, true);
-    $check(!empty($pinned['success']) && (int)$get($first)->is_fixed_start === 1 && $pinned['moved'] === [],
-        'pinning keeps every start: nothing moved '.json_encode($pinned, JSON_UNESCAPED_UNICODE));
+    $check(!empty($pinned['success']) && (int)$get($first)->is_fixed_start === 1 && array_column($pinned['moved'], 'id') === [(int)$first->id]
+        && $pinned['moved'][0]['start'] === $firstStart,
+        'pinning keeps every start: only the pinned task itself changed '.json_encode($pinned, JSON_UNESCAPED_UNICODE));
+    $check($orderError->invoke($widget, [(int)$second->id, (int)$first->id]) !== null, 'F11: a pinned task leaves the order');
     $unpinned = $pinAction($person, false);
     $byId = array_column($unpinned['moved'] ?? [], null, 'id');
     $check(!empty($unpinned['success']) && isset($byId[(int)$person->id]) && $byId[(int)$person->id]['start'] === (int)$get($person)->plan_start_at
         && $byId[(int)$person->id]['time'] !== '' && $byId[(int)$person->id]['day'] !== '' && $byId[(int)$person->id]['text'] !== '',
         'unpinning answers with the new start of the task, its day and texts '.json_encode($unpinned, JSON_UNESCAPED_UNICODE));
     foreach ($unpinned['moved'] as $m) {
-        $check($m['start'] === (int)CmsTask::findOne($m['id'])->plan_start_at, 'every moved task carries its saved start');
+        $saved = CmsTask::findOne($m['id']);
+        $check($m['start'] === (int)$saved->plan_start_at && $m['marks'] === $saved->startMarksHtml()
+            && $m['reminder'] === ($saved->remind_at && !$saved->reminded_at ? 1 : 0), 'every changed task carries its saved start and marks');
     }
+    // N4: a task the unpinned one moves gets its new marks too — the reminder follows its start.
+    $marked = $make('С напоминанием', 30);
+    $marked->reminder = '900';
+    $check($marked->save(), 'a reminder 15 minutes before');
+    $wall = $make('Закреплена на её месте', 60, (int)$get($marked)->plan_start_at);
+    $markedBefore = $get($marked);
+    $answer = $pinAction($wall, false);
+    $byId = array_column($answer['moved'] ?? [], null, 'id');
+    $check((int)$get($marked)->remind_at !== (int)$markedBefore->remind_at, 'N4: unpinning the wall moves the reminder of the task behind it');
+    $check(isset($byId[(int)$marked->id]) && $byId[(int)$marked->id]['marks'] === $get($marked)->startMarksHtml()
+        && strpos($byId[(int)$marked->id]['marks'], 'sx-task-bell') !== false && $byId[(int)$marked->id]['reminder'] === 1,
+        'N4: the moved reminder is answered with its new bell');
+    CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['id' => [(int)$marked->id, (int)$wall->id]]);
+
+    // N1: the answer names only the tasks the person may see; the layout still counts the whole queue.
+    foreach (CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.is_active' => 1])->andWhere(['not in', CmsUser::tableName().'.id', [(int)$user->id]])->limit(20)->all() as $viewer) {
+        $hidden = $make('Скрытая от смотрящего', 30);
+        if (CmsTask::find()->forManager($viewer)->andWhere([CmsTask::tableName().'.id' => (int)$hidden->id])->exists()) {
+            CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['id' => (int)$hidden->id]);
+            continue;
+        }
+        // A fixed task of the same executor the viewer authored (visible to him) stands right where the hidden one is.
+        $authored = $make('Видимая автору', 30, (int)$get($hidden)->plan_start_at);
+        CmsTask::updateAll(['created_by' => (int)$viewer->id], ['id' => (int)$authored->id]);
+        Yii::$app->user->setIdentity($viewer);
+        if (!Yii::$app->user->can('cms/admin-task/manage', ['model' => $get($authored)])) {
+            Yii::$app->user->setIdentity($user);
+            continue;
+        }
+        $before = (int)$get($hidden)->plan_start_at;
+        $answer = $pinAction($get($authored), false);
+        Yii::$app->user->setIdentity($user);
+        $check(!empty($answer['success']), 'the viewer unpins his task '.json_encode($answer, JSON_UNESCAPED_UNICODE));
+        $ids = array_column($answer['moved'], 'id');
+        $check((int)$get($hidden)->plan_start_at !== $before, 'N1: the hidden task did move (the layout counts the whole queue)');
+        $check(!in_array((int)$hidden->id, $ids, true), 'N1: the answer has no task hidden from the viewer '.json_encode($ids));
+        CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['id' => [(int)$hidden->id, (int)$authored->id]]);
+        $privacyChecked = true;
+        break;
+    }
+    echo empty($privacyChecked) ? "SKIP N1: no employee here sees a task he authored but not the rest of the queue\n" : '';
     $_SERVER['REQUEST_METHOD'] = 'GET';
+
+    // N2: a schedule change waits for the layout lock before it is written; a busy lock refuses it, nothing is saved.
+    $third = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.is_active' => 1])->andWhere(['not in', CmsUser::tableName().'.id', [(int)$user->id, (int)$other->id]])->one();
+    if ($third) {
+        $check(!$third->isTransactional(CmsUser::OP_UPDATE), 'N2: a save without a schedule change is not made transactional');
+        $saved = CmsUser::find()->select('work_shedule')->where(['id' => (int)$third->id])->scalar();
+        $holder = new yii\db\Connection(['dsn' => Yii::$app->db->dsn, 'username' => Yii::$app->db->username, 'password' => Yii::$app->db->password]);
+        $holder->createCommand("SELECT GET_LOCK('cms-task-plan-".(int)$third->id."', 0)")->queryScalar();
+        $third->work_shedule = [['day' => [1, 2, 3], 'startHour' => '10', 'startMinutes' => '00', 'endHour' => '12', 'endMinutes' => '00']];
+        $check($third->isTransactional(CmsUser::OP_UPDATE), 'N2: a schedule change is saved in a transaction with the layout');
+        $began = microtime(true);
+        $result = $third->save(false, ['work_shedule']);
+        $holder->createCommand("SELECT RELEASE_LOCK('cms-task-plan-".(int)$third->id."')")->queryScalar();
+        $holder->close();
+        $check(!$result && $third->hasErrors('work_shedule') && microtime(true) - $began >= TaskPlanner::LOCK_TIMEOUT - 1,
+            'N2: a busy layout lock refuses the schedule change with the message');
+        $check(CmsUser::find()->select('work_shedule')->where(['id' => (int)$third->id])->scalar() === $saved, 'N2: the schedule is not written');
+    }
 
     // F2. A failure before the notification is stored leaves the reminder to the next run.
     CmsTask::updateAll(['remind_at' => null], ['and', ['not', ['remind_at' => null]], ['reminded_at' => null]]);

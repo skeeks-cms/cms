@@ -173,6 +173,14 @@ class User
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "checkDataBeforeDelete"]);
 
         // A changed work schedule (a vacation too) moves the employee's auto tasks: one of the events tasks move on.
+        // The schedule and the layout are one operation (isTransactional()): the layout lock is taken before the
+        // schedule is written, a busy lock refuses the save, a failed layout rolls the schedule back.
+        $this->on(self::EVENT_BEFORE_UPDATE, function (\yii\base\ModelEvent $e) {
+            if ($e->isValid && $this->isScheduleChanged() && !\skeeks\cms\services\TaskPlanner::lockExecutors([(int)$this->id])) {
+                $this->addError('work_shedule', \skeeks\cms\services\TaskPlanner::BUSY_MESSAGE);
+                $e->isValid = false;
+            }
+        });
         $this->on(self::EVENT_AFTER_UPDATE, function (AfterSaveEvent $e) {
             if (array_key_exists('work_shedule', (array)$e->changedAttributes) && \skeeks\cms\services\TaskPlanner::hasStartMode()) {
                 (new \skeeks\cms\services\TaskPlanner())->plan($this instanceof CmsUser ? $this : CmsUser::findOne((int)$this->id));
@@ -197,6 +205,24 @@ class User
 
         // A client: the managers field rewrites the links, their levels and the main responsible are kept.
         \skeeks\cms\crm\CrmAccess::keepLinks($this, CmsCrmAccessRequest::RECORD_CLIENT);
+    }
+
+    /** Whether this save changes the work schedule the tasks are laid out by. */
+    protected function isScheduleChanged(): bool
+    {
+        if ($this->isNewRecord || !\skeeks\cms\services\TaskPlanner::hasStartMode()) {
+            return false;
+        }
+        // The stored value is JSON, the model's one is an array until HasJsonFieldsBehavior encodes it.
+        $decode = static fn($value) => is_string($value) && $value !== '' ? json_decode($value, true) : ($value ?: null);
+
+        return $decode($this->getOldAttribute('work_shedule')) != $decode($this->work_shedule);
+    }
+
+    /** A schedule change is saved in one transaction with the layout of the employee's tasks. */
+    public function isTransactional($operation)
+    {
+        return ($operation === self::OP_UPDATE && $this->isScheduleChanged()) || parent::isTransactional($operation);
     }
 
 

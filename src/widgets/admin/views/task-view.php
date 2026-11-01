@@ -131,15 +131,10 @@ JS
                     <? if ($task->plan_start_at) : ?>
                         <?
                         $isFixedStart = !$task->hasAttribute('is_fixed_start') || $task->is_fixed_start;
-                        // Only a fixed time can be overdue: an auto task whose time passed waits in the queue.
-                        $isLateStart = $isFixedStart && $task->plan_start_at < time() - 60 && $task->status !== \skeeks\cms\models\CmsTask::STATUS_IN_WORK
-                            && in_array($task->status, \skeeks\cms\models\CmsTask::activeStatuses(), true);
                         ?>
                         <span class="sx-task-start-text" title="<?= $isFixedStart ? 'Закреплена на это время' : 'Время рассчитано по графику и очереди'; ?>" data-toggle="tooltip"><?php echo \Yii::$app->formatter->asDatetime($task->plan_start_at, "d MMMM y 'г'., HH:mm"); ?></span>
-                        <?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?> <?= $task->deadlineMarkHtml; ?>
-                        <? if ($isLateStart) : ?>
-                            / <span class="sx-preview-card__meta--danger">Просрочена!</span>
-                        <? endif; ?>
+                        <? /* The marks change with the queue: the pin answers them for the moved rows (CmsTask::startMarksHtml()). */ ?>
+                        <span class="sx-task-start-marks"><?= $task->startMarksHtml(); ?></span>
                     <? else: ?>
                     
                         <? if ($worked) : ?>
