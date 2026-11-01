@@ -196,6 +196,28 @@ try {
     $check($orderError->invoke($widget, []) !== null, 'F11: an empty order is refused');
     $check($orderError->invoke($widget, [(int)$second->id, (int)$first->id]) === null, 'the executor\'s own tasks are accepted');
 
+    // The pin toggles without a reload (01.11.2026): admin-cms-task/pin answers with every task of the executor whose
+    // start changed, so the list moves those rows in place.
+    $pinAction = static function (CmsTask $task, bool $fixed) {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        Yii::$app->request->enableCsrfValidation = false;
+        Yii::$app->request->setUrl('/~sxx/cms/admin-cms-task/pin?pk='.(int)$task->id);
+        Yii::$app->request->setBodyParams(['fixed' => $fixed ? 1 : 0]);
+        return Yii::$app->createController('cms/admin-cms-task')[0]->runAction('pin', ['pk' => (int)$task->id]);
+    };
+    $pinned = $pinAction($first, true);
+    $check(!empty($pinned['success']) && (int)$get($first)->is_fixed_start === 1 && $pinned['moved'] === [],
+        'pinning keeps every start: nothing moved '.json_encode($pinned, JSON_UNESCAPED_UNICODE));
+    $unpinned = $pinAction($person, false);
+    $byId = array_column($unpinned['moved'] ?? [], null, 'id');
+    $check(!empty($unpinned['success']) && isset($byId[(int)$person->id]) && $byId[(int)$person->id]['start'] === (int)$get($person)->plan_start_at
+        && $byId[(int)$person->id]['time'] !== '' && $byId[(int)$person->id]['day'] !== '' && $byId[(int)$person->id]['text'] !== '',
+        'unpinning answers with the new start of the task, its day and texts '.json_encode($unpinned, JSON_UNESCAPED_UNICODE));
+    foreach ($unpinned['moved'] as $m) {
+        $check($m['start'] === (int)CmsTask::findOne($m['id'])->plan_start_at, 'every moved task carries its saved start');
+    }
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+
     // F2. A failure before the notification is stored leaves the reminder to the next run.
     CmsTask::updateAll(['remind_at' => null], ['and', ['not', ['remind_at' => null]], ['reminded_at' => null]]);
     $due = $make('Напомнить', 30, $at('10:00', 4));

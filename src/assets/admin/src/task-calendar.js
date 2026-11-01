@@ -332,6 +332,74 @@
         }
     }
 
+    function setTitle(el, title) {
+        el.attr('title', title).attr('data-original-title', title);
+    }
+
+    /** The toggle and its row show the new state: empty grey pin — auto, filled — fixed (the handle is hidden by CSS). */
+    function setPinState(el, fixed) {
+        var time = el.attr('data-time');
+        el.toggleClass('is-fixed', fixed).attr('aria-pressed', fixed ? 'true' : 'false').attr('data-fixed', fixed ? 1 : 0).data('fixed', fixed ? 1 : 0);
+        setTitle(el, fixed ? 'Закреплено на ' + time + '. Нажмите, чтобы снять закрепление' : 'Рассчитано по графику. Нажмите, чтобы закрепить на ' + time);
+        el.find('span').text(fixed ? 'закреплено' : 'по графику');
+        var row = el.closest('tr[data-id]');
+        row.toggleClass('sx-task-tr--fixed', fixed);
+        var hint = row.find('.sx-task-calendar__time');
+        hint.toggleClass('is-fixed', fixed).toggleClass('is-auto', !fixed);
+        setTitle(hint, fixed ? 'Закреплено на это время' : 'Рассчитано по графику: время сдвигается вместе с очередью');
+        setTitle(row.find('.sx-task-start-text'), fixed ? 'Закреплена на это время' : 'Время рассчитано по графику и очереди');
+    }
+
+    /**
+     * Shows a pin change without a reload (owner, 01.11.2026: an employee has many tasks). In the list the moved rows
+     * (`moved` of admin-cms-task/pin: the executor's tasks whose start changed) get their new time and order inside
+     * their day; a row that changes its day, or a card whose start changed, needs a reload — returns false then.
+     */
+    function applyPin(el, fixed, moved) {
+        var row = el.closest('tr[data-id]');
+        if (!row.length) {
+            // The card: only the toggle changes when the start stayed.
+            if (moved.length) {
+                return false;
+            }
+            setPinState(el, fixed);
+            return true;
+        }
+        var list = row.closest('.sx-worker-tasks-calendar-widget');
+        var rows = [];
+        for (var i = 0; i < moved.length; i++) {
+            var tr = list.find('tr[data-id="' + moved[i].id + '"]');
+            if (!tr.length) {
+                continue;
+            }
+            if ((tr.closest('tbody').attr('data-day') || '') !== moved[i].day) {
+                return false;
+            }
+            rows.push([tr, moved[i]]);
+        }
+        setPinState(el, fixed);
+        var bodies = [];
+        $.each(rows, function (n, item) {
+            var tr = item[0], m = item[1];
+            tr.attr('data-start', m.start).data('start', m.start);
+            tr.find('.sx-task-calendar__time-value').text(m.time);
+            tr.find('[data-sx-task-pin]').attr('data-time', m.time);
+            setPinState(tr.find('[data-sx-task-pin]'), !!tr.find('[data-sx-task-pin]').hasClass('is-fixed'));
+            tr.find('.sx-task-start-text').text(m.text);
+            if ($.inArray(tr.closest('tbody')[0], bodies) === -1) {
+                bodies.push(tr.closest('tbody')[0]);
+            }
+        });
+        // The rows of a day follow their start: each task row takes the place of the one before it in time.
+        $.each(bodies, function (n, body) {
+            var items = $(body).children('tr[data-start]').toArray();
+            var sorted = items.slice().sort(function (a, b) { return (+$(a).attr('data-start')) - (+$(b).attr('data-start')); });
+            var slots = $.map(items, function (item) { return $('<tr></tr>').insertBefore(item)[0]; });
+            $.each(slots, function (k, slot) { $(slot).replaceWith(sorted[k]); });
+        });
+        return true;
+    }
+
     function pin(el, fixed) {
         var data = {fixed: fixed ? 1 : 0};
         data[yii.getCsrfParam()] = yii.getCsrfToken();
@@ -348,7 +416,9 @@
                 return;
             }
             sx.notify.success(response.message);
-            setTimeout(function () { window.location.reload(); }, 900);
+            if (!applyPin(el, fixed, response.moved || [])) {
+                setTimeout(function () { window.location.reload(); }, 900);
+            }
         }).fail(function () {
             sx.notify.error('Не удалось изменить закрепление.');
         });

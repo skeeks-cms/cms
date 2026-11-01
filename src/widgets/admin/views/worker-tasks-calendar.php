@@ -272,11 +272,13 @@ JS
                     echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => [
                         'id'            => $task->id,
                         'executor_sort' => $task->executor_sort,
+                        'start'         => $start,
                     ]]);
                     ?>
                     <td class="sx-task-calendar__handle-cell">
-                        <? /* A fixed task is not dragged at all (owner, 01.11.2026): its time changes in the card or the calendar. */ ?>
-                        <? if (!$isInWork && $isCan && !$isFixed) : ?>
+                        <? /* A fixed task is not dragged at all (owner, 01.11.2026): its handle is hidden by .sx-task-tr--fixed,
+                              so the pin toggles in place without a reload. */ ?>
+                        <? if (!$isInWork && $isCan) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
                                 <a href="#" class="btn sx-move-btn sx-task-calendar__move"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></a>
                             </span>
@@ -287,7 +289,7 @@ JS
                             <? if ($withDate && $start) : ?>
                                 <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
                             <? endif; ?>
-                            <?= $time; ?>
+                            <span class="sx-task-calendar__time-value"><?= $time; ?></span>
                             <? if ($isCan && !$isInWork && $task->hasAttribute('is_fixed_start')) : ?>
                                 <?= $task->pinToggleHtml(false, 13); ?>
                             <? elseif ($isFixed) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>

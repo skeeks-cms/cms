@@ -2970,14 +2970,35 @@ JS
             return ['success' => false, 'message' => 'Нет прав менять эту задачу.'];
         }
         $fixed = (bool)\Yii::$app->request->post('fixed');
+        // The executor's queue before the change: the list updates the moved rows in place instead of reloading.
+        $queue = function () use ($task) {
+            return CmsTask::find()->select(['plan_start_at', 'id'])
+                ->andWhere(['executor_id' => $task->executor_id, 'status' => CmsTask::activeStatuses()])
+                ->indexBy('id')->column();
+        };
+        $before = $task->executor_id ? $queue() : [];
         if ($error = $task->setFixedStart($fixed)) {
             return ['success' => false, 'message' => $error];
         }
         $task->refresh();
         $f = \Yii::$app->formatter;
+        $moved = [];
+        foreach ($task->executor_id ? $queue() : [] as $id => $start) {
+            if (!array_key_exists($id, $before) || (int)$before[$id] !== (int)$start) {
+                $moved[] = [
+                    'id'    => (int)$id,
+                    'start' => (int)$start,
+                    'day'   => $start ? $f->asDate(max((int)$start, time()), 'php:Y-m-d') : '',
+                    'time'  => $start ? $f->asTime((int)$start, 'php:H:i') : '',
+                    // The same text as the start line of a task row (task-view.php).
+                    'text'  => $start ? $f->asDatetime((int)$start, "d MMMM y 'г'., HH:mm") : '',
+                ];
+            }
+        }
 
         return [
             'success' => true,
+            'moved'   => $moved,
             'task'    => [
                 'id'             => (int)$task->id,
                 'is_fixed_start' => (int)$task->is_fixed_start,

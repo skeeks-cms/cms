@@ -722,6 +722,11 @@
     cursor: grabbing;
 }
 
+/* A fixed task is not dragged: its handle stays in the row (the pin toggles in place) but is not shown. */
+.sx-worker-tasks-calendar-widget .sx-task-tr--fixed .sx-task-calendar__handle-cell > * {
+    display: none;
+}
+
 /* Library icons of task marks (BackendIcon): the pin of a fixed time takes the accent colour. */
 .sx-task-calendar .sx-icon--pin,
 .sx-task-deadlines .sx-icon--pin,
@@ -788,9 +793,11 @@
 }
 
 /* «Задачи»: the same column of handles in every day, the same indent on the left as on the right. */
+/* One width with or without the handle, so the times of every day stand in one column. */
 .sx-worker-tasks-calendar-widget .sx-calendar-day td.sx-task-calendar__handle-cell {
-    width: 44px;
-    min-width: 44px;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
     padding-left: 12px !important;
     padding-right: 0 !important;
 }
