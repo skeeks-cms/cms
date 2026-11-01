@@ -866,10 +866,6 @@
     cursor: pointer;
 }
 
-.sx-worker-tasks-calendar-widget .sx-task-calendar__move--pin {
-    color: var(--sx-color-accent) !important;
-}
-
 /* Dragging a block of the week or the day: the new time is shown on it. */
 .sx-task-calendar__block.is-movable {
     cursor: grab;
@@ -896,27 +892,47 @@
     line-height: 16px;
 }
 
-/* The pin toggle and its confirmation. */
+/* The pin toggle (like the pin of a comment): empty and grey — auto, filled accent — fixed; and its confirmation. */
 .sx-task-pin-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
+    gap: 4px;
+    min-width: 22px;
     height: 22px;
     padding: 0;
     border: none;
     border-radius: 6px;
     background: none;
     color: var(--sx-color-text-muted);
-    opacity: .45;
     cursor: pointer;
     vertical-align: middle;
 }
 
-.sx-task-pin-toggle:hover,
+.sx-task-pin-toggle svg {
+    fill: none;
+}
+
+.sx-task-pin-toggle:hover {
+    color: var(--sx-color-text);
+    background: var(--sx-color-surface-muted);
+}
+
 .sx-task-pin-toggle.is-fixed {
-    opacity: 1;
     color: var(--sx-color-accent);
+}
+
+.sx-task-pin-toggle.is-fixed svg {
+    fill: currentColor;
+}
+
+.sx-task-pin-toggle--label {
+    padding: 0 6px;
+    font-size: 13px;
+}
+
+.sx-task-pin-toggle:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .sx-task-confirm {

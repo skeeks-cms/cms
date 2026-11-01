@@ -559,15 +559,9 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                     <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($planStartAt); ?>
                         <?php if ($model->hasAttribute('is_fixed_start') && in_array($model->status, CmsTask::activeStatuses(), true) && $model->status !== CmsTask::STATUS_IN_WORK
                             && \Yii::$app->user->can('cms/admin-task/manage', ['model' => $model])) : ?>
-                            <?php \skeeks\cms\assets\admin\TaskCalendarAsset::register($this); ?>
-                            <button type="button" class="sx-task-pin-toggle <?php echo $model->is_fixed_start ? 'is-fixed' : ''; ?>"
-                                    title="<?php echo $model->is_fixed_start ? 'Снять закрепление' : 'Закрепить на это время'; ?>" data-toggle="tooltip"
-                                    data-sx-task-pin="<?php echo (int)$model->id; ?>" data-fixed="<?php echo (int)$model->is_fixed_start; ?>"
-                                    data-time="<?php echo \Yii::$app->formatter->asTime((int)$model->plan_start_at, 'php:H:i'); ?>"
-                                    data-reminder="<?php echo $model->hasAttribute('remind_at') && $model->remind_at && !$model->reminded_at ? 1 : 0; ?>"
-                                    data-url="<?php echo \yii\helpers\Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/pin'])); ?>"><?php echo CmsTask::icon('pin', 14); ?></button>
-                        <?php endif; ?>
-                        <?php if ($model->hasAttribute('is_fixed_start')) : ?>
+                            <?php // One toggle with its state: an empty grey pin «по графику», a filled one «закреплено». ?>
+                            <?php echo $model->pinToggleHtml(true); ?>
+                        <?php elseif ($model->hasAttribute('is_fixed_start')) : ?>
                             <span class="text-muted" title="<?php echo $model->is_fixed_start ? 'Время выбрал человек, система его не сдвигает' : 'Время рассчитано по рабочему графику и очереди исполнителя и сдвигается вместе с ней'; ?>" data-toggle="tooltip">
                                 · <?php echo $model->is_fixed_start ? \skeeks\cms\models\CmsTask::icon('pin', 12).' закреплено' : 'по графику'; ?>
                             </span>

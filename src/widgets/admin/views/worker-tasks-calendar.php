@@ -119,7 +119,7 @@ $model = $user;
                 providerOptions: {
                     direction: "vertical",
                     onMove: function(event) {
-                        // An empty list takes a task only when it is a day (a fixed task moves to that day).
+                        // An empty list takes a task only when it is a day.
                         if (event.from !== event.to && !$(event.to).children(".sx-task-tr").length && !$(event.to).data("day")) {
                             return false;
                         }
@@ -127,28 +127,7 @@ $model = $user;
                 },
                 onUpdate: function(event)
                 {
-                    // A fixed time changes only by a choice a person sees (owner, 31.10.2026): within its day a fixed
-                    // task does not move; on another day it keeps its time of day («завтра 17:40» → «пн 17:40»).
-                    if (event && event.jItem && event.jItem.hasClass("sx-task-tr--fixed")) {
-                        var item = event.jItem;
-                        var day = event.jContainer ? event.jContainer.data("day") : null;
-                        if (!day || day === item.data("day")) {
-                            window.location.reload();
-                            return;
-                        }
-                        sx.taskMove(self.get('moveUrl'), item.data("id"), {day: day, keep_time: 1}, {
-                            kind: 'day',
-                            done: function (state, response) {
-                                if (state === 'moved') {
-                                    item.data("day", day).attr("data-day", day);
-                                    item.find(".sx-task-calendar__time-date").remove();
-                                    return;
-                                }
-                                window.location.reload();
-                            }
-                        });
-                        return;
-                    }
+                    // Only auto tasks are dragged (a fixed one has no handle): the new order is saved by the button.
                     self.jSavePriorityButton.fadeIn();
                 }
             });
@@ -272,7 +251,7 @@ JS
                     $isCan = \Yii::$app->user->id == $user->id || \Yii::$app->user->can("cms/admin-task/manage", ['model' => $task]);
                     $isFixed = !$task->hasAttribute('is_fixed_start') || (bool)$task->is_fixed_start;
                     $isInWork = $task->status == \skeeks\cms\models\CmsTask::STATUS_IN_WORK;
-                    // Every task but the one in work moves: an auto one changes the queue, a fixed one goes to another day.
+                    // Only an auto task is dragged (its order is the queue); a fixed one and the one in work stay.
                     $class = [$isInWork ? 'sx-task-row-fixed' : ($isFixed ? 'sx-task-tr sx-task-tr--fixed' : 'sx-task-tr')];
                     if (!$isCan) {
                         $class[] = 'sx-task-hidden';
@@ -293,20 +272,11 @@ JS
                     echo \yii\helpers\Html::beginTag('tr', ['class' => implode(' ', $class), 'data' => [
                         'id'            => $task->id,
                         'executor_sort' => $task->executor_sort,
-                        // The day the row stands in: a fixed task moves only to another day.
-                        'day'           => $withDate ? '' : \Yii::$app->formatter->asDate(max((int)$task->plan_start_at, time()), 'php:Y-m-d'),
                     ]]);
                     ?>
                     <td class="sx-task-calendar__handle-cell">
-                        <? if (!$isInWork && $isCan && $isFixed) : ?>
-                            <? /* A fixed time: a pin instead of the grip; it moves only to another day, keeping its time. */ ?>
-                            <span title="Время закреплено: <?= $time; ?>. Нажмите, чтобы снять закрепление; изменить время — в карточке или в календаре; на другой день — перетащите, время сохранится" data-toggle="tooltip">
-                                <a href="#" class="btn sx-move-btn sx-task-calendar__move sx-task-calendar__move--pin"
-                                   data-sx-task-pin="<?= (int)$task->id; ?>" data-fixed="1" data-time="<?= $time; ?>"
-                                   data-reminder="<?= $task->hasAttribute('remind_at') && $task->remind_at && !$task->reminded_at ? 1 : 0; ?>"
-                                   data-url="<?= \yii\helpers\Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/pin'])); ?>"><?= \skeeks\cms\backend\helpers\BackendIcon::render('pin', ['size' => 16]); ?></a>
-                            </span>
-                        <? elseif (!$isInWork && $isCan) : ?>
+                        <? /* A fixed task is not dragged at all (owner, 01.11.2026): its time changes in the card or the calendar. */ ?>
+                        <? if (!$isInWork && $isCan && !$isFixed) : ?>
                             <span title="Перетащите, чтобы изменить очередь">
                                 <a href="#" class="btn sx-move-btn sx-task-calendar__move"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></a>
                             </span>
@@ -318,12 +288,9 @@ JS
                                 <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
                             <? endif; ?>
                             <?= $time; ?>
-                            <? if ($isFixed && !($isCan && !$isInWork)) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
-                            <? if (!$isFixed && $isCan && !$isInWork) : ?>
-                                <button type="button" class="sx-task-pin-toggle" title="Закрепить на <?= $time; ?>" data-toggle="tooltip"
-                                        data-sx-task-pin="<?= (int)$task->id; ?>" data-fixed="0" data-time="<?= $time; ?>"
-                                        data-url="<?= \yii\helpers\Html::encode(\yii\helpers\Url::to(['/cms/admin-cms-task/pin'])); ?>"><?= \skeeks\cms\models\CmsTask::icon('pin', 12); ?></button>
-                            <? endif; ?>
+                            <? if ($isCan && !$isInWork && $task->hasAttribute('is_fixed_start')) : ?>
+                                <?= $task->pinToggleHtml(false, 13); ?>
+                            <? elseif ($isFixed) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
                         </span>
                         <span class="sx-task-calendar__duration"><?= \skeeks\cms\helpers\CmsScheduleHelper::durationAsText((int)$task->plan_duration); ?></span>
                     </td>

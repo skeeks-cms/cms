@@ -1460,10 +1460,40 @@ class CmsTask extends ActiveRecord
         ]);
     }
 
-    /** An icon of the backend library (skeeks/cms-backend) for the marks of a task. */
+    /**
+     * An icon of the backend library (skeeks/cms-backend) for the marks of a task. The pin mark means «fixed», so it is
+     * filled, like a pressed pin toggle (an empty pin is only the toggle of an auto task, see pinToggleHtml()).
+     */
     public static function icon(string $name, int $size = 14): string
     {
-        return \skeeks\cms\backend\helpers\BackendIcon::render($name, ['size' => $size, 'style' => 'vertical-align: -2px;']);
+        return \skeeks\cms\backend\helpers\BackendIcon::render($name, ['size' => $size, 'style' => 'vertical-align: -2px;'.($name === 'pin' ? ' fill: currentColor;' : '')]);
+    }
+
+    /**
+     * The pin toggle of a task, the same everywhere (owner, 01.11.2026, like the pin of a comment): an empty grey pin —
+     * auto, a click fixes the task on its current start; a filled accent pin — fixed, a click asks to unfix it
+     * (task-calendar.js, [data-sx-task-pin]). $label adds the state as text (the card).
+     */
+    public function pinToggleHtml(bool $label = false, int $size = 14): string
+    {
+        $fixed = (bool)$this->is_fixed_start;
+        $time = \Yii::$app->formatter->asTime((int)$this->plan_start_at, 'php:H:i');
+        \skeeks\cms\assets\admin\TaskCalendarAsset::register(\Yii::$app->view);
+
+        return \yii\helpers\Html::button(
+            \skeeks\cms\backend\helpers\BackendIcon::render('pin', ['size' => $size]).($label ? \yii\helpers\Html::tag('span', $fixed ? 'закреплено' : 'по графику') : ''),
+            [
+                'class'         => 'sx-task-pin-toggle'.($fixed ? ' is-fixed' : '').($label ? ' sx-task-pin-toggle--label' : ''),
+                'title'         => $fixed ? 'Закреплено на '.$time.'. Нажмите, чтобы снять закрепление' : 'Рассчитано по графику. Нажмите, чтобы закрепить на '.$time,
+                'aria-pressed'  => $fixed ? 'true' : 'false',
+                'data-toggle'   => 'tooltip',
+                'data-sx-task-pin' => (int)$this->id,
+                'data-fixed'    => $fixed ? 1 : 0,
+                'data-time'     => $time,
+                'data-reminder' => $this->hasAttribute('remind_at') && $this->remind_at && !$this->reminded_at ? 1 : 0,
+                'data-url'      => \yii\helpers\Url::to(['/cms/admin-cms-task/pin']),
+            ]
+        );
     }
 
     /** Whether the table has the deadline yet (code may run before its migration). */
