@@ -239,6 +239,26 @@ try {
         'N4: the moved reminder is answered with its new bell');
     CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['id' => [(int)$marked->id, (int)$wall->id]]);
 
+    // N4 in the card (round 3): pinning keeps the start but the end and «не успевает» change — the card gets them.
+    // Five hours from 09:00 laid out over the lunch end at 15:00, after a deadline of 14:30; fixed, they end at 14:00.
+    $lunch = $make('Пять часов с обедом', 300);
+    CmsTask::updateAll(['plan_start_at' => $at('09:00', 7), 'plan_end_at' => $at('15:00', 7), 'deadline_at' => $at('14:30', 7)], ['id' => (int)$lunch->id]);
+    $check($get($lunch)->isBehindDeadline(), 'N4 card: before the pin the task does not make its deadline');
+    $answer = $pinAction($get($lunch), true);
+    $own = array_column($answer['moved'] ?? [], null, 'id')[(int)$lunch->id] ?? null;
+    $saved = $get($lunch);
+    $check($own !== null && $own['start'] === $at('09:00', 7) && (int)$saved->plan_end_at !== $at('15:00', 7) && !$saved->isBehindDeadline(),
+        'N4 card: the start stayed, the end moved and the deadline is made '.json_encode([$own['start'] ?? null, $saved->plan_end_at], JSON_UNESCAPED_UNICODE));
+    $controller = Yii::$app->createController('cms/admin-cms-task')[0];
+    $check(isset($own['card']) && $own['card']['actions'] === $controller->renderPartial('_start-state', ['model' => $saved, 'part' => 'actions'])
+        && $own['card']['properties'] === $controller->renderPartial('_start-state', ['model' => $saved, 'part' => 'properties']),
+        'N4 card: the own entry carries the card state of the saved task');
+    $check(strpos($own['card']['actions'], Yii::$app->formatter->asDatetime((int)$saved->plan_end_at, 'php:d.m.Y H:i')) !== false
+        && strpos($own['card']['actions'].$own['card']['properties'], 'sx-task-behind') === false
+        && strpos($own['card']['properties'], 'Крайний срок') !== false,
+        'N4 card: the new end, no «не успевает», the deadline row stays');
+    CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['id' => (int)$lunch->id]);
+
     // N1: the answer names only the tasks the person may see; the layout still counts the whole queue.
     foreach (CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.is_active' => 1])->andWhere(['not in', CmsUser::tableName().'.id', [(int)$user->id]])->limit(20)->all() as $viewer) {
         $hidden = $make('Скрытая от смотрящего', 30);

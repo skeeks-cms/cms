@@ -25,10 +25,6 @@ $projectClients = $model->cmsProject ? $model->cmsProject->users : [];
 if (!$planStartAt && $planStartEndAt && $model->plan_duration) {
     $planStartAt = max(0, (int)$planStartEndAt - (int)$model->plan_duration);
 }
-// The deadline: the planned end; an open task past it is overdue.
-$deadline = $model->plan_end_at ? (int)$model->plan_end_at : null;
-$isClosed = in_array($model->status, [CmsTask::STATUS_READY, CmsTask::STATUS_CANCELED], true);
-$isOverdue = $deadline && !$isClosed && $deadline < time();
 
 $quickAccessItems = [];
 $makeQuickAccessActionUrl = function ($route, $id) {
@@ -369,19 +365,7 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
             </div>
             <div class="sx-task-actions">
                 <?php echo $status; ?>
-                <?php if ($deadline) : ?>
-                    <span class="sx-task-deadline<?php echo $isOverdue ? ' sx-task-deadline--overdue' : ''; ?>"
-                          title="Планируемое завершение">
-                        <?php echo \skeeks\cms\backend\helpers\BackendIcon::render('clock', ['size' => 14]); ?>
-                        <?php echo $isOverdue ? 'Просрочена: ' : 'Закончится: '; ?><?php echo \Yii::$app->formatter->asDatetime($deadline, 'php:d.m.Y H:i'); ?>
-                    </span>
-                <?php endif; ?>
-                <?php if ($model->hasAttribute('remind_at') && $model->remind_at) : ?>
-                    <span class="sx-task-deadline"><?php echo $model->reminderIconHtml; ?></span>
-                <?php endif; ?>
-                <?php if ($model->isBehindDeadline()) : ?>
-                    <span class="sx-task-deadline"><?php echo $model->deadlineMarkHtml; ?></span>
-                <?php endif; ?>
+                <?php echo $this->render('_start-state', ['model' => $model, 'part' => 'actions']); ?>
             </div>
         <?php BackendSurfaceWidget::end(); ?>
     </div>
@@ -569,24 +553,7 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                     </span>
                 </li>
                 <?php endif; ?>
-                <?php if ($model->deadlineText) : ?>
-                <li>
-                    <span class="sx-properties--name">Крайний срок</span>
-                    <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime((int)$model->deadline_at, 'php:d.m.Y H:i'); ?> <?php echo $model->deadlineMarkHtml; ?></span>
-                </li>
-                <?php endif; ?>
-                <?php if ($model->replannedText) : ?>
-                <li>
-                    <span class="sx-properties--name">Перенесена</span>
-                    <span class="sx-properties--value"><?php echo $model->replannedIconHtml; ?> <?php echo \yii\helpers\Html::encode($model->replannedText); ?></span>
-                </li>
-                <?php endif; ?>
-                <?php if ($model->hasAttribute('remind_at') && $model->remind_at) : ?>
-                <li>
-                    <span class="sx-properties--name">Напоминание</span>
-                    <span class="sx-properties--value"><?php echo $model->reminderIconHtml; ?> <?php echo \yii\helpers\Html::encode($model->reminderText); ?></span>
-                </li>
-                <?php endif; ?>
+                <?php echo $this->render('_start-state', ['model' => $model, 'part' => 'properties']); ?>
                 <?php if ($model->plan_duration) : ?>
                 <li>
                     <span class="sx-properties--name">Длительность по плану</span>

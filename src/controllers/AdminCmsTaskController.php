@@ -3010,7 +3010,13 @@ JS
                 'text'     => $start ? $f->asDatetime($start, "d MMMM y 'г'., HH:mm") : '',
                 'marks'    => $row->startMarksHtml(),
                 'reminder' => $row->hasAttribute('remind_at') && $row->remind_at && !$row->reminded_at ? 1 : 0,
-            ];
+            ] + ((int)$row->id === (int)$task->id ? [
+                // The card of this task: its end, overdue, bell, deadline, «Перенесена» (views/admin-cms-task/_start-state.php).
+                'card' => [
+                    'actions'    => $this->renderPartial('_start-state', ['model' => $row, 'part' => 'actions']),
+                    'properties' => $this->renderPartial('_start-state', ['model' => $row, 'part' => 'properties']),
+                ],
+            ] : []);
         }
 
         return [

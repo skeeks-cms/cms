@@ -350,6 +350,23 @@
         setTitle(row.find('.sx-task-start-text'), fixed ? 'Закреплена на это время' : 'Время рассчитано по графику и очереди');
     }
 
+    /** Puts the server's new state elements in place of the old ones (or where insert() puts them), with tooltips. */
+    function replaceState(old, html, insert) {
+        if ($.fn.tooltip) {
+            old.find('[data-toggle="tooltip"]').tooltip('dispose');
+        }
+        var fresh = $($.parseHTML($.trim(html || '')));
+        if (old.length) {
+            old.first().before(fresh);
+        } else {
+            insert(fresh);
+        }
+        old.remove();
+        if ($.fn.tooltip) {
+            fresh.find('[data-toggle="tooltip"]').addBack('[data-toggle="tooltip"]').tooltip();
+        }
+    }
+
     /**
      * Shows a pin change without a reload (owner, 01.11.2026: an employee has many tasks). In the list the changed rows
      * (`moved` of admin-cms-task/pin: the visible tasks of the executor whose start or marks changed) get their new
@@ -359,13 +376,31 @@
     function applyPin(el, fixed, moved) {
         var row = el.closest('tr[data-id]');
         if (!row.length) {
-            // The card: only the toggle changes when the start stayed.
+            // The card: a new start reloads it; with the same start the toggle and the state of the task change in place —
+            // the end, «Просрочена», the bell, «не успевает», the deadline, «Перенесена» (`card` of its own entry).
+            var own = null;
             for (var j = 0; j < moved.length; j++) {
-                if (+moved[j].id === +el.data('sxTaskPin') && +moved[j].start !== +el.attr('data-start')) {
-                    return false;
+                if (+moved[j].id === +el.data('sxTaskPin')) {
+                    own = moved[j];
                 }
             }
+            if (own && +own.start !== +el.attr('data-start')) {
+                return false;
+            }
             setPinState(el, fixed);
+            if (own && own.card) {
+                el.attr('data-reminder', own.reminder ? 1 : 0).data('reminder', own.reminder ? 1 : 0);
+                var card = el.closest('.sx-task-layout');
+                if (!card.length) {
+                    card = $(document.body);
+                }
+                replaceState(card.find('[data-sx-task-state="actions"]'), own.card.actions, function (html) {
+                    card.find('.sx-task-actions').first().append(html);
+                });
+                replaceState(card.find('[data-sx-task-state="properties"]'), own.card.properties, function (html) {
+                    el.closest('li').after(html);
+                });
+            }
             return true;
         }
         var list = row.closest('.sx-worker-tasks-calendar-widget');
