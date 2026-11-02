@@ -7,12 +7,20 @@ use skeeks\cms\models\CmsLeadEmail;
 use skeeks\cms\models\CmsLeadPhone;
 use skeeks\cms\helpers\PhoneHelper;
 use yii\base\InvalidArgumentException;
+use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\db\IntegrityException;
 
 class CmsLeadService
 {
     /** Attempts of the whole creation when MySQL rolls it back for a deadlock (1213) or a lock wait (1205). */
     public const LOCK_ATTEMPTS = 4;
+
+    /** Before routing a new request: a package names its client or the deal it goes on in (crm\LeadOriginEvent). */
+    public const EVENT_LEAD_ORIGIN = 'leadOrigin';
+
+    /** After the new request of a known origin is saved, in its transaction (crm\LeadOriginEvent::$target). */
+    public const EVENT_LEAD_ORIGIN_SAVED = 'leadOriginSaved';
 
     /**
      * A request of a source: a repeated event (source_type + source_ref) goes on in its deal, a new one is
@@ -81,17 +89,27 @@ class CmsLeadService
 
         $transaction = $this->beginTransactionIfNeeded();
         try {
-            // «Входящие заявки» (п. 13б): the main responsible of a found client, or the next one of the queue;
-            // inside the transaction, so the turn of the queue stays locked until the deal is saved.
-            $route = \skeeks\cms\crm\InboundQueue::route($lead, $phones, $emails);
+            // Where the request came from, by evidence of a package (the visit of a letter link).
+            $origin = $this->origin($lead, $phones, $emails);
+            $continue = $origin ? $this->continueLeadOf($lead, $origin) : null;
+            $route = null;
+            if ($continue) {
+                $this->closeAsAdded($lead, $continue);
+            } else {
+                // «Входящие заявки» (п. 13б): the main responsible of a found client, or the next one of the queue;
+                // inside the transaction, so the turn of the queue stays locked until the deal is saved.
+                $route = \skeeks\cms\crm\InboundQueue::route($lead, $phones, $emails, $origin);
+            }
             if (!$lead->save()) {
                 throw new InvalidArgumentException('Не удалось создать сделку: '.implode('; ', $lead->getFirstErrors()));
             }
             $this->saveContacts($lead, CmsLeadPhone::class, $phones);
             $this->saveContacts($lead, CmsLeadEmail::class, $emails);
-            \skeeks\cms\crm\InboundQueue::afterRoute($lead, $route);
-            if ($lead->status === CmsLead::STATUS_NEW && (!$lead->executor_id || $route === 'round')) {
-                $lead->notifyAvailableManagers();
+            if (!$continue) {
+                \skeeks\cms\crm\InboundQueue::afterRoute($lead, $route, $origin);
+                if ($lead->status === CmsLead::STATUS_NEW && (!$lead->executor_id || $route === 'round')) {
+                    $lead->notifyAvailableManagers();
+                }
             }
             $lead->deferManagerNotifications = false;
             if ($sourceType === CmsLead::SOURCE_FORM) {
@@ -100,8 +118,19 @@ class CmsLeadService
                 // transaction, so the entry can name them.
                 $lead->recordCreationActivity();
             }
+            if ($continue) {
+                $this->afterAdded($lead, $continue, $origin);
+            }
+            if ($origin) {
+                $origin->lead = $lead;
+                $origin->target = $continue ?: $lead;
+                \yii\base\Event::trigger(self::class, self::EVENT_LEAD_ORIGIN_SAVED, $origin);
+            }
             if ($transaction) {
                 $transaction->commit();
+            }
+            if ($continue) {
+                return $continue;
             }
         } catch (IntegrityException $e) {
             if ($transaction && $transaction->isActive) {
@@ -124,6 +153,67 @@ class CmsLeadService
         }
 
         return $lead;
+    }
+
+    /**
+     * Asks the packages where a new request came from (crm\LeadOriginEvent). Null — nobody knows:
+     * the request is routed as usual.
+     */
+    private function origin(CmsLead $lead, array $phones, array $emails): ?\skeeks\cms\crm\LeadOriginEvent
+    {
+        $event = new \skeeks\cms\crm\LeadOriginEvent(['lead' => $lead, 'phones' => $phones, 'emails' => $emails]);
+        \yii\base\Event::trigger(self::class, self::EVENT_LEAD_ORIGIN, $event);
+
+        return $event->isKnown() ? $event : null;
+    }
+
+    /** The open deal of the same site the request goes on in; a partner request only into a deal of its partner. */
+    private function continueLeadOf(CmsLead $lead, \skeeks\cms\crm\LeadOriginEvent $origin): ?CmsLead
+    {
+        $target = $origin->continueLead ? $origin->continueLead->resolveMerged() : null;
+        if (!$target || !$target->id || !CmsLead::triageReady()
+            || !in_array($target->status, [CmsLead::STATUS_NEW, CmsLead::STATUS_IN_WORK], true)
+            || (int)$target->cms_site_id !== (int)$lead->cms_site_id
+            || ($lead->partner_id && (int)$lead->partner_id !== (int)$target->partner_id)) {
+            return null;
+        }
+
+        return $target;
+    }
+
+    /** The request keeps its row and source reference, closed as added to the deal (as LeadTriage::merge()). */
+    private function closeAsAdded(CmsLead $lead, CmsLead $target): void
+    {
+        $lead->executor_id = $target->executor_id ? (int)$target->executor_id : null;
+        $lead->cms_company_id = $target->cms_company_id ? (int)$target->cms_company_id : null;
+        $lead->cms_user_id = $target->cms_user_id ? (int)$target->cms_user_id : null;
+        $lead->status = CmsLead::STATUS_REJECTED;
+        $lead->triage_result = CmsLead::TRIAGE_MERGED;
+        $lead->merged_into_id = (int)$target->id;
+        $lead->triaged_at = time();
+        $lead->processed_at = time();
+        // Not a new deal for anybody: the responsible of the target is told once below.
+        $lead->suppressNotifications = true;
+    }
+
+    /** The feed keeps only absolute links (helpers\CommentHtml). */
+    private function afterAdded(CmsLead $lead, CmsLead $target, \skeeks\cms\crm\LeadOriginEvent $origin): void
+    {
+        $excerpt = trim(mb_substr(trim((string)$lead->description), 0, 500));
+        $target->addSystemActivity('Добавлено обращение '.Html::a('№'.(int)$lead->id, Url::to(['/cms/admin-cms-lead/view', 'pk' => (int)$lead->id], true))
+            .' «'.Html::encode((string)$lead->name).'» ('.Html::encode($lead->sourceNameAsText).')'
+            .($origin->reason !== '' ? '. '.Html::encode($origin->reason) : '')
+            .($excerpt !== '' ? ':<br>'.nl2br(Html::encode($excerpt)) : '.'));
+        $lead->addSystemActivity('Обращение добавлено в сделку '.Html::a('№'.(int)$target->id, Url::to(['/cms/admin-cms-lead/view', 'pk' => (int)$target->id], true))
+            .' «'.Html::encode((string)$target->name).'»'.($origin->reason !== '' ? ': '.Html::encode(mb_strtolower(mb_substr($origin->reason, 0, 1)).mb_substr($origin->reason, 1)) : '').'.');
+        if ($origin->notifyContinue && $target->executor_id) {
+            \Yii::$app->notifications->notify((int)$target->executor_id, 'lead.merged', [
+                'name' => 'В сделку добавлено обращение',
+                'comment' => (string)$lead->name,
+                'model' => $target,
+                'eventKey' => 'lead.merged:'.(int)$lead->id,
+            ]);
+        }
     }
 
     public function syncContacts(CmsLead $lead, array $phones, array $emails): void

@@ -148,6 +148,11 @@ Every CRM change in the core must keep a simple site (no cms-communication, no
 CRM data) working as before — the "base site" rule of the skill reference.
 Test: tests/crm-lead-triage-stand.php (CRM_TRIAGE_STAND_TEST=local, stand DB,
 rolled back).
+The origin of a new request named by a package (`CmsLeadService::EVENT_LEAD_ORIGIN`
+/ `EVENT_LEAD_ORIGIN_SAVED`, `crm\LeadOriginEvent`: its client or an open deal;
+`InboundQueue::route()` gives it to that client's main responsible) — skill
+`references/lead-ingestion.md`, «Origin of a request». Test:
+tests/lead-origin-stand.php (LEAD_ORIGIN_TEST=local, stand DB, rolled back).
 П2г: a deal made by an employee always has a client (`LeadTriage::requireClient()`
 in `createLead()` and the create window, except a record source); phones,
 emails, addresses, requisites and links of a deal are read-only request data

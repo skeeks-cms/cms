@@ -368,13 +368,16 @@ class InboundQueue
      *
      * @return string|null 'main' | 'round' | null (stays for the queue or the old rule)
      */
-    public static function route(CmsLead $lead, array $phones, array $emails): ?string
+    public static function route(CmsLead $lead, array $phones, array $emails, ?LeadOriginEvent $origin = null): ?string
     {
         if ($lead->status !== CmsLead::STATUS_NEW || $lead->executor_id || !$lead->cms_site_id) {
             return null;
         }
         $settings = self::settings();
         $siteId = (int)$lead->cms_site_id;
+        if ($origin && ($route = self::routeByOrigin($lead, $origin))) {
+            return $route;
+        }
         // The contacts of CmsLeadService: value strings or rows with 'value'.
         $values = static fn(array $rows) => array_values(array_filter(array_map(static fn($row) => trim((string)(is_array($row) ? ($row['value'] ?? '') : $row)), $rows)));
         $phones = $values($phones);
@@ -406,15 +409,83 @@ class InboundQueue
         return null;
     }
 
-    /** After the deal routed to the main responsible is saved: the level by the rule of a new responsible, the feed. */
-    public static function afterRoute(CmsLead $lead, ?string $route): void
+    /**
+     * A request whose client a package named (LeadOriginEvent): the client is linked, the deal goes to the main
+     * responsible of that client, otherwise to the employee of the package; the main responsible never changes.
+     *
+     * @return string|null 'origin-main' | 'origin' | null (nobody of them can take it: the usual route)
+     */
+    private static function routeByOrigin(CmsLead $lead, LeadOriginEvent $origin): ?string
     {
-        if ($route !== 'main') {
+        $companyId = $origin->companyId ?: null;
+        $clientId = $origin->clientId ?: null;
+        if (!$companyId && !$clientId) {
+            return null;
+        }
+        if ($companyId && !$lead->cms_company_id) {
+            $lead->cms_company_id = (int)$companyId;
+        }
+        if ($clientId && !$lead->cms_user_id) {
+            $lead->cms_user_id = (int)$clientId;
+        }
+        $access = CrmAccess::instance();
+        $mains = [];
+        if ($lead->cms_company_id) {
+            $mains[] = $access->mainResponsibleId(CmsCrmAccessRequest::RECORD_COMPANY, (int)$lead->cms_company_id);
+        } elseif ($lead->cms_user_id) {
+            $main = $access->mainResponsibleId(CmsCrmAccessRequest::RECORD_CLIENT, (int)$lead->cms_user_id);
+            if ($main === null) {
+                // A person of a company: its main responsible.
+                foreach ((new Query())->from('{{%cms_company2user}}')->andWhere(['cms_user_id' => (int)$lead->cms_user_id])->select('cms_company_id')->column() as $id) {
+                    $mains[] = $access->mainResponsibleId(CmsCrmAccessRequest::RECORD_COMPANY, (int)$id);
+                }
+            } else {
+                $mains[] = $main;
+            }
+        }
+        $mains = array_values(array_unique(array_filter($mains)));
+        $siteId = (int)$lead->cms_site_id;
+        if (count($mains) === 1 && self::canTake((int)$mains[0], $siteId)) {
+            $lead->executor_id = (int)$mains[0];
+            $route = 'origin-main';
+        } elseif ($origin->executorId && self::canTake((int)$origin->executorId, $siteId)) {
+            $lead->executor_id = (int)$origin->executorId;
+            $route = 'origin';
+        } else {
+            return null;
+        }
+        $lead->status = CmsLead::STATUS_IN_WORK;
+
+        return $route;
+    }
+
+    /** An active employee of the site with the deals right. */
+    private static function canTake(int $userId, int $siteId): bool
+    {
+        $query = CmsUser::find()->isWorker()->andWhere([CmsUser::tableName().'.id' => $userId, CmsUser::tableName().'.is_active' => 1]);
+        if ($siteId) {
+            $query->cmsSite($siteId);
+        }
+
+        return $query->exists() && \Yii::$app->authManager->checkAccess($userId, 'cms/admin-lead');
+    }
+
+    /** After the deal routed to the main responsible is saved: the level by the rule of a new responsible, the feed. */
+    public static function afterRoute(CmsLead $lead, ?string $route, ?LeadOriginEvent $origin = null): void
+    {
+        if (!in_array($route, ['main', 'origin-main', 'origin'], true)) {
             return;
         }
         CrmAccess::instance()->grantLeadExecutorLevel($lead);
         $executor = CmsUser::findOne((int)$lead->executor_id);
-        $lead->addSystemActivity('Клиент найден в CRM: сделка сразу передана его основному ответственному — '
-            .Html::encode($executor ? (string)$executor->shortDisplayName : '№'.(int)$lead->executor_id).'.');
+        $name = Html::encode($executor ? (string)$executor->shortDisplayName : '№'.(int)$lead->executor_id);
+        if ($route === 'main') {
+            $lead->addSystemActivity('Клиент найден в CRM: сделка сразу передана его основному ответственному — '.$name.'.');
+            return;
+        }
+        $reason = Html::encode($origin && $origin->reason !== '' ? $origin->reason : 'Клиент заявки известен').': ';
+        $lead->addSystemActivity($reason.($route === 'origin-main'
+            ? 'сделка привязана к клиенту и сразу передана его основному ответственному — '.$name.'.'
+            : 'сделка привязана к клиенту и сразу передана '.($origin && $origin->executorRole !== '' ? Html::encode($origin->executorRole) : 'сотруднику').' — '.$name.'.'));
     }
 }
