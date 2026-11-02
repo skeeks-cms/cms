@@ -27,6 +27,7 @@
         this.cfg = this.el.data('sxTaskGantt');
         this.tasks = this.cfg.tasks;
         this.work = this.cfg.work;
+        this.overload = this.cfg.overload || {};
         this.now = this.cfg.now;
         this.scale = SCALES[store('scale')] ? store('scale') : 'week';
         this.group = store('group') || '';
@@ -199,7 +200,14 @@
             if (this.scale !== 'day' && dayParts.y === nq.y && dayParts.m === nq.m && dayParts.d === nq.d) {
                 cls += ' is-today';
             }
-            scale.append($('<div></div>').addClass(cls).css({left: left, width: w}).text(label));
+            var tick = $('<div></div>').addClass(cls).css({left: left, width: w}).text(label);
+            // A day whose tasks «на день» go past its working time: «+N ч» (owner's decision 02.11.2026).
+            var over = this.scale === 'day' ? 0 : (this.overload[dayParts.y + '-' + (dayParts.m < 10 ? '0' : '') + dayParts.m + '-' + (dayParts.d < 10 ? '0' : '') + dayParts.d] || 0);
+            if (over) {
+                tick.addClass('is-overloaded').attr('title', 'Перегружен: задачи на день выходят за рабочее время на ' + this.hours(over))
+                    .append($('<span class="sx-task-gantt__overload"></span>').text('+' + this.hours(over)));
+            }
+            scale.append(tick);
             canvas.append($('<div class="sx-task-gantt__col"></div>').addClass(cls.replace('sx-task-gantt__tick', '')).css({left: left, width: w}));
             t = next;
         }
@@ -230,6 +238,9 @@
             }
             if (task.replanned) {
                 item.append($('<span class="sx-task-gantt__bell is-sent"></span>').html(self.cfg.icons.history).attr('title', task.replanned));
+            }
+            if (task.day) {
+                item.append($('<span class="sx-task-day-chip"></span>').toggleClass('is-overdue', /Просрочена/.test(task.dayText)).text(task.dayText));
             }
             side.append(item);
             canvas.append($('<div class="sx-task-gantt__row-line"></div>').css({top: index * ROW}));
@@ -285,6 +296,12 @@
         }
     };
 
+    /** Hours of an overload: «2 ч», «1,5 ч». */
+    Gantt.prototype.hours = function (seconds) {
+        var h = Math.round(seconds / 360) / 10;
+        return String(h).replace('.', ',') + ' ч';
+    };
+
     Gantt.prototype.label = function (start, end) {
         var day = this.scale === 'day' ? '' : this.fmtDay.format(new Date(start * 1000)) + ' ';
         return day + this.fmtTime.format(new Date(start * 1000)) + '–' + this.fmtTime.format(new Date(end * 1000));
@@ -305,13 +322,13 @@
         var left = (task.start - r.from) * sc.pps;
         var width = Math.max(6, (task.end - task.start) * sc.pps);
         var bar = $('<div class="sx-task-gantt__task"></div>')
-            .addClass(task.inWork ? 'is-in-work' : (task.late ? 'is-late' : (task.fixed ? 'is-fixed' : 'is-auto')))
+            .addClass(task.inWork ? 'is-in-work' : (task.late ? 'is-late' : (task.fixed ? 'is-fixed' : (task.day ? 'is-day' : 'is-auto'))))
             .toggleClass('is-behind', !!task.behind)
             .toggleClass('is-movable', task.movable)
             .attr('data-id', task.id)
             .css({left: left, width: width, top: index * ROW + 6})
             .attr('title', task.name + ' · ' + this.label(task.start, task.end) + ' · ' + task.statusText
-                + (task.fixed ? ' · закреплено на время' : ' · по графику') + (task.reminder ? ' · ' + task.reminder : '') + (task.replanned ? ' · ' + task.replanned : '') + (task.behind ? ' · не успевает: ' + task.behind : ''));
+                + (task.fixed ? ' · закреплено на время' : (task.day ? ' · ' + task.dayText + ', время по графику' : ' · по графику')) + (task.reminder ? ' · ' + task.reminder : '') + (task.replanned ? ' · ' + task.replanned : '') + (task.behind ? ' · не успевает: ' + task.behind : ''));
         var text = $('<span class="sx-task-gantt__task-text"></span>').text(this.fmtTime.format(new Date(task.start * 1000)) + ' ' + task.name);
         if (task.fixed) {
             text.prepend(' ').prepend($('<span class="sx-task-gantt__pin"></span>').html(this.cfg.icons.pin));
@@ -377,7 +394,12 @@
                 } else if (newStart !== task.start && sc.byDay) {
                     // The same request as a move to another day in the list: the server keeps the time of day.
                     var d = self.p(newStart);
-                    self.save(task, {day: d.y + '-' + (d.m < 10 ? '0' : '') + d.m + '-' + (d.d < 10 ? '0' : '') + d.d, keep_time: 1});
+                    // A fixed task keeps its time of day; any other becomes «на день» of the new day.
+                    var data = {day: d.y + '-' + (d.m < 10 ? '0' : '') + d.m + '-' + (d.d < 10 ? '0' : '') + d.d};
+                    if (task.fixed) {
+                        data.keep_time = 1;
+                    }
+                    self.save(task, data);
                 } else if (newStart !== task.start) {
                     self.save(task, {plan_start_at: newStart});
                 }
@@ -409,6 +431,7 @@
         $.getJSON(this.cfg.dataUrl).done(function (data) {
             self.tasks = data.tasks;
             self.work = data.work;
+            self.overload = data.overload || {};
             self.now = data.now;
             var left = self.main ? self.main.scrollLeft() : 0;
             self.render(false);

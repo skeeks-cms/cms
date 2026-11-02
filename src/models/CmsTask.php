@@ -36,6 +36,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property int|null            $plan_start_at Планируемое начало (есть у каждой активной задачи, см. TaskPlanner)
  * @property int                 $is_fixed_start Начало выбрано человеком и не сдвигается; 0 — его ставит TaskPlanner
+ * @property string|null         $plan_day День задачи «на день» (Y-m-d): время внутри дня ставит TaskPlanner
  * @property int|null            $remind_at Когда напомнить
  * @property int|null            $remind_offset Напомнить за столько секунд до начала (null — своё время remind_at)
  * @property int                 $remind_author Напомнить и автору
@@ -204,6 +205,14 @@ class CmsTask extends ActiveRecord
             || $this->isAttributeChanged('remind_at', false) || $this->isAttributeChanged('remind_offset', false)
             || $this->isAttributeChanged('remind_author', false));
 
+        // A task «на день» whose start is emptied (start_mode=auto, an emptied form field) goes back to the planner
+        // entirely; a new task or a new day keeps its day and only waits for the planner's time.
+        $hasDay = \skeeks\cms\services\TaskPlanner::hasPlanDay();
+        $dayChosen = $hasDay && $this->plan_day && ($insert || $this->isAttributeChanged('plan_day', false));
+        if ($hasDay && !$insert && !$this->plan_start_at && !$this->isAttributeChanged('plan_day', false)) {
+            $this->plan_day = null;
+        }
+
         // Every task has a start (owner's decision 31.10.2026, the column is NOT NULL): a task without one is an
         // auto task and gets the planner's provisional time at once; afterSave() lays the queue out exactly.
         $autoStart = false;
@@ -247,16 +256,22 @@ class CmsTask extends ActiveRecord
 
         // A start set by a person is fixed; an emptied start is given back to the planner. A start a package
         // calculated (isAutoStart) leaves a new task auto: it is the planner's suggestion, not a person's choice.
+        // A day chosen for the task («на день», owner's decision 02.11.2026) fixes only the day; a time chosen fixes
+        // the time and the day goes.
         if ($this->hasAttribute('is_fixed_start')) {
-            if (!$this->plan_start_at || $autoStart) {
+            if (!$this->plan_start_at || $autoStart || $dayChosen) {
                 $this->is_fixed_start = 0;
             } elseif ($insert) {
                 $this->is_fixed_start = $this->isAutoStart ? 0 : 1;
-            } elseif (!$this->isAttributeChanged('is_fixed_start', false) && $this->isAttributeChanged('plan_start_at', false)) {
+            } elseif (!$this->restoringStart && !$this->isAttributeChanged('is_fixed_start', false) && $this->isAttributeChanged('plan_start_at', false)) {
                 $this->is_fixed_start = 1;
             }
-            // A person chose the time: the note «moved by the system» is no longer true.
-            if ($this->is_fixed_start && $this->hasAttribute('replanned_from') && $this->isAttributeChanged('plan_start_at', false)) {
+            if ($hasDay && $this->is_fixed_start) {
+                $this->plan_day = null;
+            }
+            // A person chose the time or the day: the note «moved by the system» is no longer true.
+            if (($this->is_fixed_start || $dayChosen) && $this->hasAttribute('replanned_from')
+                && ($this->isAttributeChanged('plan_start_at', false) || $dayChosen)) {
                 $this->replanned_from = null;
                 $this->replanned_at = null;
             }
@@ -334,6 +349,7 @@ class CmsTask extends ActiveRecord
             'plan_duration',
             'plan_start_at',
             'is_fixed_start',
+            'plan_day',
             'status',
         ];
         $needRecalculate = $insert;
@@ -542,12 +558,17 @@ class CmsTask extends ActiveRecord
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_at', 'remind_offset'] : [], 'integer'],
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_offset'] : [], 'integer', 'min' => 0, 'max' => 30 * 86400],
             [\skeeks\cms\services\TaskPlanner::hasReminder() ? ['remind_author'] : [], 'boolean'],
+            [\skeeks\cms\services\TaskPlanner::hasPlanDay() ? ['plan_day'] : [], 'date', 'format' => 'php:Y-m-d'],
+            [\skeeks\cms\services\TaskPlanner::hasPlanDay() ? ['plan_day'] : [], 'default', 'value' => null],
+            [['startWhen'], 'string'],
+            [['startWhen'], 'match', 'pattern' => '/^(\d{4}-\d{2}-\d{2}( \d{1,2}:\d{2})?)?$/', 'message' => 'Укажите дату или дату и время.'],
             [static::hasDeadline() ? ['deadline_at'] : [], 'integer'],
             [static::hasDeadline() ? ['deadline_at'] : [], 'default', 'value' => null],
             // A closed task and the task in work do not move, whoever asks (views, forms, the API): checked before
             // anything is saved. Their duration of a task in work may change (the rest of the work), not its start.
             [
-                \skeeks\cms\services\TaskPlanner::hasStartMode() ? ['plan_start_at', 'is_fixed_start', 'plan_duration'] : ['plan_start_at', 'plan_duration'],
+                array_merge(['plan_start_at', 'plan_duration'], \skeeks\cms\services\TaskPlanner::hasStartMode() ? ['is_fixed_start'] : [],
+                    \skeeks\cms\services\TaskPlanner::hasPlanDay() ? ['plan_day'] : []),
                 function ($attribute) {
                     if ($this->startingWork || !$this->isAttributeChanged($attribute, false)
                         || ($attribute === 'plan_duration' && !$this->getOldAttribute('plan_duration'))) {
@@ -605,6 +626,16 @@ class CmsTask extends ActiveRecord
 
                     return true;
                 },
+            ],
+            [
+                'plan_day',
+                function ($attribute) {
+                    if ($this->{$attribute} && ($this->isNewRecord || $this->isAttributeChanged($attribute, false)) && !$this->restoringStart && !$this->allowPastDay
+                        && (string)$this->{$attribute} < \Yii::$app->formatter->asDate(time(), 'php:Y-m-d')) {
+                        $this->addError($attribute, 'Нельзя поставить задачу на прошедший день.');
+                    }
+                },
+                'when' => function () { return \skeeks\cms\services\TaskPlanner::hasPlanDay(); },
             ],
             [
                 'plan_start_at',
@@ -816,6 +847,8 @@ class CmsTask extends ActiveRecord
 
             'plan_start_at' => 'Планируемое начало',
             'is_fixed_start' => 'Закреплено на время',
+            'plan_day'       => 'На день',
+            'startWhen'      => 'Когда',
             'deadline_at'    => 'Крайний срок',
             'remind_at'      => 'Когда напомнить',
             'remind_offset'  => 'Напомнить до начала',
@@ -1327,7 +1360,8 @@ class CmsTask extends ActiveRecord
         }
         $time = \Yii::$app->formatter->asDate((int)$this->plan_start_at, 'php:j M').' '.\Yii::$app->formatter->asTime((int)$this->plan_start_at, 'php:H:i');
         $this->is_fixed_start = (int)$fixed;
-        if (!$this->save(true, ['is_fixed_start', 'plan_end_at', 'updated_at', 'updated_by'])) {
+        // A pinned task «на день» is fixed on its time: the day goes (beforeSave()).
+        if (!$this->save(true, array_merge(['is_fixed_start', 'plan_end_at', 'updated_at', 'updated_by'], $this->hasAttribute('plan_day') ? ['plan_day'] : []))) {
             return implode(' ', $this->getFirstErrors()) ?: 'Не удалось сохранить.';
         }
 
@@ -1366,6 +1400,166 @@ class CmsTask extends ActiveRecord
 
     /** @var string|null the reminder chosen in a form, applied on save */
     protected $_reminder;
+
+    /** @var string|null «Когда» chosen in a form: '' — по графику, 'Y-m-d' — на день, 'Y-m-d H:i' — закреплена */
+    protected $_startWhen;
+
+    /** @var bool a passed day is allowed (the move of fixed tasks «на день»: such a task waits today) */
+    public $allowPastDay = false;
+
+    /** The start mode: `fixed` (закреплена на время), `day` (на день) or `auto` (по графику). */
+    public function getStartMode(): string
+    {
+        if ($this->hasAttribute('is_fixed_start') && $this->is_fixed_start) {
+            return 'fixed';
+        }
+
+        return $this->hasAttribute('plan_day') && $this->plan_day ? 'day' : 'auto';
+    }
+
+    /** «Когда» of the form: one field with an optional time (owner's decision 02.11.2026). */
+    public function getStartWhen(): string
+    {
+        if ($this->_startWhen !== null) {
+            return $this->_startWhen;
+        }
+        switch ($this->getStartMode()) {
+            case 'fixed':
+                return $this->plan_start_at ? \Yii::$app->formatter->asDatetime((int)$this->plan_start_at, 'php:Y-m-d H:i') : '';
+            case 'day':
+                return (string)$this->plan_day;
+        }
+
+        return '';
+    }
+
+    public function setStartWhen($value): void
+    {
+        $this->_startWhen = trim((string)$value);
+    }
+
+    /**
+     * Applies «Когда» before validation, so the usual rules (no past day or time, a closed task does not move) check
+     * it: only a date — на день, a date and a time — закреплена, empty — по графику.
+     */
+    public function beforeValidate()
+    {
+        if ($this->_startWhen !== null && \skeeks\cms\services\TaskPlanner::hasPlanDay() && $this->hasAttribute('is_fixed_start')) {
+            $when = $this->_startWhen;
+            if ($when === '') {
+                if ($this->getStartMode() !== 'auto') {
+                    $this->plan_start_at = null;
+                    $this->plan_day = null;
+                    $this->is_fixed_start = 0;
+                }
+            } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $when)) {
+                if ($this->getStartMode() !== 'day' || (string)$this->plan_day !== $when) {
+                    $this->plan_day = $when;
+                    $this->is_fixed_start = 0;
+                }
+            } elseif (preg_match('/^(\d{4}-\d{2}-\d{2}) (\d{1,2}):(\d{2})$/', $when, $m)) {
+                $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+                $time = (new \DateTime($m[1].' '.sprintf('%02d:%s', $m[2], $m[3]).':00', $tz))->getTimestamp();
+                if ($this->getStartMode() !== 'fixed' || (int)$this->plan_start_at !== $time) {
+                    $this->plan_start_at = $time;
+                    $this->is_fixed_start = 1;
+                    $this->plan_day = null;
+                }
+            }
+        }
+
+        return parent::beforeValidate();
+    }
+
+    /** The form shows the errors of the day and the start on «Когда», the one field it has for them. */
+    public function afterValidate()
+    {
+        if ($this->_startWhen !== null) {
+            foreach (['plan_day', 'plan_start_at', 'is_fixed_start'] as $name) {
+                foreach ($this->getErrors($name) as $error) {
+                    $this->addError('startWhen', $error);
+                }
+            }
+        }
+        parent::afterValidate();
+    }
+
+    /**
+     * Puts a task «на день» (a mass action, the API, a move to a day): only the day is fixed, the planner gives the
+     * time within it. A history record names it. Closed tasks and the task in work are refused.
+     *
+     * @return string|null an error, null when done
+     */
+    public function setStartDay(string $day, bool $allowPast = false): ?string
+    {
+        $this->allowPastDay = $allowPast;
+        if (!\skeeks\cms\services\TaskPlanner::hasPlanDay()) {
+            return 'Режим «на день» недоступен до обновления базы.';
+        }
+        if ($error = $this->startChangeError()) {
+            return $error;
+        }
+        if ($this->getStartMode() === 'day' && (string)$this->plan_day === $day) {
+            return null;
+        }
+        $f = \Yii::$app->formatter;
+        $old = $this->getStartMode() === 'fixed' ? 'закреплено на '.$f->asDate((int)$this->plan_start_at, 'php:j M').' '.$f->asTime((int)$this->plan_start_at, 'php:H:i')
+            : ($this->getStartMode() === 'day' ? 'на день '.$f->asDate((string)$this->plan_day, 'php:j M') : 'по графику');
+        $this->plan_day = $day;
+        $this->is_fixed_start = 0;
+        if (!$this->save(true, ['plan_day', 'is_fixed_start', 'plan_end_at', 'replanned_from', 'replanned_at', 'updated_at', 'updated_by'])) {
+            return implode(' ', $this->getFirstErrors()) ?: 'Не удалось сохранить.';
+        }
+
+        $log = new CmsLog();
+        $log->model_code = $this->skeeksModelCode;
+        $log->model_id = $this->id;
+        $log->model_as_text = $this->asText;
+        $log->log_type = CmsLog::LOG_TYPE_UPDATE;
+        $log->data = ['plan_day' => [
+            'name' => 'Начало',
+            'old'  => $old,
+            'new'  => 'На день '.$f->asDate($day, 'php:j M'),
+        ]];
+        if (!$log->save()) {
+            \Yii::warning('Task day log: '.json_encode($log->getErrors(), JSON_UNESCAPED_UNICODE), self::class);
+        }
+
+        return null;
+    }
+
+    /** Days a task «на день» is overdue: its day passed, it waits today (0 — not overdue). */
+    public function getOverdueDays(): int
+    {
+        if ($this->getStartMode() !== 'day' || !in_array($this->status, static::activeStatuses(), true)) {
+            return 0;
+        }
+        $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+        $today = new \DateTime(\Yii::$app->formatter->asDate(time(), 'php:Y-m-d'), $tz);
+        $day = new \DateTime((string)$this->plan_day, $tz);
+
+        return $day < $today ? (int)$day->diff($today)->days : 0;
+    }
+
+    /**
+     * The mark of a task «на день» — its date without a time (a chip), «Просрочена на N дн.» when its day passed.
+     * Shown in the list, the card, the calendar and the Gantt instead of the pin.
+     */
+    public function getDayChipHtml(): string
+    {
+        if ($this->getStartMode() !== 'day') {
+            return '';
+        }
+        $f = \Yii::$app->formatter;
+        $date = $f->asDate((string)$this->plan_day, 'php:j M');
+        $overdue = $this->getOverdueDays();
+
+        return \yii\helpers\Html::tag('span', $overdue ? 'Просрочена на '.$overdue.' дн.' : 'на '.$date, [
+            'class'       => 'sx-task-day-chip'.($overdue ? ' is-overdue' : ''),
+            'title'       => $overdue ? 'Задача на '.$date.' не выполнена — стоит сегодня первой' : 'На день: время внутри дня ставит график',
+            'data-toggle' => 'tooltip',
+        ]);
+    }
 
     /**
      * Ready reminders «before the start»: seconds => label.
@@ -1455,7 +1649,7 @@ class CmsTask extends ActiveRecord
         $isLate = $isFixed && $this->plan_start_at && $this->plan_start_at < time() - 60 && $this->status !== static::STATUS_IN_WORK
             && in_array($this->status, static::activeStatuses(), true);
 
-        return $this->reminderIconHtml.$this->replannedIconHtml.' '.$this->deadlineMarkHtml
+        return $this->dayChipHtml.$this->reminderIconHtml.$this->replannedIconHtml.' '.$this->deadlineMarkHtml
             .($isLate ? ' / <span class="sx-preview-card__meta--danger">Просрочена!</span>' : '');
     }
 

@@ -86,7 +86,7 @@
             revert(event);
             return;
         }
-        // A fixed task keeps its time of day; an auto task takes the first free time of that day.
+        // A fixed task keeps its time of day; any other becomes «на день» of that column's day.
         var data = event.jItem.data('fixed') ? {day: day, keep_time: 1} : {day: day};
         board.addClass('is-busy');
         sx.taskMove(board.data('moveUrl'), event.jItem.data('pk'), data, {
@@ -208,7 +208,8 @@
                     restore: 1,
                     plan_duration: prev.plan_duration,
                     remind_at: prev.remind_at || '',
-                    reminded_at: prev.reminded_at || ''
+                    reminded_at: prev.reminded_at || '',
+                    plan_day: prev.plan_day || ''
                 };
                 post(url, id, back).done(function (r) {
                     if (r && r.success) {

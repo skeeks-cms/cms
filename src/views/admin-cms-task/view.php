@@ -541,7 +541,10 @@ $canUpdate = $controller instanceof \skeeks\cms\backend\BackendController && ($u
                 <li>
                     <span class="sx-properties--name">Начало</span>
                     <span class="sx-properties--value"><?php echo \Yii::$app->formatter->asDatetime($planStartAt); ?>
-                        <?php if ($model->hasAttribute('is_fixed_start') && in_array($model->status, CmsTask::activeStatuses(), true) && $model->status !== CmsTask::STATUS_IN_WORK
+                        <?php if ($model->startMode === 'day') : ?>
+                            <?php // «на день» (owner, 02.11.2026): the day is fixed, the time is the planner's — no pin. ?>
+                            <?php echo $model->dayChipHtml; ?>
+                        <?php elseif ($model->hasAttribute('is_fixed_start') && in_array($model->status, CmsTask::activeStatuses(), true) && $model->status !== CmsTask::STATUS_IN_WORK
                             && \Yii::$app->user->can('cms/admin-task/manage', ['model' => $model])) : ?>
                             <?php // One toggle with its state: an empty grey pin «по графику», a filled one «закреплено». ?>
                             <?php echo $model->pinToggleHtml(true); ?>

@@ -623,6 +623,27 @@ JS
                 },
             ],
 
+            // «Перевести на день» (owner's decision 02.11.2026): the chosen tasks keep only the day of their start, the
+            // planner gives the time within it; a passed day stays — such a task waits today, «Просрочена на N дн.».
+            'to-day-multi' => [
+                'class'              => \skeeks\cms\backend\actions\BackendModelMultiAction::class,
+                'name'               => 'Перевести на день',
+                'icon'               => 'far fa-calendar',
+                'priority'           => 90,
+                'confirm'            => 'Выбранные задачи останутся на свои дни, а время внутри дня поставит график. Закреплённые на время звонки и встречи лучше не выбирать.',
+                'isVisible'          => CmsTask::getTableSchema()->getColumn('plan_day') !== null,
+                'eachAccessCallback' => function (CmsTask $model) {
+                    return \Yii::$app->user->can('cms/admin-task/manage', ['model' => $model]);
+                },
+                'eachCallback'       => function (CmsTask $model) {
+                    $day = $model->startMode === 'day' ? (string)$model->plan_day : \Yii::$app->formatter->asDate((int)$model->plan_start_at, 'php:Y-m-d');
+                    if ($error = $model->setStartDay($day, true)) {
+                        throw new \yii\base\Exception($error);
+                    }
+                    return true;
+                },
+            ],
+
             'change-relation-multi' => [
                 'class' => BackendModelMultiWindowAction::class,
                 'name' => 'Редактирование',
@@ -2044,8 +2065,9 @@ JS
             $model->reminder = 'none';
         }
 
-        // A start given by the planner is not a person's choice: the form shows "automatically" for it.
-        if (!$model->isNewRecord && $model->hasAttribute('is_fixed_start') && !$model->is_fixed_start && !\Yii::$app->request->isPost) {
+        // A start given by the planner is not a person's choice: the form shows "automatically" for it (a task «на день»
+        // shows its day in «Когда»).
+        if (!$model->isNewRecord && $model->hasAttribute('is_fixed_start') && $model->startMode === 'auto' && !\Yii::$app->request->isPost) {
             $model->plan_start_at = null;
         }
 
@@ -2071,6 +2093,9 @@ JS
             ];
             \Yii::$app->end();
         }
+
+        // The field of the start: «Когда» (startWhen) after the migration of plan_day, the start before it.
+        $startField = $model->hasAttribute('plan_day') ? 'startwhen' : 'plan_start_at';
 
         $this->view->registerCSS(<<<CSS
 .field-cmstask-cms_company_id {
@@ -2111,12 +2136,12 @@ JS
 .sx-task-fixed-start-actions {
     margin-bottom: 14px;
 }
-.field-cmstask-plan_start_at {
+.field-cmstask-{$startField} {
     display: none;
     max-width: 380px;
 }
-.field-cmstask-plan_start_at .input-group,
-.field-cmstask-plan_start_at input {
+.field-cmstask-{$startField} .input-group,
+.field-cmstask-{$startField} input {
     width: 100%;
 }
 .sx-task-auto-start-actions {
@@ -2141,7 +2166,7 @@ function clearTaskProjectRelationValue() {
 }
 
 function normalizeTaskPlanStartDisplay() {
-    $(".field-cmstask-plan_start_at input[type='text']").each(function() {
+    $(".field-cmstask-{$startField} input[type='text']").each(function() {
         var value = $(this).val();
         if (value) {
             $(this).val(value.replace(/(:\\d{2})\\d{2}$/, "$1").replace(/(:\\d{2}):\\d{2}$/, "$1"));
@@ -2150,26 +2175,26 @@ function normalizeTaskPlanStartDisplay() {
 }
 
 function hasTaskPlanStartValue() {
-    return !!($("#cmstask-plan_start_at").val() || $(".field-cmstask-plan_start_at input[type='text']").val());
+    return !!($("#cmstask-{$startField}").val() || $(".field-cmstask-{$startField} input[type='text']").val());
 }
 
 function updateTaskPlanStartMode() {
     if (hasTaskPlanStartValue()) {
         $(".sx-task-estimate-end").slideUp();
-        $(".field-cmstask-plan_start_at").show();
+        $(".field-cmstask-{$startField}").show();
         $(".sx-task-fixed-start-actions").hide();
         $(".sx-task-auto-start-actions").show();
     } else {
         $(".sx-task-estimate-end").slideDown();
-        $(".field-cmstask-plan_start_at").hide();
+        $(".field-cmstask-{$startField}").hide();
         $(".sx-task-fixed-start-actions").show();
         $(".sx-task-auto-start-actions").hide();
     }
 }
 
 function clearTaskPlanStart() {
-    $("#cmstask-plan_start_at").val("").trigger("change");
-    $(".field-cmstask-plan_start_at input[type='text']").val("").trigger("change");
+    $("#cmstask-{$startField}").val("").trigger("change");
+    $(".field-cmstask-{$startField} input[type='text']").val("").trigger("change");
     updateTaskPlanStartMode();
 }
 
@@ -2317,8 +2342,8 @@ $("body").on("keyup change input", "#cmstask-plan_duration, .field-cmstask-plan_
 });
 
 $("body").on("click", ".sx-task-fixed-start-btn", function() {
-    $(".field-cmstask-plan_start_at").slideDown();
-    $(".field-cmstask-plan_start_at input").attr({
+    $(".field-cmstask-{$startField}").slideDown();
+    $(".field-cmstask-{$startField} input").attr({
         autocomplete: "off",
         "data-lpignore": "true"
     });
@@ -2329,7 +2354,7 @@ $("body").on("click", ".sx-task-fixed-start-btn", function() {
     return false;
 });
 
-$("body").on("change keyup", ".field-cmstask-plan_start_at input[type='text']", function() {
+$("body").on("change keyup", ".field-cmstask-{$startField} input[type='text']", function() {
     normalizeTaskPlanStartDisplay();
     updateTaskPlanStartMode();
 });
@@ -2383,7 +2408,7 @@ function reloadTaskRelationView() {
 
 reloadTaskRelationView();
 updateTaskEstimateEndAt();
-$(".field-cmstask-plan_start_at input").attr({
+$(".field-cmstask-{$startField} input").attr({
     autocomplete: "off",
     "data-lpignore": "true"
 });
@@ -2394,7 +2419,7 @@ $(document).on('pjax:complete', function (e) {
     setTimeout(function() {
         reloadTaskRelationView();
         updateTaskEstimateEndAt();
-        $(".field-cmstask-plan_start_at input").attr({
+        $(".field-cmstask-{$startField} input").attr({
             autocomplete: "off",
             "data-lpignore": "true"
         });
@@ -2456,14 +2481,23 @@ JS
 
             'fixed_start_at_trigger' => [
                 'class' => HtmlBlock::class,
-                'content' => '<div class="col-12 sx-task-fixed-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-fixed-start-btn"><i class="far fa-clock"></i> Начать делать задачу в фиксированное время</button></div>',
+                'content' => '<div class="col-12 sx-task-fixed-start-actions"><button type="button" class="btn btn-default btn-sm sx-task-fixed-start-btn"><i class="far fa-clock"></i> Указать день или время</button></div>',
             ],
 
-            'plan_start_at' => [
+            // «Когда» (owner's decision 02.11.2026): only a date — на день (the planner gives the time within it),
+            // a date and a time — закреплена, empty — по графику.
+            ($model->hasAttribute('plan_day') ? 'startWhen' : 'plan_start_at') => [
                 'class'        => WidgetField::class,
-                'label'        => 'Когда начать делать задачу',
+                'label'        => $model->hasAttribute('plan_day') ? 'Когда' : 'Когда начать делать задачу',
+                'hint'         => $model->hasAttribute('plan_day') ? 'Только день — задача на этот день, время поставит график. День и время — задача закреплена на это время.' : null,
                 'widgetClass'  => DateTimeInputWidget::class,
-                'widgetConfig' => [
+                'widgetConfig' => $model->hasAttribute('plan_day') ? [
+                    'type'         => DateTimeInputWidget::TYPE_DATETIME,
+                    'saveFormat'   => 'php:Y-m-d H:i',
+                    'minuteStep'   => 5,
+                    'timeOptional' => true,
+                    'placeholder'  => 'Выберите день, время — по желанию',
+                ] : [
                     'type'       => DateTimeInputWidget::TYPE_DATETIME,
                     'saveFormat' => 'php:U',
                     'minuteStep' => 5,
@@ -2880,7 +2914,8 @@ JS
             'plan_duration'  => (int)$task->plan_duration,
             'remind_at'      => $task->hasAttribute('remind_at') && $task->remind_at ? (int)$task->remind_at : null,
             'reminded_at'    => $task->hasAttribute('remind_at') && $task->reminded_at ? (int)$task->reminded_at : null,
-            'text'           => $text($task->plan_start_at),
+            'plan_day'       => $task->hasAttribute('plan_day') ? $task->plan_day : null,
+            'text'           => $task->startMode === 'day' ? $f->asDate((string)$task->plan_day, 'php:D j M') : $text($task->plan_start_at),
         ];
 
         if ($request->post('plan_duration') !== null && (int)$request->post('plan_duration') > 0) {
@@ -2904,8 +2939,14 @@ JS
                 $time = (new \DateTime('@'.(int)$task->plan_start_at))->setTimezone($tz)->format('H:i');
                 $task->plan_start_at = (new \DateTime($day.' '.$time, $tz))->getTimestamp();
                 $task->is_fixed_start = 1;
+            } elseif ($task->hasAttribute('plan_day')) {
+                // A task without a chosen time to a day (a column of «Сроки», a day of the list, the Gantt's month)
+                // becomes «на день» (owner's decision 02.11.2026, replaces 31.10): the day is fixed, the planner
+                // puts it into that day's free time.
+                $task->plan_day = $day;
+                $task->is_fixed_start = 0;
             } else {
-                // An auto task to a day (a column of «Сроки»): the first free time of the executor on that day.
+                // Before the migration of plan_day: the first free time of the executor on that day, fixed.
                 $dayStart = (new \DateTime($day.' 00:00:00', $tz))->getTimestamp();
                 $task->plan_start_at = (new \skeeks\cms\services\TaskPlanner())->nearestStart(
                     $task->executor, max(900, (int)$task->plan_duration), max($dayStart, time()), (int)$task->id
@@ -2920,6 +2961,12 @@ JS
             $task->plan_start_at = $startAt;
             $task->is_fixed_start = $request->post('fixed') !== null ? (int)(bool)$request->post('fixed') : 1;
             $task->restoringStart = (bool)$request->post('restore');
+            // «Отменить» brings the day of a task «на день» back too (or takes it away).
+            if ($task->restoringStart && $task->hasAttribute('plan_day') && $request->post('plan_day') !== null) {
+                $task->plan_day = (string)$request->post('plan_day') ?: null;
+            } elseif ($task->is_fixed_start && $task->hasAttribute('plan_day')) {
+                $task->plan_day = null;
+            }
             // «Отменить»: a reminder of its own time comes back exactly as it was, sent or not.
             if ($task->restoringStart && $task->hasAttribute('remind_at') && $task->remind_offset === null
                 && $request->post('remind_at') !== null) {
@@ -2942,8 +2989,10 @@ JS
                 'plan_end_at'    => (int)$task->plan_end_at,
                 'plan_duration'  => (int)$task->plan_duration,
                 'is_fixed_start' => (int)$task->is_fixed_start,
+                'start_mode'     => $task->startMode,
+                'plan_day'       => $task->hasAttribute('plan_day') ? $task->plan_day : null,
                 'start_text'     => $f->asDate((int)$task->plan_start_at, 'php:j F').' '.$f->asTime((int)$task->plan_start_at, 'php:H:i'),
-                'text'           => $text($task->plan_start_at),
+                'text'           => $task->startMode === 'day' ? $f->asDate((string)$task->plan_day, 'php:D j M') : $text($task->plan_start_at),
                 'reminder'       => $task->hasAttribute('remind_at') && $task->remind_at ? $task->reminderText : '',
             ],
             'warnings' => (new \skeeks\cms\services\TaskPlanner())->warnings($task),
@@ -2972,7 +3021,7 @@ JS
         $fixed = (bool)\Yii::$app->request->post('fixed');
         // The executor's queue before the change: the list updates the changed rows in place instead of reloading.
         // Everything a row shows of its start: the time, the reminder, «перенесена», the planned end against the deadline.
-        $columns = array_values(array_filter(['id', 'plan_start_at', 'plan_end_at', 'is_fixed_start', 'remind_at', 'reminded_at', 'replanned_from', 'deadline_at'],
+        $columns = array_values(array_filter(['id', 'plan_start_at', 'plan_end_at', 'is_fixed_start', 'plan_day', 'remind_at', 'reminded_at', 'replanned_from', 'deadline_at'],
             static fn($name) => CmsTask::getTableSchema()->getColumn($name) !== null));
         $queue = function () use ($task, $columns) {
             return CmsTask::find()->select($columns)

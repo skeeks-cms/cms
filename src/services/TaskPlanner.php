@@ -19,6 +19,9 @@ use yii\db\Expression;
  *
  * - A fixed task (`is_fixed_start`) keeps the time a person chose; it takes that time out of the schedule.
  * - A task in work keeps its actual start and takes the time it still needs from now.
+ * - A task «на день» (`plan_day`, owner's decision 02.11.2026) goes into the free time of its day, in queue
+ *   order, after the fixed ones; an overloaded day continues after its working time; an unfinished task of
+ *   a past day waits today, first.
  * - Auto tasks go in their queue order (`executor_sort`) into the nearest free time of the executor's
  *   work schedule, after one another, a task longer than a free window continuing in the next one.
  *
@@ -336,6 +339,9 @@ class TaskPlanner
             $select[] = $taskTable.'.remind_offset';
             $select[] = $taskTable.'.remind_at';
         }
+        if (static::hasPlanDay()) {
+            $select[] = $taskTable.'.plan_day';
+        }
 
         $db = CmsTask::getDb();
         $command = (new \yii\db\Query())->select($select)->from($taskTable)
@@ -367,25 +373,34 @@ class TaskPlanner
         $from = $this->alignUp($now);
 
         $inWork = [];
+        $days = [];
         $auto = [];
         foreach ($tasks as $id => $task) {
             if ($task['status'] === CmsTask::STATUS_IN_WORK) {
                 $inWork[$id] = $task;
-            } elseif (!$this->isFixed($task)) {
+            } elseif ($this->isFixed($task)) {
+                continue;
+            } elseif (!empty($task['plan_day'])) {
+                $days[$id] = $task;
+            } else {
                 $auto[$id] = $task;
             }
         }
 
         if ($sortTaskIds) {
-            $first = [];
-            foreach ($sortTaskIds as $id) {
-                $id = (int)$id;
-                if (isset($auto[$id])) {
-                    $first[$id] = $auto[$id];
-                    unset($auto[$id]);
+            // A manual reorder: the queue of the day tasks and of the auto tasks alike.
+            foreach ([&$days, &$auto] as &$list) {
+                $first = [];
+                foreach ($sortTaskIds as $id) {
+                    $id = (int)$id;
+                    if (isset($list[$id])) {
+                        $first[$id] = $list[$id];
+                        unset($list[$id]);
+                    }
                 }
+                $list = $first + $list;
             }
-            $auto = $first + $auto;
+            unset($list);
         }
 
         $result = [];
@@ -418,7 +433,20 @@ class TaskPlanner
         }
 
         $busy = $this->busyIntervals($tasks, $from);
-        $free = $this->freeIntervals($this->schedule($user), $cursor, $busy);
+        $schedule = $this->schedule($user);
+
+        // Tasks «на день» (owner's decision 02.11.2026): each into the free time of its own day, after the fixed
+        // ones, in queue order; an unfinished one of a past day waits today, before today's own. A day that does
+        // not hold them continues after its working time — the task never leaves its day by itself.
+        foreach ($this->placeDays($schedule, $days, $busy, $cursor) as $id => $values) {
+            $values['executor_sort'] = ++$sort;
+            $this->put($result, $days[$id], $values, $all);
+        }
+        usort($busy, static function ($a, $b) {
+            return $a[0] <=> $b[0];
+        });
+
+        $free = $this->freeIntervals($schedule, $cursor, $busy);
         $piece = $free->current();
         $pos = $piece ? $piece[0] : $cursor;
 
@@ -471,6 +499,124 @@ class TaskPlanner
         }
 
         return $result;
+    }
+
+    /**
+     * Places the tasks «на день»: the overdue ones (their day is past) today first, then every day's own in queue
+     * order, into the day's free working time from $from on; the rest of a day goes on after its working time.
+     * The time they take is added to $busy for the auto tasks.
+     *
+     * @param array $days id => task row with `plan_day`, in queue order
+     *
+     * @return array id => [plan_start_at, plan_end_at, executor_end_at]
+     */
+    protected function placeDays(array $schedule, array $days, array &$busy, int $from): array
+    {
+        if (!$days) {
+            return [];
+        }
+        $today = $this->dayOf($this->now());
+        $groups = [];
+        foreach ($days as $id => $task) {
+            $day = (string)$task['plan_day'] < $today ? $today : (string)$task['plan_day'];
+            $groups[$day][(string)$task['plan_day'] < $today ? 0 : 1][$id] = $task;
+        }
+        ksort($groups);
+
+        $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+        $result = [];
+        foreach ($groups as $day => $parts) {
+            ksort($parts);
+            $queue = array_replace(...array_values($parts));
+            $dayStart = (new \DateTime($day.' 00:00:00', $tz))->getTimestamp();
+            $dayEnd = (new \DateTime($day.' 00:00:00', $tz))->modify('+1 day')->getTimestamp();
+            $pos = max($from, $dayStart);
+            usort($busy, static function ($a, $b) {
+                return $a[0] <=> $b[0];
+            });
+            $pieces = [];
+            foreach ($this->freeIntervals($schedule, $pos, $busy) as [$a, $b]) {
+                if ($a >= $dayEnd) {
+                    break;
+                }
+                $pieces[] = [$a, min($b, $dayEnd)];
+            }
+            // After the working time of the day: its last period's end (a day without one — 18:00, as the default).
+            $after = $this->workEnd($schedule, $day) ?? ($dayStart + 18 * 3600);
+            $after = max($after, $pos);
+
+            $i = 0;
+            $pos = $pieces ? $pieces[0][0] : $after;
+            foreach ($queue as $id => $task) {
+                $need = $this->remaining($task);
+                $start = null;
+                $end = $pos;
+                while ($i < count($pieces) && $need > 0) {
+                    [$a, $b] = $pieces[$i];
+                    $pos = $this->alignUp(max($pos, $a));
+                    if ($pos >= $b) {
+                        $i++;
+                        continue;
+                    }
+                    if ($start === null) {
+                        $start = $pos;
+                    }
+                    $take = min($need, $b - $pos);
+                    $busy[] = [$pos, $pos + $take];
+                    $pos += $take;
+                    $need -= $take;
+                    $end = $pos;
+                }
+                if ($need > 0) {
+                    // The day is overloaded: the rest goes on after its working time, the day stays.
+                    $after = $this->alignUp(max($after, $start === null ? $after : $end));
+                    if ($start === null) {
+                        $start = $after;
+                    }
+                    $busy[] = [$after, $after + $need];
+                    $end = $after + $need;
+                    $after = $end;
+                }
+                $result[$id] = ['plan_start_at' => $start, 'plan_end_at' => $end, 'executor_end_at' => $end];
+            }
+        }
+
+        return $result;
+    }
+
+    /** The end of the last working period of a day (Y-m-d), null for a day off. */
+    public function workEnd(array $schedule, string $day): ?int
+    {
+        $end = null;
+        foreach (CmsScheduleHelper::getSchedulesByWorktimeForDate($schedule, $day) as $period) {
+            $end = max((int)$end, (int)$period->end_at);
+        }
+
+        return $end;
+    }
+
+    /**
+     * How far the tasks «на день» of a day go past its working time, in seconds (the mark «перегружен, +N ч»
+     * of a day in the views). $tasks — the executor's tasks shown for that day.
+     *
+     * @param CmsTask[] $tasks
+     */
+    public function dayOverload(?CmsUser $user, string $day, array $tasks): int
+    {
+        $workEnd = $this->workEnd($this->schedule($user), $day);
+        if ($workEnd === null) {
+            $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+            $workEnd = (new \DateTime($day.' 00:00:00', $tz))->getTimestamp() + 18 * 3600;
+        }
+        $over = 0;
+        foreach ($tasks as $task) {
+            if ($task->hasAttribute('plan_day') && $task->plan_day && !$task->is_fixed_start && in_array($task->status, CmsTask::activeStatuses(), true)
+                && $this->dayOf((int)$task->plan_start_at) === $day) {
+                $over = max($over, (int)$task->plan_end_at - $workEnd);
+            }
+        }
+
+        return max(0, $over);
     }
 
     protected function put(array &$result, array $task, array $values, bool $all): void
@@ -633,6 +779,20 @@ class TaskPlanner
         if ($has === null) {
             $schema = CmsTask::getTableSchema();
             $has = $schema && $schema->getColumn('remind_at') !== null;
+        }
+
+        return $has;
+    }
+
+    /**
+     * Whether the table has the day of a task «на день» yet (code may run before its migration).
+     */
+    public static function hasPlanDay(): bool
+    {
+        static $has = null;
+        if ($has === null) {
+            $schema = CmsTask::getTableSchema();
+            $has = $schema && $schema->getColumn('plan_day') !== null;
         }
 
         return $has;

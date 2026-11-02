@@ -112,6 +112,12 @@ class DateTimeInputWidget extends InputWidget
     /** @var string time for a day chosen without a time ("H:i"); today it is not earlier than now */
     public $defaultTime = '09:00';
 
+    /**
+     * @var bool datetime only: a day may be chosen without a time — the value is then "Y-m-d" («на день» of a task),
+     *           with a time it is in $saveFormat
+     */
+    public $timeOptional = false;
+
     /** @var string|null time zone of the wall time; null — Yii::$app->formatter->timeZone */
     public $timeZone = null;
 
@@ -154,16 +160,19 @@ class DateTimeInputWidget extends InputWidget
 
         $tz = new \DateTimeZone($this->timeZone);
         $save = self::pattern($this->saveFormat);
-        $date = $this->parse($this->hasModel() ? Html::getAttributeValue($this->model, $this->attribute) : $this->value, $save, $tz);
+        $raw = $this->hasModel() ? Html::getAttributeValue($this->model, $this->attribute) : $this->value;
+        // A day without a time (timeOptional): "Y-m-d" stays as it is.
+        $dateOnly = $this->timeOptional && $this->type === self::TYPE_DATETIME && is_string($raw) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw);
+        $date = $dateOnly ? new \DateTimeImmutable($raw, $tz) : $this->parse($raw, $save, $tz);
 
         $inputId = $this->options['id'];
         $saveOptions = array_merge($this->saveOptions, ['id' => $inputId, 'class' => trim('sx-dt__value '.($this->saveOptions['class'] ?? ''))]);
-        $saved = $date ? $this->format($date, $save) : '';
+        $saved = $date ? ($dateOnly ? $raw : $this->format($date, $save)) : '';
         $hidden = $this->hasModel()
             ? Html::activeHiddenInput($this->model, $this->attribute, array_merge($saveOptions, ['value' => $saved]))
             : Html::hiddenInput($this->name, $saved, $saveOptions);
 
-        $label = $date ? $this->label($date, $tz) : '';
+        $label = $date ? ($dateOnly ? $this->label($date, $tz, false).', без времени' : $this->label($date, $tz)) : '';
         $disabled = $this->disabled || !empty($this->options['disabled']);
         $readonly = $this->readonly || !empty($this->options['readonly']);
 
@@ -192,6 +201,7 @@ class DateTimeInputWidget extends InputWidget
             'quick'       => $this->quick(),
             'defaultTime' => $this->defaultTime,
             'placeholder' => $this->placeholder,
+            'optionalTime' => $this->timeOptional && $this->type === self::TYPE_DATETIME,
         ];
 
         $root = ['class' => 'sx-dt'.($date ? '' : ' is-empty'), 'id' => $inputId.'-widget', 'data-sx-datetime' => Json::encode($config)];
@@ -218,7 +228,7 @@ class DateTimeInputWidget extends InputWidget
     }
 
     /** The shown text of a date in the time zone (the same rules as the script). */
-    public function label(\DateTimeInterface $date, \DateTimeZone $tz): string
+    public function label(\DateTimeInterface $date, \DateTimeZone $tz, bool $withTime = true): string
     {
         if ($this->displayFormat !== self::DISPLAY_HUMAN) {
             return $this->format($date, self::pattern($this->displayFormat));
@@ -237,7 +247,7 @@ class DateTimeInputWidget extends InputWidget
             }
         }
 
-        return $this->type === self::TYPE_DATETIME ? $text.', '.$date->format('H:i') : $text;
+        return $this->type === self::TYPE_DATETIME && $withTime ? $text.', '.$date->format('H:i') : $text;
     }
 
     /** Formats by a pattern of d j m n Y y H G i s U D M (D, M — Russian short names). */

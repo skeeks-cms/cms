@@ -15,6 +15,12 @@ use yii\helpers\Html;
 
 $f = \Yii::$app->formatter;
 $today = $widget->today();
+// Days whose tasks «на день» go past the working time: «перегружен, +N ч» (owner's decision 02.11.2026).
+$overload = \skeeks\cms\widgets\admin\CmsTaskGanttWidget::overloadData($widget->user);
+$overloadMark = static function (string $date) use ($overload) {
+    return empty($overload[$date]) ? '' : '<span class="sx-task-day-overload" title="Задачи на день выходят за рабочее время">'
+        .\skeeks\cms\widgets\admin\CmsTaskGanttWidget::overloadText((int)$overload[$date]).'</span>';
+};
 $month = substr($widget->date, 0, 7);
 $now = time();
 $hours = static function ($seconds) {
@@ -158,6 +164,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                     <? else : ?>
                         <span class="sx-task-calendar__load">выходной</span>
                     <? endif; ?>
+                    <?= $overloadMark($date); ?>
                 </div>
                 <? if ($work) : ?>
                     <div class="sx-task-calendar__meter"><span style="width: <?= min(100, round($load / $work * 100)); ?>%"></span></div>
@@ -165,7 +172,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                 <div class="sx-task-calendar__cell-tasks">
                     <? foreach (array_slice($dayTasks, 0, $widget->monthCellLimit) as $task) : ?>
                         <?= Html::beginTag('a', $widget->taskLinkOptions($task)); ?>
-                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>
+                            <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->dayChipHtml; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>
                             <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                         <?= Html::endTag('a'); ?>
                     <? endforeach; ?>
@@ -191,6 +198,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                 <span class="sx-task-calendar__col-weekday"><?= $f->asDate($widget->day($date)->getTimestamp(), 'php:D'); ?></span>
                 <span class="sx-task-calendar__col-date"><?= (int)substr($date, 8, 2); ?></span>
                 <span class="sx-task-calendar__col-load"><?= $periods ? $hours($dayLoad(array_filter($dayTasks, [$widget, 'isActive']))).' / '.$hours(CmsScheduleHelper::durationBySchedules($periods)) : 'выходной'; ?></span>
+                <?= $overloadMark($date); ?>
             </a>
         <? endforeach; ?>
 
@@ -246,7 +254,7 @@ echo \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $w
                     }
                     ?>
                     <?= Html::beginTag('a', $options); ?>
-                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>
+                        <span class="sx-task-calendar__task-time"><?= $f->asTime((int)$task->plan_start_at, 'php:H:i'); ?><? if ($widget->isFixed($task)) : ?><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?><? endif; ?><?= $task->dayChipHtml; ?><?= $task->reminderIconHtml; ?><?= $task->replannedIconHtml; ?><?= $task->isBehindDeadline() ? '<span style="color: var(--sx-color-danger)" title="'.\yii\helpers\Html::encode($task->deadlineText).'">'.\skeeks\cms\models\CmsTask::icon('alert-circle', 12).'</span>' : ''; ?></span>
                         <span class="sx-task-calendar__task-name"><?= Html::encode($task->name); ?></span>
                     <?= Html::endTag('a'); ?>
                 <? endforeach; ?>

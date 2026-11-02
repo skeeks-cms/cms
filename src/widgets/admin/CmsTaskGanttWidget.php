@@ -43,6 +43,7 @@ class CmsTaskGanttWidget extends Widget
         $this->options['data-sx-task-gantt'] = Json::encode([
             'tasks'      => $this->tasksData(),
             'work'       => $this->workData(),
+            'overload'   => static::overloadData($this->user),
             'now'        => time(),
             'tz'         => \Yii::$app->formatter->timeZone,
             'moveUrl'    => \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']),
@@ -65,7 +66,47 @@ class CmsTaskGanttWidget extends Widget
     {
         $this->resolveContext();
 
-        return ['tasks' => $this->tasksData(), 'work' => $this->workData(), 'now' => time()];
+        return ['tasks' => $this->tasksData(), 'work' => $this->workData(), 'overload' => static::overloadData($this->user), 'now' => time()];
+    }
+
+    /**
+     * Overloaded days of an employee (owner's decision 02.11.2026): Y-m-d => seconds the tasks «на день» of that day
+     * go past its working time. The mark «перегружен, +N ч» of a day in «Сроки», «Календарь», «Гант» and the list.
+     */
+    public static function overloadData(?CmsUser $user): array
+    {
+        if (!$user || !TaskPlanner::hasPlanDay()) {
+            return [];
+        }
+        $tasks = CmsTask::find()
+            ->andWhere(['executor_id' => (int)$user->id, 'status' => CmsTask::activeStatuses(), 'is_fixed_start' => 0])
+            ->andWhere(['not', ['plan_day' => null]])
+            ->all();
+        $byDay = [];
+        $f = \Yii::$app->formatter;
+        foreach ($tasks as $task) {
+            $byDay[$f->asDate((int)$task->plan_start_at, 'php:Y-m-d')][] = $task;
+        }
+        $planner = new TaskPlanner();
+        $result = [];
+        foreach ($byDay as $day => $list) {
+            if ($over = $planner->dayOverload($user, $day, $list)) {
+                $result[$day] = $over;
+            }
+        }
+
+        return $result;
+    }
+
+    /** «перегружен, +N ч» of a day, '' when it is not. */
+    public static function overloadText(int $seconds): string
+    {
+        if ($seconds <= 0) {
+            return '';
+        }
+        $hours = round($seconds / 3600, 1);
+
+        return 'перегружен, +'.(floor($hours) == $hours ? (int)$hours : str_replace('.', ',', (string)$hours)).' ч';
     }
 
     protected function resolveContext(): void
@@ -98,10 +139,14 @@ class CmsTaskGanttWidget extends Widget
                 'end'       => max((int)$task->plan_end_at, $start + max(300, (int)$task->plan_duration)),
                 'duration'  => (int)$task->plan_duration,
                 'fixed'     => !$task->hasAttribute('is_fixed_start') || (bool)$task->is_fixed_start,
+                // «на день»: the date without a time, «Просрочена на N дн.» when its day passed.
+                'day'       => $task->startMode === 'day' ? (string)$task->plan_day : null,
+                'dayText'   => $task->startMode === 'day' ? strip_tags($task->dayChipHtml) : '',
                 'status'    => (string)$task->status,
                 'statusText'=> (string)$task->statusAsText,
                 'inWork'    => $task->status === CmsTask::STATUS_IN_WORK,
-                'late'      => (!$task->hasAttribute('is_fixed_start') || $task->is_fixed_start) && $task->status !== CmsTask::STATUS_IN_WORK && $start < time() - 60,
+                'late'      => ((!$task->hasAttribute('is_fixed_start') || $task->is_fixed_start) && $task->status !== CmsTask::STATUS_IN_WORK && $start < time() - 60)
+                    || $task->overdueDays > 0,
                 'movable'   => $canManage && $task->status !== CmsTask::STATUS_IN_WORK,
                 'project'   => $task->cmsProject ? (string)$task->cmsProject->name : '',
                 'client'    => (string)$client,

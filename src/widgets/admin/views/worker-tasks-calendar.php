@@ -128,7 +128,16 @@ $model = $user;
                 },
                 onUpdate: function(event)
                 {
-                    // Only auto tasks are dragged (a fixed one has no handle): the new order is saved by the button.
+                    // Only auto tasks and tasks «на день» are dragged (a fixed one has no handle). Inside a day the
+                    // new order is saved by the button; to another day the task becomes «на день» of that day.
+                    var day = event.jContainer ? event.jContainer.data('day') : null;
+                    if (event.from !== event.container && day) {
+                        sx.taskMove(self.get('moveUrl'), event.jItem.data('id'), {day: day}, {
+                            kind: 'day',
+                            done: function () { _.delay(function () { window.location.reload(); }, 1200); }
+                        });
+                        return;
+                    }
                     self.jSavePriorityButton.fadeIn();
                 }
             });
@@ -291,7 +300,9 @@ JS
                                 <span class="sx-task-calendar__time-date"><?= \Yii::$app->formatter->asDate($start, 'php:d.m'); ?></span>
                             <? endif; ?>
                             <span class="sx-task-calendar__time-value"><?= $time; ?></span>
-                            <? if ($isCan && !$isInWork && $task->hasAttribute('is_fixed_start')) : ?>
+                            <? if ($task->startMode === 'day') : ?>
+                                <? /* «на день» (owner, 02.11.2026): no pin; the day chip is among the row's marks (startMarksHtml). */ ?>
+                            <? elseif($isCan && !$isInWork && $task->hasAttribute('is_fixed_start')) : ?>
                                 <?= $task->pinToggleHtml(false, 13); ?>
                             <? elseif ($isFixed) : ?><span class="sx-task-calendar__pin"><?= \skeeks\cms\models\CmsTask::icon('pin', 11); ?></span><? endif; ?>
                         </span>
@@ -310,6 +321,8 @@ JS
                 };
 
                 $workShedule = $user->work_shedule;
+                // Days whose tasks «на день» go past the working time: «перегружен, +N ч» in the day's header.
+                $overloadByDay = \skeeks\cms\widgets\admin\CmsTaskGanttWidget::overloadData($user);
                 ?>
 
                 <? if ($unfinishedTasks) : ?>
@@ -440,6 +453,9 @@ JS
                     <thead>
                     <tr>
                         <th class="text-center" colspan="4"><?= \Yii::$app->formatter->asDate($date, 'full'); ?>
+                                <? if (!empty($overloadByDay[$date])) : ?>
+                                    <span class="sx-task-day-overload" data-toggle="tooltip" title="Задачи на день выходят за рабочее время"><?= \skeeks\cms\widgets\admin\CmsTaskGanttWidget::overloadText((int)$overloadByDay[$date]); ?></span>
+                                <? endif; ?>
                                 <? if ($times) : ?>
                                 <a href="<?= \yii\helpers\Url::to(['/cms/admin-user/planschedule', 'pk' => $model->id]); ?>" class="sx-task-calendar__header-link" target="_blank">
                                     <small data-toggle="tooltip" title="Время по графику: <br /><br /><?= \skeeks\cms\helpers\CmsScheduleHelper::getAsTextBySchedules($times); ?>" data-html="true">

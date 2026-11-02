@@ -2,13 +2,15 @@
  * The date and time field (skeeks/cms DateTimeInputWidget).
  *
  * Root [data-sx-datetime] (JSON: type, save, display, tz, step, min, max,
- * clear, quick, defaultTime, placeholder) holds the hidden input
+ * clear, quick, defaultTime, placeholder, optionalTime) holds the hidden input
  * .sx-dt__value (the saved value), the hidden mirror .sx-dt__display (the
  * shown text), the trigger .sx-dt__trigger and the clear button .sx-dt__clear.
  * Everything is delegated from the document: fields loaded by PJAX or into
  * windows need no initialization. One window is open at a time.
  *
  * Wall time ({y, m, d, H, i}) is in cfg.tz; "U" is converted with Intl.
+ * optionalTime (datetime): a day may be chosen without a time — H is null then,
+ * the saved value is "Y-m-d" (a task «на день»), with a time — cfg.save.
  * min/max are wall strings "Y-m-d H:i" and are compared as strings.
  *
  * API: sx.DateTimeInput.open(root), close(), setValue(root, savedValue).
@@ -134,6 +136,10 @@
         if (!value || /^0000-00-00/.test(value)) {
             return null;
         }
+        var dateOnly = cfg.optionalTime && /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+        if (dateOnly) {
+            return {y: +dateOnly[1], m: +dateOnly[2], d: +dateOnly[3], H: null, i: null, s: 0};
+        }
         if (cfg.save !== 'U') {
             var re = '', order = [];
             for (var k = 0; k < cfg.save.length; k++) {
@@ -174,6 +180,9 @@
         var diff = dayNum(w) - dayNum(t);
         var text = diff === 0 ? 'Сегодня' : (diff === 1 ? 'Завтра' : (diff === -1 ? 'Вчера'
             : DAYS_SHORT[dow(w)] + ', ' + w.d + ' ' + MONTHS_SHORT[w.m - 1] + (w.y !== t.y ? ' ' + w.y : '')));
+        if (cfg.type === 'datetime' && w.H == null && cfg.optionalTime) {
+            return text + ', без времени';
+        }
         return cfg.type === 'datetime' ? text + ', ' + pad(w.H || 0) + ':' + pad(w.i || 0) : text;
     }
 
@@ -195,7 +204,7 @@
     }
 
     function valueAllowed(w, cfg) {
-        if (cfg.type === 'date') {
+        if (cfg.type === 'date' || (cfg.optionalTime && w.H == null)) {
             return dayAllowed(w, cfg);
         }
         var k = timeKey(w);
@@ -270,7 +279,7 @@
         if (w && cfg.type === 'date') {
             w = withTime(w, 0, 0);
         }
-        var value = w ? format(w, cfg.save, cfg) : '';
+        var value = w ? format(w, cfg.optionalTime && w.H == null ? 'Y-m-d' : cfg.save, cfg) : '';
         render(root, w);
         if (input.value !== value) {
             input.value = value;
@@ -479,7 +488,7 @@
         var html = '<div class="sx-dt-pop__head">'
             + '<button type="button" class="sx-dt-pop__nav" data-act="days" aria-label="Назад к календарю">' + icon('prev') + '</button>'
             + '<div class="sx-dt-pop__title">' + escape(label(withTime(d, d.H || 0, d.i || 0), {type: 'date', display: 'human', tz: cfg.tz})) + '</div>'
-            + '<span class="sx-dt-pop__nav-space"></span></div>'
+            + (cfg.optionalTime ? '<button type="button" class="sx-dt-pop__link" data-act="notime">Без времени</button>' : '<span class="sx-dt-pop__nav-space"></span>') + '</div>'
             + '<div class="sx-dt-pop__caption" id="' + cur.pop.id + '-h">Часы</div>'
             + '<div class="sx-dt-pop__grid sx-dt-pop__hours" role="group" aria-labelledby="' + cur.pop.id + '-h">';
         for (var H = 0; H < 24; H++) {
@@ -500,7 +509,7 @@
     /* ---------- typing ---------- */
 
     function typedText(w, cfg) {
-        return w ? format(w, cfg.type === 'date' ? 'd.m.Y' : 'd.m.Y H:i', cfg) : '';
+        return w ? format(w, cfg.type === 'date' || (cfg.optionalTime && w.H == null) ? 'd.m.Y' : 'd.m.Y H:i', cfg) : '';
     }
 
     function limitText(limit, cfg) {
@@ -536,6 +545,9 @@
         var w;
         if (cfg.type === 'date') {
             w = withTime(day, 0, 0);
+        } else if (H == null && cfg.optionalTime) {
+            // Only a date: a day without a time.
+            w = withTime(day, null, null);
         } else if (H == null) {
             var time = cur && cur.draft && cur.draft.H != null ? cur.draft : timeFor(day, cfg);
             w = withTime(day, time.H, time.i);
@@ -545,11 +557,12 @@
             }
             w = withTime(day, +H, +i);
         }
-        var k = cfg.type === 'date' ? dayKey(w) : timeKey(w);
-        if (cfg.min && k < (cfg.type === 'date' ? cfg.min.slice(0, 10) : cfg.min)) {
+        var byDay = cfg.type === 'date' || w.H == null;
+        var k = byDay ? dayKey(w) : timeKey(w);
+        if (cfg.min && k < (byDay ? cfg.min.slice(0, 10) : cfg.min)) {
             return {error: 'Не раньше: ' + limitText(cfg.min, cfg)};
         }
-        if (cfg.max && k > (cfg.type === 'date' ? cfg.max.slice(0, 10) : cfg.max)) {
+        if (cfg.max && k > (byDay ? cfg.max.slice(0, 10) : cfg.max)) {
             return {error: 'Не позже: ' + limitText(cfg.max, cfg)};
         }
         return {w: w};
@@ -612,7 +625,7 @@
         var cfg = cur.cfg;
         var html = '<div class="sx-dt-pop__foot">';
         if (cfg.type === 'datetime') {
-            var time = cur.draft && cur.draft.H != null ? pad(cur.draft.H) + ':' + pad(cur.draft.i || 0) : 'Время';
+            var time = cur.draft && cur.draft.H != null ? pad(cur.draft.H) + ':' + pad(cur.draft.i || 0) : (cfg.optionalTime ? 'Без времени' : 'Время');
             html += '<button type="button" class="sx-dt-pop__time' + (cur.mode === 'time' ? ' is-active' : '') + '" data-act="time" aria-label="Время: ' + time + '">' + icon('clock') + '<span>' + time + '</span></button>';
         }
         html += '<span class="sx-dt-pop__spacer"></span>';
@@ -643,6 +656,10 @@
     /** Puts a day into the draft; datetime keeps the chosen time or takes the default one. */
     function pickDay(day) {
         var cfg = cur.cfg;
+        if (cfg.optionalTime && !(cur.draft && cur.draft.H != null)) {
+            // A day without a time stays without one until a time is chosen.
+            return withTime(day, null, null);
+        }
         var time = cur.draft && cur.draft.H != null ? cur.draft : timeFor(day, cfg);
         var w = withTime(day, time.H, time.i);
         if (cfg.type === 'datetime' && !valueAllowed(w, cfg)) {
@@ -671,6 +688,12 @@
         } else if (act === 'days') {
             cur.mode = 'days';
             draw('[data-day="' + cur.focus + '"]');
+        } else if (act === 'notime') {
+            // optionalTime: the chosen day without a time.
+            cur.draft = withTime(cur.draft || fromDayKey(cur.focus), null, null);
+            cur.dirty = true;
+            cur.mode = 'days';
+            draw('[data-act="done"]');
         } else if (act === 'clear') {
             commit(null, true);
         } else if (act === 'done') {

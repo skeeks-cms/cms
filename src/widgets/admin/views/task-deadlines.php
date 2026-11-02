@@ -16,13 +16,17 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
 <?= Html::beginTag('div', $widget->options); ?>
 <?= \skeeks\cms\widgets\admin\CmsTaskViewToolbarWidget::widget(['context' => $widget->context]); ?>
 <p class="sx-task-deadlines__hint text-muted">
-    Перетащите задачу в другую колонку — она встанет в первое свободное время этого дня по графику и закрепится.
+    Перетащите задачу в другую колонку: закреплённая сохранит своё время, остальные станут задачами на этот день — время внутри дня поставит график.
 </p>
 <div class="sx-task-deadlines__board" data-sx-task-deadlines data-sx-fit-screen="height" id="<?= $widget->id; ?>-board" data-move-url="<?= Html::encode($moveUrl); ?>">
     <? foreach ($columns as $key => $column) : ?>
         <div class="sx-task-deadlines__column <?= $key === 'late' ? 'is-late' : ''; ?> <?= !empty($column['weekend']) ? 'is-weekend' : ''; ?>" data-sx-deadlines-column="<?= $key; ?>" data-day="<?= Html::encode((string)$column['day']); ?>">
             <div class="sx-task-deadlines__head">
-                <span><?= Html::encode($column['title']); ?> <span class="sx-task-deadlines__sub"><?= Html::encode($column['sub']); ?></span></span>
+                <span><?= Html::encode($column['title']); ?> <span class="sx-task-deadlines__sub"><?= Html::encode($column['sub']); ?></span>
+                    <? if (!empty($column['overload'])) : ?>
+                        <span class="sx-task-day-overload" data-toggle="tooltip" title="Задачи на день выходят за рабочее время"><?= \skeeks\cms\widgets\admin\CmsTaskGanttWidget::overloadText((int)$column['overload']); ?></span>
+                    <? endif; ?>
+                </span>
                 <span class="sx-task-deadlines__sub"><?= count($column['tasks']); ?></span>
             </div>
             <div class="sx-task-deadlines__list" data-sx-deadlines-list>
@@ -42,6 +46,7 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
                         <div class="sx-task-deadlines__card-time">
                             <span data-sx-deadlines-time><?= in_array($key, ['d0', 'd1'], true) ? $f->asTime($start, 'php:H:i') : $f->asDate($start, 'php:j M').', '.$f->asTime($start, 'php:H:i'); ?></span>
                             <? if ($isFixed) : ?><span title="Закреплено на это время"><?= \skeeks\cms\models\CmsTask::icon('pin', 12); ?></span><? endif; ?>
+                            <?= $task->dayChipHtml; ?>
                             <?= $task->reminderIconHtml; ?>
                             <?= $task->replannedIconHtml; ?>
                             <?= $task->deadlineMarkHtml; ?>

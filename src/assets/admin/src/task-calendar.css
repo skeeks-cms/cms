@@ -948,3 +948,35 @@
     outline: none;
 }
 
+
+/* A task «на день» (owner, 02.11.2026): its date without a time, a dashed chip — the day is fixed, the time is not.
+   An unfinished one of a past day: «Просрочена на N дн.» in the danger colour. */
+.sx-task-day-chip {
+    display: inline-block;
+    padding: 0 6px;
+    border: 1px dashed var(--sx-color-accent);
+    border-radius: 999px;
+    color: var(--sx-color-accent);
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+    vertical-align: 1px;
+}
+
+.sx-task-day-chip.is-overdue {
+    border-style: solid;
+    border-color: var(--sx-color-danger);
+    color: var(--sx-color-danger);
+}
+
+/* A day whose tasks «на день» go past its working time: «перегружен, +N ч» in its header. */
+.sx-task-day-overload {
+    margin-left: 6px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--sx-color-danger-soft);
+    color: var(--sx-color-danger);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}

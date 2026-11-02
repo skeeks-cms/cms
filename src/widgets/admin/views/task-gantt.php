@@ -28,6 +28,7 @@ use yii\helpers\Html;
 ]); ?>
 <div class="sx-task-gantt__legend">
     <span><i class="sx-task-gantt__swatch is-fixed"></i> закреплено на время</span>
+    <span><i class="sx-task-gantt__swatch is-day"></i> на день</span>
     <span><i class="sx-task-gantt__swatch is-auto"></i> по графику</span>
     <span><i class="sx-task-gantt__swatch is-in-work"></i> в работе</span>
     <span><i class="sx-task-gantt__swatch is-late"></i> просрочено</span>

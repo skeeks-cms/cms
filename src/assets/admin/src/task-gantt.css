@@ -79,6 +79,29 @@
     box-shadow: inset 0 0 0 1px var(--sx-tg-accent);
 }
 
+/* «на день»: the day is fixed, the time is the planner's — dashed like a day without an hour. */
+.sx-task-gantt__swatch.is-day,
+.sx-task-gantt__task.is-day {
+    background: var(--sx-tg-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--sx-tg-accent);
+    background-image: repeating-linear-gradient(135deg, transparent 0 6px, var(--sx-tg-accent-soft) 6px 9px);
+    outline: 1px dashed var(--sx-tg-accent);
+    outline-offset: -1px;
+}
+
+.sx-task-gantt__task.is-day {
+    color: var(--sx-tg-text);
+}
+
+.sx-task-gantt__tick.is-overloaded {
+    color: var(--sx-color-danger);
+}
+
+.sx-task-gantt__overload {
+    margin-left: 4px;
+    font-weight: 600;
+}
+
 .sx-task-gantt__swatch.is-in-work,
 .sx-task-gantt__task.is-in-work {
     background: var(--sx-tg-warning);

@@ -86,6 +86,12 @@ class CmsTaskDeadlinesWidget extends Widget
             $columns[$key]['tasks'][] = $task;
         }
 
+        // A day whose tasks «на день» go past its working time: «перегружен, +N ч» in its column's head.
+        $overload = CmsTaskGanttWidget::overloadData($this->user);
+        foreach ($columns as $code => $column) {
+            $columns[$code]['overload'] = $code !== 'later' && $column['day'] ? (int)($overload[$column['day']] ?? 0) : 0;
+        }
+
         $this->options['id'] = $this->id;
         Html::addCssClass($this->options, 'sx-task-deadlines');
 
