@@ -121,7 +121,13 @@ try {
         'cms_company_id' => (int)$client->id, 'status' => CmsLead::STATUS_IN_WORK, 'source_type' => CmsLead::SOURCE_MANUAL]);
     $deal->save(false);
     $answer = ['continueLead' => $deal];
-    $result = $request('deal');
+    $phone = $freshPhone();
+    $result = (new CmsLeadService())->createFromSource([
+        'name' => 'Проверка: заявка '.$uniq.' deal', 'cms_site_id' => $siteId, 'source_type' => CmsLead::SOURCE_FORM,
+        'source_ref' => 'lead-origin-test:'.$uniq.':deal', 'phones' => [$phone], 'status' => CmsLead::STATUS_NEW,
+    ]);
+    $check(\skeeks\cms\models\CmsLeadPhone::find()->andWhere(['cms_lead_id' => (int)$deal->id])
+        ->andWhere(\skeeks\cms\helpers\PhoneHelper::equalCondition('value', $phone))->exists(), 'the phone of the request reaches the open deal at once');
     $row = CmsLead::find()->fromSource(CmsLead::SOURCE_FORM, 'lead-origin-test:'.$uniq.':deal', $siteId)->one();
     $check((int)$result->id === (int)$deal->id, 'an open deal: the request goes on there');
     $check($row && $row->status === CmsLead::STATUS_REJECTED && $row->triage_result === CmsLead::TRIAGE_MERGED && (int)$row->merged_into_id === (int)$deal->id

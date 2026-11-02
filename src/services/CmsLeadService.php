@@ -119,6 +119,10 @@ class CmsLeadService
                 $lead->recordCreationActivity();
             }
             if ($continue) {
+                // The deal where the work goes on gets the contacts too, as a repeated event of this request does
+                // (syncContacts() of the lookup above): a new phone of the form is not left in the closed row only.
+                $this->saveContacts($continue, CmsLeadPhone::class, $phones);
+                $this->saveContacts($continue, CmsLeadEmail::class, $emails);
                 $this->afterAdded($lead, $continue, $origin);
             }
             if ($origin) {
