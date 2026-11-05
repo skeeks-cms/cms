@@ -530,6 +530,13 @@ return array_merge(dashboardsMenu(), [
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
                         ],
                         [
+                            // «Откуда узнали» (crm\LeadReferrals): the site list the client keeps himself.
+                            "label" => "Откуда узнали",
+                            "url"   => ["cms/admin-cms-lead-referral"],
+                            'priority' => 900,
+                            "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/users.svg'],
+                        ],
+                        [
                             "label" => \Yii::t('skeeks/cms', "Категории компаний"),
                             "url"   => ["cms/admin-cms-company-category"],
                             'priority' => 900,

@@ -89,7 +89,8 @@ class AdminCmsLeadController extends BackendModelStandartController
                 'filters' => [
                     // «Воронка» only on a site with several pipelines (a simple site sees no new filter).
                     'visibleFilters' => array_merge(['q', 'status'], count(CmsLeadPipeline::forSite()) > 1 ? ['cms_lead_pipeline_id'] : [],
-                        ['cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], $utmAttributes),
+                        ['cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'],
+                        CmsLead::referralReady() ? ['cms_lead_referral_id'] : [], $utmAttributes),
                     'filtersModel' => [
                         'rules' => [[array_merge(['q', 'next_step'], $utmAttributes), 'safe']],
                         'attributeDefines' => array_merge(['q', 'next_step'], $utmAttributes),
@@ -119,16 +120,20 @@ class AdminCmsLeadController extends BackendModelStandartController
                             'cms_lead_stage_id' => $this->selectFilter($this->stageItems()),
                             'cms_lead_reject_reason_id' => $this->selectFilter($this->rejectReasonItems()),
                             'source_type' => $this->selectFilter(CmsLead::sources()),
+                            // «Откуда узнали»: every item of the site, the inactive ones too (old deals keep them).
+                            'cms_lead_referral_id' => $this->selectFilter($this->referralItems()),
                         ], $this->utmFilters()),
                     ],
                 ],
                 'grid' => [
                     'on init' => static function (Event $event) {
-                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(['activeTasks', 'stage', 'rejectReasonItem']);
+                        $event->sender->dataProvider->query->forManager()->cmsSite()->with(array_merge(['activeTasks', 'stage', 'rejectReasonItem'],
+                            CmsLead::referralReady() ? ['referral'] : []));
                     },
                     'defaultPageSize' => 50,
                     'defaultOrder' => ['created_at' => SORT_DESC],
-                    'visibleColumns' => ['actions', 'name', 'status', 'shown_amount', 'next_step', 'source_type', 'contacts', 'executor_id', 'partner_id', 'created_at'],
+                    'visibleColumns' => array_merge(['actions', 'name', 'status', 'shown_amount', 'next_step', 'source_type'],
+                        CmsLead::referralReady() ? ['cms_lead_referral_id'] : [], ['contacts', 'executor_id', 'partner_id', 'created_at']),
                     'columns' => [
                         // One amount at a time: «Сумма» of an open or rejected deal, «Сумма сделки» of a successful one.
                         'shown_amount' => [
@@ -162,6 +167,11 @@ class AdminCmsLeadController extends BackendModelStandartController
                             'value' => static fn(CmsLead $model) => self::renderNextStepCell($model),
                         ],
                         'source_type' => ['value' => static fn(CmsLead $model) => $model->sourceNameAsText],
+                        'cms_lead_referral_id' => [
+                            'label' => 'Откуда узнали',
+                            'visible' => CmsLead::referralReady(),
+                            'value' => static fn(CmsLead $model) => CmsLead::referralReady() && $model->referral ? $model->referral->name : '',
+                        ],
                         'contacts' => [
                             'label' => 'Контакты',
                             'format' => 'raw',
@@ -300,6 +310,23 @@ class AdminCmsLeadController extends BackendModelStandartController
                     $action = $event->sender;
                     $action->isSaveFormModels = false;
                     (new CmsLeadNoAnswerService())->apply($this->model, $action->formModels['noAnswer']);
+                },
+            ],
+            // «Откуда узнали» in one click from the card (the block «Источник и атрибуция»): only this field changes.
+            'referral' => [
+                'class' => BackendModelUpdateAction::class,
+                'name' => 'Откуда узнали',
+                'isVisible' => false,
+                'size' => BackendModelUpdateAction::SIZE_SMALL,
+                'buttons' => ['save'],
+                'successMessage' => 'Сохранено',
+                'fields' => static fn() => ['cms_lead_referral_id' => self::referralField()],
+                'accessCallback' => fn() => CmsLead::referralReady() && $this->canWorkWithModel(),
+                'on beforeValidate' => function (Event $event) {
+                    $model = $event->sender->model;
+                    $changed = $model->cms_lead_referral_id;
+                    $model->setAttributes($model->getOldAttributes(), false);
+                    $model->cms_lead_referral_id = $changed === '' ? null : $changed;
                 },
             ],
             'deal-amount' => [
@@ -700,6 +727,12 @@ JS
         if (!array_key_exists($source, CmsLead::sources())) {
             $source = '';
         }
+        // «Откуда узнали»: one item, «none» — deals without it.
+        $referrals = $this->referralItems();
+        $referral = (string)$request->get('referral');
+        if ($referral !== 'none' && !isset($referrals[(int)$referral])) {
+            $referral = '';
+        }
         // П2б: the report of one pipeline, by the history of transitions.
         $pipelines = CmsLeadPipeline::forSite();
         $pipeline = null;
@@ -726,7 +759,9 @@ JS
                 'source_type' => $source,
                 'executor_id' => $executorId,
             ])),
-            'report' => (new \skeeks\cms\services\CmsLeadReportService())->build($from, $to, $source ?: null, $pipeline),
+            'referral' => $referral,
+            'referrals' => $referrals,
+            'report' => (new \skeeks\cms\services\CmsLeadReportService())->build($from, $to, $source ?: null, $pipeline, $referral),
         ]);
     }
 
@@ -822,6 +857,26 @@ JS
         } catch (\yii\db\Exception $e) {
             return [];
         }
+    }
+
+    /** «Откуда узнали» items of the current site, the inactive ones too; empty until the migration. */
+    private function referralItems(): array
+    {
+        if (!CmsLead::referralReady()) {
+            return [];
+        }
+
+        return ArrayHelper::map(\skeeks\cms\models\CmsLeadReferral::forSite(), 'id',
+            static fn($item) => $item->name.($item->is_active ? '' : ' (выключен)'));
+    }
+
+    /** The one-click field «Откуда узнали» of a form (LeadReferralInputWidget). */
+    public static function referralField(): array
+    {
+        return [
+            'class' => WidgetField::class,
+            'widgetClass' => \skeeks\cms\widgets\admin\LeadReferralInputWidget::class,
+        ];
     }
 
     /** Stage choices of the current site (grouped by pipeline when there are several); empty until the stage table exists. */
@@ -1045,6 +1100,9 @@ JS
         if (CmsLead::amountReady() && (!$model || $model->status !== CmsLead::STATUS_SUCCESS)) {
             // An open deal shows «Сумма» only; «Сумма сделки» belongs to the success form.
             $fields['amount'] = ['class' => NumberField::class, 'elementOptions' => ['placeholder' => 'Ожидаемая сумма, ₽', 'min' => 0, 'step' => 'any']];
+        }
+        if (CmsLead::referralReady()) {
+            $fields['cms_lead_referral_id'] = self::referralField();
         }
         $fields['source_type'] = ['class' => SelectField::class, 'items' => CmsLead::sources(), 'allowNull' => false];
         $fields['source_name'] = [];

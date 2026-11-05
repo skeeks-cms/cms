@@ -113,3 +113,13 @@ html[data-sx-theme] .sx-lead-report table.sx-data-table > * > tr > .sx-lead-repo
     margin: 0.5rem 0 0;
     padding-left: 1.25rem;
 }
+
+/* «Откуда узнали»: channels of an item as indented rows under it. */
+.sx-lead-report .sx-data-table .sx-lead-report__child td {
+    color: var(--sx-color-text-muted);
+    font-size: 0.875em;
+}
+
+.sx-lead-report .sx-data-table .sx-lead-report__child td:first-child {
+    padding-left: 1.75rem;
+}

@@ -297,6 +297,11 @@ class Skeeks extends Component implements BootstrapInterface
             'name_one'   => 'Причина отказа',
             'controller' => 'cms/admin-cms-lead-reject-reason',
         ],
+        \skeeks\cms\models\CmsLeadReferral::class => [
+            'name'       => 'Откуда узнали',
+            'name_one'   => 'Пункт «Откуда узнали»',
+            'controller' => 'cms/admin-cms-lead-referral',
+        ],
         CmsLeadPhone::class     => [
             'name'       => 'Телефоны сделок',
             'name_one'   => 'Телефон сделки',

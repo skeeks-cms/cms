@@ -180,6 +180,12 @@ JS
         $dealFields = [
             'name' => ['elementOptions' => ['placeholder' => 'Можно не заполнять — подставим «Услуга — Компания» или «Компания — источник»']],
         ];
+        if (CmsLead::referralReady()) {
+            // «Откуда узнали» in one click, on a visible place (owner's decision 05.11.2026); required only by the CRM setting.
+            $dealFields['cms_lead_referral_id'] = \skeeks\cms\controllers\AdminCmsLeadController::referralField();
+            // The channel next to it: «Визит в салон / офис» is the usual choice of a deal made by hand.
+            $dealFields['source_type'] = ['class' => SelectField::class, 'items' => CmsLead::sources(), 'allowNull' => false];
+        }
         $dealFields += $this->createPipelineFields($action->model);
         if (CmsLead::dealTypeReady()) {
             // П2д: what is being sold («Исходящие продажи»: the deal is named «Услуга — Компания»).
@@ -224,7 +230,9 @@ JS
                 'name' => 'Подробнее',
                 'fields' => [
                     'description' => ['class' => TextareaField::class],
+                ] + (CmsLead::referralReady() ? [] : [
                     'source_type' => ['class' => SelectField::class, 'items' => CmsLead::sources(), 'allowNull' => false],
+                ]) + [
                     'source_name' => [],
                 ],
             ],

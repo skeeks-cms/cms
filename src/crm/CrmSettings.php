@@ -95,6 +95,12 @@ class CrmSettings extends Component
     /** @var int|null the stage after the client opened it; null — «Смотрел» */
     public $proposalViewedStageId;
 
+    /**
+     * @var int «Откуда узнали» (crm\LeadReferrals) must be chosen in a deal created by hand (channel «Создан
+     * вручную» or «Визит»). Off by default: the field stays on a visible place of the form anyway.
+     */
+    public $referralRequiredManual = 0;
+
     /** The site decides, not a user. */
     protected $_overridePath = [self::OVERRIDE_DEFAULT, self::OVERRIDE_SITE];
 
@@ -137,6 +143,7 @@ class CrmSettings extends Component
             [['inboundWorkerIds', 'inboundDepartmentIds'], 'each', 'rule' => ['integer']],
             [['inboundMode'], 'in', 'range' => array_keys(InboundQueue::modes())],
             [['inboundToMain'], 'boolean'],
+            [['referralRequiredManual'], 'boolean'],
         ]);
     }
 
@@ -160,6 +167,7 @@ class CrmSettings extends Component
             'inboundDepartmentIds' => 'Кто разбирает: отделы',
             'inboundMode' => 'Как распределять',
             'inboundToMain' => 'Если клиент найден — сразу его основному ответственному',
+            'referralRequiredManual' => 'Обязательно для сделок, созданных вручную',
         ]);
     }
 
@@ -179,6 +187,7 @@ class CrmSettings extends Component
             'inboundMode' => '«Видят все из списка» — каждый видит все новые заявки и получает уведомление, первый берёт в работу. «По кругу» — заявка сразу назначается следующему сотруднику по очереди, разбирает её он.',
             'inboundToMain' => 'Если по телефону или e-mail заявки нашёлся клиент и у всех найденных записей один основной ответственный, сделка сразу уходит ему в работу, минуя «Неразобранное». Если ответственных несколько, заявка остаётся в «Неразобранном».',
             'duplicateMode' => 'В обоих режимах при вводе показываются совпадения в базе, а новая запись отмечается как возможный повтор, чтобы её потом можно было объединить. Чужой клиент остаётся скрытым по уровню доступа.',
+            'referralRequiredManual' => 'Менеджер не сохранит новую сделку вручную или визит в салон, пока не отметит, откуда клиент узнал о вас. Заявки с сайта, письма и звонки не требуют этого: поле заполняется само, если получится определить. Список пунктов — «Настройки → Откуда узнали».',
             'protectionMonths' => 'Клиент, который платил за это время или у которого есть действующая услуга, — «Под защитой»: другой менеджер работает с ним только по согласованию с основным ответственным. Остальные — «Свободные».',
         ]);
     }
@@ -247,6 +256,13 @@ class CrmSettings extends Component
                         'items' => self::stageItems(),
                         'nullLabel' => 'Этап «'.OutboundSales::STAGE_VIEWED.'»',
                     ],
+                ],
+            ],
+            'referral' => [
+                'class' => FieldSet::class,
+                'name' => 'Откуда узнали',
+                'fields' => [
+                    'referralRequiredManual' => ['class' => \skeeks\yii2\form\fields\BoolField::class, 'allowNull' => false],
                 ],
             ],
             'protection' => [

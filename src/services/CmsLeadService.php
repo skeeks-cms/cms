@@ -112,7 +112,7 @@ class CmsLeadService
                 }
             }
             $lead->deferManagerNotifications = false;
-            if ($sourceType === CmsLead::SOURCE_FORM) {
+            if ($lead->isFormSubmission()) {
                 // The lead lifecycle deliberately skips this source: only here
                 // are the submitted contacts already part of the same
                 // transaction, so the entry can name them.

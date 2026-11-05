@@ -153,6 +153,17 @@ The origin of a new request named by a package (`CmsLeadService::EVENT_LEAD_ORIG
 `InboundQueue::route()` gives it to that client's main responsible) — skill
 `references/lead-ingestion.md`, «Origin of a request». Test:
 tests/lead-origin-stand.php (LEAD_ORIGIN_TEST=local, stand DB, rolled back).
+«Откуда узнали» (05.11.2026): the site list `CmsLeadReferral`
+(`cms/admin-cms-lead-referral`, migration m261105_100000 with the starting
+list), the deal field `cms_lead_referral_id` + `referral_note`, the channel
+`CmsLead::SOURCE_VISIT`; `crm\LeadReferrals` fills an empty field in
+`CmsLead::beforeSave()` and from an incoming call (`fillByCall()` in
+`CmsTelephonyCallLinkService`), `EVENT_DETECT` for packages; the one-click
+`widgets\admin\LeadReferralInputWidget`; the report table and the setting
+`crmSettings->referralRequiredManual`. Contract: skill
+`references/crm-lead-referrals.md`. Tests: tests/lead-referrals-stand.php
+(LEAD_REFERRALS_TEST=local), tests/lead-referral-migration-db.php
+(LEAD_REFERRAL_MIGRATION_TEST=local, separate database).
 П2г: a deal made by an employee always has a client (`LeadTriage::requireClient()`
 in `createLead()` and the create window, except a record source); phones,
 emails, addresses, requisites and links of a deal are read-only request data

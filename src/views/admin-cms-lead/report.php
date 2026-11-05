@@ -11,6 +11,8 @@
  * @var skeeks\cms\models\CmsLeadPipeline|null $pipeline
  * @var string[] $managers
  * @var int $executorId
+ * @var string $referral «Откуда узнали»: an item id, `none` or empty
+ * @var string[] $referrals
  */
 
 use skeeks\cms\assets\admin\LeadReportAsset;
@@ -67,8 +69,16 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
         .($hasRewards ? '<th class="sx-lead-report__num">Партнёрам</th>' : '')
         .'</tr>';
     $body = '';
+    // A group may keep its parts in `children` («Откуда узнали» → channels): they follow it as indented rows.
+    $rows = [];
     foreach ($groups as $group) {
-        $body .= '<tr><td>'.Html::encode($group['title']).'</td>'
+        $rows[] = $group + ['isChild' => false];
+        foreach ($group['children'] ?? [] as $child) {
+            $rows[] = $child + ['isChild' => true];
+        }
+    }
+    foreach ($rows as $group) {
+        $body .= '<tr'.($group['isChild'] ? ' class="sx-lead-report__child"' : '').'><td>'.Html::encode($group['title']).'</td>'
             .'<td class="sx-lead-report__num">'.$formatter->asInteger($group['leads']).'</td>'
             .'<td class="sx-lead-report__num">'.$formatter->asInteger($group['target']).'</td>'
             .'<td class="sx-lead-report__num">'.$formatter->asInteger($group['success']).'</td>'
@@ -103,6 +113,12 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
                 <span class="sx-lead-report__filter-label">Источник</span>
                 <?= Html::dropDownList('source_type', $source, ['' => 'Все источники'] + CmsLead::sources(), ['class' => 'form-control']); ?>
             </label>
+            <?php if (!empty($referrals)) : ?>
+                <label class="sx-lead-report__filter">
+                    <span class="sx-lead-report__filter-label">Откуда узнали</span>
+                    <?= Html::dropDownList('referral', $referral ?? '', ['' => 'Все', 'none' => 'Не указано'] + $referrals, ['class' => 'form-control']); ?>
+                </label>
+            <?php endif; ?>
             <?php if (count($managers) > 1) : ?>
                 <label class="sx-lead-report__filter">
                     <span class="sx-lead-report__filter-label">Ответственный</span>
@@ -150,6 +166,12 @@ $groupTable = static function (array $groups, string $firstColumn, bool $hasRewa
                 <?php endif; ?>
             <?php BackendSurfaceWidget::end(); ?>
         </div>
+
+        <?php if (!empty($report['referralReady']) && $report['byReferral']) : ?>
+            <?php BackendSurfaceWidget::begin(['title' => 'Откуда узнали', 'hint' => 'Какая реклама приносит сделки и деньги; под каждым пунктом — по каким каналам пришли сделки', 'raised' => true]); ?>
+                <?= $groupTable($report['byReferral'], 'Откуда узнали / канал', $report['hasRewards']); ?>
+            <?php BackendSurfaceWidget::end(); ?>
+        <?php endif; ?>
 
         <?php BackendSurfaceWidget::begin(['title' => 'По источникам', 'raised' => true]); ?>
             <?= $groupTable($report['bySource'], 'Источник', $report['hasRewards']); ?>

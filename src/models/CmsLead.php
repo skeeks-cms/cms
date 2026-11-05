@@ -66,6 +66,8 @@ class CmsLead extends Core
     public const SOURCE_MAX = 'max';
     /** Recipients of mailings imported into leads (skeeks/cms-communication). */
     public const SOURCE_MAILING = 'mailing';
+    /** A client came to the showroom or the office in person (by hand, or a form of the site with this channel, a QR code). */
+    public const SOURCE_VISIT = 'visit';
 
     public static function tableName()
     {
@@ -99,6 +101,7 @@ class CmsLead extends Core
                     'cms_lead_stage_id' => 'stage',
                     'cms_lead_pipeline_id' => 'pipeline',
                     'cms_lead_reject_reason_id' => 'rejectReasonItem',
+                    'cms_lead_referral_id' => 'referral',
                 ],
             ],
         ]);
@@ -221,6 +224,17 @@ class CmsLead extends Core
             }];
             $rules[] = [['!stage_changed_at'], 'integer'];
         }
+        if (static::referralReady()) {
+            // «Откуда узнали» (m261105_100000, crm\LeadReferrals): an item of the deal's site, may stay empty.
+            $rules[] = [['cms_lead_referral_id'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value];
+            $rules[] = [['cms_lead_referral_id'], 'integer'];
+            $rules[] = [['cms_lead_referral_id'], 'exist', 'skipOnEmpty' => true, 'targetClass' => CmsLeadReferral::class,
+                'targetAttribute' => ['cms_lead_referral_id' => 'id', 'cms_site_id' => 'cms_site_id'],
+                'message' => 'Такого пункта «Откуда узнали» нет на этом сайте.'];
+            $rules[] = [['cms_lead_referral_id'], 'required', 'message' => 'Укажите, откуда клиент узнал о вас.',
+                'when' => static fn(self $model) => $model->referralRequired()];
+            $rules[] = [['!referral_note'], 'string', 'max' => 255];
+        }
         if (static::dealTypeReady()) {
             // П2д: «Услуга» — the kind of service being sold (m261029_100000).
             $rules[] = [['cms_deal_type_id'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value];
@@ -241,6 +255,48 @@ class CmsLead extends Core
         }
 
         return $ready;
+    }
+
+    /** «Откуда узнали» exists (m261105_100000 may run after the code update). */
+    public static function referralReady(): bool
+    {
+        static $ready = null;
+        if ($ready === null) {
+            $schema = static::getDb()->getTableSchema(static::tableName(), true);
+            $ready = $schema && $schema->getColumn('cms_lead_referral_id') !== null;
+        }
+
+        return $ready;
+    }
+
+    /**
+     * «Откуда узнали» must be chosen: a new deal created by a person (channel «Создан вручную» or «Визит»), the
+     * setting of the site CRM is on and the site has active items. Automatic channels never require it.
+     */
+    public function referralRequired(): bool
+    {
+        if (!$this->isNewRecord || !in_array($this->source_type, [self::SOURCE_MANUAL, self::SOURCE_VISIT], true)
+            || (string)$this->source_ref !== '' || !\Yii::$app->has('crmSettings')
+            || empty(\Yii::$app->crmSettings->referralRequiredManual)) {
+            return false;
+        }
+
+        return CmsLeadReferral::find()->cmsSite((int)($this->cms_site_id ?: (\Yii::$app->skeeks->site->id ?? 0)))
+            ->andWhere(['is_active' => 1])->exists();
+    }
+
+    /**
+     * A submission of a site form: the channel «Форма», or «Визит» of a form with that channel (its contacts are
+     * saved after the deal row, so the creation entry is written by the ingestion service).
+     */
+    public function isFormSubmission(): bool
+    {
+        if ($this->source_type === self::SOURCE_FORM) {
+            return true;
+        }
+        $data = is_array($this->source_data) ? $this->source_data : [];
+
+        return $this->source_type === self::SOURCE_VISIT && (int)($data['form_send_id'] ?? 0) > 0;
     }
 
     /** The pipeline columns and the history exist (П2б migration may run after the code update). */
@@ -336,7 +392,7 @@ class CmsLead extends Core
         if ($insert) {
             // A Form2 lead still has no contacts here: its creation entry is
             // recorded by the ingestion service once phones and emails exist.
-            if ($this->source_type !== self::SOURCE_FORM) {
+            if (!$this->isFormSubmission()) {
                 $this->recordCreationActivity();
             }
 
@@ -403,6 +459,15 @@ class CmsLead extends Core
             $this->preparePipeline();
         }
         $this->assignFirstStageOnStart($insert);
+        if (static::referralReady()) {
+            if ($insert) {
+                // «Откуда узнали»: an empty field of a new deal is filled by the rules; a chosen one stays.
+                \skeeks\cms\crm\LeadReferrals::fill($this);
+            } elseif ($this->isAttributeChanged('cms_lead_referral_id', false) && !$this->isAttributeChanged('referral_note', false)) {
+                // A person changed it: the automatic explanation no longer applies.
+                $this->referral_note = null;
+            }
+        }
         if (static::pipelineReady() && ($insert || $this->isAttributeChanged('status', false)
             || $this->isAttributeChanged('cms_lead_stage_id', false) || $this->isAttributeChanged('cms_lead_pipeline_id', false))) {
             $this->stage_changed_at = time();
@@ -596,7 +661,7 @@ class CmsLead extends Core
     {
         $name = Html::encode((string)$this->name);
 
-        if ($this->source_type === self::SOURCE_FORM) {
+        if ($this->isFormSubmission()) {
             return $this->formCreationActivityMessage($name);
         }
 
@@ -903,6 +968,7 @@ class CmsLead extends Core
     {
         return [
             self::SOURCE_MANUAL => 'Создан вручную',
+            self::SOURCE_VISIT => 'Визит в салон / офис',
             self::SOURCE_PARTNER => 'Партнёрская программа',
             self::SOURCE_FORM => 'Конструктор форм',
             self::SOURCE_VK => 'VK',
@@ -1066,6 +1132,8 @@ class CmsLead extends Core
             'cms_lead_stage_id' => 'Этап',
             'cms_lead_pipeline_id' => 'Воронка',
             'cms_deal_type_id' => 'Услуга',
+            'cms_lead_referral_id' => 'Откуда узнали',
+            'referral_note' => 'Как определено',
             'stage_changed_at' => 'На этапе с',
             'cms_lead_reject_reason_id' => 'Причина отказа',
             'triage_result' => 'Итог разбора',
@@ -1082,6 +1150,7 @@ class CmsLead extends Core
     public function getClient() { return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']); }
     public function getStage() { return $this->hasOne(CmsLeadStage::class, ['id' => 'cms_lead_stage_id']); }
     public function getPipeline() { return $this->hasOne(CmsLeadPipeline::class, ['id' => 'cms_lead_pipeline_id']); }
+    public function getReferral() { return $this->hasOne(CmsLeadReferral::class, ['id' => 'cms_lead_referral_id']); }
     public function getDealType() { return $this->hasOne(CmsDealType::class, ['id' => 'cms_deal_type_id']); }
     public function getMergedInto() { return $this->hasOne(self::class, ['id' => 'merged_into_id']); }
     public function getTriagedBy() { return $this->hasOne(CmsUser::class, ['id' => 'triaged_by']); }

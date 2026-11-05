@@ -31,9 +31,11 @@ class CmsLeadReportService extends Component
      * @param int $to unix time, inclusive
      * @param string|null $sourceType CmsLead::SOURCE_* or null for all
      * @param CmsLeadPipeline|null $pipeline only the deals of this pipeline (П2б)
+     * @param string $referral «Откуда узнали»: an item id, `none` — deals without it, empty — all
      */
-    public function build(int $from, int $to, ?string $sourceType = null, ?CmsLeadPipeline $pipeline = null): array
+    public function build(int $from, int $to, ?string $sourceType = null, ?CmsLeadPipeline $pipeline = null, string $referral = ''): array
     {
+        $referralReady = CmsLead::referralReady();
         $this->pipeline = $pipeline;
         $table = CmsLead::tableName();
         $query = CmsLead::find()->forManager()->cmsSite()
@@ -42,6 +44,7 @@ class CmsLeadReportService extends Component
                 $table.'.cms_lead_stage_id', $table.'.cms_lead_reject_reason_id', $table.'.deal_amount',
                 $table.'.utm_source', $table.'.utm_campaign',
             ])
+            ->addSelect($referralReady ? [$table.'.cms_lead_referral_id'] : [])
             ->andWhere(['between', $table.'.created_at', $from, $to]);
         if (CmsLead::triageReady()) {
             // Spam, requests added to another deal and support are not sales.
@@ -52,6 +55,9 @@ class CmsLeadReportService extends Component
         }
         if ($pipeline) {
             $query->andWhere($pipeline->leadCondition($table));
+        }
+        if ($referralReady && $referral !== '') {
+            $query->andWhere([$table.'.cms_lead_referral_id' => $referral === 'none' ? null : (int)$referral]);
         }
         $leads = $query->asArray()->all();
 
@@ -79,7 +85,11 @@ class CmsLeadReportService extends Component
         };
 
         $sources = CmsLead::sources();
-        $bySource = $byPartner = $byCampaign = [];
+        $bySource = $byPartner = $byCampaign = $byReferral = [];
+        $referralNames = [];
+        foreach ($referralReady ? \skeeks\cms\models\CmsLeadReferral::forSite() : [] as $item) {
+            $referralNames[(int)$item->id] = $item->name;
+        }
         $total = $this->emptyGroup('Всего');
         $funnel = $rejectReasons = [];
         foreach ($leads as $lead) {
@@ -91,6 +101,18 @@ class CmsLeadReportService extends Component
             $sourceKey = (string)$lead['source_type'];
             $bySource[$sourceKey] = $bySource[$sourceKey] ?? $this->emptyGroup($sources[$sourceKey] ?? $sourceKey);
             $this->add($bySource[$sourceKey], $lead, $notTarget, $reward);
+
+            if ($referralReady) {
+                // «Откуда узнали» with its channels (source_type) inside.
+                $referralKey = (int)$lead['cms_lead_referral_id'];
+                $referralKey = isset($referralNames[$referralKey]) ? $referralKey : 0;
+                $byReferral[$referralKey] = $byReferral[$referralKey] ?? $this->emptyGroup($referralKey ? $referralNames[$referralKey] : 'Не указано') + ['children' => [], 'referralId' => $referralKey];
+                $this->add($byReferral[$referralKey], $lead, $notTarget, $reward);
+                $children = &$byReferral[$referralKey]['children'];
+                $children[$sourceKey] = $children[$sourceKey] ?? $this->emptyGroup($sources[$sourceKey] ?? $sourceKey);
+                $this->add($children[$sourceKey], $lead, $notTarget, $reward);
+                unset($children);
+            }
 
             if ($lead['partner_id']) {
                 $partnerKey = (int)$lead['partner_id'];
@@ -127,6 +149,8 @@ class CmsLeadReportService extends Component
             'bySource' => $this->sortGroups($bySource),
             'byPartner' => $this->sortGroups($byPartner),
             'byCampaign' => $this->sortGroups($byCampaign),
+            'byReferral' => $this->referralRows($byReferral),
+            'referralReady' => $referralReady,
             'funnel' => $this->funnelRows($funnel),
             'rejectReasons' => $this->reasonRows($rejectReasons, $reasons),
             'hasRewards' => (bool)$rewards,
@@ -195,6 +219,22 @@ class CmsLeadReportService extends Component
         usort($groups, static fn(array $a, array $b) => [$b['dealSum'], $b['leads']] <=> [$a['dealSum'], $a['leads']]);
 
         return $groups;
+    }
+
+    /**
+     * «Откуда узнали» by the deal sum, then the count; «Не указано» last. Each row keeps its channels in `children`.
+     */
+    private function referralRows(array $groups): array
+    {
+        $rows = [];
+        foreach ($groups as $group) {
+            $group['children'] = $this->sortGroups($group['children']);
+            $rows[] = $this->finish($group);
+        }
+        usort($rows, static fn(array $a, array $b) => [$a['referralId'] === 0 ? 0 : 1, $a['dealSum'], $a['leads']]
+            <=> [$b['referralId'] === 0 ? 0 : 1, $b['dealSum'], $b['leads']]);
+
+        return array_reverse($rows);
     }
 
     /** Current state of the target leads, in board order. */

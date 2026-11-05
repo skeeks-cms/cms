@@ -1,0 +1,28 @@
+/* «Откуда узнали» in one click: radio chips (LeadReferralInputWidget). */
+.sx-lead-referral {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sx-lead-referral .sx-chip {
+    position: relative;
+    margin: 0;
+}
+
+.sx-lead-referral__input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.sx-lead-referral .sx-chip:focus-within {
+    outline: var(--sx-button-focus-outline);
+    outline-offset: var(--sx-button-focus-outline-offset);
+}
+
+.sx-lead-referral__clear {
+    opacity: .75;
+}

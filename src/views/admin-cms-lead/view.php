@@ -18,11 +18,11 @@ use yii\helpers\Url;
 $this->title = 'Сделка №'.(int)$model->id;
 $canWork = $model->canBeWorkedBy((int)\Yii::$app->user->id);
 $sourceData = (array)$model->source_data;
-$formSendId = $model->source_type === CmsLead::SOURCE_FORM
+$formSendId = $model->isFormSubmission()
     ? (int)ArrayHelper::getValue($sourceData, 'form_send_id', $model->source_ref)
     : 0;
 $description = trim((string)$model->description);
-if ($model->source_type === CmsLead::SOURCE_FORM && $description !== '') {
+if ($model->isFormSubmission() && $description !== '') {
     $descriptionLines = preg_split('/\R/u', $description) ?: [];
     $descriptionLines = array_filter($descriptionLines, static function (string $line): bool {
         return !preg_match('/^(ID отправки формы|Страница отправки|UTM (source|medium|campaign|content|term))\s*:/ui', trim($line));
@@ -583,10 +583,43 @@ JS
                 'responsive' => true,
             ]); ?>
                 <div class="sx-contact-list">
+                    <?php if (CmsLead::referralReady()) : ?>
+                        <?php
+                        // «Откуда узнали» (crm\LeadReferrals): the value, why it was filled automatically, a change in one window.
+                        $referralNote = \skeeks\cms\crm\LeadReferrals::noteOf($model);
+                        $referralUrl = (string)\skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/cms/admin-cms-lead/referral', 'pk' => (int)$model->id])
+                            ->enableEmptyLayout()->enableNoActions()->url;
+                        $referralAction = \yii\helpers\Json::encode(['isOpenNewWindow' => true, 'url' => $referralUrl, 'size' => 'small']);
+                        ?>
+                        <div class="sx-collection-cell sx-collection-cell--stack" data-sx-lead-referral>
+                            <span class="sx-collection-cell__secondary">Откуда узнали</span>
+                            <span class="sx-collection-cell__primary">
+                                <?= $model->referral ? Html::encode($model->referral->name) : Html::tag('span', 'Не указано', ['class' => 'sx-collection-cell__secondary']); ?>
+                                <?php if ($canWork) : ?>
+                                    <?= Html::a($model->referral ? 'Изменить' : 'Указать', $referralUrl, [
+                                        'class' => 'sx-button sx-button--ghost sx-button--sm',
+                                        'data-pjax' => '0',
+                                        'onclick' => 'new sx.classes.backend.widgets.Action('.$referralAction.').go(); return false;',
+                                    ]); ?>
+                                <?php endif; ?>
+                            </span>
+                            <?php if ($referralNote !== '') : ?>
+                                <span class="sx-collection-cell__secondary"><?= Html::encode($referralNote); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="sx-collection-cell sx-collection-cell--stack">
                         <span class="sx-collection-cell__secondary">Источник</span>
                         <span class="sx-collection-cell__primary"><?= Html::encode($sourceTypeName); ?></span>
                     </div>
+                    <?php $firstReferrer = trim((string)ArrayHelper::getValue($sourceData, 'utm.sx_first_referrer', ArrayHelper::getValue($sourceData, 'referrer', ''))); ?>
+                    <?php // The header comes from the visitor's browser: only an http(s) link, never another scheme. ?>
+                    <?php if ($firstReferrer !== '' && preg_match('~^https?://~i', $firstReferrer)) : ?>
+                        <div class="sx-collection-cell sx-collection-cell--stack">
+                            <span class="sx-collection-cell__secondary">Пришёл на сайт с</span>
+                            <?= Html::a(Html::encode($firstReferrer), $firstReferrer, ['target' => '_blank', 'rel' => 'noopener noreferrer']); ?>
+                        </div>
+                    <?php endif; ?>
                     <?php if ($sourceName !== '') : ?>
                         <div class="sx-collection-cell sx-collection-cell--stack">
                             <span class="sx-collection-cell__secondary">Название источника</span>

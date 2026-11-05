@@ -114,7 +114,9 @@ if (strpos($editAction, "'icon' => 'fa fa-edit'") === false) {
 }
 if (strpos($controller, "'visibleFilters' => ['q', 'status', 'source_type']") === false) {
     // П2б: «Воронка» joins the filters only on a site with several pipelines.
-    if (strpos($controller, "['cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'], \$utmAttributes)") === false
+    // «Откуда узнали» (m261105_100000) joins after the channel once the column exists.
+    if (strpos($controller, "['cms_lead_stage_id', 'cms_lead_reject_reason_id', 'next_step', 'source_type'],") === false
+        || strpos($controller, "CmsLead::referralReady() ? ['cms_lead_referral_id'] : [], \$utmAttributes)") === false
         || strpos($controller, "count(CmsLeadPipeline::forSite()) > 1 ? ['cms_lead_pipeline_id'] : []") === false) {
         throw new RuntimeException('Lead filters must include source and canonical UTM attribution fields.');
     }
@@ -425,7 +427,8 @@ if (strpos($model, '$blameable = $log->getBehavior(BlameableBehavior::class);') 
 ) {
     throw new RuntimeException('An explicit activity author must survive BlameableBehavior.');
 }
-$creationLifecyclePosition = strpos($model, 'if ($this->source_type !== self::SOURCE_FORM) {');
+// A form submission (the channel «Форма», or «Визит» of a form with that channel) is recorded by the ingestion service.
+$creationLifecyclePosition = strpos($model, 'if (!$this->isFormSubmission()) {');
 $creationCallPosition = strpos($model, '$this->recordCreationActivity();');
 if ($creationLifecyclePosition === false || $creationCallPosition === false
     || $creationCallPosition < $creationLifecyclePosition
@@ -456,7 +459,7 @@ foreach ([
     }
 }
 if (substr_count($service, 'recordCreationActivity()') !== 1
-    || strpos($service, 'if ($sourceType === CmsLead::SOURCE_FORM) {') === false
+    || strpos($service, 'if ($lead->isFormSubmission()) {') === false
 ) {
     throw new RuntimeException('Only a newly ingested Form2 lead may receive the creation entry, exactly once.');
 }

@@ -69,6 +69,10 @@ class CmsTelephonyCallLinkService
     public function attachLead(CmsTelephonyCall $call, CmsLead $lead): void
     {
         $this->synchronize($call, $lead, $call->company, $call->user);
+        // «Откуда узнали» by the number the client called (call tracking), only for a deal without it.
+        if ($call->direction === CmsTelephonyCall::DIRECTION_IN && trim((string)$call->provider_phone_to) !== '') {
+            \skeeks\cms\crm\LeadReferrals::fillByCall($lead, (string)$call->provider_phone_to);
+        }
     }
 
     private function synchronize(
