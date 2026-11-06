@@ -402,10 +402,30 @@ class Tree extends ActiveRecord
 
 
     /**
+     * Ограничения стандартных полей загрузки раздела (image_id, image_full_id, imageIds, fileIds).
+     *
+     * Общие значения задаются в настройках компонента cms (\Yii::$app->cms, «Загрузка фото и файлов»).
+     * Точка расширения: настройки типа раздела (CmsTreeType) передаются сюда вторым аргументом
+     * getUploadLimits() и при пустом значении откатываются на общие.
+     *
+     * @return array ['image_max_size' => байты, 'images_max_count' => int, 'file_max_size' => байты, 'files_max_count' => int]
+     */
+    public function fileUploadLimits()
+    {
+        if (\Yii::$app && \Yii::$app->has('cms')) {
+            return \Yii::$app->cms->getUploadLimits(Cms::UPLOAD_SCOPE_TREE);
+        }
+
+        return Cms::defaultUploadLimits(Cms::UPLOAD_SCOPE_TREE);
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
+        $uploadLimits = $this->fileUploadLimits();
+
         return array_merge(parent::rules(), [
             [['description_short', 'description_full'], 'string'],
 
@@ -522,7 +542,7 @@ class Tree extends ActiveRecord
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
                 'maxFiles'    => 1,
-                'maxSize'     => 1024 * 1024 * 15,
+                'maxSize'     => $uploadLimits['image_max_size'],
                 'minSize'     => 1024,
             ],
             [['imageIds', 'fileIds'], 'safe'],
@@ -531,8 +551,8 @@ class Tree extends ActiveRecord
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 'extensions'  => ['jpg', 'jpeg', 'gif', 'png', 'webp'],
-                'maxFiles'    => 40,
-                'maxSize'     => 1024 * 1024 * 15,
+                'maxFiles'    => $uploadLimits['images_max_count'],
+                'maxSize'     => $uploadLimits['image_max_size'],
                 'minSize'     => 1024,
             ],
             [
@@ -540,8 +560,8 @@ class Tree extends ActiveRecord
                 \skeeks\cms\validators\FileValidator::class,
                 'skipOnEmpty' => false,
                 //'extensions'    => [''],
-                'maxFiles'    => 40,
-                'maxSize'     => 1024 * 1024 * 50,
+                'maxFiles'    => $uploadLimits['files_max_count'],
+                'maxSize'     => $uploadLimits['file_max_size'],
                 'minSize'     => 1024,
             ],
 

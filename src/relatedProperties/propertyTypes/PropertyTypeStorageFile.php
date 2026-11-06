@@ -32,7 +32,15 @@ class PropertyTypeStorageFile extends PropertyType
 
 
     public $allowExtensions = 'jpg,jpeg,gif,png';
+    /**
+     * @var int Минимальный размер файла в байтах (так хранится в настройках характеристики).
+     *          В форме настроек редактируется через minSizeKb.
+     */
     public $minSize = 1024;
+    /**
+     * @var int Максимальный размер файла в байтах (так хранится в настройках характеристики).
+     *          В форме настроек редактируется через maxSizeMb.
+     */
     public $maxSize = 10485760;
     public $maxFiles = 20;
 
@@ -56,8 +64,8 @@ class PropertyTypeStorageFile extends PropertyType
         $result = $activeForm->field($this, 'is_multiple')->checkbox(\Yii::$app->formatter->booleanFormat);
         $result .= $activeForm->field($this, 'accept');
         $result .= $activeForm->field($this, 'allowExtensions');
-        $result .= $activeForm->field($this, 'minSize');
-        $result .= $activeForm->field($this, 'maxSize');
+        $result .= $activeForm->field($this, 'minSizeKb')->input('number', ['step' => 'any', 'min' => 0]);
+        $result .= $activeForm->field($this, 'maxSizeMb')->input('number', ['step' => 'any', 'min' => 0.01]);
         $result .= $activeForm->field($this, 'maxFiles');
 
         return $result;
@@ -69,18 +77,20 @@ class PropertyTypeStorageFile extends PropertyType
             'accept' => "Типы файлов разрешенные к загрузке",
             'is_multiple' => \Yii::t('skeeks/cms', 'Multiple choice'),
             'allowExtensions' => "Разрешенные расширения файлов к загрузке",
-            'minSize' => "Минимально допустимый размер файла",
-            'maxSize' => "Максимально допустимый размер файла",
+            'minSize' => "Минимально допустимый размер файла, байт",
+            'maxSize' => "Максимально допустимый размер файла, байт",
+            'minSizeKb' => "Минимально допустимый размер файла, КБ",
+            'maxSizeMb' => "Максимально допустимый размер файла, МБ",
             'maxFiles' => "Максимальное количество файлов",
         ]);
     }
     public function attributeHints()
     {
-        return array_merge(parent::attributeLabels(), [
+        return array_merge(parent::attributeHints(), [
             'accept' => "image/* - например",
             'allowExtensions' => "Указать через запятую например: jpg,jpeg,gif,png",
-            'minSize' => "Значение указываетя в Kb",
-            'maxSize' => "Значение указываетя в Kb",
+            'minSizeKb' => "В килобайтах. Например: 1 — файлы меньше 1 КБ не принимаются.",
+            'maxSizeMb' => "В мегабайтах. Например: 100 — файлы больше 100 МБ не принимаются. Можно дробное число: 0.5.",
             'maxFiles' => "Значение указывается если выбрана множественная загрузка",
         ]);
     }
@@ -91,8 +101,10 @@ class PropertyTypeStorageFile extends PropertyType
                 ['is_multiple', 'boolean'],
                 ['accept', 'string'],
                 ['allowExtensions', 'string'],
-                ['minSize', 'integer'],
-                ['maxSize', 'integer'],
+                ['minSize', 'integer', 'min' => 0],
+                ['maxSize', 'integer', 'min' => 1],
+                ['minSizeKb', 'number', 'min' => 0],
+                ['maxSizeMb', 'number', 'min' => 0.01],
                 ['maxFiles', 'integer'],
             ]);
     }
@@ -145,6 +157,41 @@ class PropertyTypeStorageFile extends PropertyType
         }
 
         return parent::addRules($relatedPropertiesModel);
+    }
+
+    /**
+     * Максимальный размер в МБ для формы настроек. Хранится по-прежнему maxSize в байтах,
+     * поэтому уже сохранённые настройки характеристик читаются без изменений.
+     * @return float|null
+     */
+    public function getMaxSizeMb()
+    {
+        return $this->maxSize === null || $this->maxSize === '' ? null : round((int)$this->maxSize / 1048576, 2);
+    }
+
+    /**
+     * @param float|string $value
+     */
+    public function setMaxSizeMb($value)
+    {
+        $this->maxSize = ($value === null || $value === '') ? $this->maxSize : (int)round((float)$value * 1048576);
+    }
+
+    /**
+     * Минимальный размер в КБ для формы настроек (хранится minSize в байтах).
+     * @return float|null
+     */
+    public function getMinSizeKb()
+    {
+        return $this->minSize === null || $this->minSize === '' ? null : round((int)$this->minSize / 1024, 2);
+    }
+
+    /**
+     * @param float|string $value
+     */
+    public function setMinSizeKb($value)
+    {
+        $this->minSize = ($value === null || $value === '') ? 0 : (int)round((float)$value * 1024);
     }
 
     /**

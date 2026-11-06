@@ -170,6 +170,24 @@ class Cms extends \skeeks\cms\base\Component
     public $element_max_code_length = 48;
 
     /**
+     * Ограничения стандартных полей загрузки «Фото» / «Изображения» / «Файлы».
+     * Размеры — в мегабайтах, количество — штук. Правила моделей получают их
+     * через getUploadLimits(), а не напрямую из этих свойств.
+     */
+    const UPLOAD_SCOPE_TREE = 'tree';
+    const UPLOAD_SCOPE_ELEMENT = 'element';
+
+    public $tree_image_max_size_mb = 15;
+    public $tree_images_max_count = 40;
+    public $tree_file_max_size_mb = 50;
+    public $tree_files_max_count = 40;
+
+    public $element_image_max_size_mb = 15;
+    public $element_images_max_count = 100;
+    public $element_file_max_size_mb = 50;
+    public $element_files_max_count = 50;
+
+    /**
      * Время последней активности когда считается что пользователь онлайн
      * @var int
      */
@@ -399,7 +417,95 @@ class Cms extends \skeeks\cms\base\Component
             [['pass_required_need_uppercase'], 'integer'],
             [['pass_required_need_lowercase'], 'integer'],
             [['pass_required_need_specialChars'], 'integer'],
+
+            [static::uploadSizeAttributes(), 'required'],
+            [static::uploadSizeAttributes(), 'number', 'min' => 0.1, 'max' => 102400],
+            [static::uploadCountAttributes(), 'required'],
+            [static::uploadCountAttributes(), 'integer', 'min' => 1, 'max' => 1000],
         ]);
+    }
+
+    /**
+     * Значения ограничений загрузки по умолчанию (как было в коде моделей до выноса в настройки).
+     * @return array scope => [атрибут-суффикс => значение]
+     */
+    public static function defaultUploadLimitSettings()
+    {
+        return [
+            self::UPLOAD_SCOPE_TREE    => ['image_max_size_mb' => 15, 'images_max_count' => 40, 'file_max_size_mb' => 50, 'files_max_count' => 40],
+            self::UPLOAD_SCOPE_ELEMENT => ['image_max_size_mb' => 15, 'images_max_count' => 100, 'file_max_size_mb' => 50, 'files_max_count' => 50],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected static function uploadSizeAttributes()
+    {
+        return ['tree_image_max_size_mb', 'tree_file_max_size_mb', 'element_image_max_size_mb', 'element_file_max_size_mb'];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected static function uploadCountAttributes()
+    {
+        return ['tree_images_max_count', 'tree_files_max_count', 'element_images_max_count', 'element_files_max_count'];
+    }
+
+    /**
+     * Действующие ограничения стандартных полей загрузки для разделов или элементов контента.
+     *
+     * Единственная точка, откуда правила Tree / CmsContentElement берут лимиты. Пустое или
+     * неверное сохранённое значение заменяется значением по умолчанию.
+     *
+     * @param string     $scope     self::UPLOAD_SCOPE_TREE | self::UPLOAD_SCOPE_ELEMENT
+     * @param array|null $overrides необязательные значения более узкого уровня (тип раздела, контент)
+     *                              с теми же ключами, что defaultUploadLimitSettings(); пустые игнорируются
+     * @return array ['image_max_size' => байты, 'images_max_count' => int, 'file_max_size' => байты, 'files_max_count' => int]
+     */
+    public function getUploadLimits($scope, $overrides = null)
+    {
+        $defaults = static::defaultUploadLimitSettings();
+        if (!isset($defaults[$scope])) {
+            throw new \yii\base\InvalidArgumentException("Unknown upload limits scope: {$scope}");
+        }
+
+        $values = [];
+        foreach ($defaults[$scope] as $key => $default) {
+            $value = $this->{$scope.'_'.$key};
+            if (is_array($overrides) && isset($overrides[$key]) && $overrides[$key] !== '' && (float)$overrides[$key] > 0) {
+                $value = $overrides[$key];
+            }
+            $values[$key] = (is_numeric($value) && (float)$value > 0) ? $value : $default;
+        }
+
+        return static::uploadLimitsToBytes($values);
+    }
+
+    /**
+     * Ограничения по умолчанию без обращения к компоненту (для приложений, где компонент cms не настроен).
+     * @param string $scope
+     * @return array
+     */
+    public static function defaultUploadLimits($scope)
+    {
+        $defaults = static::defaultUploadLimitSettings();
+        return static::uploadLimitsToBytes($defaults[$scope]);
+    }
+
+    /**
+     * @param array $values
+     * @return array
+     */
+    protected static function uploadLimitsToBytes(array $values)
+    {
+        return [
+            'image_max_size'   => (int)round((float)$values['image_max_size_mb'] * 1024 * 1024),
+            'images_max_count' => (int)$values['images_max_count'],
+            'file_max_size'    => (int)round((float)$values['file_max_size_mb'] * 1024 * 1024),
+            'files_max_count'  => (int)$values['files_max_count'],
+        ];
     }
     public function attributeLabels()
     {
@@ -423,6 +529,15 @@ class Cms extends \skeeks\cms\base\Component
             'pass_required_need_uppercase'      => 'Пароль должен содержать хотя бы одну заглавную букву',
             'pass_required_need_lowercase'      => 'Пароль должен содержать хотя бы одну строчную букву',
             'pass_required_need_specialChars'      => 'Пароль должен содержать хотя бы один спецсимвол',
+
+            'tree_image_max_size_mb'    => 'Разделы: максимальный размер изображения, МБ',
+            'tree_images_max_count'     => 'Разделы: максимальное количество изображений',
+            'tree_file_max_size_mb'     => 'Разделы: максимальный размер файла, МБ',
+            'tree_files_max_count'      => 'Разделы: максимальное количество файлов',
+            'element_image_max_size_mb' => 'Элементы и товары: максимальный размер изображения, МБ',
+            'element_images_max_count'  => 'Элементы и товары: максимальное количество изображений',
+            'element_file_max_size_mb'  => 'Элементы и товары: максимальный размер файла, МБ',
+            'element_files_max_count'   => 'Элементы и товары: максимальное количество файлов',
         ]);
     }
     public function attributeHints()
@@ -437,6 +552,15 @@ class Cms extends \skeeks\cms\base\Component
             'auth_submit_code_always'      => 'Постоянный пароль не спрашивается, всегда отправляется сообщение на email или телефон.',
             'auth_session_idle_days' => '0 — не выходить по бездействию. Посещение сайта или приложения продлевает этот срок. Получение push не считается активностью. Не больше максимального срока входа.',
             'auth_session_max_days' => 'От 1 до 365 дней с момента входа, независимо от активности. Единые сроки для сайта и приложения применяются при следующем входе, если включён учёт сеансов. Для немедленного выхода завершите сеансы в профиле.',
+
+            'tree_image_max_size_mb'    => 'Основное и детальное фото раздела и каждое изображение галереи. По умолчанию 15 МБ. Можно указать дробное число, например 0.5.',
+            'tree_images_max_count'     => 'Сколько изображений можно добавить в галерею одного раздела. По умолчанию 40.',
+            'tree_file_max_size_mb'     => 'Каждый файл в поле «Файлы» раздела. По умолчанию 50 МБ.',
+            'tree_files_max_count'      => 'Сколько файлов можно прикрепить к одному разделу. По умолчанию 40.',
+            'element_image_max_size_mb' => 'Основное и детальное фото элемента (новости, товара и т.п.) и каждое изображение галереи. По умолчанию 15 МБ.',
+            'element_images_max_count'  => 'Сколько изображений можно добавить в галерею одного элемента. По умолчанию 100.',
+            'element_file_max_size_mb'  => 'Каждый файл в поле «Файлы» элемента. По умолчанию 50 МБ. Ограничения характеристик типа «Файл» задаются в настройках самой характеристики.',
+            'element_files_max_count'   => 'Сколько файлов можно прикрепить к одному элементу. По умолчанию 50.',
         ]);
     }
     /**
@@ -541,7 +665,22 @@ class Cms extends \skeeks\cms\base\Component
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    
+
+                ],
+            ],
+
+            'uploads' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Загрузка фото и файлов',
+                'fields' => [
+                    'tree_image_max_size_mb'    => ['class' => NumberField::class, 'step' => 'any', 'append' => 'МБ'],
+                    'tree_images_max_count'     => ['class' => NumberField::class],
+                    'tree_file_max_size_mb'     => ['class' => NumberField::class, 'step' => 'any', 'append' => 'МБ'],
+                    'tree_files_max_count'      => ['class' => NumberField::class],
+                    'element_image_max_size_mb' => ['class' => NumberField::class, 'step' => 'any', 'append' => 'МБ'],
+                    'element_images_max_count'  => ['class' => NumberField::class],
+                    'element_file_max_size_mb'  => ['class' => NumberField::class, 'step' => 'any', 'append' => 'МБ'],
+                    'element_files_max_count'   => ['class' => NumberField::class],
                 ],
             ],
 

@@ -226,6 +226,22 @@ Do not repeat this backfill at runtime or reset a user's later choice. Import
 writers in cms-shop must honor the flag before preparing media or modifying data.
 The migration intentionally refuses automatic rollback to avoid removing protection.
 `tests/tree-gpd-sync-migration.php` verifies old/new and prefixed-table behavior.
+## Upload limits of sections and elements
+
+The `Cms` component settings «Загрузка фото и файлов» (MB and pieces:
+`tree_*` and `element_*` image/file max size and count) feed the
+FileValidator rules of `Tree` and `CmsContentElement` (products inherit them)
+through `fileUploadLimits()` → `Cms::getUploadLimits($scope, $overrides)`.
+Defaults equal the former hardcoded values; empty or non-positive stored
+values fall back to them. A future CmsTreeType/CmsContent level passes its
+values as `$overrides` inside `fileUploadLimits()`. Uploads are chunked, so
+the model rule at save (on the assembled temporary file) is the only size
+check: no PHP/nginx warnings, no client-side check. `PropertyTypeStorageFile`
+keeps `maxSize`/`minSize` in bytes; its form edits virtual `maxSizeMb`/
+`minSizeKb`. Contract: skill `references/resumable-file-uploads.md`, «Size and
+count limits of a field». Test: tests/upload-limits-stand.php
+(UPLOAD_LIMITS_TEST=local, stand application, no database writes).
+
 ## List value ownership
 PropertyTypeList adds an ownership validator through the property's getEnums relation. It validates single and multiple selections before RelatedPropertiesModel saves/replaces rows; empty optional selections remain allowed. This is validation, not a database constraint: save(false) and SQL can bypass it. tests/property-list-ownership.php covers cross-property, missing, empty and duplicate selections.
 
