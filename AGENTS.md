@@ -470,6 +470,19 @@ UPD, waybill and invoice-facture from it, falling back to the buyer address.
 Model rules, form and card access it through hasAttribute(), so code works
 before the migration is applied. The API writes it through safeAttributes.
 
+## Text property format «Телефон»
+
+`PropertyTypeText::FIELD_PHONE` (`fieldElement = 'phone'`) is the explicit
+phone format of text properties and form-constructor fields: an input
+`type=tel inputmode=tel autocomplete=tel` with the dependency-free soft mask
+`widgets/assets/PhoneInputAsset` (`data-sx-phone-input`: Russian numbers shown
+as «+7 900 000-00-00» while typing at the end and on blur, other country codes
+and text left as typed, nothing cleared), validated by `PhoneValidator`
+(country `ru`, other codes by their plans) which stores the international
+format. Code that needs the phone fields of arbitrary forms relies on this
+format, never on field names. The hard profile mask `CmsProfilePhoneAsset`
+(jquery.maskedinput) is a separate, profile-only behavior.
+
 ## Rich-text editor
 
 RichTextInputWidget (widgets/formInputs/richText) replaces yii2-ckeditor in

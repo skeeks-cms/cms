@@ -10,6 +10,8 @@ namespace skeeks\cms\relatedProperties\propertyTypes;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\validators\PhoneValidator;
+use skeeks\cms\widgets\assets\PhoneInputAsset;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -30,6 +32,12 @@ class PropertyTypeText extends PropertyType
         'textInput' => 'Текстовая строка (input)',
     ];*/
 
+    /**
+     * The format «Телефон»: an input type=tel with a soft mask, the number is checked and stored in the international
+     * format by PhoneValidator («+7 900 000-00-00»). Other code may rely on it to find phone fields of arbitrary forms.
+     */
+    const FIELD_PHONE = 'phone';
+
     public $fieldElement = 'textInput';
     public $rows = 5;
 
@@ -38,9 +46,15 @@ class PropertyTypeText extends PropertyType
         return [
             'textarea' => \Yii::t('skeeks/cms', 'Text field') . ' (textarea)',
             'textInput' => \Yii::t('skeeks/cms', 'Text string') . ' (input)',
+            self::FIELD_PHONE => \Yii::t('skeeks/cms', 'Телефон') . ' (tel)',
             'hiddenInput' => \Yii::t('skeeks/cms', 'Скрытое поле') . ' (hiddenInput)',
             'default_value' => \Yii::t('skeeks/cms', 'Default Value'),
         ];
+    }
+
+    public function isPhone(): bool
+    {
+        return $this->fieldElement === self::FIELD_PHONE;
     }
 
     public function init()
@@ -92,7 +106,15 @@ class PropertyTypeText extends PropertyType
     {
         $field = parent::renderForActiveForm($relatedPropertiesModel);
 
-        if (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
+        if ($this->isPhone()) {
+            PhoneInputAsset::register($field->form->getView());
+            $field->textInput([
+                'type' => 'tel',
+                'inputmode' => 'tel',
+                'autocomplete' => 'tel',
+                'data-sx-phone-input' => '',
+            ]);
+        } elseif (in_array($this->fieldElement, array_keys(self::fieldElements()))) {
             $fieldElement = $this->fieldElement;
 
             if ($fieldElement == 'textarea') {
@@ -119,6 +141,12 @@ class PropertyTypeText extends PropertyType
     public function addRules(RelatedPropertiesModel $relatedPropertiesModel)
     {
         $relatedPropertiesModel->addRule($this->property->code, 'string');
+
+        if ($this->isPhone()) {
+            // Russia by default; a number with another country code (+375 …) is checked by its own plan.
+            $relatedPropertiesModel->addRule($this->property->code, 'trim');
+            $relatedPropertiesModel->addRule($this->property->code, PhoneValidator::class, ['country' => 'ru']);
+        }
 
         if ($this->property->isRequired) {
             $relatedPropertiesModel->addRule($this->property->code, 'required');
