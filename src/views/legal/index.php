@@ -15,10 +15,6 @@
             'title' => "Правовая информация",
             'model' => null,
         ]); ?>
-        <ul class="sx-menu list-unstyled">
-            <li><a href="<?php echo \yii\helpers\Url::to(['/cms/legal/privacy-policy']); ?>">Политика конфиденциальности</a></li>
-            <li><a href="<?php echo \yii\helpers\Url::to(['/cms/legal/cookie']); ?>">Политика обработки файлов cookie</a></li>
-            <li><a href="<?php echo \yii\helpers\Url::to(['/cms/legal/personal-data']); ?>">Политика в отношении обработки персональных данных</a></li>
-        </ul>
+        <?php echo $this->render('_menu', ['class' => 'sx-menu list-unstyled']); ?>
     </div>
 </div>

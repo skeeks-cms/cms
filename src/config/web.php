@@ -10,7 +10,7 @@
  * @since 1.0.0
  */
 $config = [
-    'bootstrap' => ['cms', 'upaBackend'],
+    'bootstrap' => ['cms', 'upaBackend', 'localFonts'],
 
     'components' => [
 

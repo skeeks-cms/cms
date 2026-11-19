@@ -12,11 +12,7 @@
 
         <div class="row">
             <div class="order-md-1 col-md-3 col-12" style="padding-top: 2rem;">
-                <ul class="list-unstyled sx-col-menu">
-                    <li><a href="<?php echo \yii\helpers\Url::to(['/cms/legal/privacy-policy']); ?>">Политика конфиденциальности</a></li>
-                    <li><a href="<?php echo \yii\helpers\Url::to(['/cms/legal/cookie']); ?>">Политика обработки файлов cookie</a></li>
-                    <li><a href="<?php echo \yii\helpers\Url::to(['/cms/legal/personal-data']); ?>">Политика в отношении обработки персональных данных</a></li>
-                </ul>
+                <?php echo $this->render('_menu', ['class' => 'list-unstyled sx-col-menu']); ?>
             </div>
 
             <div class="order-md-2 col-md-9 col-12" style="padding-top: 2rem;">

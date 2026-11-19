@@ -93,5 +93,20 @@ class LegalController extends Controller
         return $this->render($this->action->id);
     }
 
+    /**
+     * Отдельный документ «Согласие на обработку персональных данных» (/~legal-consent).
+     * @return $this|string
+     */
+    public function actionConsent()
+    {
+        \Yii::$app->breadcrumbs->append([
+            'url'  => Url::to(['/cms/legal/consent']),
+            'name' => "Согласие на обработку персональных данных",
+        ]);
+
+        \Yii::$app->view->title = "Согласие на обработку персональных данных";
+        return $this->render($this->action->id);
+    }
+
 
 }

@@ -30,6 +30,9 @@ $this->title = \Yii::t('skeeks/cms', 'Registration');
                     <?= $form->field($model, 'username') ?>
                     <?= $form->field($model, 'email') ?>
                     <?= $form->field($model, 'password')->passwordInput() ?>
+                    <?php if (\Yii::$app->legal->is_auth_consent) : ?>
+                        <?= \Yii::$app->legal->renderConsentCheckbox($form->id.'-consent'); ?>
+                    <?php endif; ?>
 
                     <div class="form-group">
                         <?= Html::submitButton("<i class=\"glyphicon glyphicon-off\"></i> " . \Yii::t('skeeks/cms',

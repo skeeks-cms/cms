@@ -91,6 +91,23 @@ return [
                     'resourceKey' => static function () { return 'cms:crm-protection'; },
                     'dedupKey' => static function () { return 'cms:crm-protection'; },
                 ],
+                // Local copy of Google fonts (components\LocalFonts): queued by a page that has no copy yet.
+                'cms.local-fonts' => [
+                    'type' => 'cms.local-fonts',
+                    'title' => 'Скачать шрифты Google на сайт',
+                    'handler' => \skeeks\cms\jobs\LocalFontsJobHandler::class,
+                    'queue' => 'maintenance',
+                    'visibility' => 'transient',
+                    'timeout' => 120,
+                    'leaseSeconds' => 60,
+                    'maxAttempts' => 2,
+                    'idempotent' => true,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    // Key = URL + copies directory: the same fonts on two sites are two jobs.
+                    'resourceKey' => static function (array $payload) { return 'cms:local-fonts:'.md5((string) ($payload['url'] ?? '').'|'.(string) ($payload['dir'] ?? '')); },
+                    'dedupKey' => static function (array $payload) { return 'cms:local-fonts:'.md5((string) ($payload['url'] ?? '').'|'.(string) ($payload['dir'] ?? '')); },
+                ],
             ],
         ],
 
@@ -151,6 +168,12 @@ return [
 
         'legal' => [
             'class' => \skeeks\cms\components\LegalComponent::class,
+        ],
+
+        // Google fonts from the site itself. Defined here so the cms-job worker (console) uses the same settings;
+        // bootstrapped only in web (config/web.php).
+        'localFonts' => [
+            'class' => \skeeks\cms\components\LocalFonts::class,
         ],
 
         'imaging' => [

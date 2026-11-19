@@ -497,6 +497,23 @@ images from TemporaryUploads into the storage on save
 (cms/admin-rich-text/upload). Full contract: skeeks-cms-package-development
 references/rich-text-editor.md. Test: tests/rich-text-editor.php.
 
+## Legal documents, consent and local Google fonts (152-ФЗ)
+
+`LegalComponent` (`legal`) owns four documents: privacy policy, cookie policy,
+personal data policy and the separate «Согласие на обработку персональных
+данных» (`LegalController::actionConsent`, `doc_consent`, `template_consent`);
+templates are filled by `fillTemplate()`, the side menu is
+`views/legal/_menu.php`. Consent checkboxes of other packages take their label
+from `legal->consentCheckboxText` (setting `consent_checkbox_template`).
+`components\LocalFonts` (`localFonts`, defined in `config/common.php`,
+bootstrapped in `config/web.php`) rewrites `fonts.googleapis.com` links in
+`<link>`/`<style>` of HTML responses to a copy in `assets/sx-fonts/<md5>/`
+linked by a direct static path; without a copy the Google link stays (owner,
+19.11.2026) and the cms-job type `cms.local-fonts` (`jobs\LocalFontsJobHandler`,
+queue maintenance) downloads it. Site switches in «Правовая информация» (both on by default):
+is_local_google_fonts and is_auth_consent. Counters are not gated by consent (owner, 19.11.2026). Contract:
+skill `references/site-legal-152fz.md`.
+
 ## Planned: storage file usage registry
 
 Status: plan agreed with the owner on 2026-10-21, not started. Nothing below
