@@ -93,6 +93,11 @@ class LocalFonts extends Component implements BootstrapInterface
     private $_queued = [];
 
     /**
+     * @var resource|\CurlHandle|null соединение на время одной сборки
+     */
+    private $_curl;
+
+    /**
      * @var array|null [папка, адрес] хранилища копий
      */
     private $_storage;
@@ -684,6 +689,10 @@ class LocalFonts extends Component implements BootstrapInterface
                 flock($lock, LOCK_UN);
                 fclose($lock);
             }
+            if ($this->_curl !== null) {
+                curl_close($this->_curl);
+                $this->_curl = null;
+            }
         }
     }
 
@@ -745,8 +754,17 @@ class LocalFonts extends Component implements BootstrapInterface
 
         if (function_exists('curl_init')) {
             $tooBig = false;
-            $ch = curl_init($url);
+            //Одно соединение на всю сборку: curl_reset() сохраняет кеш DNS и открытые
+            //соединения, поэтому адрес fonts.gstatic.com ищется один раз, а не на каждый
+            //из десятков файлов (на сервере с медленным DNS это секунды на файл).
+            if ($this->_curl === null) {
+                $this->_curl = curl_init();
+            } else {
+                curl_reset($this->_curl);
+            }
+            $ch = $this->_curl;
             curl_setopt_array($ch, [
+                CURLOPT_URL            => $url,
                 CURLOPT_FOLLOWLOCATION => false,
                 CURLOPT_TIMEOUT        => $timeout,
                 CURLOPT_CONNECTTIMEOUT => min(10, $timeout),
@@ -763,7 +781,6 @@ class LocalFonts extends Component implements BootstrapInterface
             ]);
             $ok = curl_exec($ch);
             $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
             if ($ok === false || $tooBig || $code !== 200) {
                 return null;
             }
