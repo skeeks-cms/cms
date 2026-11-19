@@ -196,10 +196,19 @@ class UrlRuleContentElement
         }
 
         /**
-         * @deprecated 
+         * @deprecated Старый формат «id-код». Под шаблон попадает любой адрес, начинающийся с цифр
+         * (бренд «1721-…-b58», коллекция «9512-c1260»), поэтому адрес принимается, только если
+         * есть элемент ровно с этими id и кодом — иначе уступаем следующим правилам.
          */
         if (preg_match('/\/(?<id>\d+)\-(?<code>\S+)$/i', "/" . $pathInfo, $matches)) {
             if ($this->isTreeDir($pathInfo)) {
+                return false;
+            }
+
+            if (!CmsContentElement::find()->where([
+                'id'   => (int)$matches['id'],
+                'code' => $matches['code'],
+            ])->exists()) {
                 return false;
             }
 
