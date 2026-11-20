@@ -577,6 +577,12 @@ class TaskPlanner
                     $end = $after + $need;
                     $after = $end;
                 }
+                if ($start === null) {
+                    // Nothing left to do (its work already took its duration, a paused task): it keeps a place in
+                    // its day all the same — the start is never empty.
+                    $start = $this->alignUp($i < count($pieces) ? max($pos, $pieces[$i][0]) : $after);
+                    $end = $start;
+                }
                 $result[$id] = ['plan_start_at' => $start, 'plan_end_at' => $end, 'executor_end_at' => $end];
             }
         }

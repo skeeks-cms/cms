@@ -141,6 +141,16 @@ try {
     CmsTask::updateAll(['status' => CmsTask::STATUS_READY], ['id' => (int)$b->id]);
     $check($get($b)->setStartDay($next) !== null, 'a closed task is not put «на день»');
 
+    // 5a. A paused task «на день» whose work already took its duration still gets a start (20.11.2026: an empty start
+    // broke the layout of a whole queue on production).
+    $done = $make('На день, отработана', 30, ['plan_day' => $day]);
+    CmsTask::updateAll(['status' => CmsTask::STATUS_ON_PAUSE], ['id' => (int)$done->id]);
+    (new CmsTaskSchedule(['cms_task_id' => (int)$done->id, 'cms_user_id' => (int)$user->id, 'start_at' => time() - 7200, 'end_at' => time() - 3600]))->save(false);
+    $plan('08:00');
+    $check((int)$get($done)->plan_start_at > 0 && $f->asDate((int)$get($done)->plan_start_at, 'php:Y-m-d') === $day,
+        'a task «на день» with nothing left to do keeps a start in its day');
+    CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['id' => (int)$done->id]);
+
     // 6. The one-time move of fixed tasks: calls, meetings and tasks with a reminder keep the pin.
     CmsTask::updateAll(['status' => CmsTask::STATUS_CANCELED], ['executor_id' => (int)$user->id, 'status' => CmsTask::activeStatuses()]);
     $plan1 = $make('Статья: плитка для ванной', 60, ['plan_start_at' => $at('11:00', 2)]);
