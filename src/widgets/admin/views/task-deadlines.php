@@ -39,7 +39,7 @@ $moveUrl = \yii\helpers\Url::to(['/cms/admin-cms-task/reschedule']);
                     $start = (int)$task->plan_start_at;
                     $canMove = $widget->canMove($task);
                     ?>
-                    <div class="sx-task-deadlines__card <?= $key === 'late' ? 'is-late' : ''; ?>" <?= $canMove ? 'data-sx-deadlines-card' : ''; ?> data-pk="<?= (int)$task->id; ?>" data-fixed="<?= $isFixed ? 1 : 0; ?>">
+                    <div class="sx-task-deadlines__card <?= $key === 'late' || $task->isLateStart() ? 'is-late' : ''; ?>" <?= $canMove ? 'data-sx-deadlines-card' : ''; ?> data-pk="<?= (int)$task->id; ?>" data-fixed="<?= $isFixed ? 1 : 0; ?>">
                         <? if ($canMove) : ?>
                             <span class="sx-task-deadlines__handle" data-sx-deadlines-handle title="Перетащите в другую колонку"><?= \skeeks\cms\backend\helpers\BackendIcon::render('grip', ['size' => 16]); ?></span>
                         <? endif; ?>

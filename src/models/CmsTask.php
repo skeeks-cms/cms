@@ -1645,12 +1645,36 @@ class CmsTask extends ActiveRecord
      */
     public function startMarksHtml(): string
     {
-        $isFixed = !$this->hasAttribute('is_fixed_start') || $this->is_fixed_start;
-        $isLate = $isFixed && $this->plan_start_at && $this->plan_start_at < time() - 60 && $this->status !== static::STATUS_IN_WORK
-            && in_array($this->status, static::activeStatuses(), true);
+        $isLate = $this->isLateStart();
 
         return $this->dayChipHtml.$this->reminderIconHtml.$this->replannedIconHtml.' '.$this->deadlineMarkHtml
             .($isLate ? ' / <span class="sx-preview-card__meta--danger">Просрочена!</span>' : '');
+    }
+
+    /**
+     * «Просрочена»: the fixed time of an open task not in work has passed. An auto task whose time passed is not late:
+     * it waits in the queue.
+     */
+    public function isLateStart(?int $now = null): bool
+    {
+        $now = $now ?? time();
+        $isFixed = !$this->hasAttribute('is_fixed_start') || $this->is_fixed_start;
+
+        return $isFixed && $this->plan_start_at && (int)$this->plan_start_at < $now - 60 && $this->status !== static::STATUS_IN_WORK
+            && in_array($this->status, static::activeStatuses(), true);
+    }
+
+    /**
+     * Late before today (owner, 20.11.2026): such a task goes to the block «Просроченные задачи» of the list and the
+     * column «Просрочены» of «Сроки». A task whose time passed today stays in today, red, «Просрочена». Today is
+     * of the site's time zone, as the task views count days.
+     */
+    public function isLateBeforeToday(?int $now = null): bool
+    {
+        $now = $now ?? time();
+        $today = (new \DateTime('@'.$now))->setTimezone(new \DateTimeZone(\Yii::$app->formatter->timeZone))->setTime(0, 0)->getTimestamp();
+
+        return $this->isLateStart($now) && (int)$this->plan_start_at < $today;
     }
 
     /** The mark of a task the planner moved: its former start in the title. */

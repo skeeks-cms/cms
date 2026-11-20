@@ -980,3 +980,13 @@
     font-weight: 600;
     white-space: nowrap;
 }
+
+/* A task whose fixed time passed today stays in today's list, red (owner, 20.11.2026); the block above takes only
+   tasks late before today. */
+.sx-worker-tasks-calendar-widget .sx-task-tr--late > td {
+    background: var(--sx-color-danger-soft);
+}
+
+.sx-worker-tasks-calendar-widget .sx-task-tr--late .sx-task-calendar__time-value {
+    color: var(--sx-color-danger);
+}

@@ -242,10 +242,9 @@ JS
                 $expiredTasks = [];
                 $tasksByDate = [];
                 foreach ($tasks as $task) {
-                    $isLate = (int)$task->plan_start_at < $now - 60
-                        && $task->status !== \skeeks\cms\models\CmsTask::STATUS_IN_WORK
-                        && (!$task->hasAttribute('is_fixed_start') || $task->is_fixed_start);
-                    if ($isLate || !$task->plan_start_at) {
+                    // Only a time passed before today goes up to «Просроченные задачи» (owner, 20.11.2026): a task late
+                    // today stays in today, red, «Просрочена»; tomorrow it is in the block if it is not done.
+                    if ($task->isLateBeforeToday($now) || !$task->plan_start_at) {
                         $expiredTasks[] = $task;
                         continue;
                     }
@@ -268,6 +267,9 @@ JS
                     }
                     if ($isInWork) {
                         $class[] = 'sx-row-in-work';
+                    }
+                    if ($task->isLateStart()) {
+                        $class[] = 'sx-task-tr--late';
                     }
                     if ($extraClass !== '') {
                         $class[] = $extraClass;

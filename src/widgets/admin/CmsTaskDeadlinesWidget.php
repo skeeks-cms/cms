@@ -73,9 +73,9 @@ class CmsTaskDeadlinesWidget extends Widget
         foreach ($tasks as $task) {
             $start = (int)$task->plan_start_at;
             $key = 'late';
-            // Only a fixed time is overdue: an auto task whose time passed stays in its day.
-            $isFixed = !$task->hasAttribute('is_fixed_start') || $task->is_fixed_start;
-            if ($task->status === CmsTask::STATUS_IN_WORK || !$isFixed || $start >= $now - 60) {
+            // Only a fixed time passed before today is in «Просрочены» (the list's rule, owner 20.11.2026): an auto task
+            // whose time passed stays in its day, a task late today stays in «Сегодня», red.
+            if (!$task->isLateBeforeToday($now)) {
                 $key = 'd0';
                 foreach ($columns as $code => $column) {
                     if ($column['from'] !== null && $start >= $column['from']) {
