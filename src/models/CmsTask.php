@@ -1647,8 +1647,45 @@ class CmsTask extends ActiveRecord
     {
         $isLate = $this->isLateStart();
 
-        return $this->dayChipHtml.$this->reminderIconHtml.$this->replannedIconHtml.' '.$this->deadlineMarkHtml
-            .($isLate ? ' / <span class="sx-preview-card__meta--danger">Просрочена!</span>' : '');
+        // A fixed time that passed gets the same chip as an overdue task «на день» (owner, 24.11.2026).
+        return $this->dayChipHtml.($isLate ? ' '.$this->lateChipHtml() : '').$this->reminderIconHtml.$this->replannedIconHtml.' '.$this->deadlineMarkHtml;
+    }
+
+    /**
+     * How late a fixed time is: «Просрочена на 25 мин.», «на 2 ч», «на 3 дн.» (a passed day counts in days), '' when
+     * it is not late.
+     */
+    public function getLateText(?int $now = null): string
+    {
+        $now = $now ?? time();
+        if (!$this->isLateStart($now)) {
+            return '';
+        }
+        $tz = new \DateTimeZone(\Yii::$app->formatter->timeZone);
+        $today = (new \DateTime('@'.$now))->setTimezone($tz)->setTime(0, 0);
+        $day = (new \DateTime('@'.(int)$this->plan_start_at))->setTimezone($tz)->setTime(0, 0);
+        if ($day < $today) {
+            return 'Просрочена на '.(int)$day->diff($today)->days.' дн.';
+        }
+        $minutes = max(1, intdiv($now - (int)$this->plan_start_at, 60));
+
+        return $minutes < 60 ? 'Просрочена на '.$minutes.' мин.' : 'Просрочена на '.intdiv($minutes, 60).' ч';
+    }
+
+    /** The chip of a late fixed time, the same as of an overdue task «на день». */
+    public function lateChipHtml(): string
+    {
+        $text = $this->getLateText();
+        if ($text === '') {
+            return '';
+        }
+        $f = \Yii::$app->formatter;
+
+        return \yii\helpers\Html::tag('span', $text, [
+            'class'       => 'sx-task-day-chip is-overdue',
+            'title'       => 'Закреплена на '.$f->asDate((int)$this->plan_start_at, 'php:j M').' '.$f->asTime((int)$this->plan_start_at, 'php:H:i'),
+            'data-toggle' => 'tooltip',
+        ]);
     }
 
     /**

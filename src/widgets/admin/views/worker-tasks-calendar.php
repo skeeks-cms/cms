@@ -268,7 +268,8 @@ JS
                     if ($isInWork) {
                         $class[] = 'sx-row-in-work';
                     }
-                    if ($task->isLateStart()) {
+                    // Late rows look the same (owner, 24.11.2026): a fixed time passed or a task «на день» of a passed day.
+                    if ($task->isLateStart() || $task->overdueDays > 0) {
                         $class[] = 'sx-task-tr--late';
                     }
                     if ($extraClass !== '') {

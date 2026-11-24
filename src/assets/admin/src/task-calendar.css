@@ -983,8 +983,9 @@
 
 /* A task whose fixed time passed today stays in today's list, red (owner, 20.11.2026); the block above takes only
    tasks late before today. */
+/* A visible tint in both themes: the soft danger colour of the light theme is almost white (owner, 24.11.2026). */
 .sx-worker-tasks-calendar-widget .sx-task-tr--late > td {
-    background: var(--sx-color-danger-soft);
+    background: color-mix(in srgb, var(--sx-color-danger) 10%, var(--sx-color-danger-soft));
 }
 
 .sx-worker-tasks-calendar-widget .sx-task-tr--late .sx-task-calendar__time-value {

@@ -82,6 +82,24 @@ try {
     $check((bool)preg_match('/<tr class="[^"]*sx-task-tr--late[^"]*"[^>]*data-id="'.(int)$todayLate->id.'"/u', $html), 'today\'s late task is red in today\'s day');
     $check(strpos($html, 'data-id="'.(int)$autoLate->id.'"') !== false && strpos($block, 'data-id="'.(int)$autoLate->id.'"') === false, 'the auto task stays in the days');
 
+    // One look of late rows (owner, 24.11.2026): a chip «Просрочена на …» instead of «/ Просрочена!».
+    $check($yesterday->getLateText($now) === 'Просрочена на 1 дн.', 'a time of yesterday: late by 1 day');
+    $probe = clone $todayLate;
+    $probe->plan_start_at = $now - 25 * 60;
+    $check($probe->getLateText($now) === 'Просрочена на 25 мин.', 'late by minutes: '.$probe->getLateText($now));
+    $probe->plan_start_at = $now - 130 * 60;
+    $expect = (new DateTime('@'.($now - 130 * 60)))->setTimezone($tz) < (new DateTime('@'.$now))->setTimezone($tz)->setTime(0, 0) ? 'Просрочена на 1 дн.' : 'Просрочена на 2 ч';
+    $check($probe->getLateText($now) === $expect, 'late by hours: '.$probe->getLateText($now));
+    $check(strpos($html, 'Просрочена!') === false, 'no «Просрочена!» left in the list');
+    if (CmsTask::getTableSchema()->getColumn('plan_day')) {
+        $dayTask = $make('Проверка: на день вчера', $today - 86400 + 36000, 0);
+        CmsTask::updateAll(['plan_day' => date('Y-m-d', $today - 86400)], ['id' => (int)$dayTask->id]);
+        (new skeeks\cms\services\TaskPlanner())->plan($user);
+        $html = skeeks\cms\widgets\admin\CmsWorkerTasksCalendarWidget::widget(['id' => 'overdue-test2', 'user' => $user]);
+        $check((bool)preg_match('/<tr class="[^"]*sx-task-tr--late[^"]*"[^>]*data-id="'.(int)$dayTask->id.'"/u', $html),
+            'an overdue task «на день» has the same red row');
+    }
+
     // «Сроки»: the same rule for the column «Просрочены».
     $deadlines = skeeks\cms\widgets\admin\CmsTaskDeadlinesWidget::widget(['user' => $user]);
     $late = preg_match('/data-sx-deadlines-column="late".*?data-sx-deadlines-column="d0"/su', $deadlines, $l) ? $l[0] : '';
